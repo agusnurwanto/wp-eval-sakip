@@ -25,6 +25,38 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
+$jadwal = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT
+            * 
+        FROM esakip_data_jadwal
+        WHERE tipe = 'kuesioner_mendagri'
+          AND status != 0
+          AND tahun_anggaran = %d
+    ", $input['tahun']),
+    ARRAY_A
+);
+
+$id_jadwal = !empty($jadwal['id']) ? (int)$jadwal['id'] : 0;
+
+if (!empty($jadwal) && $jadwal['status'] == 1) {
+    $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $jenis_jadwal = $jadwal['jenis_jadwal'];
+    $nama_jadwal = $jadwal['nama_jadwal'];
+    $mulai_jadwal = $jadwal['started_at'];
+    $selesai_jadwal = $jadwal['end_at'];
+    $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
+} else {
+    $tahun_anggaran = $input['tahun'];
+    $jenis_jadwal = '-';
+    $nama_jadwal = '-';
+    $mulai_jadwal = '-';
+    $selesai_jadwal = '-';
+    $lama_pelaksanaan = 1;
+}
+
+$timezone = get_option('timezone_string');
+
 $idtahun = $wpdb->get_results("
     SELECT DISTINCT tahun_anggaran
     FROM esakip_data_unit
@@ -43,7 +75,7 @@ foreach ($idtahun as $val) {
 $current_user = wp_get_current_user();
 $ret['debug_roles'] = $current_user->roles;
 $user_roles = $current_user->roles;
-$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles)|| in_array('admin_ortala', $user_roles) || in_array("admin_bappeda", $current_user->roles) || in_array("administrator", $current_user->roles);
+$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles)|| in_array("admin_bappeda", $current_user->roles) || in_array("administrator", $current_user->roles);
 
 $nama_pemda = get_option(ESAKIP_NAMA_PEMDA);
 
@@ -411,6 +443,15 @@ $html .= '</div>';
             jQuery(document).on('change', '#level', function() {
                 getIndikatorDanBuktiDukung();
             });
+
+            let dataHitungMundur = {
+            'jenisJadwal': <?php echo json_encode(ucwords($jenis_jadwal)); ?>,
+            'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
+            'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
+            'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,
+            'thisTimeZone': <?php echo json_encode($timezone); ?>
+            };
+            penjadwalanHitungMundur(dataHitungMundur);
         <?php endif; ?>
     });
 
@@ -424,6 +465,7 @@ $html .= '</div>';
                 action: 'get_table_variabel_pengisian_mendagri',
                 api_key: esakip.api_key,
                 tahun_anggaran: <?php echo $input['tahun']; ?>,
+                id_jadwal: <?php echo $id_jadwal; ?>,
                 id_skpd: <?php echo $id_skpd; ?>
             },
             dataType: 'json',

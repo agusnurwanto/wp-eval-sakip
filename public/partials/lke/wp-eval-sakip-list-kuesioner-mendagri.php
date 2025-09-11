@@ -6,8 +6,40 @@ if (!defined('WPINC')) {
 }
 
 $input = shortcode_atts(array(
-    'tahun' => '2022'
+    'tahun' => '2022',
 ), $atts);
+
+$jadwal = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT
+            * 
+        FROM esakip_data_jadwal
+        WHERE tipe = 'kuesioner_mendagri'
+          AND status != 0
+          AND tahun_anggaran = %d
+    ", $input['tahun']),
+    ARRAY_A
+);
+
+$id_jadwal = !empty($jadwal['id']) ? (int)$jadwal['id'] : 0;
+
+if (!empty($jadwal) && $jadwal['status'] == 1) {
+    $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $jenis_jadwal = $jadwal['jenis_jadwal'];
+    $nama_jadwal = $jadwal['nama_jadwal'];
+    $mulai_jadwal = $jadwal['started_at'];
+    $selesai_jadwal = $jadwal['end_at'];
+    $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
+} else {
+    $tahun_anggaran = $input['tahun'];
+    $jenis_jadwal = '-';
+    $nama_jadwal = '-';
+    $mulai_jadwal = '-';
+    $selesai_jadwal = '-';
+    $lama_pelaksanaan = 1;
+}
+
+$timezone = get_option('timezone_string');
 
 $idtahun = $wpdb->get_results(
     "
@@ -89,6 +121,14 @@ foreach ($idtahun as $val) {
 <script>
     jQuery(document).ready(function() {
         getTableSkpd();
+        let dataHitungMundur = {
+            'jenisJadwal': <?php echo json_encode(ucwords($jenis_jadwal)); ?>,
+            'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
+            'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
+            'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,
+            'thisTimeZone': <?php echo json_encode($timezone); ?>
+        };
+        penjadwalanHitungMundur(dataHitungMundur);
     });
 
     function getTableSkpd() {
@@ -100,6 +140,7 @@ foreach ($idtahun as $val) {
                 action: 'get_table_skpd_kuesioner_mendagri',
                 api_key: esakip.api_key,
                 tahun_anggaran: <?php echo $input['tahun']; ?>,
+                id_jadwal: <?php echo $id_jadwal; ?>,
             },
             dataType: 'json',
             success: function(response) {

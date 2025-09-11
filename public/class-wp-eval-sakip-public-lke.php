@@ -4841,6 +4841,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if (empty($_POST['id_jadwal'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Id Jadwal kosong!';
+					die(json_encode($ret));
+				}
 				if (empty($_POST['tahun_anggaran'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tahun Anggaran kosong!';
@@ -4853,6 +4858,69 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				}
 				$tahun = $_POST['tahun_anggaran'];
 				$id_skpd =  $_POST['id_skpd'];
+				$id_jadwal = $_POST['id_jadwal'];
+
+				//get jadwal
+				date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
+				$dateTime = new DateTime();
+
+				$data_jadwal = $wpdb->get_row(
+					$wpdb->prepare("
+						SELECT
+							*
+						FROM esakip_data_jadwal
+						WHERE id=%d
+					", $id_jadwal),
+					ARRAY_A
+				);
+				if (!empty($data_jadwal)) {
+					$started_at = trim($data_jadwal['started_at']);
+					$end_at = trim($data_jadwal['end_at']);
+
+					$started_at_dt = new DateTime($started_at);
+					$end_at_dt = new DateTime($end_at);
+					$jenis_jadwal = $data_jadwal['jenis_jadwal'];
+				} else {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Data jadwal tidak ditemukan!';
+					die(json_encode($ret));
+				}
+
+				$current_user = wp_get_current_user();
+				$is_admin = false;
+				if (
+					in_array("admin_ortala", $current_user->roles) ||
+					in_array("admin_bappeda", $current_user->roles) ||
+					in_array("administrator", $current_user->roles)
+				) {
+					$is_admin = true;
+				}
+
+				$disabled = 'disabled';
+				// Jika jadwal masih buka
+				if ($dateTime > $started_at_dt && $dateTime < $end_at_dt && $data_jadwal['status'] == 1) {
+					// Jika jadwal penetapan
+					if ($jenis_jadwal == 'penetapan') {
+						// dan user adalah verifikator
+						if ($is_admin == true) {
+							$disabled = '';
+						} else {
+							// Jika bukan verifikator, tidak bisa input saat penetapan
+							$disabled = 'disabled';
+						}
+						// Jika jadwal usulan
+					} else if ($jenis_jadwal == 'usulan') {
+						// dan user bukan verifikator
+						if ($is_admin == false) {
+							$disabled = '';
+						} else {
+							$disabled = 'disabled';
+						}
+					}
+				} else {
+					// Jika jadwal sudah tutup
+					$disabled = 'disabled';
+				}
 				$data_variabel = $wpdb->get_results(
 					$wpdb->prepare("
 						SELECT 
@@ -4891,8 +4959,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 					);
 
 					foreach ($data_variabel as $variabel) {
-						$btn = "<button class='btn btn-warning' onclick='tambahKuesionerDetail(\"" . $variabel['id_variabel'] . "\", \"" . $variabel['id_level'] . "\");' title='Pilih tingkat kematangan'><span class='dashicons dashicons-edit'></span></button>";
-
+						$btn = "";
+						if ($disabled == '') {
+							$btn = "<button class='btn btn-warning' onclick='tambahKuesionerDetail(\"" . $variabel['id_variabel'] . "\", \"" . $variabel['id_level'] . "\");' title='Pilih tingkat kematangan'><span class='dashicons dashicons-edit'></span></button>";
+						}
 						// variabel
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'><b>" . $counter++ . "</b></td>";       			// nomor //
@@ -4938,9 +5008,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							if (!empty($data_dukung)) {
 								foreach ($data_dukung as $val) {
 									$all_data_dukung[] = $val['jenis_bukti_dukung'];
-									$btn = "<button class='btn btn-warning' onclick='tambahDokumenBuktiDukung("
-										. $variabel['id_kuesioner_mendagri_detail'] . ", "
-										. $val['id'] . ");' title='Edit Dokumen Bukti'><span class='dashicons dashicons-edit'></span></button>";
+									$btn = "";
+									if ($disabled == '') {
+										$btn = "<button class='btn btn-warning' onclick='tambahDokumenBuktiDukung("
+											. $variabel['id_kuesioner_mendagri_detail'] . ", "
+											. $val['id'] . ");' title='Edit Dokumen Bukti'><span class='dashicons dashicons-edit'></span></button>";
+									}
 									$nama_dokumen = '-';
 									$id_kuesioner = $variabel['id_kuesioner_mendagri_detail'];
 
@@ -5154,7 +5227,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
 				$current_user = wp_get_current_user();
 				$user_roles = $current_user->roles;
-				$is_admin = in_array('administrator', $user_roles) || in_array('admin_panrb', $user_roles)|| in_array('admin_ortala', $user_roles) || in_array("admin_bappeda", $user_roles);
+				$is_admin = in_array('administrator', $user_roles) || 
+							in_array('admin_ortala', $user_roles) || 
+							in_array("admin_bappeda", $user_roles);
 
 				if (empty($_POST['id_variabel'])) {
 					$ret['status'] = 'error';
