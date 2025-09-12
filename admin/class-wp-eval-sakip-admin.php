@@ -4041,6 +4041,7 @@ class Wp_Eval_Sakip_Admin
 					'read' => true,
 					'edit_posts' => false,
 					'delete_posts' => false,
+					'edit_pages' => true,
 					'upload_files' => true
 				));
 			}
