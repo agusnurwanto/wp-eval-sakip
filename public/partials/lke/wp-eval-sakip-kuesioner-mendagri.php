@@ -283,11 +283,44 @@ $html .= '</div>';
     .align-middle {
         vertical-align: middle !important;
     }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 50px;
+    }
+
+    .info-section {
+        display: flex;
+        justify-content: space-between;
+        max-width: 400px;
+        width: 280px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border-left: 5px solid #007BFF;
+
+    }
+
+    .info-section .label {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .info-section .value {
+        color: #007BFF;
+        font-weight: bold;
+    }
+    .entry-content h1 {
+        margin-bottom: 10px !important; /* kecilin jarak bawah judul */
+    }
 </style>
 <?php if(empty($laporan)): ?>
 <div class="container-md">
     <div style="padding: 10px;margin:0 0 3rem 0;">
-        <h1 class="text-center" style="margin:3rem;">Kuesioner Mendagri<br>
+        <h1 class="text-center" style="margin:3rem;">Pengisian Kuesioner Mendagri<br>
             <?php echo strtoupper($skpd['nama_skpd']); ?><br>
             Tahun Anggaran <?php echo $input['tahun']; ?>
         </h1>
@@ -295,6 +328,16 @@ $html .= '</div>';
                 <div id="action-sakip" class="hide-print">
                     <a href="<?php echo $laporan_kuesioner; ?>" target="_blank" class="btn btn-success">Laporan Kuesioner</a>
                 </div>
+        </div>
+        <div class="container">
+            <div class="info-section">
+                <span class="label">Total Nilai Awal :</span> 
+                <span class="value"><?php echo $total_skor_awal; ?></span>
+            </div>
+            <div class="info-section">
+                <span class="label">Total Nilai Akhir :</span> 
+                <span class="value"> <?php echo $total_skor_akhir; ?></span>
+            </div>
         </div>
         <div class="wrap-table">
             <table id="table_kuesioner_pengisian_mendagri" cellpadding="2" cellspacing="0" style="collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
