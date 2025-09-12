@@ -4512,9 +4512,75 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
                     $ret['status'] = 'error';
                     $ret['message'] = 'ID SKPD Anggaran kosong!';
                 }
-
+				 if (!empty($_POST['id_jadwal'])) {
+                    $id_jadwal = $_POST['id_jadwal'];
+                } else {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'ID Jadwal kosong!';
+                }
 
                 if ($ret['status'] == 'success') {
+					date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
+					$dateTime = new DateTime();
+
+					$data_jadwal = $wpdb->get_row(
+						$wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_data_jadwal
+							WHERE id=%d
+						", $id_jadwal),
+						ARRAY_A
+					);
+					if (!empty($data_jadwal)) {
+						$started_at = trim($data_jadwal['started_at']);
+						$end_at = trim($data_jadwal['end_at']);
+
+						$started_at_dt = new DateTime($started_at);
+						$end_at_dt = new DateTime($end_at);
+						$jenis_jadwal = $data_jadwal['jenis_jadwal'];
+					} else {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Data jadwal tidak ditemukan!';
+						die(json_encode($ret));
+					}
+
+					$current_user = wp_get_current_user();
+					$is_admin = false;
+					if (
+						in_array("admin_ortala", $current_user->roles) ||
+						in_array("admin_bappeda", $current_user->roles) ||
+						in_array("administrator", $current_user->roles)
+					) {
+						$is_admin = true;
+					}
+
+					$disabled = 'disabled';
+					// Jika jadwal masih buka
+					if ($dateTime > $started_at_dt && $dateTime < $end_at_dt && $data_jadwal['status'] == 1) {
+						// Jika jadwal penetapan
+						if ($jenis_jadwal == 'penetapan') {
+							// dan user adalah verifikator
+							if ($is_admin == true) {
+								$disabled = '';
+							} else {
+								// Jika bukan verifikator, tidak bisa input saat penetapan
+								$disabled = 'disabled';
+							}
+							// Jika jadwal usulan
+						} else if ($jenis_jadwal == 'usulan') {
+							// dan user bukan verifikator
+							if ($is_admin == false) {
+								$disabled = '';
+							} else {
+								$disabled = 'disabled';
+							}
+						}
+					} else {
+						// Jika jadwal sudah tutup
+						$disabled = 'disabled';
+					}
+					
                     $html = '';
 		            $total_semua_nilai = 0;
 
@@ -4554,17 +4620,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		            }
 
 		            $counter = 1;
-		            $current_user = wp_get_current_user();
-		            $current_user = wp_get_current_user();
-					$is_admin = false;
-					if (
-					    in_array("admin_ortala", $current_user->roles) ||
-					    in_array("admin_bappeda", $current_user->roles) ||
-					    in_array("administrator", $current_user->roles)
-					) {
-					    $is_admin = true;
-					}
-
+					
 		            foreach ($data_kuesioner as $kuesioner) {
 		                $total_soal = $wpdb->get_var($wpdb->prepare("
 		                    SELECT 
@@ -4693,7 +4749,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		                                    }
 
 		                                    $html .= "<div class='form-check'>";
-		                                    $html .= "<input class='form-check-input' type='radio' name='jawaban[{$id_kuesioner}][{$id_unik}]' value='{$value}' id='jawaban_{$value}' data-id='{$value}' data-nilai='{$bobot}' data-id_unik='{$id_unik}'style='margin-top: 13px;' onchange=\"document.getElementById('{$input_nilai}').value = this.dataset.nilai;\" {$checked}>";
+		                                    $html .= "<input class='form-check-input' {$disabled} type='radio' name='jawaban[{$id_kuesioner}][{$id_unik}]' value='{$value}' id='jawaban_{$value}' data-id='{$value}' data-nilai='{$bobot}' data-id_unik='{$id_unik}'style='margin-top: 13px;' onchange=\"document.getElementById('{$input_nilai}').value = this.dataset.nilai;\" {$checked}>";
 		                                    $html .= "<label class='form-check-label' for='jawaban_{$value}' style='margin-left: 8px;'><b>{$kode}</b>: {$deskripsi}</label>";
 		                                    $html .= "</div>";
 		                                }
@@ -4708,12 +4764,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 										if ($is_admin == true) {			                          
 			                                $html .= "<textarea name='jawaban[{$id_kuesioner}][{$id_unik}]' class='form-control' rows='3' data-id='{$get_id_esai}' data-id_unik='{$id_unik}' readonly>{$jawaban_esai}</textarea>";
 			                                $html .= "</td><td class='text-center' rowspan='{$rowspan}'>";
-			                                $html .= "<input type='number' step='0.1' name='nilai[{$get_id_esai}]' class='form-control text-center' value='{$nilai_esai}' data-id='{$get_id_esai}' data-id_unik='{$id_unik}'/>";
+			                                $html .= "<input type='number' step='0.1' name='nilai[{$get_id_esai}]' class='form-control text-center' value='{$nilai_esai}' data-id='{$get_id_esai}' data-id_unik='{$id_unik}' {$disabled}/>";
 			                                $html .= "</td>";
 			                            } else {		                          
 			                                $html .= "<textarea name='jawaban[{$id_kuesioner}][{$id_unik}]' class='form-control' rows='3' data-id='{$get_id_esai}' data-id_unik='{$id_unik}'>{$jawaban_esai}</textarea>";
 			                                $html .= "</td><td class='text-center' rowspan='{$rowspan}'>";
-			                                $html .= "<input type='number' step='0.1' name='nilai[{$get_id_esai}]' class='form-control text-center' value='{$nilai_esai}' data-id='{$get_id_esai}' data-id_unik='{$id_unik}'readonly/>";
+			                                $html .= "<input type='number' step='0.1' name='nilai[{$get_id_esai}]' class='form-control text-center' value='{$nilai_esai}' data-id='{$get_id_esai}' data-id_unik='{$id_unik}'readonly {$disabled}/>";
 			                                $html .= "</td>";                      	
 			                            }
 		                            }
