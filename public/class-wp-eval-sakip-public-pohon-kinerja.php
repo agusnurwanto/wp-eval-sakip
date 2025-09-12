@@ -1006,7 +1006,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								$table_koneksi_pokin .= '
 									<td class="text-center">' . $aksi_koneksi . '</td>
 								</tr>';
-								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1 && $v_koneksi_pokin['tipe'] != 1) {
+								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1) {
 								    $table_koneksi_croscutting_pemda .= '
 								        <tr style="border: 1px solid black;">
 								            <td class="text-left" style="width: 270px; border: 1px solid black; padding: 8px;">' . $nama_perangkat . '</td>
