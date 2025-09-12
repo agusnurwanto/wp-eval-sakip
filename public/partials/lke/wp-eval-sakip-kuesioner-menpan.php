@@ -20,6 +20,89 @@ $skpd = $wpdb->get_row($wpdb->prepare("
         AND active = 1
 ", $id_skpd, $input['tahun']), ARRAY_A);
 
+$jadwal = $wpdb->get_row(
+    $wpdb->prepare("
+        SELECT
+            * 
+        FROM esakip_data_jadwal
+        WHERE tipe = 'kuesioner_menpan'
+          AND status != 0
+          AND tahun_anggaran = %d
+    ", $input['tahun']),
+    ARRAY_A
+);
+
+$id_jadwal = !empty($jadwal['id']) ? (int)$jadwal['id'] : 0;
+
+if (!empty($jadwal) && $jadwal['status'] == 1) {
+    $tahun_anggaran = $jadwal['tahun_anggaran'];
+    $jenis_jadwal = $jadwal['jenis_jadwal'];
+    $nama_jadwal = $jadwal['nama_jadwal'];
+    $mulai_jadwal = $jadwal['started_at'];
+    $selesai_jadwal = $jadwal['end_at'];
+    $lama_pelaksanaan = $jadwal['lama_pelaksanaan'];
+} else {
+    $tahun_anggaran = $input['tahun'];
+    $jenis_jadwal = '-';
+    $nama_jadwal = '-';
+    $mulai_jadwal = '-';
+    $selesai_jadwal = '-';
+    $lama_pelaksanaan = 1;
+}
+
+$timezone = get_option('timezone_string');
+
+date_default_timezone_set('Asia/Jakarta'); // Adjust this if your server is set to a different timezone
+$dateTime = new DateTime();
+if (!empty($jadwal)) {
+    $started_at = trim($jadwal['started_at']);
+    $end_at = trim($jadwal['end_at']);
+
+    $started_at_dt = new DateTime($started_at);
+    $end_at_dt = new DateTime($end_at);
+    $jenis_jadwal = $jadwal['jenis_jadwal'];
+} else {
+    $ret['status'] = 'error';
+    $ret['message'] = 'Data jadwal tidak ditemukan!';
+    die(json_encode($ret));
+}
+
+$current_user = wp_get_current_user();
+$is_admin = false;
+if (
+    in_array("admin_ortala", $current_user->roles) ||
+    in_array("admin_bappeda", $current_user->roles) ||
+    in_array("administrator", $current_user->roles)
+) {
+    $is_admin = true;
+}
+
+$disabled = 'disabled';
+// Jika jadwal masih buka
+if ($dateTime > $started_at_dt && $dateTime < $end_at_dt && $jadwal['status'] == 1) {
+    // Jika jadwal penetapan
+    if ($jenis_jadwal == 'penetapan') {
+        // dan user adalah verifikator
+        if ($is_admin == true) {
+            $disabled = '';
+        } else {
+            // Jika bukan verifikator, tidak bisa input saat penetapan
+            $disabled = 'disabled';
+        }
+        // Jika jadwal usulan
+    } else if ($jenis_jadwal == 'usulan') {
+        // dan user bukan verifikator
+        if ($is_admin == false) {
+            $disabled = '';
+        } else {
+            $disabled = 'disabled';
+        }
+    }
+} else {
+    // Jika jadwal sudah tutup
+    $disabled = 'disabled';
+}
+
 $idtahun = $wpdb->get_results(
     "
         SELECT DISTINCT 
@@ -446,6 +529,9 @@ if(!empty($_GET['laporan'])){
     #action-sakip a {
         text-decoration: none;
     }
+    #penjadwalanHitungMundur #titles {
+        font-size: 15px !important;
+    }
 </style>
 
 <?php if(empty($laporan)): ?>
@@ -482,7 +568,7 @@ if(!empty($_GET['laporan'])){
                         </tbody>
                     </table>
                     <div style="text-align: right; margin: 10px 20px 0px 0px;">
-                        <button type="button" class="btn btn-primary" style="font-size: 24px; min-width: 200px;" onclick="submit_kuesioner(); return false;">Submit</button>
+                        <button type="button" <?php echo $disabled; ?> class="btn btn-primary" style="font-size: 24px; min-width: 200px;" onclick="submit_kuesioner(); return false;">Submit</button>
                     </div>
                 </div>
             </div>
@@ -496,6 +582,14 @@ if(!empty($_GET['laporan'])){
     jQuery(document).ready(function() {
         <?php if(empty($laporan)): ?>
             get_table_kuesioner();
+            let dataHitungMundur = {
+            'jenisJadwal': <?php echo json_encode(ucwords($jenis_jadwal)); ?>,
+            'namaJadwal': <?php echo json_encode(ucwords($nama_jadwal)); ?>,
+            'mulaiJadwal': <?php echo json_encode($mulai_jadwal); ?>,
+            'selesaiJadwal': <?php echo json_encode($selesai_jadwal); ?>,
+            'thisTimeZone': <?php echo json_encode($timezone); ?>
+            };
+            penjadwalanHitungMundur(dataHitungMundur);
         <?php endif; ?>
     });
     <?php if(empty($laporan)): ?>
@@ -508,6 +602,7 @@ if(!empty($_GET['laporan'])){
                     action: 'get_table_penilaian_kuesioner_menpan',
                     api_key: esakip.api_key,
                     tahun_anggaran: <?php echo $input['tahun']; ?>,
+                    id_jadwal: <?php echo $id_jadwal; ?>,
                     id_skpd: <?php echo $id_skpd; ?>
                 },
                 dataType: 'json',

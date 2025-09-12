@@ -1519,32 +1519,43 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 	<div class="sidebar-body">
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-tag"></i> Kinerja</h6>
-			<p id="label"></p>
+			<p id="label_detail"></p>
 		</div>
 
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-chart-bar"></i> Indikator Kinerja</h6>
-			<p id="indikator"></p>
+			<p id="indikator_detail"></p>
 		</div>
 
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-admin-users"></i> Pelaksana</h6>
-			<p id="pelaksana"></p>
+			<p id="pelaksana_detail"></p>
 		</div>
 
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-clipboard"></i> Bentuk Kegiatan</h6>
-			<p id="bentuk_kegiatan"></p>
+			<p id="bentuk_kegiatan_detail"></p>
 		</div>
 
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-chart-line"></i> Outcome</h6>
-			<p id="outcome"></p>
+			<p id="outcome_detail"></p>
 		</div>
 
 		<div class="info-section text-left">
 			<h6><i class="dashicons dashicons-groups"></i> Crosscutting Dengan</h6>
-			<p id="crosscutting"></p>
+			<div class="wrap-table">
+                <table id="croscutting_detail" cellpadding="2" cellspacing="0" class="table table-bordered">
+                    <thead>
+						<tr>
+							<th class="text-center" style="border: 1px solid black;">PD/UPT/Lembaga/Desa</th>
+							<th class="text-center" style="border: 1px solid black;">Informasi Kegiatan	</th>
+						</tr>	
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
 		</div>
 	</div>
 </div>
@@ -1739,23 +1750,23 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 					alert(response.message);
 					return;
 				}
-				jQuery("#label").text(response.data.label || '-');
+				jQuery("#label_detail").text(response.data.label || '-');
 
 				if (response.indikator && response.indikator.length > 0) {
-					jQuery("#indikator").html(
+					jQuery("#indikator_detail").html(
 						response.indikator.join(', <br> '));
 				} else {
-					jQuery("#indikator").text('-');
+					jQuery("#indikator_detail").text('-');
 				}
 
-				jQuery("#pelaksana").text(response.data.pelaksana || '-');
-				jQuery("#bentuk_kegiatan").text(response.data.bentuk_kegiatan || '-');
-				jQuery("#outcome").text(response.data.outcome || '-');
+				jQuery("#pelaksana_detail").text(response.data.pelaksana || '-');
+				jQuery("#bentuk_kegiatan_detail").text(response.data.bentuk_kegiatan || '-');
+				jQuery("#outcome_detail").text(response.data.outcome || '-');
 				
 				if (!response.data_koneksi_croscutting_pemda || response.data_koneksi_croscutting_pemda.length === 0) {
-					jQuery("#croscutting tbody").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
+					jQuery("#croscutting_detail tbody").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
 				} else {
-					jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_pemda);
+					jQuery("#croscutting_detail tbody").html(response.data_koneksi_croscutting_pemda);
 				}
 
 				toggleSidebar();
