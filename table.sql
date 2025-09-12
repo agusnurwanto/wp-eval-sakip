@@ -1556,8 +1556,8 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
 
 CREATE TABLE `esakip_data_iku_opd` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `kode_sasaran` TEXT NOT NULL COMMENT '(id_unik)',
-  `label_sasaran` TEXT DEFAULT NULL,
+  `kode_sasaran` TEXT NOT NULL COMMENT 'kode unik tujuan dan sasaran',
+  `label_sasaran` TEXT DEFAULT NULL COMMENT 'label tujuan dan sasaran',
   `id_unik_indikator` TEXT DEFAULT NULL,
   `label_indikator` TEXT DEFAULT NULL,
   `formulasi` TEXT DEFAULT NULL,
