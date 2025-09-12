@@ -985,7 +985,18 @@ if (!empty($data_all['data'])) {
 	                </table>
 	            </div>
             <?php else: ?>
-				<p id="croscutting"></p>
+            	<div class="wrap-table">
+	                <table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
+	                    <thead>
+							<tr>
+								<th class="text-center" style="border: 1px solid black;">PD/UPT/Lembaga/Desa</th>
+								<th class="text-center" style="border: 1px solid black;">Informasi Kegiatan	</th>
+							</tr>	
+	                    </thead>
+	                    <tbody>
+	                    </tbody>
+	                </table>
+	            </div>
 			<?php endif; ?>
 		</div>
 	</div>
@@ -1069,9 +1080,9 @@ if (!empty($data_all['data'])) {
                     <?php else: ?>
 
 						if (!response.data_koneksi_croscutting_pemda || response.data_koneksi_croscutting_pemda.length === 0) {
-							jQuery("#croscutting").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
+							jQuery("#croscutting tbody").html(`<tr><td colspan="4" class="text-center" style="border: 1px solid black;">Tidak ada data koneksi croscutting</td></tr>`);
 						} else {
-							jQuery("#croscutting").html(response.data_koneksi_croscutting_pemda);
+							jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_pemda);
 						}
 
 					<?php endif; ?>
