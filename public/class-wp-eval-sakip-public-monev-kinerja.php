@@ -3913,9 +3913,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	            if ($ret['status'] != 'error' && empty($_POST['id_unik'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Tujuan/Sasaran tidak boleh kosong!';
-	            } else if ($ret['status'] != 'error' && empty($_POST['label_indikator'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'Indikator tidak boleh kosong!';
 	            } else if ($ret['status'] != 'error' && empty($_POST['formulasi'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Definisi Operasional/Formulasi boleh kosong!';
@@ -3931,9 +3928,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	            } else if ($ret['status'] != 'error' && empty($_POST['id_jadwal_wpsipd'])) {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'ID Jadwal tidak boleh kosong!';
-	            } else if ($ret['status'] != 'error' && empty($_POST['id_unik_indikators'])) {
-	                $ret['status'] = 'error';
-	                $ret['message'] = 'ID Unik Indikator tidak boleh kosong!';
 	            }
 
 	            if ($ret['status'] != 'error') {
@@ -3961,12 +3955,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                    }
 	                }
 
+					$formulasi = isset($_POST['formulasi']) ? stripslashes($_POST['formulasi']) : '';
+
 	                $data = array(
 	                    'kode_sasaran' 		=> $_POST['id_unik'],
 	                    'label_sasaran' 	=> $_POST['label_tujuan_sasaran'],
 	                    'id_unik_indikator' => $_POST['id_unik_indikators'],
 	                    'label_indikator' 	=> $label_indikator,
-	                    'formulasi' 		=> $_POST['formulasi'],
+	                    'formulasi' 		=> $formulasi,
 	                    'sumber_data' 		=> $_POST['sumber_data'],
 	                    'penanggung_jawab' 	=> $_POST['penanggung_jawab'],
 	                    'id_skpd' 			=> $_POST['id_skpd'],
