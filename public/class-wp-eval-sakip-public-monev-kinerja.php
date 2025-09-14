@@ -9475,18 +9475,27 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							);
 
 							if ($get_data_pk) {
-								if ($get_data_pk['active'] != $active) {
-									$wpdb->update(
-										'esakip_laporan_pk_pemda',
-										array('active' => $active),
-										array('id_iku' => $id_iku)
-									);
-								}
-							} else {
+	                            $update_data = array();
+	                            if ($get_data_pk['active'] != $active) {
+	                                $update_data['active'] = $active;
+	                            }
+	                            if ($get_data_pk['satuan'] != $iku['satuan']) {
+	                                $update_data['satuan'] = $iku['satuan'];
+	                            }
+
+	                            if (!empty($update_data)) {
+	                                $wpdb->update(
+	                                    'esakip_laporan_pk_pemda',
+	                                    $update_data,
+	                                    array('id_iku' => $id_iku)
+	                                );
+	                            }
+	                        } else {
 								// Insert baru jika belum ada
 								if ($active == 1) {
 									$data = array(
 										'id_iku' => $id_iku,
+										'satuan' => $iku['satuan'],
 										'target' => $iku['target_1'],
 										'id_jadwal' => $id_jadwal,
 										'active' => 1,
@@ -9514,6 +9523,64 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		die(json_encode($ret));
 	}
 
+	public function submit_sasaran_pk()
+	{
+		global $wpdb;
+
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$data = json_decode(stripslashes($_POST['data']), true);
+
+					if (empty($data['label_sasaran'])) {
+						throw new Exception('Sasaran tidak boleh kosong!');
+					}
+					if (empty($data['label_indikator'])) {
+						throw new Exception('Indikator tidak boleh kosong!');
+					}
+					if (empty($data['target'])) {
+						throw new Exception('Target tidak boleh kosong!');
+					}
+					if (empty($data['satuan'])) {
+						throw new Exception('Satuan tidak boleh kosong!');
+					}
+
+					$data_sasaran = array(
+						'label_sasaran'  	=> $data['label_sasaran'],
+						'label_indikator'	=> $data['label_indikator'],
+						'target'         	=> $data['target'],
+						'satuan'         	=> $data['satuan'],
+						'tahun_anggaran'	=> $_POST['tahun_anggaran'],
+						'id_jadwal'			=> $_POST['id_jadwal'],
+						'active' => 1
+					);
+
+					$status = $wpdb->insert('esakip_laporan_pk_pemda', $data_sasaran);
+
+					if ($status === false) {
+						throw new Exception('Terjadi kesalahan saat simpan data, harap hubungi admin!');
+					}
+
+					echo json_encode([
+						'status' => true,
+						'message' => 'Sukses simpan sasaran'
+					]);
+					exit;
+				} else {
+					throw new Exception('Api key tidak sesuai');
+				}
+			} else {
+				throw new Exception('Format tidak sesuai');
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit;
+		}
+	}
 	function simpan_finalisasi_pk_pemda()
 	{
 		global $wpdb;

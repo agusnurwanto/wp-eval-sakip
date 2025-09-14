@@ -2352,7 +2352,10 @@ CREATE TABLE esakip_kuesioner_mendagri_detail (
 CREATE TABLE esakip_laporan_pk_pemda (
   `id` int(11) NOT NULL auto_increment,
   `id_iku` int(11) DEFAULT NULL,
+  `label_sasaran` text DEFAULT NULL,
+  `label_indikator` text DEFAULT NULL,
   `target` text DEFAULT NULL,
+  `satuan` text DEFAULT NULL,
   `id_jadwal` int(11) DEFAULT NULL,
   `pagu` double(20, 0) DEFAULT NULL,
   `tahun_anggaran` year(4) DEFAULT null,
