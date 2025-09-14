@@ -111,16 +111,16 @@ $data_simpan = [];
 if (!empty($iku)) {
     foreach ($iku as $k_iku => $v_iku) {
         // Proses label_indikator untuk pemisahan dengan <br/>
-        $label_indikator_processed = $v_iku['label_indikator'] ?? '-';
+        $label_indikator = $v_iku['label_indikator'] ?? '-';
         
-        if ($label_indikator_processed !== '-') {
-            if (strpos($label_indikator_processed, ' - ') !== false) {
-                $indikator_array = explode(' - ', $label_indikator_processed);
-                $label_indikator_processed = '- ' . implode('<br/>- ', $indikator_array);
+        if ($label_indikator !== '-') {
+            if (strpos($label_indikator, ' - ') !== false) {
+                $indikator_array = explode(' - ', $label_indikator);
+                $label_indikator = '- ' . implode('<br/>- ', $indikator_array);
             }
-            else if (strpos($label_indikator_processed, "\n- ") !== false) {
-                $indikator_array = explode("\n- ", $label_indikator_processed);
-                $label_indikator_processed = implode("<br/>- ", $indikator_array);
+            else if (strpos($label_indikator, "\n- ") !== false) {
+                $indikator_array = explode("\n- ", $label_indikator);
+                $label_indikator = implode("<br/>- ", $indikator_array);
             }
         }
         
@@ -139,7 +139,7 @@ if (!empty($iku)) {
             <tr>
                 <td class="text-left atas kanan bawah kiri">' . $no_iku++ . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['label_sasaran'] . '</td>
-                <td class="text-left atas kanan bawah kiri">' . $label_indikator_processed . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $label_indikator . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['formulasi'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['sumber_data'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['penanggung_jawab'] . '</td>
