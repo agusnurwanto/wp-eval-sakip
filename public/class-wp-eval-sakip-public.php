@@ -32997,8 +32997,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		    'id' => '',
 		    'url' => '',
 		), $atts);
+		$profile_id = um_profile_id();
+
 		if(is_user_logged_in()){
-       		return 'onclick="get_link_login(this); return false;" id="'.$input['id'].'" title="'.$input['url'].'"';
+       		return 'onclick="get_link_login(this); return false;" id="'.$input['id'].'" user_id="'.$profile_id.'" title="'.$input['url'].'"';
 		}else{
 			return 'title="Anda tidak dapat akses untuk melihat halaman ini!"';
 		}

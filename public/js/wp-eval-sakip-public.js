@@ -559,6 +559,7 @@ function validateForm(fields) {
 function get_link_login(that){
     var id = jQuery(that).attr('id');
     var url = jQuery(that).attr('title');
+    var user_id = jQuery(that).attr('user_id');
     if(id == ''){
         return alert('Nama atau ID unik auto login tidak boleh kosong!');
     }
@@ -569,6 +570,7 @@ function get_link_login(that){
         data: {
             "action": "coba_auto_login",
             "api_key": esakip.api_key,
+            "user_id": user_id,
             "id": id,
             "url": url
         },

@@ -644,6 +644,9 @@ class Esakip_Functions
             wp_die($pesan_error);
         }
 
+        // Logout pengguna saat ini, jika ada
+        wp_logout();
+
         // Login otomatis
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID, true);
