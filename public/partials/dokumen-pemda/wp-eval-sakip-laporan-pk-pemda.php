@@ -49,35 +49,51 @@ $data_simpan = [];
 
 if (!empty($data_pk)) {
     foreach ($data_pk as $k_pk => $v_pk) {
+        $label_sasaran = '';
+        $label_indikator = '';
+        $satuan = '';
+        $aksi = '';
+        
         if (!empty($v_pk['id_iku']) && !empty($v_pk['ik_label_sasaran'])) {
-            $label_sasaran = $v_pk['ik_label_sasaran'];
-            $label_indikator = $v_pk['ik_label_indikator'];
+            $get_label_sasaran = $v_pk['ik_label_sasaran'];
+            $get_label_indikator = $v_pk['ik_label_indikator'];
+            
+            $label_sasaran = $get_label_sasaran;
+            $label_indikator = $get_label_indikator;
+            $satuan = $v_pk['satuan'] ?? '';
+            $aksi = '<span>IKU</span>';
         } else {
-            $label_sasaran = $v_pk['label_sasaran'] ?? '';
-            $label_indikator = $v_pk['label_indikator'] ?? '';
+            $get_label_sasaran = $v_pk['label_sasaran'] ?? '';
+            $get_label_indikator = $v_pk['label_indikator'] ?? '';
+            
+            $label_sasaran = '<input type="text" class="form-control form-control-sm" name="label_sasaran[' . $v_pk['id'] . ']" value="' . htmlspecialchars($get_label_sasaran) . '">';
+            $label_indikator = '<input type="text" class="form-control form-control-sm" name="label_indikator[' . $v_pk['id'] . ']" value="' . htmlspecialchars($get_label_indikator) . '">';
+            $satuan = '<input type="text" class="form-control form-control-sm" name="satuan[' . $v_pk['id'] . ']" value="' . htmlspecialchars($v_pk['satuan'] ?? '') . '">';
+            $aksi = "<button class='btn btn-danger btn-hapus hapus-sasaran' onclick='hapus_data_sasaran({$v_pk['id']});' title='Hapus Data Sasaran'><span class='dashicons dashicons-trash'></span></button>";
         }
 
         $data_simpan[] = [
-            'label_sasaran'    => $label_sasaran,
-            'label_indikator'  => $label_indikator,
+            'label_sasaran'    => $get_label_sasaran,
+            'label_indikator'  => $get_label_indikator,
             'target'           => $v_pk['target'] ?? '', 
             'pagu'             => $v_pk['pagu'] ?? '', 
             'id_jadwal'        => $v_pk['id_jadwal'] ?? '', 
             'tahun_anggaran'   => $v_pk['tahun_anggaran'] ?? '', 
         ]; 
-
+        
         $html .= '<tr>';
         $html .= '<td class="text-left atas kanan bawah kiri">' . $no++ . '</td>';
         $html .= '<td class="text-left atas kanan bawah kiri">' . $label_sasaran . '</td>';
         $html .= '<td class="text-left atas kanan bawah kiri">' . $label_indikator . '</td>';
         $html .= '<td class="text-left atas kanan bawah kiri"><input type="number" class="form-control form-control-sm input-target" name="target[' . $v_pk['id'] . ']" value="' . $v_pk['target'] . '"></td>';
-        $html .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['satuan'] . '</td>';
+        $html .= '<td class="text-left atas kanan bawah kiri">' . $satuan . '</td>';
+        $html .= '<td class="text-left atas kanan bawah kiri text-center">' . $aksi . '</td>';
         $html .= '</tr>';
 
         $html_2 .= '<tr>';
         $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $no_pk++ . '</td>';
-        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $label_sasaran . '</td>';
-        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $label_indikator . '</td>';
+        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $get_label_sasaran . '</td>';
+        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $get_label_indikator . '</td>';
         $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['target'] . '</td>';
         $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['satuan'] . '</td>';
         $html_2 .= '</tr>';
@@ -154,7 +170,7 @@ if (!empty($data_pk)) {
         }
     }
 } else {
-    $html = '<tr><td class="text-center" colspan="4">Data tidak tersedia.</td></tr>';
+    $html = '<tr><td class="text-center" colspan="6">Data tidak tersedia.</td></tr>';
     $html_2 = '<tr><td class="text-center" colspan="5">Data tidak tersedia.</td></tr>';
 }
 
@@ -548,6 +564,17 @@ if (!empty($data_tahapan)) {
                 flex: 0 0 33.333%;
             }
         }
+
+        .badge-lg {
+            font-size: 14px;
+            padding: 0.6em 1em;
+            margin: 4px 10px;
+        }
+
+        .btn-hapus {
+            margin: 4px 10px;  
+        }
+
     </style>
 </head>
 
@@ -885,6 +912,7 @@ if (!empty($data_tahapan)) {
                                                 <th class="text-center atas kanan bawah kiri">Indikator Kinerja</th>
                                                 <th class="text-center atas kanan bawah kiri">Target</th>
                                                 <th class="text-center atas kanan bawah kiri">Satuan</th>
+                                                <th class="text-center atas kanan bawah kiri">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1232,19 +1260,52 @@ if (!empty($data_tahapan)) {
         jQuery("#ModalLabel").show();
         jQuery("#Modal").modal('show');
     }
+
     function submit_data_target() {
         let confirmFinalisasi = confirm('Apakah anda yakin ingin perbarui data ini?');
         if (!confirmFinalisasi) {
             return;
         }
 
-        let targetData = {};
+        let formData = {};
+        
         jQuery('.input-target').each(function () {
             let name = jQuery(this).attr('name'); 
             let match = name.match(/target\[(\d+)\]/);
             if (match) {
                 let id = match[1];
-                targetData[id] = jQuery(this).val();
+                if (!formData.target) formData.target = {};
+                formData.target[id] = jQuery(this).val();
+            }
+        });
+
+        jQuery('input[name^="label_sasaran"]').each(function () {
+            let name = jQuery(this).attr('name'); 
+            let match = name.match(/label_sasaran\[(\d+)\]/);
+            if (match) {
+                let id = match[1];
+                if (!formData.label_sasaran) formData.label_sasaran = {};
+                formData.label_sasaran[id] = jQuery(this).val();
+            }
+        });
+
+        jQuery('input[name^="label_indikator"]').each(function () {
+            let name = jQuery(this).attr('name'); 
+            let match = name.match(/label_indikator\[(\d+)\]/);
+            if (match) {
+                let id = match[1];
+                if (!formData.label_indikator) formData.label_indikator = {};
+                formData.label_indikator[id] = jQuery(this).val();
+            }
+        });
+
+        jQuery('input[name^="satuan"]').each(function () {
+            let name = jQuery(this).attr('name'); 
+            let match = name.match(/satuan\[(\d+)\]/);
+            if (match) {
+                let id = match[1];
+                if (!formData.satuan) formData.satuan = {};
+                formData.satuan[id] = jQuery(this).val();
             }
         });
 
@@ -1260,7 +1321,10 @@ if (!empty($data_tahapan)) {
                 api_key: esakip.api_key,
                 id_jadwal: id_jadwal,
                 tahun_anggaran: tahun_anggaran,
-                target: targetData
+                target: formData.target || {},
+                label_sasaran: formData.label_sasaran || {},
+                label_indikator: formData.label_indikator || {},
+                satuan: formData.satuan || {}
             },
             dataType: 'json',
             success: function(response) {
@@ -1276,6 +1340,39 @@ if (!empty($data_tahapan)) {
                 jQuery('#wrap-loading').hide();
                 console.error('AJAX Error:', error);
                 alert('Gagal menyimpan data. Silakan coba lagi.');
+            }
+        });
+    }
+    function hapus_data_sasaran(id) {
+        let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
+        if (!confirmHapus) {
+            return;
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "hapus_sasaran_pk",
+                api_key: esakip.api_key,
+                tahun_anggaran: <?php echo $input['tahun']; ?>,
+                id: id
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error('AJAX Error:', error);
+                alert('Gagal menghapus data. Silakan coba lagi.');
             }
         });
     }
