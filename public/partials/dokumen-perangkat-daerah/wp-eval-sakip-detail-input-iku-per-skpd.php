@@ -111,16 +111,16 @@ $data_simpan = [];
 if (!empty($iku)) {
     foreach ($iku as $k_iku => $v_iku) {
         // Proses label_indikator untuk pemisahan dengan <br/>
-        $label_indikator_processed = $v_iku['label_indikator'] ?? '-';
+        $label_indikator = $v_iku['label_indikator'] ?? '-';
         
-        if ($label_indikator_processed !== '-') {
-            if (strpos($label_indikator_processed, ' - ') !== false) {
-                $indikator_array = explode(' - ', $label_indikator_processed);
-                $label_indikator_processed = '- ' . implode('<br/>- ', $indikator_array);
+        if ($label_indikator !== '-') {
+            if (strpos($label_indikator, ' - ') !== false) {
+                $indikator_array = explode(' - ', $label_indikator);
+                $label_indikator = '- ' . implode('<br/>- ', $indikator_array);
             }
-            else if (strpos($label_indikator_processed, "\n- ") !== false) {
-                $indikator_array = explode("\n- ", $label_indikator_processed);
-                $label_indikator_processed = implode("<br/>- ", $indikator_array);
+            else if (strpos($label_indikator, "\n- ") !== false) {
+                $indikator_array = explode("\n- ", $label_indikator);
+                $label_indikator = implode("<br/>- ", $indikator_array);
             }
         }
         
@@ -139,7 +139,7 @@ if (!empty($iku)) {
             <tr>
                 <td class="text-left atas kanan bawah kiri">' . $no_iku++ . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['label_sasaran'] . '</td>
-                <td class="text-left atas kanan bawah kiri">' . $label_indikator_processed . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $label_indikator . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['formulasi'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['sumber_data'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['penanggung_jawab'] . '</td>
@@ -953,43 +953,42 @@ if (!empty($data_tahapan)) {
         get_tujuan_sasaran()
         .then(function() {
             jQuery('#wrap-loading').hide();
-
             let html_indikator = '<option value="">Pilih Indikator</option>';
             let id_unik_indikators = [];
             let all_indikator_values = []; 
-
-            if (typeof data_tujuan_cascading != 'undefined' && data_tujuan_cascading.data !== null) {
-                data_tujuan_cascading.data.map(function(value) {
-                    if (value.id_unik_indikator != null && value.id_unik == id_unik) {
-                        html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
-                        id_unik_indikators.push(value.id_unik_indikator);
-                        all_indikator_values.push(value.id_unik_indikator); 
-                    }
-                });
-            }
-
-            if (typeof data_sasaran_cascading != 'undefined' && data_sasaran_cascading.data !== null) {
-                data_sasaran_cascading.data.map(function(value) {
-                    if (value.id_unik_indikator != null && value.id_unik == id_unik) {
-                        html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
-                        id_unik_indikators.push(value.id_unik_indikator);
-                        all_indikator_values.push(value.id_unik_indikator); 
-                    }
-                });
-            }
-
-            jQuery("#indikator").html(html_indikator);
             
+            if (typeof data_tujuan_cascading != 'undefined' && data_tujuan_cascading.data != null) {
+                data_tujuan_cascading.data.map(function(value) {
+                    if (value.id_unik_indikator != null && value.id_unik_indikator !== undefined && value.id_unik_indikator !== '' && value.id_unik_indikator !== 'null' && value.indikator_teks != null && value.indikator_teks !== undefined && value.indikator_teks !== '' && value.indikator_teks !== 'null' && value.id_unik == id_unik) {
+                        
+                        html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
+                        id_unik_indikators.push(value.id_unik_indikator);
+                        all_indikator_values.push(value.id_unik_indikator); 
+                    }
+                });
+            }
+            
+            if (typeof data_sasaran_cascading != 'undefined' && data_sasaran_cascading.data != null) {
+                data_sasaran_cascading.data.map(function(value) {
+                    if (value.id_unik_indikator != null && value.id_unik_indikator !== undefined && value.id_unik_indikator !== '' && value.id_unik_indikator !== 'null' && value.indikator_teks != null && value.indikator_teks !== undefined && value.indikator_teks !== '' && value.indikator_teks !== 'null' && value.id_unik == id_unik) {
+                        
+                        html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
+                        id_unik_indikators.push(value.id_unik_indikator);
+                        all_indikator_values.push(value.id_unik_indikator); 
+                    }
+                });
+            }
+            
+            jQuery("#indikator").html(html_indikator);
             jQuery("#id_unik_indikators").text(id_unik_indikators.join(','));
             
-            jQuery('#indikator').select2('destroy'); 
             jQuery('#indikator').select2({
                 width: "100%",
                 placeholder: "Pilih Indikator",
                 allowClear: true,
                 dropdownParent: jQuery('#indikator').closest('.form-group')
             });
-
+            
             if (all_indikator_values.length > 0) {
                 jQuery('#indikator').val(all_indikator_values).trigger('change');
             }

@@ -122,7 +122,7 @@ foreach ($idtahun as $val) {
     }
 </style>
 <div class="container-md">
-    <div id="cetak" style="padding: 5px;">
+    <div id="cetak" title="Rencana Aksi Pemda" style="padding: 5px;">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 style="margin-top: 20px;" class="text-center">Rencana Aksi <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?><br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1 style="margin-top: 20px;">
             <div class="text-center" style="margin-bottom: 25px;">
@@ -347,24 +347,39 @@ function getTable() {
 
                     for (let i = 0; i < jmlRenaksi; i++) {
                         html += '<tr>';
-                        if (rowIndex == 0) {
-                            html += `<td style="vertical-align: middle;" rowspan="${totalRow}">${index + 1}</td>`;
-                            html += `<td style="vertical-align: middle;" rowspan="${totalRow}">${item.label_sasaran}</td>`;
-                            html += `<td style="vertical-align: middle;" rowspan="${totalRow}">${item.label_indikator}</td>`;
+
+                        if (rowIndex === 0) {
+                            let label_sasaran = (item.id_iku && item.ik_label_sasaran) 
+                                ? item.ik_label_sasaran 
+                                : (item.label_sasaran || '');
+
+                            let label_indikator = (item.id_iku && item.ik_label_indikator) 
+                                ? item.ik_label_indikator 
+                                : (item.label_indikator || '');
+
+                            html += `<td rowspan="${totalRow}">${index + 1}</td>`;
+                            html += `<td rowspan="${totalRow}">${label_sasaran}</td>`;
+                            html += `<td rowspan="${totalRow}">${label_indikator}</td>`;
                         }
-                        if (i == 0) {
-                            html += `<td style="vertical-align: middle;" rowspan="${jmlRenaksi}">${g.nama_skpd}</td>`;
+
+                        if (i === 0) {
+                            html += `<td rowspan="${jmlRenaksi}">${g.nama_skpd}</td>`;
                         }
+
                         html += `<td>${g.renaksi[i]}</td>`;
-                        if (rowIndex == 0) {
-                            html += `<td class="text-center" style="vertical-align: middle;" rowspan="${totalRow}">
-                                <a href="javascript:void(0)" onclick="edit_rencana_aksi(${item.id}, 1)" data-id="${item.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit"><i class="dashicons dashicons-edit"></i>
-                                    </a>
+
+                        if (rowIndex === 0) {
+                            html += `<td class="text-center" rowspan="${totalRow}">
+                                <a href="javascript:void(0)" onclick="edit_rencana_aksi(${item.id}, 1)" data-id="${item.id}" class="btn btn-sm btn-primary edit-kegiatan-utama" title="Edit">
+                                    <i class="dashicons dashicons-edit"></i>
+                                </a>
                             </td>`;
                         }
+
                         html += '</tr>';
                         rowIndex++;
                     }
+
                 }
             });
 
@@ -392,8 +407,16 @@ function edit_rencana_aksi(id){
         success: function(response) {
             jQuery('#wrap-loading').hide();
             if (response.status === 'success') {
-                jQuery('#sasaran_strategis').val(response.data.label_sasaran);
-                jQuery("#indikator_kinerja").val(response.data.label_indikator);
+                let label_sasaran = (response.data.id_iku && response.data.ik_label_sasaran) 
+                    ? response.data.ik_label_sasaran 
+                    : (response.data.label_sasaran || '');
+
+                let label_indikator = (response.data.id_iku && response.data.ik_label_indikator) 
+                    ? response.data.ik_label_indikator 
+                    : (response.data.label_indikator || '');
+
+                jQuery('#sasaran_strategis').val(label_sasaran);
+                jQuery("#indikator_kinerja").val(label_indikator);
 
                 let selected_skpd = response.data.skpd.map(skpd => skpd.id_skpd);
                 jQuery('#id_skpd').empty();

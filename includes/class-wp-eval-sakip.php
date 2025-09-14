@@ -525,6 +525,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_nopriv_get_data_pokin_all',  $plugin_public, 'get_data_pokin_all');
 		$this->loader->add_action('wp_ajax_create_pokin',  $plugin_public, 'create_pokin');
 		$this->loader->add_action('wp_ajax_edit_pokin',  $plugin_public, 'edit_pokin');
+		$this->loader->add_action('wp_ajax_nopriv_edit_pokin',  $plugin_public, 'edit_pokin');
 		$this->loader->add_action('wp_ajax_update_pokin',  $plugin_public, 'update_pokin');
 		$this->loader->add_action('wp_ajax_delete_pokin',  $plugin_public, 'delete_pokin');
 		$this->loader->add_action('wp_ajax_create_indikator_pokin',  $plugin_public, 'create_indikator_pokin');
@@ -711,6 +712,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_finalisasi_pk_pemda_by_id', $plugin_public, 'get_finalisasi_pk_pemda_by_id');
 		$this->loader->add_action('wp_ajax_edit_finalisasi_pk_pemda', $plugin_public, 'edit_finalisasi_pk_pemda');
 		$this->loader->add_action('wp_ajax_submit_target_pk_pemda', $plugin_public, 'submit_target_pk_pemda');
+		$this->loader->add_action('wp_ajax_submit_sasaran_pk', $plugin_public, 'submit_sasaran_pk');
 		
 		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg', $plugin_public, 'get_table_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_simpan_pegawai_simpeg', $plugin_public, 'simpan_pegawai_simpeg');

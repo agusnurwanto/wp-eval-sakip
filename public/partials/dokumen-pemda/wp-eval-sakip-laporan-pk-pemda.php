@@ -27,8 +27,8 @@ $data_pk = $wpdb->get_results(
     $wpdb->prepare("
         SELECT 
             pk.*,
-            ik.label_sasaran,
-            ik.label_indikator
+            ik.label_sasaran as ik_label_sasaran,
+            ik.label_indikator as ik_label_indikator
         FROM esakip_laporan_pk_pemda pk
         LEFT JOIN esakip_data_iku_pemda ik
             ON pk.id_iku = ik.id 
@@ -46,29 +46,40 @@ $no_pk = 1;
 $html = '';
 $html_2 = '';
 $data_simpan = []; 
+
 if (!empty($data_pk)) {
     foreach ($data_pk as $k_pk => $v_pk) {
+        if (!empty($v_pk['id_iku']) && !empty($v_pk['ik_label_sasaran'])) {
+            $label_sasaran = $v_pk['ik_label_sasaran'];
+            $label_indikator = $v_pk['ik_label_indikator'];
+        } else {
+            $label_sasaran = $v_pk['label_sasaran'] ?? '';
+            $label_indikator = $v_pk['label_indikator'] ?? '';
+        }
+
         $data_simpan[] = [
-            'label_sasaran'    => $v_pk['label_sasaran'] ?? '-',
-            'label_indikator'  => $v_pk['label_indikator'] ?? '-',
-            'target'           => $v_pk['target'] ?? '-', 
-            'pagu'             => $v_pk['pagu'] ?? '-', 
-            'id_jadwal'        => $v_pk['id_jadwal'] ?? '-', 
-            'tahun_anggaran'   => $v_pk['tahun_anggaran'] ?? '-', 
+            'label_sasaran'    => $label_sasaran,
+            'label_indikator'  => $label_indikator,
+            'target'           => $v_pk['target'] ?? '', 
+            'pagu'             => $v_pk['pagu'] ?? '', 
+            'id_jadwal'        => $v_pk['id_jadwal'] ?? '', 
+            'tahun_anggaran'   => $v_pk['tahun_anggaran'] ?? '', 
         ]; 
 
         $html .= '<tr>';
         $html .= '<td class="text-left atas kanan bawah kiri">' . $no++ . '</td>';
-        $html .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['label_sasaran'] . '</td>';
-        $html .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['label_indikator'] . '</td>';
+        $html .= '<td class="text-left atas kanan bawah kiri">' . $label_sasaran . '</td>';
+        $html .= '<td class="text-left atas kanan bawah kiri">' . $label_indikator . '</td>';
         $html .= '<td class="text-left atas kanan bawah kiri"><input type="number" class="form-control form-control-sm input-target" name="target[' . $v_pk['id'] . ']" value="' . $v_pk['target'] . '"></td>';
+        $html .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['satuan'] . '</td>';
         $html .= '</tr>';
 
         $html_2 .= '<tr>';
         $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $no_pk++ . '</td>';
-        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['label_sasaran'] . '</td>';
-        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['label_indikator'] . '</td>';
+        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $label_sasaran . '</td>';
+        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $label_indikator . '</td>';
         $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['target'] . '</td>';
+        $html_2 .= '<td class="text-left atas kanan bawah kiri">' . $v_pk['satuan'] . '</td>';
         $html_2 .= '</tr>';
 
         $detail = $wpdb->get_results($wpdb->prepare("
@@ -687,6 +698,7 @@ if (!empty($data_tahapan)) {
                         <th class="esakip-text_tengah" style="width: 300px;">Sasaran Strategis</th>
                         <th class="esakip-text_tengah" style="width: 150px;">Indikator Kinerja</th>
                         <th class="esakip-text_tengah" style="width: 10px;">Target</th>
+                        <th class="esakip-text_tengah" style="width: 10px;">Satuan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -778,7 +790,7 @@ if (!empty($data_tahapan)) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php echo $html; ?>
+                                        <?php echo $html_2; ?>
                                     </tbody>
                                 </table>
                             <?php endif; ?>
@@ -857,6 +869,7 @@ if (!empty($data_tahapan)) {
                     </button>
                 </div>
                 <div class="modal-body">
+                    <button type="button" class="btn btn-primary mb-2 btn-tambah-sasaran"><i class="dashicons dashicons-plus" style="margin-buttom: 10px;"></i> Tambah Sasaran</button>
                     <form enctype="multipart/form-data">
                         <input type="hidden" value="<?php echo $input['periode']; ?>" id="idJadwal">
                         <input type="hidden" value="<?php echo $input['tahun']; ?>" id="tahunAnggaran">
@@ -871,6 +884,7 @@ if (!empty($data_tahapan)) {
                                                 <th class="text-center atas kanan bawah kiri">Sasaran Strategis</th>
                                                 <th class="text-center atas kanan bawah kiri">Indikator Kinerja</th>
                                                 <th class="text-center atas kanan bawah kiri">Target</th>
+                                                <th class="text-center atas kanan bawah kiri">Satuan</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -889,10 +903,108 @@ if (!empty($data_tahapan)) {
         </div>
     </div>
 </body>
+<!-- Modal crud tambah sasaran -->
+<div class="modal fade" id="modal-crud-sasaran">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
 <script>
     jQuery(document).ready(function() {
         getTable();
     });
+
+    jQuery(document).on('click', '.btn-tambah-sasaran', function() {
+        var that = this;
+        return new Promise(function(resolve, reject) {
+
+            let sasaranModal = jQuery("#modal-crud-sasaran");
+            let html = '' +
+                '<form id="form-sasaran">' +
+                    '<div class="form-group">' +
+                        '<label for="label_sasaran">Sasaran</label>' +
+                        '<input class="form-control" name="label_sasaran"></input>' +
+                    '</div>' +
+                    '<div class="form-group">' +
+                        '<label for="label_indikator">Indikator</label>' +
+                        '<input class="form-control" name="label_indikator"></input>' +
+                    '</div>' +
+                    `<div class="form-group row">` +
+                        '<div class="col-md-6">' +
+                            '<label for="target">Target</label>' +
+                            '<input type="number" class="form-control" name="target"/>' +
+                        '</div>' +
+                        '<div class="col-md-6">' +
+                            '<label for="satuan">Satuan</label>' +
+                            '<input class="form-control" name="satuan"></input>' +
+                        '</div>' +
+                    `</div>` +
+                '</form>';
+
+            sasaranModal.find('.modal-body').html('');
+            sasaranModal.find('.modal-title').html('Tambah Sasaran');
+            sasaranModal.find('.modal-body').html(html);
+            sasaranModal.find('.modal-footer').html('' +
+                '<button type="button" class="btn btn-warning" data-dismiss="modal">' +
+                    '<i class="dashicons dashicons-no" style="margin-top: 2px;"></i> Tutup' +
+                '</button>' +
+                '<button type="button" class="btn btn-success" id="btn-simpan-data-sasaran" data-action="submit_sasaran_pk">' +
+                    '<i class="dashicons dashicons-yes" style="margin-top: 2px;"></i> Simpan' +
+                '</button>');
+            sasaranModal.find('.modal-dialog').css('maxWidth', '50%');
+            sasaranModal.find('.modal-dialog').css('width', '');
+            sasaranModal.modal('show');
+            jQuery('#wrap-loading').hide();
+        });
+    });
+
+    jQuery(document).on('click', '#btn-simpan-data-sasaran', function() {
+
+        jQuery('#wrap-loading').show();
+        let sasaranModal = jQuery("#modal-crud-sasaran");
+        let action = jQuery(this).data('action');
+        let view = jQuery(this).data('view');
+        let form = getFormData(jQuery("#form-sasaran"));
+
+        jQuery.ajax({
+            method: 'POST',
+            url: esakip.url,
+            dataType: 'json',
+            data: {
+                'action': action,
+                'api_key': esakip.api_key,
+                'data': JSON.stringify(form),
+                'tahun_anggaran': <?php echo $input['tahun']; ?>,
+                'id_jadwal': <?php echo $input['periode']?>
+            },
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                alert(response.message);
+                if (response.status) {
+                    location.reload();
+                    sasaranModal.modal('hide');
+                }
+            }
+        })
+    });
+
+    function runFunction(name, arguments) {
+        var fn = window[name];
+        if (typeof fn !== 'function')
+            return;
+
+        fn.apply(window, arguments);
+    }
 
     function scrollCarousel(direction) {
         const carousel = jQuery('#card-carousel');
