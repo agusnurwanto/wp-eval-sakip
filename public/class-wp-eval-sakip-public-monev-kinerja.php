@@ -9863,73 +9863,191 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 		die(json_encode($ret));
 	}
-	function submit_target_pk_pemda()
+
+    function submit_target_pk_pemda()
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil simpan data!'
+        );
+
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+                if (empty($_POST['id_jadwal'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'ID jadwal tidak boleh kosong!';
+                    die(json_encode($ret));
+                }
+
+                if (empty($_POST['tahun_anggaran'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tahun Anggaran tidak boleh kosong!';
+                die(json_encode($ret));
+                }
+
+                if (!empty($_POST['target']) && is_array($_POST['target'])) {
+                    foreach ($_POST['target'] as $id_pk => $target) {
+                        $cek_id = $wpdb->get_row($wpdb->prepare("
+                            SELECT * 
+                            FROM esakip_laporan_pk_pemda 
+                            WHERE id = %d AND active = 1
+                        ", $id_pk));
+
+                        if (!empty($cek_id)) {
+                            $wpdb->update(
+                                'esakip_laporan_pk_pemda',
+                                array('target' => $target),
+                                array('id' => $id_pk, 'active' => 1)
+                            );
+                        }
+                    }
+                }
+
+                if (!empty($_POST['label_sasaran']) && is_array($_POST['label_sasaran'])) {
+                    foreach ($_POST['label_sasaran'] as $id_pk => $label_sasaran) {
+                        $cek_id = $wpdb->get_row($wpdb->prepare("
+                            SELECT * 
+                            FROM esakip_laporan_pk_pemda 
+                            WHERE id = %d AND active = 1 AND (id_iku IS NULL OR id_iku = '' OR id_iku = 0)
+                        ", $id_pk));
+
+                        if (!empty($cek_id)) {
+                            $wpdb->update(
+                                'esakip_laporan_pk_pemda',
+                                array('label_sasaran' => $label_sasaran),
+                                array('id' => $id_pk, 'active' => 1)
+                            );
+                        }
+                    }
+                }
+
+                if (!empty($_POST['label_indikator']) && is_array($_POST['label_indikator'])) {
+                    foreach ($_POST['label_indikator'] as $id_pk => $label_indikator) {
+                        $cek_id = $wpdb->get_row($wpdb->prepare("
+                            SELECT * 
+                            FROM esakip_laporan_pk_pemda 
+                            WHERE id = %d AND active = 1 AND (id_iku IS NULL OR id_iku = '' OR id_iku = 0)
+                        ", $id_pk));
+
+                        if (!empty($cek_id)) {
+                            $wpdb->update(
+                                'esakip_laporan_pk_pemda',
+                                array('label_indikator' => $label_indikator),
+                                array('id' => $id_pk, 'active' => 1)
+                            );
+                        }
+                    }
+                }
+
+                if (!empty($_POST['satuan']) && is_array($_POST['satuan'])) {
+                    foreach ($_POST['satuan'] as $id_pk => $satuan) {
+                        $cek_id = $wpdb->get_row($wpdb->prepare("
+                            SELECT * 
+                            FROM esakip_laporan_pk_pemda 
+                            WHERE id = %d AND active = 1
+                        ", $id_pk));
+
+                        if (!empty($cek_id)) {
+                            $wpdb->update(
+                                'esakip_laporan_pk_pemda',
+                                array('satuan' => $satuan),
+                                array('id' => $id_pk, 'active' => 1)
+                            );
+                        }
+                    }
+                }
+
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message' => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message' => 'Format tidak sesuai!'
+            );
+        }
+
+        die(json_encode($ret));
+    }
+
+    function hapus_sasaran_pk()
 	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil simpan data PK!'
-		);
-
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-
-				if (empty($_POST['target']) || !is_array($_POST['target'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Target tidak valid atau kosong!';
-					die(json_encode($ret));
-				}
-
-				if (empty($_POST['id_jadwal'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID jadwal tidak boleh kosong!';
-					die(json_encode($ret));
-				}
-
-				if (empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun Anggaran tidak boleh kosong!';
-					die(json_encode($ret));
-				}
-
-				foreach ($_POST['target'] as $id_pk => $target) {
-					$cek_id = $wpdb->get_row($wpdb->prepare("
-						SELECT 
-							* 
-						FROM esakip_laporan_pk_pemda 
-						WHERE id = %d 
-							AND active = 1
-					", $id_pk));
-
-					if (empty($cek_id)) {
-						continue;
-					}
-
-					$wpdb->update(
-						'esakip_laporan_pk_pemda',
-						array(
-							'target' => $target
-						),
-						array(
-							'id' => $id_pk,
-							'active' => 1
-						)
-					);
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message' => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message' => 'Format tidak sesuai!'
-			);
-		}
-
-		die(json_encode($ret));
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil menghapus data!'
+	    );
+	    
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (empty($_POST['id'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'ID kosong!';
+	                die(json_encode($ret));
+	            }
+	            
+	            if (empty($_POST['tahun_anggaran'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Tahun anggaran kosong!';
+	                die(json_encode($ret));
+	            }
+	            
+	            $cek_id = $wpdb->get_row($wpdb->prepare("
+	                SELECT 
+	                	* 
+	                FROM esakip_laporan_pk_pemda 
+	                WHERE id = %d 
+	                	AND active = 1 
+	                	AND (id_iku IS NULL OR id_iku = '' OR id_iku = 0)
+	            ", $_POST['id']));
+	            
+	            // Validasi cek apakah PK ini digunakan di renaksi opd
+	            if (!empty($cek_id)) {
+	                $cek_koneksi = $wpdb->get_row($wpdb->prepare("
+	                    SELECT 
+	                    	r.*,
+	                    	l.* 
+	                    FROM esakip_detail_rencana_aksi_pemda AS r
+	                    LEFT JOIN esakip_data_label_rencana_aksi AS l
+	                        ON l.parent_renaksi_pemda = r.id 
+	                        AND l.active = r.active 
+	                    WHERE r.id_pk = %d
+	                        AND l.active = 1
+	                ", $_POST['id']));
+	                
+	                if (!empty($cek_koneksi)) {
+						$ret['status'] = 'error';
+						$ret['message'] = 'Data ini tidak bisa dihapus dikarenakan sudah terkoneksi dengan rencana aksi perangkat daerah!';
+						die(json_encode($ret));
+	                } else {
+	                    $wpdb->update(
+	                        'esakip_laporan_pk_pemda',
+	                        array('active' => 0),
+	                        array('id' => $_POST['id'])
+	                    );
+	                }
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Data tidak ditemukan!';
+	            }
+	        } else {
+	            $ret = array(
+	                'status' => 'error',
+	                'message' => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    } else {
+	        $ret = array(
+	            'status' => 'error',
+	            'message' => 'Format tidak sesuai!'
+	        );
+	    }
+	    die(json_encode($ret));
 	}
 
 	function get_table_rencana_aksi_pemda_baru()

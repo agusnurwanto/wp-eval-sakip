@@ -713,6 +713,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_edit_finalisasi_pk_pemda', $plugin_public, 'edit_finalisasi_pk_pemda');
 		$this->loader->add_action('wp_ajax_submit_target_pk_pemda', $plugin_public, 'submit_target_pk_pemda');
 		$this->loader->add_action('wp_ajax_submit_sasaran_pk', $plugin_public, 'submit_sasaran_pk');
+		$this->loader->add_action('wp_ajax_hapus_sasaran_pk', $plugin_public, 'hapus_sasaran_pk');
 		
 		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg', $plugin_public, 'get_table_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_simpan_pegawai_simpeg', $plugin_public, 'simpan_pegawai_simpeg');
