@@ -44,34 +44,6 @@ foreach ($idtahun as $val) {
     }
     $tahun .= "<option value='$val[tahun_anggaran]' $selected>$val[tahun_anggaran]</option>";
 }
-
-$current_user = wp_get_current_user();
-$user_roles = $current_user->roles;
-$is_admin_panrb = in_array('admin_panrb', $user_roles);
-$is_administrator = in_array('administrator', $user_roles);
-$status_api_esr = get_option('_crb_api_esr_status');
-
-    $admin_role_pemda = array(
-        'admin_bappeda',
-        'admin_ortala'
-    );
-
-    $this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2 ;
-
-    $cek_settingan_menu = $wpdb->get_var(
-        $wpdb->prepare(
-        "SELECT 
-            jenis_role
-        FROM esakip_menu_dokumen 
-        WHERE nama_dokumen='Dokumen Kuesioner'
-          AND user_role='perangkat_daerah' 
-          AND active = 1
-          AND tahun_anggaran=%d
-    ", $input['tahun'])
-    );
-
-    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
-
 ?>
 <style type="text/css">
     .wrap-table {
@@ -96,28 +68,14 @@ $status_api_esr = get_option('_crb_api_esr_status');
     <div class="cetak">
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen Kuesioner <br><?php echo $skpd['nama_skpd'] ?><br> Tahun Anggaran <?php echo $input['tahun']; ?></h1>
-            <?php if (!$is_admin_panrb && $hak_akses_user): ?>
             <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen_pedoman_teknis_kuesioner();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                <?php
-                if($status_api_esr){
-                    echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
-                }
-                ?>
+                <button class="btn btn-primary" onclick="tambah_dokumen_kuesioner();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
-            <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen_kuesioner" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
                         <tr>
                             <th class="text-center">No</th>
-                            <?php
-                                if (!$is_admin_panrb && $hak_akses_user):
-                                    if($status_api_esr){
-                                        echo '<th class="text-center" rowspan="2" id="check-list-esr" style="display:none">Checklist ESR</th>';
-                                    }
-                                endif;
-                            ?>
                             <th class="text-center">Perangkat Daerah</th>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
@@ -153,7 +111,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     <div class="form-group">
                         <label for="fileUpload">Pilih File</label>
                         <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept="application/pdf" required>
-                        <div style="padding-top: 10px; padding-bottom: 10px;"><a id="fileUploadExisting" target="_blank"></a></div>
+                        <div><a id="fileUploadExisting" target="_blank"></a></div>
                     </div>
                     <div class="alert alert-warning mt-2" role="alert">
                         Maksimal ukuran file: <?php echo get_option('_crb_maksimal_upload_dokumen_esakip'); ?> MB. Format file yang diperbolehkan: PDF.
@@ -208,7 +166,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
         });
     }
 
-    function tambah_dokumen_pedoman_teknis_kuesioner() {
+    function tambah_dokumen_kuesioner() {
         jQuery("#editModalLabel").hide();
         jQuery("#uploadModalLabel").show();
         jQuery("#idDokumen").val('');
