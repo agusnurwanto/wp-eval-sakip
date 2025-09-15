@@ -519,9 +519,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent 
 								AND a.level=b.level 
 								AND a.active=b.active 
+								AND a.id_jadwal=b.id_jadwal 
+								AND a.id_skpd=b.id_skpd 
 							WHERE 
 								a.id_jadwal=%d AND 
-								a.parent=%d AND 
 								a.active=%d AND
 								a.label_indikator_kinerja is NULL
 							ORDER BY a.level ASC, a.nomor_urut ASC, b.nomor_urut ASC",
@@ -540,6 +541,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent 
 								AND a.level=b.level 
 								AND a.active=b.active 
+								AND a.id_jadwal=b.id_jadwal 
+								AND a.id_skpd=b.id_skpd 
 							WHERE 
 								a.id_jadwal=%d AND
 								a.active=%d AND 
