@@ -3230,10 +3230,8 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 
                         $btn = '<div class="btn-action-group">';
                         $btn .= '<button class="btn btn-sm btn-info" onclick="lihatDokumen(\'' . $vv['dokumen'] . '\'); return false;" href="#" title="Lihat Dokumen"><span class="dashicons dashicons-visibility"></span></button>';
-                        if (!$this->is_admin_panrb() && $this->hak_akses_upload_dokumen('Dokumen Kuesioner', $tahun_anggaran)) {
-                            $btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_kuesioner(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
-                            $btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_kuesioner(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
-                        }
+                        $btn .= '<button class="btn btn-sm btn-warning" onclick="edit_dokumen_kuesioner(\'' . $vv['id'] . '\'); return false;" href="#" title="Edit Dokumen"><span class="dashicons dashicons-edit"></span></button>';
+                        $btn .= '<button class="btn btn-sm btn-danger" onclick="hapus_dokumen_kuesioner(\'' . $vv['id'] . '\'); return false;" href="#" title="Hapus Dokumen"><span class="dashicons dashicons-trash"></span></button>';
                         $btn .= '</div>';
 
                         $tbody .= "<td class='text-center'>" . $btn . "</td>";
