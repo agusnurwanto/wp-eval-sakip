@@ -110,21 +110,36 @@ $no_iku = 1;
 $data_simpan = [];
 if (!empty($iku)) {
     foreach ($iku as $k_iku => $v_iku) {
+        // Proses label_indikator untuk pemisahan dengan <br/>
+        $label_indikator = $v_iku['label_indikator'] ?? '-';
+        
+        if ($label_indikator !== '-') {
+            if (strpos($label_indikator, ' - ') !== false) {
+                $indikator_array = explode(' - ', $label_indikator);
+                $label_indikator = '- ' . implode('<br/>- ', $indikator_array);
+            }
+            else if (strpos($label_indikator, "\n- ") !== false) {
+                $indikator_array = explode("\n- ", $label_indikator);
+                $label_indikator = implode("<br/>- ", $indikator_array);
+            }
+        }
+        
         $data_simpan[] = [
-            'kode_sasaran'    => $v_iku['kode_sasaran'] ?? '-',
+            'kode_sasaran'     => $v_iku['kode_sasaran'] ?? '-',
             'label_sasaran'    => $v_iku['label_sasaran'] ?? '-',
-            'id_unik_indikator'  => $v_iku['id_unik_indikator'] ?? '-',
-            'label_indikator'  => $v_iku['label_indikator'] ?? '-',
+            'id_unik_indikator'=> $v_iku['id_unik_indikator'] ?? '-',
+            'label_indikator'  => $v_iku['label_indikator'] ?? '-', 
             'formulasi'        => $v_iku['formulasi'] ?? '-',
             'sumber_data'      => $v_iku['sumber_data'] ?? '-',
             'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '-',
             'id_jadwal_wpsipd' => $v_iku['id_jadwal_wpsipd'] ?? '-',
         ];
+        
         $html_iku .= '
             <tr>
                 <td class="text-left atas kanan bawah kiri">' . $no_iku++ . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['label_sasaran'] . '</td>
-                <td class="text-left atas kanan bawah kiri">' . $v_iku['label_indikator'] . '</td>
+                <td class="text-left atas kanan bawah kiri">' . $label_indikator . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['formulasi'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['sumber_data'] . '</td>
                 <td class="text-left atas kanan bawah kiri">' . $v_iku['penanggung_jawab'] . '</td>
@@ -475,7 +490,7 @@ if (!empty($data_tahapan)) {
                 </button>
             </div>
             <br>
-            <div id="cetak" class="wrap-table">
+            <div id="cetak" title="Laporan <?php echo $nama_jadwal ?>" class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_iku table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
@@ -492,7 +507,7 @@ if (!empty($data_tahapan)) {
                     </tbody>
                 </table>
             </div>
-            <div id="cetak" class="wrap-table">
+            <div id="cetak" title="Laporan <?php echo $nama_jadwal ?>" class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_edit_dokumen_iku table table-bordered" style="display: none;">
                     <thead style="background: #ffc491;">
                         <tr>
@@ -529,9 +544,10 @@ if (!empty($data_tahapan)) {
                         <label for="tujuan-sasaran">Tujuan/Sasaran</label>
                         <select name="tujuan-sasaran" id="tujuan-sasaran"></select>
                     </div>
-                    <div class="form-group">
-                        <label for="indikator">Indikator</label>
-                        <textarea name="indikator" id="indikator" disabled></textarea>
+                    <div class="form-group"> 
+                        <label for="indikator">Indikator</label> 
+                        <select class="form-control" multiple name="indikator" id="indikator">
+                        </select> 
                     </div>
                     <div class="form-group">
                         <label for="formulasi">Definisi Operasional/Formulasi</label>
@@ -743,59 +759,93 @@ if (!empty($data_tahapan)) {
     function tambahIku() {
         jQuery('#wrap-loading').show();
         return get_tujuan_sasaran()
-            .then(function() {
-                return new Promise(function(resolve, reject) {
+        .then(function() {
+            return new Promise(function(resolve, reject) {
+                jQuery('#wrap-loading').hide();
+                document.input_iku.reset();
+                jQuery('#id_iku').val("");
+                jQuery('#id_unik_indikators').text("");
+                jQuery('#indikator').html(""); 
+                
+                if (typeof data_tujuan_cascading != 'undefined' || typeof data_sasaran_cascading != 'undefined') {
                     jQuery('#wrap-loading').hide();
-                    document.input_iku.reset();
-                    jQuery('#id_iku').val("");
-                    jQuery('#id_unik_indikators').text("");
-                    jQuery('#indikator').text("");
-                    if (typeof data_sasaran_cascading != 'undefined') {
-                        jQuery('#wrap-loading').hide();
-                        jQuery("#modal-iku").modal('show');
-                        jQuery("#modal-iku").find('.modal-title').html('Tambah IKU');
-                        jQuery("#modal-iku").find('.modal-footer').html('' +
-                            '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
-                            'Tutup' +
-                            '</button>' +
-                            '<button type="button" class="btn btn-success" onclick="simpan_data_iku()">' +
-                            'Simpan' +
-                            '</button>');
+                    jQuery("#modal-iku").modal('show');
+                    jQuery("#modal-iku").find('.modal-title').html('Tambah IKU');
+                    jQuery("#modal-iku").find('.modal-footer').html('' +
+                        '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
+                        'Tutup' +
+                        '</button>' +
+                        '<button type="button" class="btn btn-success" onclick="simpan_data_iku()">' +
+                        'Simpan' +
+                        '</button>');
 
-                        if (data_sasaran_cascading != undefined) {
-                            let html_cascading = '<option value="">Pilih Tujuan/Sasaran</option>';
-                            if (data_sasaran_cascading.data !== null) {
-                                data_sasaran_cascading.data.map(function(value, index) {
-                                    if (value.id_unik_indikator == null) {
-                                        html_cascading += '<option value="' + value.id_unik + '">' + value.sasaran_teks + '</option>';
-                                    }
-                                });
+                    let html_cascading = '<option value="">Pilih Tujuan/Sasaran</option>';
+
+                    if (typeof data_tujuan_cascading != 'undefined' && data_tujuan_cascading.data !== null) {
+                        data_tujuan_cascading.data.map(function(value, index) {
+                            if (value.id_unik_indikator == null) {
+                                let nama_bidang_urusan = value.nama_bidang_urusan.replace(/^\d+\.\d+\s*/, '');
+                                html_cascading += '<option value="' + value.id_unik + '" data-label="' + value.tujuan_teks + '">Tujuan : ' + value.tujuan_teks + '</option>';
                             }
-                            jQuery("#tujuan-sasaran").html(html_cascading);
-                            jQuery('#tujuan-sasaran').select2({
-                                width: '100%'
-                            });
-                            jQuery('#tujuan-sasaran').attr("onchange", "get_indikator(this.value)")
-                        }
-
-                        resolve();
+                        });
                     }
-                })
+
+                    if (typeof data_sasaran_cascading != 'undefined' && data_sasaran_cascading.data !== null) {
+                        data_sasaran_cascading.data.map(function(value, index) {
+                            if (value.id_unik_indikator == null) {
+                                let nama_bidang_urusan = value.nama_bidang_urusan.replace(/^\d+\.\d+\s*/, '');
+                                html_cascading += '<option value="' + value.id_unik + '" data-label="' + value.sasaran_teks + '">Sasaran : ' + value.sasaran_teks + '</option>';
+                            }
+                        });
+                    }
+
+                    jQuery("#tujuan-sasaran").html(html_cascading);
+
+                    jQuery('#tujuan-sasaran').select2({
+                        width: '100%'
+                    });
+                    
+                    jQuery('#indikator').select2({
+                        width: "100%",
+                        placeholder: "Pilih Indikator",
+                        allowClear: true,
+                        dropdownParent: jQuery('#indikator').closest('.form-group')
+                    });
+                    
+                    jQuery('#tujuan-sasaran').attr("onchange", "get_indikator(this.value)")
+                    
+                    resolve();
+                }
             })
+        })
     }
 
     function simpan_data_iku() {
         let id_iku = jQuery('#id_iku').val();
         let id_unik = jQuery('#tujuan-sasaran').val();
-        let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
+        let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').attr('data-label'); 
         let id_unik_indikators = jQuery('#id_unik_indikators').text();
-        let label_indikator = jQuery('#indikator').val();
+        
+        let selected_indikator_ids = jQuery('#indikator').val();
+        let label_indikator = [];
+        
+        if (selected_indikator_ids && selected_indikator_ids.length > 0) {
+            selected_indikator_ids.forEach(function(id) {
+                let option_text = jQuery('#indikator option[value="' + id + '"]').text();
+                if (option_text && option_text !== '') {
+                    label_indikator.push(option_text);
+                }
+            });
+        }
+        
         let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
         let sumber_data = jQuery('#sumber-data').val();
         let penanggung_jawab = jQuery('#penanggung-jawab').val();
-        if (id_unik == '' || label_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == '') {
+        
+        if (id_unik == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == '') {
             return alert('Ada Input Data Yang Kosong!')
         }
+        
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -805,9 +855,9 @@ if (!empty($data_tahapan)) {
                 "api_key": esakip.api_key,
                 "tipe_iku": "opd",
                 "id_unik": id_unik,
-                "label_tujuan_sasaran": label_tujuan_sasaran,
+                "label_tujuan_sasaran": label_tujuan_sasaran, 
                 "id_unik_indikators": id_unik_indikators,
-                "label_indikator": label_indikator,
+                "label_indikator": label_indikator, 
                 "formulasi": formulasi,
                 "sumber_data": sumber_data,
                 "penanggung_jawab": penanggung_jawab,
@@ -901,34 +951,89 @@ if (!empty($data_tahapan)) {
     function get_indikator(id_unik) {
         jQuery('#wrap-loading').show();
         get_tujuan_sasaran()
-            .then(function() {
-                jQuery('#wrap-loading').hide();
-
-                if (typeof data_sasaran_cascading != 'undefined' && data_sasaran_cascading != undefined) {
-                    let html_indikator = '';
-                    let id_unik_indikators = [];
-
-                    if (data_sasaran_cascading.data !== null) {
-                        data_sasaran_cascading.data.map(function(value) {
-                            if (value.id_unik_indikator != null && value.id_unik == id_unik) {
-                                html_indikator += '- ' + value.indikator_teks + '\n';
-                                id_unik_indikators.push(value.id_unik_indikator);
-                            }
-                        });
+        .then(function() {
+            jQuery('#wrap-loading').hide();
+            let html_indikator = '<option value="">Pilih Indikator</option>';
+            let id_unik_indikators = [];
+            let all_indikator_values = []; 
+            
+            if (typeof data_tujuan_cascading != 'undefined' && data_tujuan_cascading.data != null) {
+                data_tujuan_cascading.data.map(function(value) {
+                    if (value.id_unik_indikator != null && value.id_unik_indikator !== undefined && value.id_unik_indikator !== '' && value.id_unik_indikator !== 'null' && value.indikator_teks != null && value.indikator_teks !== undefined && value.indikator_teks !== '' && value.indikator_teks !== 'null' && value.id_unik == id_unik) {
+                        
+                        html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
+                        id_unik_indikators.push(value.id_unik_indikator);
+                        all_indikator_values.push(value.id_unik_indikator); 
                     }
-
-                    jQuery("#indikator").html(html_indikator);
-                    jQuery("#id_unik_indikators").text(id_unik_indikators.join(','));
-                }
+                });
+            }
+            
+            if (typeof data_sasaran_cascading != 'undefined' && data_sasaran_cascading.data != null) {
+                data_sasaran_cascading.data.map(function(value) {
+                    if (value.id_unik_indikator != null && value.id_unik_indikator !== undefined && value.id_unik_indikator !== '' && value.id_unik_indikator !== 'null' && value.indikator_teks != null && value.indikator_teks !== undefined && value.indikator_teks !== '' && value.indikator_teks !== 'null' && value.id_unik == id_unik) {
+                        
+                        html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
+                        id_unik_indikators.push(value.id_unik_indikator);
+                        all_indikator_values.push(value.id_unik_indikator); 
+                    }
+                });
+            }
+            
+            jQuery("#indikator").html(html_indikator);
+            jQuery("#id_unik_indikators").text(id_unik_indikators.join(','));
+            
+            jQuery('#indikator').select2({
+                width: "100%",
+                placeholder: "Pilih Indikator",
+                allowClear: true,
+                dropdownParent: jQuery('#indikator').closest('.form-group')
             });
+            
+            if (all_indikator_values.length > 0) {
+                jQuery('#indikator').val(all_indikator_values).trigger('change');
+            }
+        });
     }
 
+    function getSelectedIndikators() {
+        var selectedValues = jQuery('#indikator').val();
+        if (selectedValues && selectedValues.length > 0) {
+            return selectedValues; 
+        }
+        return [];
+    }
 
     function get_tujuan_sasaran() {
         return new Promise(function(resolve, reject) {
+            let promises = [];
+            
+            if (typeof data_tujuan_cascading == 'undefined') {
+                jQuery('#wrap-loading').show();
+                let tujuanPromise = jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: {
+                        "action": 'get_tujuan_sasaran_cascading',
+                        "api_key": esakip.api_key,
+                        "id_skpd": <?php echo $skpd['id_skpd']; ?>,
+                        "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                        "jenis": 'tujuan',
+                        "id_jadwal_wpsipd": id_jadwal_wpsipd
+                    },
+                    dataType: "json"
+                }).done(function(response) {
+                    if (response.status) {
+                        window.data_tujuan_cascading = response;
+                    } else {
+                        console.log("Data tujuan cascading tidak ditemukan");
+                    }
+                });
+                promises.push(tujuanPromise);
+            }
+            
             if (typeof data_sasaran_cascading == 'undefined') {
                 jQuery('#wrap-loading').show();
-                jQuery.ajax({
+                let sasaranPromise = jQuery.ajax({
                     url: esakip.url,
                     type: "post",
                     data: {
@@ -939,15 +1044,26 @@ if (!empty($data_tahapan)) {
                         "jenis": 'sasaran',
                         "id_jadwal_wpsipd": id_jadwal_wpsipd
                     },
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status) {
-                            window.data_sasaran_cascading = response;
-                        } else {
-                            alert("Data cascading tidak ditemukan")
-                        }
-                        resolve();
+                    dataType: "json"
+                }).done(function(response) {
+                    if (response.status) {
+                        window.data_sasaran_cascading = response;
+                    } else {
+                        console.log("Data sasaran cascading tidak ditemukan");
                     }
+                });
+                promises.push(sasaranPromise);
+            }
+            
+            if (promises.length > 0) {
+                Promise.all(promises).then(function() {
+                    jQuery('#wrap-loading').hide();
+                    resolve();
+                }).catch(function(error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error("Error loading data:", error);
+                    alert("Gagal memuat data tujuan/sasaran");
+                    reject(error);
                 });
             } else {
                 resolve();

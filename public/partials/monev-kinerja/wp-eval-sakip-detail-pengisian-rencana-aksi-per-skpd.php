@@ -195,8 +195,8 @@ if (!empty($renaksi_pemda)) {
         $get_data_pemda = $wpdb->get_results("
             SELECT 
                 pk.*,
-                ik.label_sasaran,
-                ik.label_indikator
+                ik.label_sasaran as ik_label_sasaran,
+                ik.label_indikator as ik_label_indikator
             FROM esakip_laporan_pk_pemda pk
             LEFT JOIN esakip_data_iku_pemda ik
                 ON pk.id_iku = ik.id 
@@ -1380,15 +1380,22 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                             var renaksi_pemda = "";
                             response.data.renaksi_pemda.map(function(b, i) {
+                                let label_sasaran = (b.id_iku && b.ik_label_sasaran) 
+                                    ? b.ik_label_sasaran 
+                                    : (b.label_sasaran || '');
+
+                                let label_indikator = (b.id_iku && b.ik_label_indikator) 
+                                    ? b.ik_label_indikator 
+                                    : (b.label_indikator || '');
                                 renaksi_pemda += `
                                 <tr>
-                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda" name="checklist_renaksi_pemda[]" value="${b.label_sasaran}" id_label_renaksi_pemda="${b.id_renaksi}" ${b.id_label != null ? 'checked' : ''}>
+                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda" name="checklist_renaksi_pemda[]" value="${label_sasaran}" id_label_renaksi_pemda="${b.id_renaksi}" ${b.id_label != null ? 'checked' : ''}>
                                     </td>
                                     <td>
-                                        <label class="form-check-label" id="label_sasaran_strategis" for="label_sasaran_strategis">${b.label_sasaran}</label>
+                                        <label class="form-check-label" id="label_sasaran_strategis" for="label_sasaran_strategis">${label_sasaran}</label>
                                     </td>
                                     <td>
-                                        <label class="form-check-label" id="label_indikator_uraian_kegiatan" for="label_indikator_uraian_kegiatan">${b.label_indikator}</label>
+                                        <label class="form-check-label" id="label_indikator_uraian_kegiatan" for="label_indikator_uraian_kegiatan">${label_indikator}</label>
                                     </td>
                                 </tr>
                             `;
@@ -3134,12 +3141,19 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             <tbody>
                     `;
                     get_renaksi_pemda.forEach(function(item, index) {
+                        let label_sasaran = (item.id_iku && item.ik_label_sasaran) 
+                            ? item.ik_label_sasaran 
+                            : (item.label_sasaran || '');
+
+                        let label_indikator = (item.id_iku && item.ik_label_indikator) 
+                            ? item.ik_label_indikator 
+                            : (item.label_indikator || '');
                         checklist_renaksi_pemda += `
                             <tr>
-                                <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}" name="checklist_renaksi_pemda[]" value="${item.label_sasaran}" id_label_renaksi_pemda="${item.id_detail}">
+                                <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}" name="checklist_renaksi_pemda[]" value="${label_sasaran}" id_label_renaksi_pemda="${item.id_detail}">
                                     </td>
-                                <td>${item.label_sasaran}</td>
-                                <td>${item.label_indikator}</td>
+                                <td>${label_sasaran}</td>
+                                <td>${label_indikator}</td>
                             </tr>
                         `;
                     });

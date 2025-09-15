@@ -650,7 +650,7 @@ if (!empty($pohon_kinerja_level_1)) {
 											$id_skpd_view_pokin = $koneksi_pokin_level_4['id_skpd_koneksi'];
 										} elseif ($koneksi_pokin_level_4['tipe'] == 4) {
 											$nama_perangkat_koneksi = $koneksi_pokin_level_4['nama_desa'];
-										} elseif ($koneksi_pokin_level_1['tipe'] == 2) {
+										} elseif ($koneksi_pokin_level_4['tipe'] == 2) {
 											$lembaga_lainnya = $wpdb->get_var(
 												$wpdb->prepare("
 													SELECT 
@@ -713,7 +713,7 @@ if (!empty($pohon_kinerja_level_1)) {
 												'label_parent' => $koneksi_pokin_level_4['label_parent'],
 												'keterangan_tolak' => $koneksi_pokin_level_4['keterangan_tolak'],
 												'nama_skpd' => $nama_perangkat_koneksi,
-												'id_skpd_view_pokin' => $id_skpd_view_pokin,
+												'id_skpd_view_pokin' => $id_skpd_view_pokin ?? '',
 												'id_level_1_parent' => $id_level_1_parent,
 												'id_level_2_parent' => $koneksi_pokin_level_4['id_parent'],
 												'pokin_opd_turunan' => $data_pokin_opd,

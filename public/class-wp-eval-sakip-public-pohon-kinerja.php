@@ -516,7 +516,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								b.label_indikator_kinerja,
 								b.nomor_urut as nomor_urut_indikator
 							FROM esakip_pohon_kinerja a
-							LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent AND a.level=b.level 
+							LEFT JOIN esakip_pohon_kinerja b ON a.id=b.parent 
+								AND a.level=b.level 
+								AND a.active=b.active 
 							WHERE 
 								a.id_jadwal=%d AND 
 								a.parent=%d AND 
@@ -535,7 +537,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								b.label_indikator_kinerja,
 								b.nomor_urut as nomor_urut_indikator
 							FROM esakip_pohon_kinerja_opd a
-							LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent AND a.level=b.level 
+							LEFT JOIN esakip_pohon_kinerja_opd b ON a.id=b.parent 
+								AND a.level=b.level 
+								AND a.active=b.active 
 							WHERE 
 								a.id_jadwal=%d AND
 								a.active=%d AND 

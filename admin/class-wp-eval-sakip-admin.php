@@ -4041,6 +4041,7 @@ class Wp_Eval_Sakip_Admin
 					'read' => true,
 					'edit_posts' => false,
 					'delete_posts' => false,
+					'edit_pages' => true,
 					'upload_files' => true
 				));
 			}
@@ -4620,7 +4621,7 @@ class Wp_Eval_Sakip_Admin
 		global $wpdb;
 		$ret = array(
 			'status'    => 'success',
-			'message'   => 'Berhasil cek lisensi aktif!'
+			'message'   => 'Berhasil login!'
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
@@ -4630,6 +4631,9 @@ class Wp_Eval_Sakip_Admin
 				} else {
 					if (!empty($_POST['id'])) {
 						$user = wp_get_current_user();
+						if(in_array('administrator', $user->roles)){
+							$user = get_user_by('id', $_POST['user_id']);
+						}
 						$ret['url_login'] = $this->functions->login_to_other_site(array(
 							'user' => $user,
 							'id_login' => $_POST['id'],
