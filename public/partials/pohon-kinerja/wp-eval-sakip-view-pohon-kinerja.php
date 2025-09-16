@@ -875,6 +875,10 @@ if (!empty($data_all['data'])) {
 				<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
 				<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
 			</div>
+			<div class="custom-control custom-checkbox custom-control-inline mt-4">
+				<input type="checkbox" class="custom-control-input" id="show_all_pokin">
+				<label class="custom-control-label" for="show_all_pokin">Tampilkan Semua Pokin <?php echo $nama_pemda; ?></label>
+			</div>
 	</div>
 	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
 	<br>
@@ -1171,7 +1175,7 @@ if (!empty($data_all['data'])) {
 			collapse = true;
 		}
 		data_all.map(function(b, i) {
-			if (b[0].f.indexOf('show-hide-pokin-opd') != -1) {
+			if (b[0] && b[0].f && b[0].f.indexOf('show-hide-pokin-opd') !== -1) {
 				chart.collapse(i, collapse);
 			}
 		});
@@ -1179,6 +1183,24 @@ if (!empty($data_all['data'])) {
 			jQuery('body').prepend('<style id="custom_style_pokin_pemda">.tampil_koneksi_pokin{ display: block !important; }</style>');
 		} else {
 			jQuery("#custom_style_pokin_pemda").remove();
+		}
+	});
+
+	jQuery("#show_all_pokin").on('click', function() {
+		var expand = this.checked; //jika checked = di expan semua
+		
+		if (expand) {
+			console.log("expand semua pokin");
+			data_all.forEach(function(b,i){
+				chart.collapse(i, false) // false = dibuka/expand
+			})
+		} else {
+			console.log("collapse semua pokin");
+			data_all.forEach(function(b,i){
+				if (b[0] && b[0] !== ''){					
+					chart.collapse(i, true) // true = collapse/tutup
+				}
+			})
 		}
 	});
 
@@ -1201,10 +1223,11 @@ if (!empty($data_all['data'])) {
 		});
 
 		data_all.map(function(b, i) {
-			if (b[0].f.indexOf('show-hide-pokin-opd') != -1) {
-				chart.collapse(i, true);
-			}
+			if (b[0] && b[0] !== '') { 
+	            chart.collapse(i, true); 
+	        }
 		});
+		jQuery("#show_all_pokin").prop('checked', false);
 	}
 
 	function setZoom(zoom, el) {

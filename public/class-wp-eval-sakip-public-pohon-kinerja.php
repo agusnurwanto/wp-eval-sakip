@@ -893,7 +893,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									FROM 
 										esakip_pohon_kinerja as pk
 									WHERE pk.parent=%d
-									AND active=1 
+										AND pk.active=1
+										AND pk.label_indikator_kinerja IS NOT NULL
 								", $v_koneksi_pokin['id_parent_pemda']),
 									ARRAY_A
 								);
@@ -951,6 +952,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										<td>' . $no++ . '</td>
 										<td>' . $v_koneksi_pokin['label_pokin_pemda'] . '</td>
 										<td>' . $v_koneksi_pokin['indikator_pokin_pemda'] . '</td>
+										<td>' . $v_koneksi_pokin['keterangan_koneksi'] . '</td>
 										<td>' . $status_koneksi . '</td>
 										<td class="text-center">' . $aksi_koneksi . '</td>
 									</tr>';
@@ -1004,6 +1006,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										$aksi_koneksi .= '<div> - </div>';
 									} else {
 										$aksi_koneksi .= '
+											<div class="btn btn-sm m-2 btn-warning" title="Edit Koneksi" onclick="handleFormEditKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', this)">
+												<span class="dashicons dashicons-edit"></span>
+											</div>
 											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
 												<span class="dashicons dashicons-trash"></span>
 											</div>';
