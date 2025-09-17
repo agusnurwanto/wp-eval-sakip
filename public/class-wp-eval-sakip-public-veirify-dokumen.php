@@ -219,19 +219,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     $tbody .= "<tr>";
                     $tbody .= "<td class='text-center'>1</td>";
                     $tbody .= "<td class='text-left'>Pemerintah Daerah</td>";
-                    $tbody .= "<td class='text-left'>
-                                <div><label>Pilih Menu:</label><br>";
+                    $tbody .= "<td class='text-left'>";
 
                     foreach ($menu_list as $menu) {
-                        $checked = ($menu === $menu_pemda_terpilih) ? 'checked' : '';
-                        $tbody .= "<label class='radio-inline' style='margin-right:15px;'>
-                                    <input type='radio' name='menu_pemda' value='$menu' $checked onclick='ganti_menu_pemda(\"$menu\")'> $menu
-                                   </label>";
+                        $menu_html = get_option('sakip_menu_khusus_set_html_pemda_' . $menu . '_' . $tahun_anggaran);
+                        $tbody .= "<div style='margin-bottom: 10px;'>
+                                    <label><strong>$menu :</strong></label>
+                                    <textarea class='form-control' id='set_html_menu_khusus_pemda_$menu' rows='2'>" . stripslashes(htmlspecialchars_decode($menu_html)) . "</textarea>
+                                   </div>";
                     }
 
-                    $tbody .= "</div><br>
-                               <textarea class='form-control' id='set_html_menu_khusus_pemda' rows='3'>" . stripslashes(htmlspecialchars_decode($set_html_pemda)) . "</textarea>
-                              </td>";
+                    $tbody .= "</td>";
                     $tbody .= "<td class='text-center'>
                                 <button class='btn btn-primary' onclick='simpan_menu_khusus(\"pemda\"); return false;' title='Simpan Data'>
                                     <span class='dashicons dashicons-saved'></span>
@@ -243,19 +241,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     $tbody .= "<tr>";
                     $tbody .= "<td class='text-center'>2</td>";
                     $tbody .= "<td class='text-left'>Perangkat Daerah</td>";
-                    $tbody .= "<td class='text-left'>
-                                <div><label>Pilih Menu:</label><br>";
+                    $tbody .= "<td class='text-left'>";
 
                     foreach ($menu_list as $menu) {
-                        $checked = ($menu === $menu_opd_terpilih) ? 'checked' : '';
-                        $tbody .= "<label class='radio-inline' style='margin-right:15px;'>
-                                    <input type='radio' name='menu_opd' value='$menu' $checked onclick='ganti_menu_opd(\"$menu\")'> $menu
-                                   </label>";
+                        $menu_html = get_option('sakip_menu_khusus_set_html_opd_' . $menu . '_' . $tahun_anggaran);
+                        $tbody .= "<div style='margin-bottom: 10px;'>
+                                    <label><strong>$menu :</strong></label>
+                                    <textarea class='form-control' id='set_html_menu_khusus_opd_$menu' rows='2'>" . stripslashes(htmlspecialchars_decode($menu_html)) . "</textarea>
+                                   </div>";
                     }
 
-                    $tbody .= "</div><br>
-                               <textarea class='form-control' id='set_html_menu_khusus_opd' rows='3'>" . stripslashes(htmlspecialchars_decode($set_html_opd)) . "</textarea>
-                              </td>";
+                    $tbody .= "</td>";
                     $tbody .= "<td class='text-center'>
                                 <button class='btn btn-primary' onclick='simpan_menu_khusus(\"opd\"); return false;' title='Simpan Data'>
                                     <span class='dashicons dashicons-saved'></span>
@@ -283,7 +279,6 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         die(json_encode($ret));
     }
 
-
     public function simpan_perubahan_menu_khusus()
     {
         global $wpdb;
@@ -291,36 +286,31 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
             'status' => 'success',
             'message' => 'Berhasil Simpan Pengaturan Menu Khusus!'
         );
-
+        
         if (!empty($_POST)) {
             if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                $set_html = !empty($_POST['set_html']) ? $_POST['set_html'] : '';
+                $menu_data = !empty($_POST['menu_data']) ? $_POST['menu_data'] : array();
                 $tahun_anggaran = !empty($_POST['tahun_anggaran']) ? $_POST['tahun_anggaran'] : '';
                 $tipe = !empty($_POST['tipe']) ? $_POST['tipe'] : '';
-
+                
                 if (empty($tahun_anggaran)) {
                     $ret['status'] = 'error';
                     $ret['message'] = 'Tahun Anggaran kosong!';
                 } elseif (empty($tipe)) {
                     $ret['status'] = 'error';
                     $ret['message'] = 'Tipe kosong!';
+                } elseif (empty($menu_data)) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data menu kosong!';
                 }
-
+                
                 if ($ret['status'] == 'success') {
-                    $menu = !empty($_POST['menu']) ? strtolower($_POST['menu']) : '';
-                    if ($tipe == 'opd') {
-                        if ($menu != '') {
-                            update_option('sakip_menu_khusus_set_html_opd_' . $menu . '_' . $tahun_anggaran, trim(htmlspecialchars($set_html)));
-                        } else {
-                            $ret['status'] = 'error';
-                            $ret['message'] = 'Menu OPD kosong!';
-                        }
-                    } else if ($tipe == 'pemda') {
-                        if ($menu != '') {
-                            update_option('sakip_menu_khusus_set_html_pemda_' . $menu . '_' . $tahun_anggaran, trim(htmlspecialchars($set_html)));
-                        } else {
-                            $ret['status'] = 'error';
-                            $ret['message'] = 'Menu Pemda kosong!';
+                    foreach ($menu_data as $menu => $set_html) {
+                        $menu_key = strtoupper($menu);
+                        if ($tipe == 'opd') {
+                            update_option('sakip_menu_khusus_set_html_opd_' . $menu_key . '_' . $tahun_anggaran, trim(htmlspecialchars($set_html)));
+                        } else if ($tipe == 'pemda') {
+                            update_option('sakip_menu_khusus_set_html_pemda_' . $menu_key . '_' . $tahun_anggaran, trim(htmlspecialchars($set_html)));
                         }
                     }
                 }
@@ -330,77 +320,77 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         } else {
             $ret = array('status' => 'error', 'message' => 'Format tidak sesuai!');
         }
-
+        
         die(json_encode($ret));
     }
 
-    public function get_html_menu_khusus_opd_by_menu()
-    {
-        global $wpdb;
-        $ret = array(
-            'status' => 'success',
-            'message' => 'Berhasil get data!'
-        );
+    // public function get_html_menu_khusus_opd_by_menu()
+    // {
+    //     global $wpdb;
+    //     $ret = array(
+    //         'status' => 'success',
+    //         'message' => 'Berhasil get data!'
+    //     );
 
-        if (!empty($_POST)) {
-            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                $tahun = $_POST['tahun_anggaran'];
-                $menu = strtolower($_POST['menu']);
-                $data = get_option('sakip_menu_khusus_set_html_opd_' . $menu . '_' . $tahun);
+    //     if (!empty($_POST)) {
+    //         if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+    //             $tahun = $_POST['tahun_anggaran'];
+    //             $menu = strtolower($_POST['menu']);
+    //             $data = get_option('sakip_menu_khusus_set_html_opd_' . $menu . '_' . $tahun);
 
-                $ret = [
-                    'status' => 'success',
-                    'message' => 'Berhasil memuat data',
-                    'data' => stripslashes(htmlspecialchars_decode($data))
-                ];
-            } else {
-                $ret = array(
-                    'status' => 'error',
-                    'message'   => 'Api Key tidak sesuai!'
-                );
-            }
-        } else {
-            $ret = array(
-                'status' => 'error',
-                'message'   => 'Format tidak sesuai!'
-            );
-        }
-        die(json_encode($ret));
-    }
+    //             $ret = [
+    //                 'status' => 'success',
+    //                 'message' => 'Berhasil memuat data',
+    //                 'data' => stripslashes(htmlspecialchars_decode($data))
+    //             ];
+    //         } else {
+    //             $ret = array(
+    //                 'status' => 'error',
+    //                 'message'   => 'Api Key tidak sesuai!'
+    //             );
+    //         }
+    //     } else {
+    //         $ret = array(
+    //             'status' => 'error',
+    //             'message'   => 'Format tidak sesuai!'
+    //         );
+    //     }
+    //     die(json_encode($ret));
+    // }
 
-    public function get_html_menu_khusus_pemda_by_menu()
-    {
-        global $wpdb;
-        $ret = array(
-            'status' => 'success',
-            'message' => 'Berhasil get data!'
-        );
+    // public function get_html_menu_khusus_pemda_by_menu()
+    // {
+    //     global $wpdb;
+    //     $ret = array(
+    //         'status' => 'success',
+    //         'message' => 'Berhasil get data!'
+    //     );
 
-        if (!empty($_POST)) {
-            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                $tahun = $_POST['tahun_anggaran'];
-                $menu = strtolower($_POST['menu']);
-                $data = get_option('sakip_menu_khusus_set_html_pemda_' . $menu . '_' . $tahun);
+    //     if (!empty($_POST)) {
+    //         if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+    //             $tahun = $_POST['tahun_anggaran'];
+    //             $menu = strtolower($_POST['menu']);
+    //             $data = get_option('sakip_menu_khusus_set_html_pemda_' . $menu . '_' . $tahun);
 
-                $ret = [
-                    'status' => 'success',
-                    'message' => 'Berhasil memuat data',
-                    'data' => stripslashes(htmlspecialchars_decode($data))
-                ];
-            } else {
-                $ret = array(
-                    'status' => 'error',
-                    'message'   => 'Api Key tidak sesuai!'
-                );
-            }
-        } else {
-            $ret = array(
-                'status' => 'error',
-                'message'   => 'Format tidak sesuai!'
-            );
-        }
-        die(json_encode($ret));
-    }
+    //             $ret = [
+    //                 'status' => 'success',
+    //                 'message' => 'Berhasil memuat data',
+    //                 'data' => stripslashes(htmlspecialchars_decode($data))
+    //             ];
+    //         } else {
+    //             $ret = array(
+    //                 'status' => 'error',
+    //                 'message'   => 'Api Key tidak sesuai!'
+    //             );
+    //         }
+    //     } else {
+    //         $ret = array(
+    //             'status' => 'error',
+    //             'message'   => 'Format tidak sesuai!'
+    //         );
+    //     }
+    //     die(json_encode($ret));
+    // }
 
     public function generate_pengaturan_menu($tahun_anggaran, $tipe)
     {
