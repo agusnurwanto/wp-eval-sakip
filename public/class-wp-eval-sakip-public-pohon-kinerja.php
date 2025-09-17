@@ -3638,23 +3638,28 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 						foreach ($data_koneksi_pokin as $key_koneksi => $koneksi_pokin) {
 
-							$nama_skpd = $wpdb->get_row(
-								$wpdb->prepare("
-									SELECT 
-										nama_skpd,
-										id_skpd,
-										tahun_anggaran
-									FROM esakip_data_unit 
-									WHERE active=1 
-									  AND is_skpd=1 
-									  AND id_skpd=%d
-									  AND tahun_anggaran=%d
-									GROUP BY id_skpd
-									ORDER BY kode_skpd ASC
-								", $koneksi_pokin['id_skpd_koneksi'], $tahun_anggaran_sakip),
-								ARRAY_A
-							);
-							$nama_perangkat = $nama_skpd['nama_skpd'] ?? 'Nama Perangkat Tidak Ditemukan';
+							if($koneksi_pokin['tipe'] == 1){
+								$nama_skpd = $wpdb->get_row(
+									$wpdb->prepare("
+										SELECT 
+											nama_skpd,
+											id_skpd,
+											tahun_anggaran
+										FROM esakip_data_unit 
+										WHERE active=1 
+										  AND is_skpd=1 
+										  AND id_skpd=%d
+										  AND tahun_anggaran=%d
+										GROUP BY id_skpd
+										ORDER BY kode_skpd ASC
+									", $koneksi_pokin['id_skpd_koneksi'], $tahun_anggaran_sakip),
+									ARRAY_A
+								);
+								$nama_perangkat = $nama_skpd['nama_skpd'] ?? 'Nama Perangkat Tidak Ditemukan';
+							}else{
+								$nama_perangkat = $koneksi_pokin['nama_desa'];
+								$koneksi_pokin['label_parent'] = $koneksi_pokin['keterangan_koneksi'];
+							}
 
 							$data_parent_tujuan = array();
 							$id_level_1_parent = 0;
@@ -3682,6 +3687,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									'label_parent' => $koneksi_pokin['label_parent'],
 									'id_level_1_parent' => $id_level_1_parent,
 									'nama_skpd' => $nama_perangkat,
+									'tipe' => $koneksi_pokin['tipe'],
 									'id_skpd_view_pokin' => $koneksi_pokin['id_skpd_koneksi']
 								];
 							}
