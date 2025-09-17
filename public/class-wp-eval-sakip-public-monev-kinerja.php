@@ -8439,6 +8439,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			'status' => true,
 			'message' => 'Tidak Ada Update Data Dari Aplikasi E-Kinerja!',
 			'data' => array(),
+			'debug' => array()
 		);
 
 		try {
@@ -8500,12 +8501,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$body_param['nip'] = $nip;
 			}
 
-			$response = wp_remote_post(get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk', [
+			$_POST['debug'] = true;
+			if(!empty($_POST['debug'])){
+				$startTimeOp1 = microtime(true);
+			}
+
+			$url_api = get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk';
+			$response = wp_remote_post($url_api, [
 				'headers' => array(
 					'X-api-key' => get_option('_crb_api_key_ekinerja'),
 				),
 				'body' => $body_param
 			]);
+
+			if(!empty($_POST['debug'])){
+				$endTimeOp1 = microtime(true);
+				$durationOp1 = $endTimeOp1 - $startTimeOp1;
+				$ret['debug'][] = "Operasi 1 (".$url_api.") selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
+			}
 
 			if (is_wp_error($response)) {
 				$error_message = $response->get_error_message();
@@ -8530,6 +8543,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				);
 				return json_encode($ret);
 			}
+
+			if(!empty($_POST['debug'])){
+				$startTimeOp1 = microtime(true);
+			}
+
 			if ($data_ekin['status']) {
 				if (!empty($data_ekin['data'])) {
 					foreach ($data_ekin['data'] as $k_ekin => $v_ekin) {
@@ -8552,6 +8570,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 												continue;
 											}
 										}
+										
+										$cek_id_indikator = $wpdb->get_var($wpdb->prepare("
+											SELECT 
+												id 
+											FROM esakip_data_rencana_aksi_indikator_opd
+											WHERE id=%d 
+												AND id_renaksi=%d 
+												AND tahun_anggaran=%d 
+												AND id_skpd=%d 
+												AND active=1
+											", $v_indikator['indikator_rhk_id'], $v_rhk['rhk_id'], $tahun, $id_skpd)
+										);
 
 										if (!empty($v_indikator['kinerja_triwulan'])) {
 											$data_triwulan = array();
@@ -8565,18 +8595,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											if (!empty($data_triwulan)) {
 
 												$data_triwulan['update_at'] = current_time('mysql');
-										
-												$cek_id_indikator = $wpdb->get_var($wpdb->prepare("
-													SELECT 
-														id 
-													FROM esakip_data_rencana_aksi_indikator_opd
-													WHERE id=%d 
-														AND id_renaksi=%d 
-														AND tahun_anggaran=%d 
-														AND id_skpd=%d 
-														AND active=1
-													", $v_indikator['indikator_rhk_id'], $v_rhk['rhk_id'], $tahun, $id_skpd)
-												);
 
 												if (!empty($cek_id_indikator)) {
 													$wpdb->update(
@@ -8623,17 +8641,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 														'created_at' => current_time('mysql'),
 													);
 
-													$cek_id_indikator = $wpdb->get_var($wpdb->prepare("
-														SELECT 
-															id 
-														FROM esakip_data_rencana_aksi_indikator_opd
-														WHERE id=%d 
-															AND id_renaksi=%d 
-															AND tahun_anggaran=%d 
-															AND id_skpd=%d 
-															AND active=1
-														", $v_indikator['indikator_rhk_id'], $v_rhk['rhk_id'], $tahun, $id_skpd)
-													);
 													// print_r($cek_id_indikator); die($wpdb->last_query);
 													if (!empty($cek_id_indikator)) {
 														$cek_id = $wpdb->get_var($wpdb->prepare("
@@ -8672,6 +8679,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 			} else {
 				throw new Exception("Message: " . $data_ekin['message'], 1);
+			}
+
+			if(!empty($_POST['debug'])){
+				$endTimeOp1 = microtime(true);
+				$durationOp1 = $endTimeOp1 - $startTimeOp1;
+				$ret['debug'][] = "Operasi 2 (Cek dan Update DB RHK) selesai dalam " . number_format($durationOp1, 4) . " detik<br>";
 			}
 
 		} catch (Exception $e) {
@@ -9076,6 +9089,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
 					$data_ekin_terbaru = json_decode($data_ekin, true);
 					$ret['message'] = $data_ekin_terbaru['message'];
+					$ret['debug'] = $data_ekin_terbaru['debug'];
 					if (!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']) {
 						$ret['show_alert_bulanan'] = 1;
 					}
