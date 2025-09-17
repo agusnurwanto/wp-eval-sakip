@@ -8554,15 +8554,36 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										}
 
 										if (!empty($v_indikator['kinerja_triwulan'])) {
+											$data_triwulan = array();
 											foreach ($v_indikator['kinerja_triwulan'] as $k_tw => $v_tw) {
 												if(!empty($v_tw['kinerja'])){
-													for($tw=1; $tw<=4; $tw++){
-														$data_option = array(
-															'realisasi_tw_'.$tw => $v_tw['kinerja']['realisasi_kuantitas'],
-															'ket_tw_'.$tw => $v_tw['kinerja']['catatan']
-														);
-														// belum selesai
-													}
+													$tw = intval(str_replace('tw', '', strtolower($v_tw['triwulan'])));
+													$data_triwulan['realisasi_tw_'.$tw] = $v_tw['kinerja']['realisasi_kuantitas'];
+													$data_triwulan['ket_tw_'.$tw] = $v_tw['kinerja']['catatan'];
+												}
+											}
+											if (!empty($data_triwulan)) {
+
+												$data_triwulan['update_at'] = current_time('mysql');
+										
+												$cek_id_indikator = $wpdb->get_var($wpdb->prepare("
+													SELECT 
+														id 
+													FROM esakip_data_rencana_aksi_indikator_opd
+													WHERE id=%d 
+														AND id_renaksi=%d 
+														AND tahun_anggaran=%d 
+														AND id_skpd=%d 
+														AND active=1
+													", $v_indikator['indikator_rhk_id'], $v_rhk['rhk_id'], $tahun, $id_skpd)
+												);
+
+												if (!empty($cek_id_indikator)) {
+													$wpdb->update(
+														'esakip_data_rencana_aksi_indikator_opd',
+														$data_triwulan,
+														array('id' => $cek_id_indikator)
+													);
 												}
 											}
 										}
