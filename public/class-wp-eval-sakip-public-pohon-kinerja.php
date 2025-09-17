@@ -3638,6 +3638,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 						foreach ($data_koneksi_pokin as $key_koneksi => $koneksi_pokin) {
 
+							// OPD
 							if($koneksi_pokin['tipe'] == 1){
 								$nama_skpd = $wpdb->get_row(
 									$wpdb->prepare("
@@ -3657,7 +3658,48 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 								);
 								$nama_perangkat = $nama_skpd['nama_skpd'] ?? 'Nama Perangkat Tidak Ditemukan';
 							}else{
-								$nama_perangkat = $koneksi_pokin['nama_desa'];
+								// Lembaga Lainnya
+								if($koneksi_pokin['tipe'] == 2){
+									$nama_lembaga = $wpdb->get_row(
+										$wpdb->prepare("
+											SELECT 
+												nama_lembaga,
+												id,
+												tahun_anggaran
+											FROM esakip_data_lembaga_lainnya 
+											WHERE active=1 
+												AND id=%d
+												AND tahun_anggaran=%d
+											GROUP BY id
+											ORDER BY nama_lembaga ASC
+										", $koneksi_pokin['id_skpd_koneksi'], $tahun_anggaran_sakip),
+										ARRAY_A
+									);
+									if (!empty($nama_lembaga)) {
+										$nama_perangkat = $nama_lembaga['nama_lembaga'];
+									}
+								// SUB SKPD
+								}else if($koneksi_pokin['tipe'] == 3){
+									$nama_skpd = $wpdb->get_row(
+										$wpdb->prepare("
+											SELECT 
+												nama_skpd,
+												id_skpd,
+												tahun_anggaran
+											FROM esakip_data_unit 
+											WHERE active=1 
+											  AND is_skpd=0 
+											  AND id_skpd=%d
+											  AND tahun_anggaran=%d
+											GROUP BY id_skpd
+											ORDER BY kode_skpd ASC
+										", $koneksi_pokin['id_skpd_koneksi'], $tahun_anggaran_sakip),
+										ARRAY_A
+									);
+									$nama_perangkat = $nama_skpd['nama_skpd'] ?? 'Nama Perangkat Tidak Ditemukan';
+								}else{
+									$nama_perangkat = $koneksi_pokin['nama_desa'];
+								}
 								$koneksi_pokin['label_parent'] = $koneksi_pokin['keterangan_koneksi'];
 							}
 

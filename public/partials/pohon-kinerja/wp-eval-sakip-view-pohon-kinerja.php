@@ -892,6 +892,13 @@ if (!empty($data_all['data'])) {
 	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
 	<br>
 	<textarea id="val-range" disabled>100%</textarea>
+	<br>
+    <div class="input-group" style="max-width: 400px; margin: 10px auto 0;">
+	    <input type="text" class="form-control" placeholder="Cari Pohon Kinerja" title="Cari Pohon Kinerja" aria-label="Search" id="cari_pokin" onkeydown="if(event.keyCode == 13){cari_pokin()};">
+	    <div class="input-group-append">
+	      	<button class="btn btn-success" type="submit" onclick="cari_pokin();"><span class="dashicons dashicons-search"></span></button>
+	    </div>
+  	</div>
 </div>
 <h1 style="text-align: center; margin-top: 30px; font-weight: bold;">Pohon Kinerja<br><?php echo $nama_skpd . $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1><br>
 <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; max-width: 100vw; max-height: 90vh;">
@@ -1193,6 +1200,7 @@ if (!empty($data_all['data'])) {
 		} else {
 			jQuery("#custom_style_pokin_pemda").remove();
 		}
+		center_div(1);
 	});
 
 	jQuery("#show_all_pokin").on('click', function() {
@@ -1223,14 +1231,56 @@ if (!empty($data_all['data'])) {
 					cek_level = true;
 				}
 			}
+
+			if(sampai_level==1 && collapse==true){
+				cek_level = true;
+			}
+
 			if(cek_level){
-				console.log('cek_level', cek_level, collapse);
 				chart.collapse(i, collapse);
 			}else{
 				chart.collapse(i, !collapse);
 			}
 		});
 		center_div(sampai_level);
+	}
+
+	function cari_pokin(){
+		var val = jQuery('#cari_pokin').val();
+		if(val == ''){
+			return;
+		}
+		var cek = false;
+		data_all.forEach(function(b,i){
+			var text = '';
+			if (
+				!cek 
+				&& b[0] 
+				&& b[0].f
+			){
+				var html = jQuery('<div>'+b[0].f+'</div>');
+				var div1 = jQuery(html.find('div')[0]);
+				text += div1.text().toLowerCase();
+				text += jQuery(html.find('.item-rincian')[0]).text().toLowerCase();
+				var _class = div1.attr('class').replace(/ /g, '.');
+				var id = div1.attr('data-id');
+				if(text.indexOf(val.toLowerCase()) !== -1){
+					cek = true;
+					center_div(false, jQuery('.'+_class+'[data-id="'+id+'"]')[0]);
+					cariTeks(val);
+				}
+			}
+		});
+		if(!cek){
+			alert('Kata kunci "'+val+'" tidak ditemukan!');
+		}
+	}
+
+	function cariTeks(query) {
+	  	window.getSelection().removeAllRanges();
+	  	for (let i = 0; i < 2; i++) {
+	  		window.find(query, false, false, true, false, false, false);
+	  	}
 	}
 
 	function drawChart() {
@@ -1288,10 +1338,14 @@ if (!empty($data_all['data'])) {
 		jQuery('#sidebarBackdrop').toggleClass('show');
 	}
 
-	function center_div(level){
-		const divA = document.getElementsByClassName('label'+level)[0];
-		if(divA){
-		  	divA.scrollIntoView({
+	function center_div(level, html=false){
+		if(html){
+			var target = html;
+		}else{
+			var target = document.getElementsByClassName('label'+level)[0];
+		}
+		if(target){
+		  	target.scrollIntoView({
 			    behavior: 'smooth',
 			    block: 'center',
 			    inline: 'center'
