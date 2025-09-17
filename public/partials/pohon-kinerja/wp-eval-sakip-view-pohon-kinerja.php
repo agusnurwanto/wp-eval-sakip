@@ -1211,32 +1211,26 @@ if (!empty($data_all['data'])) {
 		if (expand) {
 			console.log("expand semua pokin");
 			var collapse = false; // false = dibuka/expand
-
-			// ditutup semua dulu
-			data_all.forEach(function(b,i){
-				chart.collapse(i, true);
-			});
 		} else {
 			console.log("collapse semua pokin");
 			var collapse = true; // true = collapse/tutup
-
-			// dibuka semua dulu
-			data_all.forEach(function(b,i){
-				chart.collapse(i, false);
-			});
 		}
 		data_all.forEach(function(b,i){
 			var cek_level = false;
-			for(var level=0; level<sampai_level; level++){
+			for(var level=0; level < sampai_level; level++){
 				var label = ' label'+level+'"';
 				if (b[0] && b[0].f && b[0].f.indexOf(label) !== -1) {
 					cek_level = true;
 				}
 			}
 			if(cek_level){
+				console.log('cek_level', cek_level, collapse);
 				chart.collapse(i, collapse);
+			}else{
+				chart.collapse(i, !collapse);
 			}
 		});
+		center_div(sampai_level);
 	}
 
 	function drawChart() {
@@ -1263,6 +1257,7 @@ if (!empty($data_all['data'])) {
 	        }
 		});
 		jQuery("#show_all_pokin").prop('checked', false);
+		center_div(1);
 	}
 
 	function setZoom(zoom, el) {
@@ -1291,5 +1286,16 @@ if (!empty($data_all['data'])) {
 	function toggleSidebar() {
 		jQuery('#rincianSidebar').toggleClass('show');
 		jQuery('#sidebarBackdrop').toggleClass('show');
+	}
+
+	function center_div(level){
+		const divA = document.getElementsByClassName('label'+level)[0];
+		if(divA){
+		  	divA.scrollIntoView({
+			    behavior: 'smooth',
+			    block: 'center',
+			    inline: 'center'
+		  	});
+		}
 	}
 </script>

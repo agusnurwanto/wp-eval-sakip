@@ -8553,6 +8553,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											}
 										}
 
+										if (!empty($v_indikator['kinerja_triwulan'])) {
+											foreach ($v_indikator['kinerja_triwulan'] as $k_tw => $v_tw) {
+												if(!empty($v_tw['kinerja'])){
+													for($tw=1; $tw<=4; $tw++){
+														$data_option = array(
+															'realisasi_tw_'.$tw => $v_tw['kinerja']['realisasi_kuantitas'],
+															'ket_tw_'.$tw => $v_tw['kinerja']['catatan']
+														);
+														// belum selesai
+													}
+												}
+											}
+										}
+
 										if (!empty($v_indikator['kinerja_bulan'])) {
 											foreach ($v_indikator['kinerja_bulan'] as $k_k_bulan => $v_k_bulan) {
 												if (!empty($v_k_bulan['kinerja'])) {
