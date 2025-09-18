@@ -339,7 +339,8 @@ if(!empty($pohon_kinerja_level_1)){
 						FROM 
 							esakip_pohon_kinerja as pk
 						WHERE pk.parent=%d
-						AND active=1 
+							AND pk.active=1
+							AND pk.label_indikator_kinerja IS NOT NULL 
 					", $koneksi_pokin_level_1['id_parent'])
 					,ARRAY_A);
 
@@ -587,7 +588,8 @@ if(!empty($pohon_kinerja_level_1)){
 							FROM 
 								esakip_pohon_kinerja as pk
 							WHERE pk.parent=%d
-							AND active=1 
+								AND pk.active=1
+								AND pk.label_indikator_kinerja IS NOT NULL 
 						", $koneksi_pokin_level_2['id_parent'])
 						,ARRAY_A);
 
@@ -834,7 +836,8 @@ if(!empty($pohon_kinerja_level_1)){
 									FROM 
 										esakip_pohon_kinerja as pk
 									WHERE pk.parent=%d
-									AND active=1 
+										AND pk.active=1
+										AND pk.label_indikator_kinerja IS NOT NULL 
 								", $koneksi_pokin_level_3['id_parent'])
 								,ARRAY_A);
 
@@ -1082,7 +1085,8 @@ if(!empty($pohon_kinerja_level_1)){
 											FROM 
 												esakip_pohon_kinerja as pk
 											WHERE pk.parent=%d
-											AND active=1 
+												AND pk.active=1
+												AND pk.label_indikator_kinerja IS NOT NULL 
 										", $koneksi_pokin_level_4['id_parent'])
 										,ARRAY_A);
 
@@ -1331,7 +1335,8 @@ if(!empty($pohon_kinerja_level_1)){
 													FROM 
 														esakip_pohon_kinerja as pk
 													WHERE pk.parent=%d
-													AND active=1 
+														AND pk.active=1
+														AND pk.label_indikator_kinerja IS NOT NULL 
 												", $koneksi_pokin_level_5['id_parent'])
 												,ARRAY_A);
 
@@ -2241,7 +2246,8 @@ if(!empty($data_notifikasi_koneksi_pokin_pemda)){
 			FROM 
 				esakip_pohon_kinerja as pk
 			WHERE pk.parent=%d
-			AND active=1 
+				AND pk.active=1
+				AND pk.label_indikator_kinerja IS NOT NULL 
 		", $v_notif_koneksi['id_parent_pemda'])
 		,ARRAY_A);
 
@@ -2268,6 +2274,7 @@ if(!empty($data_notifikasi_koneksi_pokin_pemda)){
 				<td>'. $no_notif_koneksi_pokin++ .'</td>
 				<td>'. $v_notif_koneksi['label_parent_pemda'] .'</td>
 				<td>'. $show_indikator_pokin_pemda .'</td>
+				<td>'. $v_notif_koneksi['keterangan_koneksi'] .'</td>
 				<td>'. $aksi .'</td>
 			</tr>';
 	}
@@ -2558,6 +2565,7 @@ $hak_akses_user = ($this_jenis_role || $cek_settingan_menu == 3 || $is_administr
 				<th>No</th>
 				<th>Label Pohon Kinerja</th>
 				<th>Indikator Pohon Kinerja</th>
+				<th>Informasi Kegiatan</th>
 				<th style="min-width: 10em;">Aksi</th>
 			</tr>
 		</thead>
@@ -2916,6 +2924,7 @@ jQuery(document).ready(function(){
 										+`<th class="text-center">No</th>`
 										+`<th class="text-center">Label Pokin <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Indikator Pokin <?php echo $nama_pemda ?></th>`
+										+`<th class="text-center">Informasi Kegiatan <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Status</th>`
 										+`<th class="text-center" style="width: 150px;">Aksi</th>`
 									+`</tr>`
@@ -3191,6 +3200,7 @@ jQuery(document).ready(function(){
 										+`<th class="text-center">No</th>`
 										+`<th class="text-center">Label Pokin <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Indikator Pokin <?php echo $nama_pemda ?></th>`
+										+`<th class="text-center">Informasi Kegiatan <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Status</th>`
 										+`<th class="text-center" style="width: 150px;">Aksi</th>`
 									+`</tr>`
@@ -3474,6 +3484,7 @@ jQuery(document).ready(function(){
 										+`<th class="text-center">No</th>`
 										+`<th class="text-center">Label Pokin <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Indikator Pokin <?php echo $nama_pemda ?></th>`
+										+`<th class="text-center">Informasi Kegiatan <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Status</th>`
 										+`<th class="text-center" style="width: 150px;">Aksi</th>`
 									+`</tr>`
@@ -3758,6 +3769,7 @@ jQuery(document).ready(function(){
 										+`<th class="text-center">No</th>`
 										+`<th class="text-center">Label Pokin <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Indikator Pokin <?php echo $nama_pemda ?></th>`
+										+`<th class="text-center">Informasi Kegiatan <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Status</th>`
 										+`<th class="text-center" style="width: 150px;">Aksi</th>`
 									+`</tr>`
@@ -4049,6 +4061,7 @@ jQuery(document).ready(function(){
 										+`<th class="text-center">No</th>`
 										+`<th class="text-center">Label Pokin <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Indikator Pokin <?php echo $nama_pemda ?></th>`
+										+`<th class="text-center">Informasi Kegiatan <?php echo $nama_pemda ?></th>`
 										+`<th class="text-center">Status</th>`
 										+`<th class="text-center" style="width: 150px;">Aksi</th>`
 									+`</tr>`

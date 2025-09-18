@@ -2307,6 +2307,8 @@ CREATE TABLE esakip_kuesioner_menpan_detail (
 
 CREATE TABLE esakip_penilaian_kuesioner_menpan (
   `id` int(11) NOT NULL auto_increment,
+  `id_unik` varchar(512) DEFAULT NULL,
+  `id_detail` int(11) DEFAULT NULL,
   `id_kuesioner` int(11) DEFAULT NULL,
   `jawaban` text DEFAULT NULL,
   `tipe` varchar(255) DEFAULT NULL COMMENT '1 STS, 2 TS, 3 S, 4 SS, 5 Esai',
@@ -2314,6 +2316,7 @@ CREATE TABLE esakip_penilaian_kuesioner_menpan (
   `tahun_anggaran` year(4) DEFAULT null,
   `active` tinyint(4) NOT NULL DEFAULT '1',
   PRIMARY KEY  (`id`),
+  KEY `id_detail` (`id_detail`),
   KEY `id_kuesioner` (`id_kuesioner`),
   KEY `id_skpd` (`id_skpd`),
   KEY `tahun_anggaran` (`tahun_anggaran`),

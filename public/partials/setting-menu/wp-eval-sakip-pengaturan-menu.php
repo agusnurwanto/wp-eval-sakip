@@ -257,82 +257,81 @@ $body = '';
 		});
 	}
 
-	function ganti_menu_opd(menu = null) {
-	    if (!menu) {
-	        menu = jQuery("input[name='menu_opd']:checked").val();
-	    }
+	// function ganti_menu_opd(menu = null) {
+	//     if (!menu) {
+	//         menu = jQuery("input[name='menu_opd']:checked").val();
+	//     }
 
-	    let tahun = tahun_anggaran;
+	//     let tahun = tahun_anggaran;
 
-	    jQuery('#wrap-loading').show();
-	    jQuery.ajax({
-	        url: esakip.url,
-	        type: 'POST',
-	        data: {
-	            action: 'get_html_menu_khusus_opd_by_menu',
-	            api_key: esakip.api_key,
-	            tahun_anggaran: tahun,
-	            menu: menu
-	        },
-	        dataType: 'json',
-	        success: function(response) {
-	            jQuery('#wrap-loading').hide();
-	            if (response.status === 'success') {
-	                jQuery('#set_html_menu_khusus_opd').val(response.data);
-	            } else {
-	                alert(response.message);
-	            }
-	        },
-	        error: function() {
-	            jQuery('#wrap-loading').hide();
-	            alert('Gagal memuat data menu!');
-	        }
-	    });
-	}
+	//     jQuery('#wrap-loading').show();
+	//     jQuery.ajax({
+	//         url: esakip.url,
+	//         type: 'POST',
+	//         data: {
+	//             action: 'get_html_menu_khusus_opd_by_menu',
+	//             api_key: esakip.api_key,
+	//             tahun_anggaran: tahun,
+	//             menu: menu
+	//         },
+	//         dataType: 'json',
+	//         success: function(response) {
+	//             jQuery('#wrap-loading').hide();
+	//             if (response.status === 'success') {
+	//                 jQuery('#set_html_menu_khusus_opd').val(response.data);
+	//             } else {
+	//                 alert(response.message);
+	//             }
+	//         },
+	//         error: function() {
+	//             jQuery('#wrap-loading').hide();
+	//             alert('Gagal memuat data menu!');
+	//         }
+	//     });
+	// }
 
-	function ganti_menu_pemda(menu = null) {
-	    if (!menu) {
-	        menu = jQuery("input[name='menu_pemda']:checked").val();
-	    }
+	// function ganti_menu_pemda(menu = null) {
+	//     if (!menu) {
+	//         menu = jQuery("input[name='menu_pemda']:checked").val();
+	//     }
 
-	    let tahun = tahun_anggaran;
+	//     let tahun = tahun_anggaran;
 
-	    jQuery('#wrap-loading').show();
-	    jQuery.ajax({
-	        url: esakip.url,
-	        type: 'POST',
-	        data: {
-	            action: 'get_html_menu_khusus_pemda_by_menu',
-	            api_key: esakip.api_key,
-	            tahun_anggaran: tahun,
-	            menu: menu
-	        },
-	        dataType: 'json',
-	        success: function(response) {
-	            jQuery('#wrap-loading').hide();
-	            if (response.status === 'success') {
-	                jQuery('#set_html_menu_khusus_pemda').val(response.data);
-	            } else {
-	                alert(response.message);
-	            }
-	        },
-	        error: function() {
-	            jQuery('#wrap-loading').hide();
-	            alert('Gagal memuat data menu!');
-	        }
-	    });
-	}
+	//     jQuery('#wrap-loading').show();
+	//     jQuery.ajax({
+	//         url: esakip.url,
+	//         type: 'POST',
+	//         data: {
+	//             action: 'get_html_menu_khusus_pemda_by_menu',
+	//             api_key: esakip.api_key,
+	//             tahun_anggaran: tahun,
+	//             menu: menu
+	//         },
+	//         dataType: 'json',
+	//         success: function(response) {
+	//             jQuery('#wrap-loading').hide();
+	//             if (response.status === 'success') {
+	//                 jQuery('#set_html_menu_khusus_pemda').val(response.data);
+	//             } else {
+	//                 alert(response.message);
+	//             }
+	//         },
+	//         error: function() {
+	//             jQuery('#wrap-loading').hide();
+	//             alert('Gagal memuat data menu!');
+	//         }
+	//     });
+	// }
 
 	function simpan_menu_khusus(tipe) {
-	    let set_html = jQuery('#set_html_menu_khusus_' + tipe).val();
-	    let menu = '';
-
-	    if (tipe === 'opd') {
-	        menu = jQuery("input[name='menu_opd']:checked").val();
-	    } else if (tipe === 'pemda') {
-	        menu = jQuery("input[name='menu_pemda']:checked").val();
-	    }
-
+	    let menu_data = {};
+	    let menu_list = ['PERENCANAAN', 'PENGUKURAN_KINERJA', 'PELAPORAN', 'EVALUASI'];
+	    
+	    menu_list.forEach(function(menu) {
+	        let textarea_value = jQuery('#set_html_menu_khusus_' + tipe + '_' + menu).val();
+	        menu_data[menu] = textarea_value;
+	    });
+	    
 	    jQuery('#wrap-loading').show();
 	    jQuery.ajax({
 	        url: esakip.url,
@@ -341,9 +340,8 @@ $body = '';
 	            action: 'simpan_perubahan_menu_khusus',
 	            api_key: esakip.api_key,
 	            tahun_anggaran: tahun_anggaran,
-	            set_html: set_html,
-	            tipe: tipe,
-	            menu: menu
+	            menu_data: menu_data,
+	            tipe: tipe
 	        },
 	        dataType: 'json',
 	        success: function(response) {
@@ -359,7 +357,6 @@ $body = '';
 	        }
 	    });
 	}
-
 
     function edit_pengaturan_menu(id,tipe){
         jQuery('#wrap-loading').show();

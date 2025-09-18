@@ -21815,20 +21815,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			$dokumen_perencanaan_opd = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-perencanaan-opd-' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							foreach ($cek_data_perencanaan['perangkat_daerah'] as $data_perencanaan_opd) {
-								if (!empty($data_perencanaan_opd['link'])) {
-									$dokumen_perencanaan_opd .= $data_perencanaan_opd['link'];
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-perencanaan-opd-' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+								foreach ($cek_data_perencanaan['perangkat_daerah'] as $data_perencanaan_opd) {
+									if (!empty($data_perencanaan_opd['link'])) {
+										$dokumen_perencanaan_opd .= $data_perencanaan_opd['link'];
+									}
 								}
-							}
 
 			$dokumen_perencanaan_opd .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_perencanaan_opd = '
 				<div class="accordion">
@@ -21843,7 +21845,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
 							if (!empty($set_html_opd_perencanaan)) {
-								$halaman_perencanaan_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_perencanaan));
+								$halaman_perencanaan_opd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_perencanaan)));
 							}
 			$halaman_perencanaan_opd .= '
 						</ul>
@@ -21851,20 +21853,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 
 			$dokumen_perencanaan_pemda = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-perencanaan-pemda' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-						foreach ($cek_data_perencanaan['pemerintah_daerah'] as $data_perencanaan_pemda) {
-							if (!empty($data_perencanaan_pemda['link'])) {
-								$dokumen_perencanaan_pemda .= $data_perencanaan_pemda['link'];
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-perencanaan-pemda' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_perencanaan['pemerintah_daerah'] as $data_perencanaan_pemda) {
+								if (!empty($data_perencanaan_pemda['link'])) {
+									$dokumen_perencanaan_pemda .= $data_perencanaan_pemda['link'];
+								}
 							}
-						}
 
 			$dokumen_perencanaan_pemda .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_perencanaan_pemda = '
 				<div class="accordion">
@@ -21876,7 +21880,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 							$set_html_pemda_perencanaan = get_option('sakip_menu_khusus_set_html_pemda_PERENCANAAN_' . $_GET['tahun']);
 							if (!empty($set_html_pemda_perencanaan)) {
-								$halaman_perencanaan_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_perencanaan));
+								$halaman_perencanaan_pemda .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_pemda_perencanaan)));
 							}
 			$halaman_perencanaan_pemda .= '
 						</ul>
@@ -21902,19 +21906,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 				
 			$dokumen_pengukuran_kinerja_opd = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-pengukuran_kinerja-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-pengukuran_kinerja-opd-' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							foreach ($cek_data_pengukuran_kinerja['perangkat_daerah'] as $data_pengukuran_kinerja_opd) {
-								if (!empty($data_pengukuran_kinerja_opd['link'])) {
-									$dokumen_pengukuran_kinerja_opd .= $data_pengukuran_kinerja_opd['link'];
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-pengukuran_kinerja-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-pengukuran_kinerja-opd-' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+								foreach ($cek_data_pengukuran_kinerja['perangkat_daerah'] as $data_pengukuran_kinerja_opd) {
+									if (!empty($data_pengukuran_kinerja_opd['link'])) {
+										$dokumen_pengukuran_kinerja_opd .= $data_pengukuran_kinerja_opd['link'];
+									}
 								}
-							}
 			$dokumen_pengukuran_kinerja_opd .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_pengukuran_kinerja_opd = '
 				<div class="accordion">
@@ -21924,7 +21930,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_pengukuran_kinerja_opd .= $dokumen_pengukuran_kinerja_opd;
 							$set_html_opd_pengukuran_kinerja = get_option('sakip_menu_khusus_set_html_opd_PENGUKURAN_KINERJA_' . $_GET['tahun']);
 							if (!empty($set_html_opd_pengukuran_kinerja)) {
-								$halaman_pengukuran_kinerja_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_pengukuran_kinerja));
+								$halaman_pengukuran_kinerja_opd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_pengukuran_kinerja)));
 							}
 			$halaman_pengukuran_kinerja_opd .= '
 						</ul>
@@ -21932,19 +21938,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 
 			$dokumen_pengukuran_kinerja_pemda = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-pengukuran-kinerja-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-pengukuran-kinerja-pemda' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							foreach ($cek_data_pengukuran_kinerja['pemerintah_daerah'] as $data_pengukuran_kinerja_pemda) {
-							if (!empty($data_pengukuran_kinerja_pemda['link'])) {
-								$dokumen_pengukuran_kinerja_pemda .= $data_pengukuran_kinerja_pemda['link'];
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-pengukuran-kinerja-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-pengukuran-kinerja-pemda' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+								foreach ($cek_data_pengukuran_kinerja['pemerintah_daerah'] as $data_pengukuran_kinerja_pemda) {
+								if (!empty($data_pengukuran_kinerja_pemda['link'])) {
+									$dokumen_pengukuran_kinerja_pemda .= $data_pengukuran_kinerja_pemda['link'];
+								}
 							}
-						}
 			$dokumen_pengukuran_kinerja_pemda .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_pengukuran_kinerja_pemda = '
 				<div class="accordion">
@@ -21954,7 +21962,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_pengukuran_kinerja_pemda .= $dokumen_pengukuran_kinerja_pemda;
 							$set_html_pemda_pengukuran_kinerja = get_option('sakip_menu_khusus_set_html_pemda_PENGUKURAN_KINERJA_' . $_GET['tahun']);
 							if (!empty($set_html_pemda_pengukuran_kinerja)) {
-								$halaman_pengukuran_kinerja_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_pengukuran_kinerja));
+								$halaman_pengukuran_kinerja_pemda .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_pemda_pengukuran_kinerja)));
 							}
 			$halaman_pengukuran_kinerja_pemda .= '
 						</ul>
@@ -21980,20 +21988,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 
 			$dokumen_pelaporan_opd = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-pelaporan-opd-' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							foreach ($cek_data_pelaporan['perangkat_daerah'] as $data_pelaporan_opd) {
-								if (!empty($data_pelaporan_opd['link'])) {
-									$dokumen_pelaporan_opd .= $data_pelaporan_opd['link'];
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-pelaporan-opd-' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+								foreach ($cek_data_pelaporan['perangkat_daerah'] as $data_pelaporan_opd) {
+									if (!empty($data_pelaporan_opd['link'])) {
+										$dokumen_pelaporan_opd .= $data_pelaporan_opd['link'];
+									}
 								}
-							}
-
 			$dokumen_pelaporan_opd .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_pelaporan_opd = '
 				<div class="accordion">
@@ -22003,7 +22012,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_pelaporan_opd .= $dokumen_pelaporan_opd;
 							$set_html_opd_pelaporan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
 							if (!empty($set_html_opd_pelaporan)) {
-								$halaman_pelaporan_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_pelaporan));
+								$halaman_pelaporan_opd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_pelaporan)));
 							}
 			$halaman_pelaporan_opd .= '
 						</ul>
@@ -22011,20 +22020,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 
 			$dokumen_pelaporan_pemda = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-pelaporan-pemda' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-						foreach ($cek_data_pelaporan['pemerintah_daerah'] as $data_pelaporan_pemda) {
-							if (!empty($data_pelaporan_pemda['link'])) {
-								$dokumen_pelaporan_pemda .= $data_pelaporan_pemda['link'];
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-pelaporan-pemda' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_pelaporan['pemerintah_daerah'] as $data_pelaporan_pemda) {
+								if (!empty($data_pelaporan_pemda['link'])) {
+									$dokumen_pelaporan_pemda .= $data_pelaporan_pemda['link'];
+								}
 							}
-						}
 
 			$dokumen_pelaporan_pemda .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_pelaporan_pemda = '
 				<div class="accordion">
@@ -22034,7 +22045,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_pelaporan_pemda .= $dokumen_pelaporan_pemda;
 							$set_html_pemda_pelaporan = get_option('sakip_menu_khusus_set_html_pemda_PERENCANAAN_' . $_GET['tahun']);
 							if (!empty($set_html_pemda_pelaporan)) {
-								$halaman_pelaporan_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_pelaporan));
+								$halaman_pelaporan_pemda .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_pemda_pelaporan)));
 							}
 			$halaman_pelaporan_pemda .= '
 						</ul>
@@ -22059,21 +22070,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>';
 
-						$dokumen_evaluasi_opd = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-evaluasi-opd-' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							foreach ($cek_data_evaluasi['perangkat_daerah'] as $data_evaluasi_opd) {
-								if (!empty($data_evaluasi_opd['link'])) {
-									$dokumen_evaluasi_opd .= $data_evaluasi_opd['link'];
+			$dokumen_evaluasi_opd = '
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-opd-' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-evaluasi-opd-' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+								foreach ($cek_data_evaluasi['perangkat_daerah'] as $data_evaluasi_opd) {
+									if (!empty($data_evaluasi_opd['link'])) {
+										$dokumen_evaluasi_opd .= $data_evaluasi_opd['link'];
+									}
 								}
-							}
-
 			$dokumen_evaluasi_opd .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_evaluasi_opd = '
 				<div class="accordion">
@@ -22083,7 +22095,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_evaluasi_opd .= $dokumen_evaluasi_opd;
 							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
 							if (!empty($set_html_opd_evaluasi)) {
-								$halaman_evaluasi_opd .= do_shortcode(htmlspecialchars_decode($set_html_opd_evaluasi));
+								$halaman_evaluasi_opd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_evaluasi)));
 							}
 			$halaman_evaluasi_opd .= '
 						</ul>
@@ -22091,32 +22103,35 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				</div>';
 
 			$dokumen_evaluasi_pemda = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-						foreach ($cek_data_evaluasi['pemerintah_daerah'] as $data_evaluasi_pemda) {
-							if (!empty($data_evaluasi_pemda['link'])) {
-								$dokumen_evaluasi_pemda .= $data_evaluasi_pemda['link'];
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+							foreach ($cek_data_evaluasi['pemerintah_daerah'] as $data_evaluasi_pemda) {
+								if (!empty($data_evaluasi_pemda['link'])) {
+									$dokumen_evaluasi_pemda .= $data_evaluasi_pemda['link'];
+								}
 							}
-						}
 
 			$dokumen_evaluasi_pemda .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$evaluasi_kelembagaan_pemda = '
-				<div class="accordion">
-					<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
-					<div class="esakip-body-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '">
-						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							$evaluasi_kelembagaan_pemda .= 
-
+				<li>
+					<div class="accordion">
+						<h5 class="esakip-header-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '" style="margin: 0;">Unggah Dokumen</h5>
+						<div class="esakip-body-tahun" data-id="dokumen-evaluasi-pemda' . $_GET['tahun'] . '">
+							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+								$evaluasi_kelembagaan_pemda .= 
 			$evaluasi_kelembagaan_pemda .= '
-						</ul>
+							</ul>
+						</div>
 					</div>
-				</div>';
+				</li>';
 
 			$halaman_evaluasi_pemda = '
 				<div class="accordion">
@@ -22126,7 +22141,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_evaluasi_pemda .= $dokumen_evaluasi_pemda;
 							$set_html_pemda_evaluasi = get_option('sakip_menu_khusus_set_html_pemda_EVALUASI_' . $_GET['tahun']);
 							if (!empty($set_html_pemda_evaluasi)) {
-								$halaman_evaluasi_pemda .= do_shortcode(htmlspecialchars_decode($set_html_pemda_evaluasi));
+								$halaman_evaluasi_pemda .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_pemda_evaluasi)));
 							}
 			$halaman_evaluasi_pemda .= '
 						</ul>
@@ -22890,20 +22905,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</div>
 					</div>';
 					$dokumen_perencanaan = '
-						<div class="accordion">
-							<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Unggah Dokumen Perencanaan</h5>
-							<div class="esakip-body-tahun" data-id="dokumen-perencanaan-' . $skpd_db['id_skpd'] . '">
-								<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-								foreach ($cek_data_perencanaan['perangkat_daerah'] as $data_perencanaan) {
-									if (!empty($data_perencanaan['link'])) {
-										$dokumen_perencanaan .= $data_perencanaan['link'];
+						<li>
+							<div class="accordion">
+								<h5 class="esakip-header-tahun" data-id="dokumen-perencanaan-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Unggah Dokumen Perencanaan</h5>
+								<div class="esakip-body-tahun" data-id="dokumen-perencanaan-' . $skpd_db['id_skpd'] . '">
+									<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+									foreach ($cek_data_perencanaan['perangkat_daerah'] as $data_perencanaan) {
+										if (!empty($data_perencanaan['link'])) {
+											$dokumen_perencanaan .= $data_perencanaan['link'];
+										}
 									}
-								}
-	
 					$dokumen_perencanaan .= '
-								</ul>
+									</ul>
+								</div>
 							</div>
-						</div>';
+						</li>';
 
 					$halaman_sakip_perencanaan_skpd = '
 						<div class="accordion">
@@ -22918,7 +22934,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								$halaman_sakip_perencanaan_skpd .= $dokumen_perencanaan;
 								$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
 								if (!empty($set_html_opd_perencanaan)) {
-								  $halaman_sakip_perencanaan_skpd .= do_shortcode(htmlspecialchars_decode($set_html_opd_perencanaan));
+								  $halaman_sakip_perencanaan_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_perencanaan)));
 								}
 
 	
@@ -22943,20 +22959,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</div>';
 
 					$dokumen_pelaporan = '
-						<div class="accordion">
-							<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Unggah Dokumen Pelaporan</h5>
-							<div class="esakip-body-tahun" data-id="dokumen-pelaporan-' . $skpd_db['id_skpd'] . '">
-								<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-					foreach ($cek_data_pelaporan['perangkat_daerah'] as $data_pelaporan) {
-						if (!empty($data_pelaporan['link'])) {
-							$dokumen_pelaporan .= $data_pelaporan['link'];
-						}
-					}
-
+						<li>
+							<div class="accordion">
+								<h5 class="esakip-header-tahun" data-id="dokumen-pelaporan-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Unggah Dokumen Pelaporan</h5>
+								<div class="esakip-body-tahun" data-id="dokumen-pelaporan-' . $skpd_db['id_skpd'] . '">
+									<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
+									foreach ($cek_data_pelaporan['perangkat_daerah'] as $data_pelaporan) {
+										if (!empty($data_pelaporan['link'])) {
+											$dokumen_pelaporan .= $data_pelaporan['link'];
+										}
+									}
 					$dokumen_pelaporan .= '
-								</ul>
+									</ul>
+								</div>
 							</div>
-						</div>';
+						</li>';
 
 					$halaman_pelaporan_skpd = '
 					<div class="accordion">
@@ -22966,7 +22983,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_pelaporan_skpd .= $dokumen_pelaporan;
 							$set_html_opd_pelaporan = get_option('sakip_menu_khusus_set_html_opd_PELAPORAN_' . $_GET['tahun']);
 							if (!empty($set_html_opd_pelaporan)) {
-							  $halaman_pelaporan_skpd .= do_shortcode(htmlspecialchars_decode($set_html_opd_pelaporan));
+							  $halaman_pelaporan_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_pelaporan)));
 							}
 						
 					$halaman_pelaporan_skpd .= '
@@ -23004,7 +23021,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							$halaman_evaluasi_skpd .= $dokumen_evaluasi;
 							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
 							if (!empty($set_html_opd_evaluasi)) {
-							  $halaman_evaluasi_skpd .= do_shortcode(htmlspecialchars_decode($set_html_opd_evaluasi));
+							  $halaman_evaluasi_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_evaluasi)));
 							}
 					$halaman_evaluasi_skpd .= '
 								</ul>
