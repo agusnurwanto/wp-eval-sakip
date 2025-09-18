@@ -6238,7 +6238,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                                                 <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
                                                 <br />
                                                 <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
-                                                <button class="btn btn-danger view-kegiatan-button" onclick="view_kegiatan(this, \'' . $p['id'] . '\', \'' . $p['program'] . '\',  \'' . $s['sasaran'] . '\', \'' . $t['tujuan'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-visibility visibility-icon"></i>
+                                                <button class="btn btn-danger view-kegiatan-button" onclick="view_kegiatan(this, \'' . $p['id'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-visibility visibility-icon"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -6301,15 +6301,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
             if (empty($_POST['id'])) {
                 $ret['status'] = 'error';
                 $ret['message'] = 'ID tidak boleh kosong!';
-            } else if (empty($_POST['tujuan'])) {
-                $ret['status'] = 'error';
-                $ret['message'] = 'Tujuan kosong!';
-            } else if (empty($_POST['sasaran'])) {
-                $ret['status'] = 'error';
-                $ret['message'] = 'Sasaran kosong!';
-            } else if (empty($_POST['program'])) {
-                $ret['status'] = 'error';
-                $ret['message'] = 'Program kosong!';
             } else if (empty($_POST['id_skpd'])) {
                 $ret['status'] = 'error';
                 $ret['message'] = 'id_skpd tidak boleh kosong!';
@@ -6317,9 +6308,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
             if ($ret['status'] === 'success') {
                 $id = intval($_POST['id']);
-                $tujuan = trim($_POST['tujuan']);
-                $sasaran = trim($_POST['sasaran']);
-                $program = trim($_POST['program']);
                 $id_skpd = trim($_POST['id_skpd']);
                 $show_pokin = isset($_POST['show_pokin']) ? $_POST['show_pokin'] : false;
 

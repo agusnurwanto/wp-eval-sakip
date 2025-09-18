@@ -584,7 +584,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         }
     }
 
-    function view_kegiatan(button, id, program, sasaran, tujuan) {
+    function view_kegiatan(button, id) {
         let icon = jQuery(button).find('.visibility-icon');
         let body = jQuery('#tabel-cascading-kegiatan tbody');
 
@@ -611,9 +611,6 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     action: 'get_kegiatan_by_program',
                     id: id,
                     id_skpd: <?php echo $id_skpd; ?>,
-                    tujuan: tujuan,
-                    sasaran: sasaran,
-                    program: program,
                     show_pokin: showPokin
                 },
                 dataType: 'json',
