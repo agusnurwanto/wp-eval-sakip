@@ -399,7 +399,7 @@ if (!empty($renaksi_pemda_parent2)) {
 		);
 
 		if (!empty($pokin_level_1_pemda)) {
-			$html_label_pokin_1_pemda = '<ul style="margin: 0; list-style-type: circle;">';
+			$html_label_pokin_1_pemda = '<ul class="m-0">';
 			foreach ($pokin_level_1_pemda as $k_label_pokin_1_pemda => $v_label_pokin_1_pemda) {
 				$html_label_pokin_1_pemda .= '<li>' . $v_label_pokin_1_pemda['pokin_label'] . '</li>';
 			}
@@ -838,40 +838,42 @@ if (!empty($get_data_bulanan)) {
 			$unser_keterangan = unserialize($v_bulanan['keterangan']);
 
 			$data_capaian_all = $sementara_volume = $sementara_rencana_aksi = $sementara_satuan_bulan = $sementara_realisasi = $sementara_keterangan = array();
-			foreach ($unser_rencana_aksi as $k_c_rencana_aksi => $v_c_rencana_aksi) {
-				if (!empty($unser_volume_target[$k_c_rencana_aksi])) {
-					array_push($sementara_volume, $unser_volume_target[$k_c_rencana_aksi]);
-				} else {
-					array_push($sementara_volume, "0");
-				}
-				if (!empty($unser_rencana_aksi[$k_c_rencana_aksi])) {
-					array_push($sementara_rencana_aksi, $unser_rencana_aksi[$k_c_rencana_aksi]);
-				} else {
-					array_push($sementara_rencana_aksi, "-");
-				}
-				if (!empty($unser_satuan_bulan[$k_c_rencana_aksi])) {
-					array_push($sementara_satuan_bulan, $unser_satuan_bulan[$k_c_rencana_aksi]);
-				} else {
-					array_push($sementara_satuan_bulan, "-");
-				}
-				if (!empty($unser_realisasi[$k_c_rencana_aksi])) {
-					array_push($sementara_realisasi, $unser_realisasi[$k_c_rencana_aksi]);
-				} else {
-					array_push($sementara_realisasi, "0");
-				}
-				if (!empty($unser_keterangan[$k_c_rencana_aksi])) {
-					array_push($sementara_keterangan, $unser_keterangan[$k_c_rencana_aksi]);
-				} else {
-					array_push($sementara_keterangan, "");
-				}
-				// ----- cek capaian jika kolom capaian kosong -----
-				if (!empty($unser_capaian[$k_c_rencana_aksi])) {
-					array_push($data_capaian_all, $unser_capaian[$k_c_rencana_aksi]);
-				} elseif (!empty($unser_realisasi[$k_c_rencana_aksi]) && !empty($unser_volume_target[$k_c_rencana_aksi])) {
-					$persen_capaian = number_format(($unser_realisasi[$k_c_rencana_aksi] / $unser_volume_target[$k_c_rencana_aksi]) * 100, 0) . "%";
-					array_push($data_capaian_all, $persen_capaian);
-				} elseif (!empty($unser_volume_target[$k_c_rencana_aksi])) {
-					array_push($data_capaian_all, "0%");
+			if ($unser_rencana_aksi !== false) {
+				foreach ($unser_rencana_aksi as $k_c_rencana_aksi => $v_c_rencana_aksi) {
+					if (!empty($unser_volume_target[$k_c_rencana_aksi])) {
+						array_push($sementara_volume, $unser_volume_target[$k_c_rencana_aksi]);
+					} else {
+						array_push($sementara_volume, "0");
+					}
+					if (!empty($unser_rencana_aksi[$k_c_rencana_aksi])) {
+						array_push($sementara_rencana_aksi, $unser_rencana_aksi[$k_c_rencana_aksi]);
+					} else {
+						array_push($sementara_rencana_aksi, "-");
+					}
+					if (!empty($unser_satuan_bulan[$k_c_rencana_aksi])) {
+						array_push($sementara_satuan_bulan, $unser_satuan_bulan[$k_c_rencana_aksi]);
+					} else {
+						array_push($sementara_satuan_bulan, "-");
+					}
+					if (!empty($unser_realisasi[$k_c_rencana_aksi])) {
+						array_push($sementara_realisasi, $unser_realisasi[$k_c_rencana_aksi]);
+					} else {
+						array_push($sementara_realisasi, "0");
+					}
+					if (!empty($unser_keterangan[$k_c_rencana_aksi])) {
+						array_push($sementara_keterangan, $unser_keterangan[$k_c_rencana_aksi]);
+					} else {
+						array_push($sementara_keterangan, "");
+					}
+					// ----- cek capaian jika kolom capaian kosong -----
+					if (!empty($unser_capaian[$k_c_rencana_aksi])) {
+						array_push($data_capaian_all, $unser_capaian[$k_c_rencana_aksi]);
+					} elseif (!empty($unser_realisasi[$k_c_rencana_aksi]) && !empty($unser_volume_target[$k_c_rencana_aksi])) {
+						$persen_capaian = number_format(($unser_realisasi[$k_c_rencana_aksi] / $unser_volume_target[$k_c_rencana_aksi]) * 100, 0) . "%";
+						array_push($data_capaian_all, $persen_capaian);
+					} elseif (!empty($unser_volume_target[$k_c_rencana_aksi])) {
+						array_push($data_capaian_all, "0%");
+					}
 				}
 			}
 
@@ -903,41 +905,7 @@ $bulan = array(
 $tbody_target_realisasi_bulanan = '';
 $triwulan = 1;
 foreach ($bulan as $k_bulan => $v_bulan) {
-	if (!isset($data_target_realisasi_bulanan[$k_bulan])) {
-		$tbody_target_realisasi_bulanan .= "<tr>
-	        <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>$v_bulan</td>
-	        <td colspan='6' class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'></td>
-	    </tr>";
-		continue;
-	}
-
-	$get_rencana_aksi = explode("<br><br>", $data_jadi_rencana_aksi[$k_bulan] ?? '');
-	$get_volume = explode("<br><br>", $data_jadi_volume[$k_bulan] ?? '');
-	$get_satuan_bulan = explode("<br><br>", $data_jadi_satuan_bulan[$k_bulan] ?? '');
-	$get_realisasi = explode("<br><br>", $data_jadi_realisasi[$k_bulan] ?? '');
-	$get_capaian = explode("<br><br>", $data_capaian_target_realisasi_bulanan[$k_bulan] ?? '');
-	$get_keterangan = explode("<br><br>", $data_jadi_keterangan[$k_bulan] ?? '');
-
-
-	$rowspan = count($get_rencana_aksi);
-
-	foreach ($get_rencana_aksi as $i => $rencana_aksi) {
-		$tbody_target_realisasi_bulanan .= '<tr>';
-
-		if ($i === 0) {
-			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="' . $rowspan . '">' . $v_bulan . '</td>';
-		}
-
-		$tbody_target_realisasi_bulanan .= '<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $rencana_aksi . '</td>';
-		$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_volume[$i] ?? '') . '</td>';
-		$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_satuan_bulan[$i] ?? '') . '</td>';
-		$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_realisasi[$i] ?? '') . '</td>';
-		$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_capaian[$i] ?? '') . '</td>';
-		$tbody_target_realisasi_bulanan .= '<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-bawah">' . ($get_keterangan[$i] ?? '') . '</td>';
-
-		$tbody_target_realisasi_bulanan .= '</tr>';
-	}
-
+	$tbody_triwulanan = '';
 	if ($k_bulan % 3 == 0) {
 		// ----- capaian triwulan -----
 		if (!empty($indikator_rhk['target_' . $triwulan]) && !empty($indikator_rhk['realisasi_tw_' . $triwulan])) {
@@ -948,7 +916,7 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 			$capaian_triwulan = "";
 		}
 
-		$tbody_target_realisasi_bulanan .= '<tr style="background-color:#FDFFB6;">
+		$tbody_triwulanan .= '<tr style="background-color:#FDFFB6;">
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan ' . $triwulan . '</td>
 			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['indikator'] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['target_' . $triwulan] . '</td>
@@ -958,6 +926,41 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $indikator_rhk['ket_tw_' . $triwulan] . '</td>
 		</tr>';
 		$triwulan++;
+	}
+
+	if (!isset($data_target_realisasi_bulanan[$k_bulan])) {
+		$tbody_target_realisasi_bulanan .= "<tr>
+	        <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>$v_bulan</td>
+	        <td colspan='6' class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'></td>
+	    </tr>" . $tbody_triwulanan;
+		continue;
+	} else {
+		$get_rencana_aksi = explode("<br><br>", $data_jadi_rencana_aksi[$k_bulan] ?? '');
+		$get_volume = explode("<br><br>", $data_jadi_volume[$k_bulan] ?? '');
+		$get_satuan_bulan = explode("<br><br>", $data_jadi_satuan_bulan[$k_bulan] ?? '');
+		$get_realisasi = explode("<br><br>", $data_jadi_realisasi[$k_bulan] ?? '');
+		$get_capaian = explode("<br><br>", $data_capaian_target_realisasi_bulanan[$k_bulan] ?? '');
+		$get_keterangan = explode("<br><br>", $data_jadi_keterangan[$k_bulan] ?? '');
+
+
+		$rowspan = count($get_rencana_aksi);
+
+		foreach ($get_rencana_aksi as $i => $rencana_aksi) {
+			$tbody_target_realisasi_bulanan .= '<tr>';
+
+			if ($i === 0) {
+				$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="' . $rowspan . '">' . $v_bulan . '</td>';
+			}
+
+			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $rencana_aksi . '</td>';
+			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_volume[$i] ?? '') . '</td>';
+			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_satuan_bulan[$i] ?? '') . '</td>';
+			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_realisasi[$i] ?? '') . '</td>';
+			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_capaian[$i] ?? '') . '</td>';
+			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-bawah">' . ($get_keterangan[$i] ?? '') . '</td>';
+
+			$tbody_target_realisasi_bulanan .= '</tr>' . $tbody_triwulanan;
+		}
 	}
 }
 
@@ -1114,12 +1117,12 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 			<table class="borderless-table data-organisasi">
 				<tbody>
 					<tr>
-						<td style="width: 270px;">Pohon Kinerja Level 1</td>
+						<td style="width: 290px;">Pohon Kinerja Level 1</td>
 						<td style="width: 20px;" class="text-center">:</td>
 						<td><?php echo $html_label_pokin_1_pemda; ?></td>
 					</tr>
 					<tr>
-						<td style="width: 270px;">Pohon Kinerja Level 2</td>
+						<td style="width: 290px;">Pohon Kinerja Level 2</td>
 						<td style="width: 20px;" class="text-center">:</td>
 						<td><?php echo $html_label_pokin_pemda[1]; ?></td>
 					</tr>
@@ -1138,7 +1141,7 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 			<table class="borderless-table data-organisasi">
 				<tbody>
 					<tr>
-						<td style="width: 270px;">Pohon Kinerja Level 3</td>
+						<td style="width: 290px;">Pohon Kinerja Level 3</td>
 						<td style="width: 20px;" class="text-center">:</td>
 						<td><?php echo $html_label_pokin_pemda[2]; ?></td>
 					</tr>
@@ -1157,7 +1160,7 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 			<table class="borderless-table data-organisasi">
 				<tbody>
 					<tr>
-						<td style="width: 270px;">Pohon Kinerja Level 4</td>
+						<td style="width: 290px;">Pohon Kinerja Level 4</td>
 						<td style="width: 20px;" class="text-center">:</td>
 						<td><?php echo implode('<br>', $html_label_pokin_pemda[3]); ?></td>
 					</tr>
@@ -1188,10 +1191,10 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 							<?php if (!empty($html_label_pokin[1]) && is_array($html_label_pokin[1])): ?>
 								<?php foreach ($html_label_pokin[1] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
+										<td style="width: 290px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>
+											<ul class="m-0">
 												<?php if (is_array($labels)): ?>
 													<?php foreach ($labels as $value): ?>
 														<li><?= htmlspecialchars($value) ?></li>
@@ -1213,12 +1216,12 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 								<td><?php echo $data_rhk[1]['kode_cascading_sasaran'] . ' ' . $data_rhk[1]['label_cascading_sasaran']; ?></td>
 							</tr>
 							<tr>
-								<td style="width: 270px;">Satuan Kerja</td>
+								<td style="width: 290px;">Satuan Kerja</td>
 								<td>:</td>
 								<td><?php echo $data_skpd[1]; ?></td>
 							</tr>
 							<tr>
-								<td style="width: 270px;">Nama Pegawai</td>
+								<td style="width: 290px;">Nama Pegawai</td>
 								<td>:</td>
 								<td>
 									<?php
@@ -1248,10 +1251,10 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 							<?php if (!empty($html_label_pokin[2]) && is_array($html_label_pokin[2])): ?>
 								<?php foreach ($html_label_pokin[2] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
+										<td style="width: 290px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>
+											<ul class="m-0">
 												<?php if (is_array($labels)): ?>
 													<?php foreach ($labels as $value): ?>
 														<li><?= htmlspecialchars($value) ?></li>
@@ -1278,24 +1281,24 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 								$label_subkeg = $subkeg[1];
 								echo '
 									<tr>
-										<td style="width: 270px;">Kegiatan</td>
+										<td style="width: 290px;">Kegiatan</td>
 										<td>:</td>
 										<td>' . $data_rhk[2]['kode_cascading_kegiatan'] . ' ' . $data_rhk[2]['label_cascading_kegiatan'] . '</td>
 									</tr>
 									<tr>
-										<td style="width: 270px;">Sub Kegiatan</td>
+										<td style="width: 290px;">Sub Kegiatan</td>
 										<td>:</td>
 										<td>' . $data_rhk[2]['kode_cascading_sub_kegiatan'] . ' ' . $label_subkeg . '</td>
 									</tr>';
 							}
 							?>
 							<tr>
-								<td style="width: 270px;">Satuan Kerja</td>
+								<td style="width: 290px;">Satuan Kerja</td>
 								<td>:</td>
 								<td><?php echo $data_skpd[2]; ?></td>
 							</tr>
 							<tr>
-								<td style="width: 270px;">Nama Pegawai</td>
+								<td style="width: 290px;">Nama Pegawai</td>
 								<td>:</td>
 								<td>
 									<?php
@@ -1325,10 +1328,10 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 							<?php if (!empty($html_label_pokin[3]) && is_array($html_label_pokin[3])): ?>
 								<?php foreach ($html_label_pokin[3] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
+										<td style="width: 290px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>
+											<ul class="m-0">
 												<?php if (is_array($labels)): ?>
 													<?php foreach ($labels as $value): ?>
 														<li><?= htmlspecialchars($value) ?></li>
@@ -1355,19 +1358,19 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 								$label_subkeg = $subkeg[1];
 								echo '
 							<tr>
-								<td style="width: 270px;">Sub Kegiatan</td>
+								<td style="width: 290px;">Sub Kegiatan</td>
 								<td>:</td>
 								<td>' . $data_rhk[3]['kode_cascading_sub_kegiatan'] . ' ' . $label_subkeg . '</td>
 							</tr>';
 							}
 							?>
 							<tr>
-								<td style="width: 270px;">Satuan Kerja</td>
+								<td style="width: 290px;">Satuan Kerja</td>
 								<td>:</td>
 								<td><?php echo $data_skpd[3]; ?></td>
 							</tr>
 							<tr>
-								<td style="width: 270px;">Nama Pegawai</td>
+								<td style="width: 290px;">Nama Pegawai</td>
 								<td>:</td>
 								<td>
 									<?php
@@ -1397,10 +1400,10 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 							<?php if (!empty($html_label_pokin[4]) && is_array($html_label_pokin[4])): ?>
 								<?php foreach ($html_label_pokin[4] as $level => $labels): ?>
 									<tr>
-										<td style="width: 270px;">Pohon Kinerja Level <?= $level ?></td>
+										<td style="width: 290px;">Pohon Kinerja Level <?= $level ?></td>
 										<td style="width: 20px;" class="text-center">:</td>
 										<td>
-											<ul>
+											<ul class="m-0">
 												<?php if (is_array($labels)): ?>
 													<?php foreach ($labels as $value): ?>
 														<li><?= htmlspecialchars($value) ?></li>
@@ -1432,12 +1435,12 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 								<td>Rp 0</td>
 							</tr>
 							<tr>
-								<td style="width: 270px;">Satuan Kerja</td>
+								<td style="width: 290px;">Satuan Kerja</td>
 								<td>:</td>
 								<td><?php echo $data_skpd[4]; ?></td>
 							</tr>
 							<tr>
-								<td style="width: 270px;">Nama Pegawai</td>
+								<td style="width: 290px;">Nama Pegawai</td>
 								<td>:</td>
 								<td>
 									<?php

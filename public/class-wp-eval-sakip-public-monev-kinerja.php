@@ -9157,7 +9157,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$datas = '';
 				if (!empty($data_pokin)) {
-					$datas = '<ul style="margin: 0; list-style-type: circle;">';
+					$datas = '<ul class="m-0">';
 					foreach ($data_pokin as $v_label_pokin) {
 						$datas .= '<li>' . $v_label_pokin['pokin_label'] . '</li>';
 					}
