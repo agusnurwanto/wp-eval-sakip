@@ -977,6 +977,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									$nama_perangkat = $v_koneksi_pokin['nama_desa'];
 								}
 
+								$aksi_koneksi = '';
 								$keterangan_tolak = (!empty($v_koneksi_pokin['keterangan_tolak'])) ? '<hr><small class="text-muted">Keterangan ditolak : <br>' . $v_koneksi_pokin['keterangan_tolak'] . '</small>' : '';
 								$table_koneksi_pokin .= '
 									<tr>
@@ -985,9 +986,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center font-weight-bold ' . $text_color . '">' . $status_koneksi . '</td>
 										<td>' . $v_koneksi_pokin['keterangan_koneksi'] . $keterangan_tolak . '</td>';
 
-								$aksi_koneksi = '';
-								if ($v_koneksi_pokin['tipe'] != 1) {
-									if ($status_koneksi == 'disetujui') {
 										$aksi_koneksi .= '
 											<div class="btn btn-sm m-2 btn-warning" title="Edit Koneksi" onclick="handleFormEditKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', this)">
 												<span class="dashicons dashicons-edit"></span>
@@ -995,25 +993,27 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
 												<span class="dashicons dashicons-trash"></span>
 											</div>';
-									} else {
-										$aksi_koneksi .= '
-											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
-												<span class="dashicons dashicons-trash"></span>
-											</div>';
-									}
-								} else {
-									if ($status_koneksi == 'disetujui') {
-										$aksi_koneksi .= '<div> - </div>';
-									} else {
-										$aksi_koneksi .= '
-											<div class="btn btn-sm m-2 btn-warning" title="Edit Koneksi" onclick="handleFormEditKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', this)">
-												<span class="dashicons dashicons-edit"></span>
-											</div>
-											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
-												<span class="dashicons dashicons-trash"></span>
-											</div>';
-									}
-								}
+								// if ($v_koneksi_pokin['tipe'] != 1) {
+								// 	if ($status_koneksi == 'disetujui') {
+								// 	} else {
+								// 		$aksi_koneksi .= '
+								// 			<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
+								// 				<span class="dashicons dashicons-trash"></span>
+								// 			</div>';
+								// 	}
+								// } else {
+								// 	if ($status_koneksi == 'disetujui') {
+								// 		$aksi_koneksi .= '<div> - </div>';
+								// 	} else {
+								// 		$aksi_koneksi .= '
+								// 			<div class="btn btn-sm m-2 btn-warning" title="Edit Koneksi" onclick="handleFormEditKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', this)">
+								// 				<span class="dashicons dashicons-edit"></span>
+								// 			</div>
+								// 			<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
+								// 				<span class="dashicons dashicons-trash"></span>
+								// 			</div>';
+								// 	}
+								// }
 
 								$table_koneksi_pokin .= '
 									<td class="text-center">' . $aksi_koneksi . '</td>
@@ -8641,10 +8641,12 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
-					$data = $wpdb->delete('esakip_koneksi_pokin_pemda_opd', [
-						'id' => $_POST['id']
-					]);
-
+					$wpdb->update(
+						'esakip_koneksi_pokin_pemda_opd',
+						['active' => 0],
+						['id' => $_POST['id']]
+					);
+					
 					if ($data === false) {
 						error_log("Error deleting koneksi pokin: " . $wpdb->last_error);
 					}
