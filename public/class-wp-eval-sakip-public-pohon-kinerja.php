@@ -987,10 +987,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										<td>' . $v_koneksi_pokin['keterangan_koneksi'] . $keterangan_tolak . '</td>';
 
 										$aksi_koneksi .= '
-											<div class="btn btn-sm m-2 btn-warning" title="Edit Koneksi" onclick="handleFormEditKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', this)">
+											<div class="btn btn-sm btn-warning" title="Edit Koneksi" onclick="handleFormEditKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', this)">
 												<span class="dashicons dashicons-edit"></span>
 											</div>
-											<div class="btn btn-sm m-2 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
+											<div class="btn btn-sm m-1 btn-danger" title="Hapus Koneksi" onclick="handleDeleteKoneksiPokin(' . $v_koneksi_pokin['id'] . ', ' . $data['id'] . ', ' . $data['parent'] . ', ' . $data['level'] . ')">
 												<span class="dashicons dashicons-trash"></span>
 											</div>';
 								// if ($v_koneksi_pokin['tipe'] != 1) {
@@ -8646,7 +8646,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						['active' => 0],
 						['id' => $_POST['id']]
 					);
-					
+
 					if ($data === false) {
 						error_log("Error deleting koneksi pokin: " . $wpdb->last_error);
 					}
