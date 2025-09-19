@@ -1547,6 +1547,7 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `realisasi_target_teks_3` VARCHAR(50) DEFAULT NULL,
   `realisasi_target_teks_4` VARCHAR(50) DEFAULT NULL,
   `rumus_indikator` text DEFAULT NULL,
+  `rumus_capaian_kinerja` TINYINT(4) DEFAULT 1 NOT NULL COMMENT '1 = Tren Positif, 2 = Nilai Akhir',
   PRIMARY key (id),
   KEY `id_renaksi` (`id_renaksi`),
   KEY `tahun_anggaran` (`tahun_anggaran`),

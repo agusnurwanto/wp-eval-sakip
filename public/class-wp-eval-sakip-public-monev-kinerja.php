@@ -1684,6 +1684,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID SKPD tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['rumus_capaian_kinerja'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'rumus capaian kinerja tidak boleh kosong!';
 				}
 				if ($ret['status'] != 'error') {
 					$_POST['id'] = $_POST['id_label'];
@@ -1771,6 +1774,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'target_3' => $_POST['target_tw_3'],
 						'target_4' => $_POST['target_tw_4'],
 						'id_skpd' => $_POST['id_skpd'],
+						'rumus_capaian_kinerja' => $_POST['rumus_capaian_kinerja'],
 						'active' => 1,
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
@@ -8694,6 +8698,49 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			);
 		}
 		return json_encode($ret);
+	}
+
+	public function get_capaian_realisasi_by_type(int $type, array $target, array $realisasi, int $tahun_anggaran)
+	{
+		$current_year = (int)date('Y');
+		
+		// Jika tahun anggaran sudah lewat, hitung semua 4 triwulan.
+		// Jika tahun anggaran adalah tahun ini, hitung sampai triwulan saat ini.
+		// Jika tahun anggaran di masa depan, capaian 0.
+		if ($tahun_anggaran < $current_year) {
+			$limit_quarter = 4;
+		} elseif ($tahun_anggaran == $current_year) {
+			$current_month = (int)date('n');
+			$limit_quarter = (int)ceil($current_month / 3);
+		} else {
+			return 0.0; // Anggaran di masa depan, belum ada realisasi.
+		}
+
+		$total_target = 0.0;
+		$total_realisasi = 0.0;
+
+		switch ($type) {
+			case 1: // Indikator Tren Positif (Kumulatif)
+				for ($i = 1; $i <= $limit_quarter; $i++) {
+					$total_realisasi += $realisasi['realisasi_' . $i] ?? 0;
+					$total_target += $target['target_' . $i] ?? 0;
+				}
+				break;
+
+			case 2: // Nilai Akhir (Mengambil nilai pada triwulan terakhir)
+				$total_realisasi = $realisasi['realisasi_' . $limit_quarter] ?? 0;
+				$total_target = $target['target_' . $limit_quarter] ?? 0;
+				break;
+
+			default:
+				return false; // unknown type
+		}
+		
+		if ($total_target == 0) {
+			return 0.0; // Menghindari pembagian dengan nol
+		}
+
+		return ($total_realisasi / $total_target) * 100;
 	}
 
 	function simpan_finalisasi_iku_pemda()

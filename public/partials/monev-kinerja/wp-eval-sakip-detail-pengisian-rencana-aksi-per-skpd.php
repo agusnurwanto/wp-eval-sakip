@@ -854,6 +854,10 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         if (target_tw_4 == '') {
             return alert('Target triwulan 4 tidak boleh kosong!')
         }
+        var rumus_capaian_kinerja = jQuery('#rumus_capaian_kinerja').val();
+        if (rumus_capaian_kinerja == '') {
+            return alert('Rumus Capaian Kinerja tidak boleh kosong!')
+        }
         var rencana_pagu_tk = rencana_pagu;
         if(jQuery('#rencana_pagu_tk').length >= 1){
             rencana_pagu_tk = jQuery('#rencana_pagu_tk').val();
@@ -914,6 +918,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 "aspek_rhk": aspek_rhk,
                 "target_teks_awal": target_teks_awal,
                 "target_teks_akhir": target_teks_akhir,
+                "rumus_capaian_kinerja": rumus_capaian_kinerja,
                 "target_teks_tw_1": target_teks_tw_1,
                 "target_teks_tw_2": target_teks_tw_2,
                 "target_teks_tw_3": target_teks_tw_3,
@@ -1863,7 +1868,25 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     `</div>` +
                     `<div class="form-group row">` +
                         `<div class="col-md-2">` +
-                            `<label for="rumus-indikator">Rumus Indikator</label>` +
+                            `<label for="rumus-indikator">Rumus Capaian Kinerja</label>` +
+                        `</div>` +
+                        `<div class="col-md-10">` +
+                            `<select class="form-control" name="rumus_capaian_kinerja" id="rumus_capaian_kinerja">
+                                <option value="1">Indikator Tren Positif</option>
+                                <option value="2">Nilai Akhir</option>
+                            </select>` +
+                            `<small class="text-muted">
+                                <ul>
+                                    <li>Tren Positif : (Akumulasi Realisasi / Akumulasi Target) * 100.</li>
+                                    <li>Nilai Akhir : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
+                                    <li>Kedua rumus dihitung berdasarkan Realisasi dan Target triwulan berjalan.</li>
+                                </ul>
+                            </small>` +
+                        `</div>` +
+                    `</div>` +
+                    `<div class="form-group row">` +
+                        `<div class="col-md-2">` +
+                            `<label for="rumus-indikator">Rumus Indikator Teks</label>` +
                         `</div>` +
                         `<div class="col-md-10">` +
                             `<textarea class="form-control" name="label" id="rumus-indikator" placeholder="Tuliskan Rumus Indikator...">(Realisasi Indikator / Target Indikator) * 100 = Capaian </textarea>` +
@@ -2134,6 +2157,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         jQuery('#target_teks_tw_2').val(response.data.target_teks_2);
                         jQuery('#target_teks_tw_3').val(response.data.target_teks_3);
                         jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
+                        jQuery('#rumus_capaian_kinerja').val(response.data.rumus_capaian_kinerja);
 
                         if(persen < 0){
                             persen = 100;
@@ -2650,7 +2674,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     `<tr style="display: none;" class="data_bulanan_${b.id}">` +
                                         `<td colspan="8" style="padding: 10px;">` +
                                         `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
-                                        `<h4 class="text-center" style="margin: 10px;">Rumus Indikator</h4>` +
+                                        `<h4 class="text-center" style="margin: 10px;">Rumus Indikator Teks</h4>` +
                                         `<textarea class="form-control" id="show-rumus-indikator">${val_rumus_indikator}</textarea>` +
                                         `</div>` +
                                         `</td>` +

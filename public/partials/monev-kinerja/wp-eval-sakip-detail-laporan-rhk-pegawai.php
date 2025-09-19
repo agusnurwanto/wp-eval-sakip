@@ -196,15 +196,27 @@ foreach ($ret['rhk_unik'] as $v) {
         $realisasi_tw_4  .= $ind['realisasi_tw_4'] . '<br>';
 
         // Hitung capaian realisasi
-        $total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
-        if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
-            $capaian = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0 ) . "%";
+        $all_target = [
+            'target_1' => $ind['target_1'],
+            'target_2' => $ind['target_2'],
+            'target_3' => $ind['target_3'],
+            'target_4' => $ind['target_4']
+        ];
+        $all_realisasi_tw = [
+            'realisasi_1' => $ind['realisasi_tw_1'],
+            'realisasi_2' => $ind['realisasi_tw_2'],
+            'realisasi_3' => $ind['realisasi_tw_3'],
+            'realisasi_4' => $ind['realisasi_tw_4']
+        ];
+        $get_capaian_realisasi = $this->get_capaian_realisasi_by_type($ind['rumus_capaian_kinerja'], $all_target, $all_realisasi_tw, $ind['tahun_anggaran']);
+        if ($get_capaian_realisasi === false) {
+            $rumus_teks = 'Jenis rumus tidak diketahui';
+            $get_capaian_realisasi = '-';
         } else {
-            $capaian = "0%";
+            $rumus_teks = $ind['rumus_capaian_kinerja'] == 1 ? "Tren Positif" : "Nilai Akhir";
         }
 
-        $capaian_realisasi .= $capaian . '<br>';
-        $rencana_pagu .= ($set_pagu_renaksi == 1) ? '0<br>' : (!empty($ind['rencana_pagu']) ? number_format((float)$ind['rencana_pagu'], 0, ",", ".") . '<br>' : '0<br>');
+        $capaian_realisasi = $get_capaian_realisasi . ' (' . $rumus_teks . ')' . '</br>';
 
         $data_tagging = $wpdb->get_results($wpdb->prepare("
                 SELECT 
@@ -457,7 +469,7 @@ foreach ($ret['rhk_unik'] as $v) {
                             <th>16</th>
                             <th>17</th>
                             <th>18</th>
-                            <th>19<br>= ((15 + 16 + 17 + 18 / 12) * 100)</th>
+                            <th>19</th>
                             <th>20</th>
                             <th>21</th>
                             <th>22</th>
