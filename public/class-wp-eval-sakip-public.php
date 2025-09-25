@@ -33060,7 +33060,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	function process_tbody_capaian_kinerja_pk(array $data_unit_simpeg, int $tahun_anggaran)
 	{
 		if (empty($data_unit_simpeg)) {
-			return "<tr><td class='text-center' colspan='15'>Tidak ada data tersedia</td></tr>";
+			return "<tr><td class='text-center' colspan='14'>Tidak ada data tersedia</td></tr>";
 		}
 
 		$tbody = '';
@@ -33085,7 +33085,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<tr>
 						<td class='text-center'>{$no}</td>
 						<td class='text-left'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</td>
-						<td class='text-center' colspan='13'>Sasaran belum tersedia</td>
+						<td class='text-center' colspan='12'>Sasaran belum tersedia</td>
 					</tr>";
 				$no++;
 				continue;
@@ -33121,7 +33121,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$is_first_row_for_skpd = false;
 					}
 					$tbody .= "<td class='text-left'>{$sasaran_data['label']}</td>";
-					$tbody .= "<td class='text-center' colspan='12'>Indikator belum tersedia</td>";
+					$tbody .= "<td class='text-center' colspan='11'>Indikator belum tersedia</td>";
 					$tbody .= "</tr>";
 					continue;
 				}
@@ -33130,10 +33130,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				foreach ($indikators as $indikator) {
 					$tbody .= "<tr>";
 					
+					$tbody_2 = "</tr>";
 					if ($is_first_row_for_skpd) {
 						$tbody .= "<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$no}</td>";
 						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</td>";
 						$is_first_row_for_skpd = false;
+
+						$tbody_2 = "
+							<td class='text-center' rowspan='{$skpd_total_rowspan}'>-</td>
+							<td class='text-center' rowspan='{$skpd_total_rowspan}'>-</td>
+							<td class='text-center' rowspan='{$skpd_total_rowspan}'>-</td>
+						</tr>";
 					}
 
 					if ($is_first_indicator) {
@@ -33142,16 +33149,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 
 					$all_target = [
-						'target_1' => $indikator['target_1'], 
-						'target_2' => $indikator['target_2'], 
-						'target_3' => $indikator['target_3'], 
-						'target_4' => $indikator['target_4']
+						'target_1' => $indikator['target_1'] ?? 0, 
+						'target_2' => $indikator['target_2'] ?? 0, 
+						'target_3' => $indikator['target_3'] ?? 0, 
+						'target_4' => $indikator['target_4'] ?? 0
 					];
 					$all_realisasi = [
-						'realisasi_1' => $indikator['realisasi_target_1'], 
-						'realisasi_2' => $indikator['realisasi_target_2'], 
-						'realisasi_3' => $indikator['realisasi_target_3'], 
-						'realisasi_4' => $indikator['realisasi_target_4']
+						'realisasi_1' => $indikator['realisasi_target_1'] ?? 0, 
+						'realisasi_2' => $indikator['realisasi_target_2'] ?? 0, 
+						'realisasi_3' => $indikator['realisasi_target_3'] ?? 0, 
+						'realisasi_4' => $indikator['realisasi_target_4'] ?? 0
 					];
 					
 					$capaian = $this->get_capaian_realisasi_by_type(
@@ -33163,23 +33170,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
 					
 					// jika capaian 0 tampilkan kosong.
-					$anti_zero_capaian = ($capaian_display == 0) ? '-' : $capaian;
+					$anti_zero_capaian = ($capaian_display == 0) ? '' : $capaian;
 
 					$tbody .= "
 						<td class='text-left'>{$indikator['indikator']}</td>
-						<td class='text-left'>{$indikator['satuan']}</td>
+						<td class='text-center'>{$indikator['satuan']}</td>
 						<td class='text-center'>{$indikator['target_akhir']}</td>
-						<td class='text-center'>{$indikator['target_1']}</td>
-						<td class='text-center'>{$indikator['target_2']}</td>
-						<td class='text-center'>{$indikator['target_3']}</td>
-						<td class='text-center'>{$indikator['target_4']}</td>
 						<td class='text-center'>{$indikator['realisasi_target_1']}</td>
 						<td class='text-center'>{$indikator['realisasi_target_2']}</td>
 						<td class='text-center'>{$indikator['realisasi_target_3']}</td>
 						<td class='text-center'>{$indikator['realisasi_target_4']}</td>
-						<td class='text-center'>{$anti_zero_capaian}</td>
-					</tr>";
-				}
+						<td class='text-center'>{$anti_zero_capaian}</td>"
+						. $tbody_2;
+					}
 			}
 			$no++;
 		}
