@@ -8510,7 +8510,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$startTimeOp1 = microtime(true);
 			}
 
-			$url_api = get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk';
+			$url_api = get_option('_crb_url_api_ekinerja') . 'api/kinerjarhk';
 			$response = wp_remote_post($url_api, [
 				'headers' => array(
 					'X-api-key' => get_option('_crb_api_key_ekinerja'),
