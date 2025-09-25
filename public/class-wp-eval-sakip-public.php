@@ -440,6 +440,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-capaian-kinerja.php';
 	}
 
+	public function capaian_kinerja_pk_publish($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-homepage-capaian-kinerja-pk.php';
+	}
+
 	public function mapping_skpd()
 	{
 		global $wpdb;
@@ -32954,6 +32963,230 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die(json_encode($ret));
 	}
 
+	function get_all_unit_mapping_simpeg_by_tahun_anggaran(int $tahun_anggaran)
+	{
+		global $wpdb;
+		
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					unit.id_skpd,
+					unit.kode_skpd,
+					unit.nama_skpd,
+					mapping.id_satker_simpeg
+				FROM esakip_data_unit unit
+				LEFT JOIN esakip_data_mapping_unit_sipd_simpeg mapping
+					   ON unit.id_skpd = mapping.id_skpd
+					  AND mapping.tahun_anggaran = %d
+				WHERE unit.active = 1
+				  AND mapping.active = 1
+				  AND unit.is_skpd = 1
+				  AND unit.tahun_anggaran = %d;
+			", $tahun_anggaran, $tahun_anggaran),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function get_renaksi_kepala(int $id_skpd, int $tahun_anggaran, string $nip, string $id_jabatan) {
+		global $wpdb;
+		
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id,
+					label
+				FROM esakip_data_rencana_aksi_opd
+				WHERE id_skpd = %d 
+				  AND tahun_anggaran = %d 
+				  AND nip = %s 
+				  AND id_jabatan_asli = %s 
+				  AND level = 1
+				  AND active = 1
+			", $id_skpd, $tahun_anggaran, $nip, $id_jabatan),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function get_renaksi_indikator_by_id_renaksi(int $id_renaksi) {
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT *
+				FROM esakip_data_rencana_aksi_indikator_opd
+				WHERE active = 1
+				  AND id_renaksi = %d
+			", $id_renaksi),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function get_table_pk_publish()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'tahun_anggaran'	=> 'required|string'
+			]);
+
+			$data_unit_simpeg = $this->get_all_unit_mapping_simpeg_by_tahun_anggaran($_POST['tahun_anggaran']);
+			if (empty($data_unit_simpeg)) {
+				throw new Exception("Data unit mapping SIMPEG tidak ditemukan!. ", 400);
+			}
+			
+			$process_tbody = $this->process_tbody_capaian_kinerja_pk($data_unit_simpeg, $_POST['tahun_anggaran']);
+
+			echo json_encode([
+				'status'  => true,
+				'message' => 'Data berhasil ditemukan.',
+				'data'    => $process_tbody
+			]);
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
+	}
+
+	function process_tbody_capaian_kinerja_pk(array $data_unit_simpeg, int $tahun_anggaran)
+	{
+		if (empty($data_unit_simpeg)) {
+			return "<tr><td class='text-center' colspan='15'>Tidak ada data tersedia</td></tr>";
+		}
+
+		$tbody = '';
+		$no = 1;
+
+		foreach ($data_unit_simpeg as $perangkat_daerah) {
+			$kepala_opd_simpeg = $this->get_data_pegawai_simpeg_atasan_by_satker_id($perangkat_daerah['id_satker_simpeg']);
+			
+			if (!empty($kepala_opd_simpeg)) {
+				$all_sasaran = $this->get_renaksi_kepala(
+					$perangkat_daerah['id_skpd'],
+					$tahun_anggaran,
+					$kepala_opd_simpeg->nip_baru,
+					$kepala_opd_simpeg->id_jabatan
+				);
+			} else {
+				$all_sasaran = [];
+			}
+
+			if (empty($all_sasaran)) {
+				$tbody .= "
+					<tr>
+						<td class='text-center'>{$no}</td>
+						<td class='text-left'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</td>
+						<td class='text-center' colspan='13'>Sasaran belum tersedia</td>
+					</tr>";
+				$no++;
+				continue;
+			}
+
+			$processed_sasarans = [];
+			$skpd_total_rowspan = 0;
+			foreach ($all_sasaran as $sasaran) {
+				$indikators = $this->get_renaksi_indikator_by_id_renaksi($sasaran['id']);
+
+				$sasaran_rowspan = count($indikators) > 0 ? count($indikators) : 1;
+				
+				$processed_sasarans[] = [
+					'sasaran_data' => $sasaran,
+					'indikators'   => $indikators,
+					'rowspan'      => $sasaran_rowspan,
+				];
+				$skpd_total_rowspan += $sasaran_rowspan;
+			}
+			
+			$is_first_row_for_skpd = true;
+
+			foreach ($processed_sasarans as $proc_sasaran) {
+				$sasaran_data   = $proc_sasaran['sasaran_data'];
+				$indikators     = $proc_sasaran['indikators'];
+				$sasaran_rowspan = $proc_sasaran['rowspan'];
+
+				if (empty($indikators)) {
+					$tbody .= "<tr>";
+					if ($is_first_row_for_skpd) {
+						$tbody .= "<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$no}</td>";
+						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</td>";
+						$is_first_row_for_skpd = false;
+					}
+					$tbody .= "<td class='text-left'>{$sasaran_data['label']}</td>";
+					$tbody .= "<td class='text-center' colspan='12'>Indikator belum tersedia</td>";
+					$tbody .= "</tr>";
+					continue;
+				}
+
+				$is_first_indicator = true;
+				foreach ($indikators as $indikator) {
+					$tbody .= "<tr>";
+					
+					if ($is_first_row_for_skpd) {
+						$tbody .= "<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$no}</td>";
+						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</td>";
+						$is_first_row_for_skpd = false;
+					}
+
+					if ($is_first_indicator) {
+						$tbody .= "<td class='text-left' rowspan='{$sasaran_rowspan}'>{$sasaran_data['label']}</td>";
+						$is_first_indicator = false;
+					}
+
+					$all_target = [
+						'target_1' => $indikator['target_1'], 
+						'target_2' => $indikator['target_2'], 
+						'target_3' => $indikator['target_3'], 
+						'target_4' => $indikator['target_4']
+					];
+					$all_realisasi = [
+						'realisasi_1' => $indikator['realisasi_target_1'], 
+						'realisasi_2' => $indikator['realisasi_target_2'], 
+						'realisasi_3' => $indikator['realisasi_target_3'], 
+						'realisasi_4' => $indikator['realisasi_target_4']
+					];
+					
+					$capaian = $this->get_capaian_realisasi_by_type(
+						$indikator['rumus_capaian_kinerja'],
+						$all_target,
+						$all_realisasi,
+						$indikator['tahun_anggaran']
+					);
+					$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
+					
+					// jika capaian 0 tampilkan kosong.
+					$anti_zero_capaian = ($capaian_display == 0) ? '-' : $capaian;
+
+					$tbody .= "
+						<td class='text-left'>{$indikator['indikator']}</td>
+						<td class='text-left'>{$indikator['satuan']}</td>
+						<td class='text-center'>{$indikator['target_akhir']}</td>
+						<td class='text-center'>{$indikator['target_1']}</td>
+						<td class='text-center'>{$indikator['target_2']}</td>
+						<td class='text-center'>{$indikator['target_3']}</td>
+						<td class='text-center'>{$indikator['target_4']}</td>
+						<td class='text-center'>{$indikator['realisasi_target_1']}</td>
+						<td class='text-center'>{$indikator['realisasi_target_2']}</td>
+						<td class='text-center'>{$indikator['realisasi_target_3']}</td>
+						<td class='text-center'>{$indikator['realisasi_target_4']}</td>
+						<td class='text-center'>{$anti_zero_capaian}</td>
+					</tr>";
+				}
+			}
+			$no++;
+		}
+
+		return $tbody;
+	}
+
 	function get_datatable_iku_publish_opd() 
 	{
 		// data to send in API request
@@ -33690,23 +33923,41 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
     }
 
     public function get_data_pegawai_simpeg_atasan_by_satker_id($satker_id)
-    {
-        global $wpdb; 
+	{
+		global $wpdb;
 
-		$sql = $wpdb->prepare(
-            "SELECT id FROM {$this->table_data_pegawai_simpeg} WHERE active = 1 AND satker_id = %s AND tipe_pegawai_id = 11",
-            $satker_id
-        );
+		$kepala_definitif_query = $wpdb->prepare("
+			SELECT id
+			FROM {$this->table_data_pegawai_simpeg}
+			WHERE active = 1
+			  AND satker_id = %s
+			  AND tipe_pegawai_id = 11
+			  AND plt_plh IS NULL
+		", $satker_id);
+		$kepala_definitif = $wpdb->get_var($kepala_definitif_query);
 
-		$id_pegawai_atasan = $wpdb->get_var($sql);
+		if (empty($kepala_definitif)) {
+			$id_pegawai_atasan_query = $wpdb->prepare("
+				SELECT id
+				FROM {$this->table_data_pegawai_simpeg}
+				WHERE active = 1
+				  AND satker_id = %s
+				  AND tipe_pegawai_id = 11
+				  AND plt_plh = 1
+			", $satker_id);
+
+			$id_pegawai_atasan = $wpdb->get_var($id_pegawai_atasan_query);
+		} else {
+			$id_pegawai_atasan = $kepala_definitif;
+		}
 
 		if (!empty($id_pegawai_atasan)) {
 			$data_atasan = $this->get_data_pegawai_simpeg_by_id($id_pegawai_atasan);
 			return $data_atasan;
 		}
 
-        return null;
-    }
+		return null;
+	}
 	
 	/**
 	 * AJAX handler to get pegawai data by ID.

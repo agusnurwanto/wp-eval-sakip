@@ -738,6 +738,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_nopriv_get_datatable_pokin_publish',  $plugin_public, 'get_datatable_pokin_publish');
 		$this->loader->add_action('wp_ajax_get_datatable_iku_publish',  $plugin_public, 'get_datatable_iku_publish');
 		$this->loader->add_action('wp_ajax_nopriv_get_datatable_iku_publish',  $plugin_public, 'get_datatable_iku_publish');
+		$this->loader->add_action('wp_ajax_nopriv_get_table_pk_publish',  $plugin_public, 'get_table_pk_publish');
+		$this->loader->add_action('wp_ajax_get_table_pk_publish',  $plugin_public, 'get_table_pk_publish');
 		$this->loader->add_action('wp_ajax_get_datatable_iku_publish_opd',  $plugin_public, 'get_datatable_iku_publish_opd');
 		$this->loader->add_action('wp_ajax_nopriv_get_datatable_iku_publish_opd',  $plugin_public, 'get_datatable_iku_publish_opd');
 		
@@ -880,6 +882,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('cascading_publish', array($plugin_public, 'cascading_publish'));
 		add_shortcode('view_cascading_publish', array($plugin_public, 'view_cascading_publish'));
 		add_shortcode('capaian_kinerja_publish', array($plugin_public, 'capaian_kinerja_publish'));
+		add_shortcode('capaian_kinerja_pk_publish', array($plugin_public, 'capaian_kinerja_pk_publish'));
 		
 		add_shortcode('menu_eval_sakip', array($plugin_public, 'menu_eval_sakip'));
 		add_shortcode('penyusunan_pohon_kinerja',array($plugin_public,'penyusunan_pohon_kinerja'));
