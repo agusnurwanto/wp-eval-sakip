@@ -1873,12 +1873,14 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         `<div class="col-md-10">` +
                             `<select class="form-control" name="rumus_capaian_kinerja" id="rumus_capaian_kinerja">
                                 <option value="1">Indikator Tren Positif</option>
-                                <option value="2">Nilai Akhir</option>
+                                <option value="2">Nilai Akhir / %</option>
+                                <option value="3">Indikator Tren Negatif</option>
                             </select>` +
                             `<small class="text-muted">
                                 <ul>
                                     <li>Tren Positif : (Akumulasi Realisasi / Akumulasi Target) * 100.</li>
-                                    <li>Nilai Akhir : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
+                                    <li>Nilai Akhir / % : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
+                                    <li>Tren Negatif : (Akumulasi Target / Akumulasi Realisasi) * 100.</li>
                                     <li>Kedua rumus dihitung berdasarkan Realisasi dan Target triwulan berjalan.</li>
                                 </ul>
                             </small>` +
@@ -1886,7 +1888,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     `</div>` +
                     `<div class="form-group row">` +
                         `<div class="col-md-2">` +
-                            `<label for="rumus-indikator">Rumus Indikator Teks</label>` +
+                            `<label for="rumus-indikator">Rumus Indikator Teks / Formulasi Perhitungan Indikator</label>` +
                         `</div>` +
                         `<div class="col-md-10">` +
                             `<textarea class="form-control" name="label" id="rumus-indikator" placeholder="Tuliskan Rumus Indikator...">(Realisasi Indikator / Target Indikator) * 100 = Capaian </textarea>` +
@@ -2674,7 +2676,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     `<tr style="display: none;" class="data_bulanan_${b.id}">` +
                                         `<td colspan="8" style="padding: 10px;">` +
                                         `<div style="display: none; margin: 1rem auto;" class="data_bulanan_${b.id}">` +
-                                        `<h4 class="text-center" style="margin: 10px;">Rumus Indikator Teks</h4>` +
+                                        `<h4 class="text-center" style="margin: 10px;">Rumus Indikator Teks / Formulasi Perhitungan Indikator</h4>` +
                                         `<textarea class="form-control" id="show-rumus-indikator">${val_rumus_indikator}</textarea>` +
                                         `</div>` +
                                         `</td>` +

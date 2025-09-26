@@ -6,25 +6,113 @@ if (! defined('WPINC')) {
 if (empty($_GET) && empty($_GET['tahun'])) {
     die('Parameter tidak valid!');
 }
-global $wpdb;
-$tahun_anggaran = intval($_GET['tahun']);
 
-$jadwal_rpjmd = $this->get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran);
+if (empty($_GET['iscurrentpage']) || $_GET['iscurrentpage'] !== 'true') {
+    $perjanjian_kinerja_page = $this->functions->generatePage([
+        'nama_page'   => 'Capaian Kinerja Perjanjian Kinerja',
+        'content'     => '[capaian_kinerja_pk_publish]',
+        'show_header' => 1,
+        'post_status' => 'publish'
+    ]);
+    $iku_page = $this->functions->generatePage([
+        'nama_page'   => 'Capaian Kinerja',
+        'content'     => '[capaian_kinerja_publish]',
+        'show_header' => 1,
+        'post_status' => 'publish'
+    ]);
 
-if (empty($jadwal_rpjmd)) {
-    die('Jadwal RPJMD/RENSTRA terbuka tidak tersedia!');
-}
+    $pk = $perjanjian_kinerja_page['url'] . '&tahun=' . $_GET['tahun'];
+    $iku = $iku_page['url'] . '&tahun=' . $_GET['tahun'] . '&iscurrentpage=true';
 
-$thead = '';
-$thead_capaian = '';
-for($i=1; $i<=$jadwal_rpjmd['lama_pelaksanaan']; $i++){
-    $thead .= '
-        <th class="text-center" colspan="2" style="width: 200px;">'.($jadwal_rpjmd['tahun_selesai_anggaran']-($jadwal_rpjmd['lama_pelaksanaan']-$i)).'</th>
-    ';
-    $thead_capaian .= '
-        <th class="text-center" style="width: 100px;">Target</th>
-        <th class="text-center" style="width: 100px;">Realisasi</th>
-    ';
+    echo '
+    <style>
+        .menu-container {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        
+        .menu-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 3rem 2rem;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .menu-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+        }
+        
+        .menu-btn {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary-custom:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+    </style>
+    <div class="container-fluid menu-container d-flex justify-content-center align-items-center">
+        <div class="menu-card text-center">
+            <h2 class="menu-title">Pilih Menu</h2>
+            <div class="d-grid gap-3">
+                <button class="menu-btn btn-primary-custom" onclick="selectMenu(1)">
+                    <span class="dashicons dashicons-businessman"></span> Perjanjian Kinerja
+                </button>
+                <button class="menu-btn btn-primary-custom" onclick="selectMenu(2)">
+                    <span class="dashicons dashicons-performance"></span> Indikator Kinerja Utama
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+    function selectMenu(menuType) {
+        if (menuType === 1) {
+            window.open(\'' . $pk . '\');
+        } else if (menuType === 2) {
+            window.open(\'' . $iku . '\');
+        }
+    }
+    </script>';
+    die();
+} else {
+    global $wpdb;
+    $tahun_anggaran = intval($_GET['tahun']);
+    
+    $jadwal_rpjmd = $this->get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran);
+    
+    if (empty($jadwal_rpjmd)) {
+        die('Jadwal RPJMD/RENSTRA terbuka tidak tersedia!');
+    }
+    
+    $thead = '';
+    $thead_capaian = '';
+    for($i=1; $i<=$jadwal_rpjmd['lama_pelaksanaan']; $i++){
+        $thead .= '
+            <th class="text-center" colspan="2" style="width: 200px;">'.($jadwal_rpjmd['tahun_selesai_anggaran']-($jadwal_rpjmd['lama_pelaksanaan']-$i)).'</th>
+        ';
+        $thead_capaian .= '
+            <th class="text-center" style="width: 100px;">Target</th>
+            <th class="text-center" style="width: 100px;">Realisasi</th>
+        ';
+    }
 }
 ?>
 <style>

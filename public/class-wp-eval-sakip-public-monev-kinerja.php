@@ -8510,7 +8510,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$startTimeOp1 = microtime(true);
 			}
 
-			$url_api = get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk';
+			$url_api = get_option('_crb_url_api_ekinerja') . 'api/kinerjarhk';
 			$response = wp_remote_post($url_api, [
 				'headers' => array(
 					'X-api-key' => get_option('_crb_api_key_ekinerja'),
@@ -8730,6 +8730,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			case 2: // Nilai Akhir (Mengambil nilai pada triwulan terakhir)
 				$total_realisasi = $realisasi['realisasi_' . $limit_quarter] ?? 0;
 				$total_target = $target['target_' . $limit_quarter] ?? 0;
+				break;
+
+			case 3: // Indikator Tren Negatif (Kumulatif)
+				for ($i = 1; $i <= $limit_quarter; $i++) {
+					$total_realisasi += $target['target_' . $i] ?? 0;
+					$total_target += $realisasi['realisasi_' . $i] ?? 0;
+				}
 				break;
 
 			default:
