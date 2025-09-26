@@ -673,13 +673,15 @@ $generate_page = $this->functions->generatePage(array(
                             <div class="form-group">
                                 <label for="rumus_capaian_kinerja">Rumus Capaian Kinerja</label>
                                 <select name="rumus_capaian_kinerja" id="rumus_capaian_kinerja" onchange="setDataIku();">
-                                    <option value="1">Tren Positif</option>
+                                    <option value="1">Indikator Tren Positif</option>
                                     <option value="2">Nilai Akhir</option>
+                                    <option value="3">Indikator Tren Negatif</option>
                                 </select>
                                 <small class="text-muted">
                                     <ul>
                                         <li>Tren Positif : (Akumulasi Realisasi / Akumulasi Target) * 100.</li>
                                         <li>Nilai Akhir : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
+                                        <li>Tren Negatif : (Akumulasi Target / Akumulasi Realisasi) * 100.</li>
                                         <li>Kedua rumus dihitung berdasarkan Realisasi dan Target triwulan berjalan.</li>
                                     </ul>
                                 </small>
