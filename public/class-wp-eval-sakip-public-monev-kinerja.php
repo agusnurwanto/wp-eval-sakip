@@ -8514,7 +8514,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$startTimeOp1 = microtime(true);
 			}
 
-			$url_api = get_option('_crb_url_api_ekinerja') . 'dev/api/kinerjarhk';
+			$url_api = get_option('_crb_url_api_ekinerja') . 'api/kinerjarhk';
 			$response = wp_remote_post($url_api, [
 				'headers' => array(
 					'X-api-key' => get_option('_crb_api_key_ekinerja'),
@@ -8734,6 +8734,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			case 2: // Nilai Akhir (Mengambil nilai pada triwulan terakhir)
 				$total_realisasi = $realisasi['realisasi_' . $limit_quarter] ?? 0;
 				$total_target = $target['target_' . $limit_quarter] ?? 0;
+				break;
+
+			case 3: // Indikator Tren Negatif (Kumulatif)
+				for ($i = 1; $i <= $limit_quarter; $i++) {
+					$total_realisasi += $target['target_' . $i] ?? 0;
+					$total_target += $realisasi['realisasi_' . $i] ?? 0;
+				}
 				break;
 
 			default:
@@ -10678,5 +10685,89 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 
 		die(json_encode($ret));
+	}
+
+	public function get_data_iku_all()
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+					$_prefix_opd = $_where_opd = $id_skpd = '';
+					if (!empty($_POST['tipe_iku'])) {
+						if (!empty($_POST['id_skpd'])) {
+							$id_skpd = $_POST['id_skpd'];
+
+							$_prefix_opd = $_POST['tipe_iku'] == "opd" ? "_opd" : "";
+							$_where_opd = $_POST['tipe_iku'] == "opd" ? ' AND id_skpd=' . $id_skpd : '';
+						} else {
+							throw new Exception("Id SKPD tidak ditemukan!", 1);
+						}
+					}
+
+					if ($_prefix_opd == '') {
+						$data_iku = $wpdb->get_results($wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_data_iku_pemda
+							WHERE id_jadwal=%d
+								AND active=1
+						", 0), ARRAY_A);
+					} else if ($_prefix_opd == '_opd') {
+						$data_iku = $wpdb->get_results($wpdb->prepare("
+							SELECT
+								*
+							FROM esakip_data_iku_opd
+							WHERE id_skpd=%d
+								AND id_jadwal_wpsipd=%d
+								AND active=1
+						", $_POST['id_skpd'], $_POST['id_jadwal']), ARRAY_A);
+					}
+
+					$data = [
+						'data' => []
+					];
+					foreach ($data_iku as $key => $iku) {
+						if (empty($data['data'][$iku['id']])) {
+							$data['data'][$iku['id']] = [
+								'id' => $iku['id'],
+								'kode_sasaran' => $iku['kode_sasaran'],
+								'id_unik_indikator' => $iku['id_unik_indikator'],
+								// pemda
+								'id_sasaran' => $iku['id_sasaran'],
+								'target_1' => $iku['target_1'] ? $iku['target_1'] : '',
+								'target_2' => $iku['target_2'] ? $iku['target_2'] : '',
+								'target_3' => $iku['target_3'] ? $iku['target_3'] : '',
+								'target_4' => $iku['target_4'] ? $iku['target_4'] : '',
+								'target_5' => $iku['target_5'] ? $iku['target_5'] : '',
+								'realisasi_1' => $iku['realisasi_1'] ? $iku['realisasi_1'] : '',
+								'realisasi_2' => $iku['realisasi_2'] ? $iku['realisasi_2'] : '',
+								'realisasi_3' => $iku['realisasi_3'] ? $iku['realisasi_3'] : '',
+								'realisasi_4' => $iku['realisasi_4'] ? $iku['realisasi_4'] : '',
+								'realisasi_5' => $iku['realisasi_5'] ? $iku['realisasi_5'] : '',
+							];
+						}
+					}
+
+					echo json_encode([
+						'status' => true,
+						'data' => array_values($data['data']),
+						'sql' => $wpdb->last_query
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => false,
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
 	}
 }

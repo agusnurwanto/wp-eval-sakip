@@ -209,11 +209,17 @@ foreach ($ret['rhk_unik'] as $v) {
             'realisasi_4' => $ind['realisasi_tw_4']
         ];
         $get_capaian_realisasi = $this->get_capaian_realisasi_by_type($ind['rumus_capaian_kinerja'], $all_target, $all_realisasi_tw, $ind['tahun_anggaran']);
+        $rumus_teks = 'Jenis rumus tidak diketahui';
         if ($get_capaian_realisasi === false) {
-            $rumus_teks = 'Jenis rumus tidak diketahui';
             $get_capaian_realisasi = '-';
         } else {
-            $rumus_teks = $ind['rumus_capaian_kinerja'] == 1 ? "Tren Positif" : "Nilai Akhir";
+            if($ind['rumus_capaian_kinerja'] == 1){
+                $rumus_teks = "Tren Positif";
+            }else if($ind['rumus_capaian_kinerja'] == 2){
+                $rumus_teks = "Nilai Akhir / %";
+            }else if($ind['rumus_capaian_kinerja'] == 3){
+                $rumus_teks = "Tren Negatif";
+            }
         }
 
         $capaian_realisasi = $get_capaian_realisasi . ' (' . $rumus_teks . ')' . '</br>';

@@ -296,6 +296,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_finalisasi_iku_opd', $plugin_public, 'hapus_finalisasi_iku_opd');
 		$this->loader->add_action('wp_ajax_get_finalisasi_iku_by_id', $plugin_public, 'get_finalisasi_iku_by_id');
 		$this->loader->add_action('wp_ajax_edit_finalisasi_iku', $plugin_public, 'edit_finalisasi_iku');
+		$this->loader->add_action('wp_ajax_get_data_iku_all',  $plugin_public, 'get_data_iku_all');
+		$this->loader->add_action('wp_ajax_nopriv_get_data_iku_all',  $plugin_public, 'get_data_iku_all');
 		
 		$this->loader->add_action('wp_ajax_get_table_cascading_pd', $plugin_public, 'get_table_cascading_pd');
 		$this->loader->add_action('wp_ajax_nopriv_get_table_cascading_pd', $plugin_public, 'get_table_cascading_pd');
