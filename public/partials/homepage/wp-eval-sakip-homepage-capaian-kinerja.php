@@ -27,7 +27,7 @@ if (empty($_GET['iscurrentpage']) || $_GET['iscurrentpage'] !== 'true') {
     echo '
     <style>
         .menu-container {
-            min-height: 100vh;
+            min-height: 90vh;
             background-color: #f8f9fa;
         }
         
@@ -71,13 +71,13 @@ if (empty($_GET['iscurrentpage']) || $_GET['iscurrentpage'] !== 'true') {
     </style>
     <div class="container-fluid menu-container d-flex justify-content-center align-items-center">
         <div class="menu-card text-center">
-            <h2 class="menu-title">Pilih Menu</h2>
+            <h2 class="menu-title">Pilih Capaian Kinerja</h2>
             <div class="d-grid gap-3">
                 <button class="menu-btn btn-primary-custom" onclick="selectMenu(1)">
-                    <span class="dashicons dashicons-businessman"></span> Perjanjian Kinerja
+                    <span class="dashicons dashicons-businessman"></span> Perjanjian Kinerja (PK)
                 </button>
                 <button class="menu-btn btn-primary-custom" onclick="selectMenu(2)">
-                    <span class="dashicons dashicons-performance"></span> Indikator Kinerja Utama
+                    <span class="dashicons dashicons-performance"></span> Indikator Kinerja Utama (IKU)
                 </button>
             </div>
         </div>
