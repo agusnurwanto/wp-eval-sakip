@@ -1600,6 +1600,7 @@ CREATE TABLE `esakip_data_iku_pemda` (
   `realisasi_4` varchar(255) DEFAULT NULL,
   `realisasi_5` varchar(255) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
+  `rumus_capaian_kinerja` TINYINT(4) DEFAULT 1 NOT NULL COMMENT '1 = Tren Positif, 2 = Nilai Akhir',
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp(),
   PRIMARY key (id),

@@ -32989,7 +32989,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return $data;
 	}
 
-	function get_renaksi_kepala(int $id_skpd, int $tahun_anggaran, string $nip, string $id_jabatan) {
+	function get_renaksi_kepala(int $id_skpd, int $tahun_anggaran) {
 		global $wpdb;
 		
 		$data = $wpdb->get_results(
@@ -32999,12 +32999,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					label
 				FROM esakip_data_rencana_aksi_opd
 				WHERE id_skpd = %d 
-				  AND tahun_anggaran = %d 
-				  AND nip = %s 
-				  AND id_jabatan_asli = %s 
+				  AND tahun_anggaran = %d
 				  AND level = 1
 				  AND active = 1
-			", $id_skpd, $tahun_anggaran, $nip, $id_jabatan),
+			", $id_skpd, $tahun_anggaran),
 			ARRAY_A
 		);
 
@@ -33040,11 +33038,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 			
 			$process_tbody = $this->process_tbody_capaian_kinerja_pk($data_unit_simpeg, $_POST['tahun_anggaran']);
+			
+			$id_jadwal = $this->get_rpjmd_settings($_POST['tahun_anggaran']);
+			if (!empty($id_jadwal)) {
+				$process_tbody_kepala_daerah = $this->process_tbody_capaian_pk_kepala_daerah($_POST['tahun_anggaran'], $id_jadwal['id_jadwal_rpjmd']);
+			} else {
+				$process_tbody_kepala_daerah = "<td class='text-center' colspan='12'>Tahun Anggaran belum diset.</td>";
+			}
 
 			echo json_encode([
 				'status'  => true,
 				'message' => 'Data berhasil ditemukan.',
-				'data'    => $process_tbody
+				'data'    => $process_tbody,
+				'data_kepala_daerah'   => $process_tbody_kepala_daerah
 			]);
 		} catch (Exception $e) {
 			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
@@ -33067,18 +33073,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$no = 1;
 
 		foreach ($data_unit_simpeg as $perangkat_daerah) {
-			$kepala_opd_simpeg = $this->get_data_pegawai_simpeg_atasan_by_satker_id($perangkat_daerah['id_satker_simpeg']);
-			
-			if (!empty($kepala_opd_simpeg)) {
-				$all_sasaran = $this->get_renaksi_kepala(
-					$perangkat_daerah['id_skpd'],
-					$tahun_anggaran,
-					$kepala_opd_simpeg->nip_baru,
-					$kepala_opd_simpeg->id_jabatan
-				);
-			} else {
-				$all_sasaran = [];
-			}
+			$all_sasaran = $this->get_renaksi_kepala(
+				$perangkat_daerah['id_skpd'],
+				$tahun_anggaran
+			);
 
 			if (empty($all_sasaran)) {
 				$tbody .= "
@@ -33185,6 +33183,110 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					}
 			}
 			$no++;
+		}
+
+		return $tbody;
+	}
+
+	function get_rpjmd_settings($tahun_anggaran)
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT 
+					j.id,
+					j.nama_jadwal,
+					j.nama_jadwal_renstra,
+					j.tahun_anggaran,
+					j.lama_pelaksanaan,
+					j.tahun_selesai_anggaran,
+					j.status,
+					r.id_jadwal_rpjmd,
+					r.tahun_anggaran as tahun_anggaran_setting
+				FROM esakip_data_jadwal j
+				LEFT JOIN esakip_pengaturan_upload_dokumen r
+					   ON r.id_jadwal_rpjmd = j.id
+				WHERE j.tipe = %s
+				  AND j.status != 0
+				  AND r.tahun_anggaran = %d
+			", 'RPJMD', $tahun_anggaran),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function process_tbody_capaian_pk_kepala_daerah(int $tahun_anggaran, int $id_jadwal) {
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					pk.*,
+					ik.label_sasaran as label_sasaran_iku,
+					ik.label_indikator as label_indikator_iku,
+					ik.rumus_capaian_kinerja,
+					ik.penanggung_jawab
+				FROM esakip_laporan_pk_pemda pk
+				LEFT JOIN esakip_data_iku_pemda ik
+					   ON pk.id_iku = ik.id 
+					  AND pk.id_jadwal = ik.id_jadwal
+				WHERE pk.active = 1
+				  AND pk.tahun_anggaran = %d
+				  AND pk.id_jadwal = %d
+				ORDER BY pk.id ASC
+			", $tahun_anggaran, $id_jadwal),
+			ARRAY_A
+		);
+
+		if (!empty($data)) {
+			$no = 1;
+			
+			foreach ($data as $v) {
+				$all_target = [
+					'target_1' => $v['target_1'] ?? 0, 
+					'target_2' => $v['target_2'] ?? 0, 
+					'target_3' => $v['target_3'] ?? 0, 
+					'target_4' => $v['target_4'] ?? 0
+				];
+				$all_realisasi = [
+					'realisasi_1' => $v['realisasi_1'] ?? 0, 
+					'realisasi_2' => $v['realisasi_2'] ?? 0, 
+					'realisasi_3' => $v['realisasi_3'] ?? 0, 
+					'realisasi_4' => $v['realisasi_4'] ?? 0
+				];
+				
+				$capaian = $this->get_capaian_realisasi_by_type(
+					$v['rumus_capaian_kinerja'],
+					$all_target,
+					$all_realisasi,
+					$v['tahun_anggaran']
+				);
+
+				$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
+					
+				// jika capaian 0 tampilkan kosong.
+				$anti_zero_capaian = ($capaian_display == 0) ? '' : $capaian;
+
+				$tbody .= "
+				<tr>
+					<td class='text-left'>" . $no++ . "</td> // no
+					<td class='text-left'>{$v['label_sasaran_iku']}</td> // sasaran
+					<td class='text-left'>{$v['label_indikator_iku']}</td> // indikator
+					<td class='text-center'>{$v['satuan']}</td> // satuan
+					<td class='text-center'>{$v['target']}</td> // target
+					<td class='text-center'>{$v['realisasi_1']}</td> // realisasi tw 1
+					<td class='text-center'>{$v['realisasi_2']}</td> // realisasi tw 2
+					<td class='text-center'>{$v['realisasi_3']}</td> // realisasi tw 3
+					<td class='text-center'>{$v['realisasi_4']}</td> // realisasi tw 4
+					<td class='text-center'>{$anti_zero_capaian}</td> // capaian
+					<td class='text-left'>{$v['penanggung_jawab']}</td> // opd penanggung jawab
+				</tr>
+				";
+			}
+		} else {
+			$tbody = "<td class='text-center' colspan='12'>Tidak ada data tersedia</td>";
 		}
 
 		return $tbody;

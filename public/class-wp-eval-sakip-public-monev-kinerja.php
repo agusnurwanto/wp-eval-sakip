@@ -4412,6 +4412,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else if (empty($_POST['id_jadwal'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'ID Jadwal tidak boleh kosong!';
+				} else if (empty($_POST['rumus_capaian_kinerja'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Rumus Capaian Kinerja tidak boleh kosong!';
 				}
 
 				if ($ret['status'] != 'error') {
@@ -4438,6 +4441,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'realisasi_4' => $_POST['realisasi_4'],
 						'realisasi_5' => $_POST['realisasi_5'],
 						'id_sasaran_murni' => $_POST['id_sasaran_murni'],
+						'rumus_capaian_kinerja' => $_POST['rumus_capaian_kinerja'],
 						'active' => 1,
 						'updated_at' => current_time('mysql'),
 					);

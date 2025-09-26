@@ -23,13 +23,14 @@ $data_jadwal = $wpdb->get_row(
         AND tipe='RPJMD'
         AND status!=0
     ", $input['id_periode']),
-    ARRAY_A);
+    ARRAY_A
+);
 
-if(empty($data_jadwal)){
+if (empty($data_jadwal)) {
     die("JADWAL KOSONG");
 }
 
-if(!empty($data_jadwal)){
+if (!empty($data_jadwal)) {
     $lama_pelaksanaan = $data_jadwal['lama_pelaksanaan'] ?? 4;
     $tahun_anggaran = $data_jadwal['tahun_anggaran'];
     $tahun_awal = $data_jadwal['tahun_anggaran'];
@@ -41,7 +42,7 @@ if(!empty($data_jadwal)){
     $colspan = $data_jadwal['lama_pelaksanaan'];
     $header_tahun = '<tr>';
     for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
-        $header_tahun .= '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+        $header_tahun .= '<th class="text-center atas kanan bawah kiri" colspan="2">' . $i . '</th>';
     }
     $header_tahun .= '</tr><tr>';
     for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
@@ -49,14 +50,13 @@ if(!empty($data_jadwal)){
         $header_tahun .= '<th class="text-center atas kanan bawah kiri">Realisasi</th>';
     }
     $header_tahun .= '</tr>';
-
 }
 
 $nama_jadwal = strtoupper($data_jadwal['jenis_jadwal_khusus']) . ' ' . $data_jadwal['nama_jadwal'] . ' ' . '(' . $tahun_awal . ' - ' . $tahun_akhir . ')';
 
-if(empty($input['id_periode'])){
+if (empty($input['id_periode'])) {
     $id_jadwal = 0;
-}else{
+} else {
     $id_jadwal = $input['id_periode'];
 }
 $cek_id_jadwal = empty($input['id_periode']) ? 0 : 1;
@@ -72,7 +72,7 @@ $admin_role_pemda = array(
     'admin_ortala'
 );
 
-$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2 ;
+$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
 $hak_akses_user = ($nip_kepala == $is_administrator || $this_jenis_role == 1) ? true : false;
 $iku = $wpdb->get_results(
@@ -116,21 +116,21 @@ if (!empty($iku)) {
             'label_sasaran'    => $v_iku['label_sasaran'] ?? '-',
             'id_unik_indikator'  => $v_iku['id_unik_indikator'] ?? '-',
             'label_indikator'  => $v_iku['label_indikator'] ?? '-',
-            'formulasi'        => $v_iku['formulasi'] ?? '-', 
-            'sumber_data'      => $v_iku['sumber_data'] ?? '-', 
-            'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '-', 
-            'satuan' => $v_iku['satuan'] ?? '-', 
-            'target_1' => $v_iku['target_1'] ?? '-', 
-            'target_2' => $v_iku['target_2'] ?? '-', 
-            'target_3' => $v_iku['target_3'] ?? '-', 
-            'target_4' => $v_iku['target_4'] ?? '-', 
-            'target_5' => $v_iku['target_5'] ?? '-',  
-            'realisasi_1' => $v_iku['realisasi_1'] ?? '-', 
-            'realisasi_2' => $v_iku['realisasi_2'] ?? '-', 
-            'realisasi_3' => $v_iku['realisasi_3'] ?? '-', 
-            'realisasi_4' => $v_iku['realisasi_4'] ?? '-', 
-            'realisasi_5' => $v_iku['realisasi_5'] ?? '-', 
-            'id_jadwal' => $v_iku['id_jadwal'] ?? '-', 
+            'formulasi'        => $v_iku['formulasi'] ?? '-',
+            'sumber_data'      => $v_iku['sumber_data'] ?? '-',
+            'penanggung_jawab' => $v_iku['penanggung_jawab'] ?? '-',
+            'satuan' => $v_iku['satuan'] ?? '-',
+            'target_1' => $v_iku['target_1'] ?? '-',
+            'target_2' => $v_iku['target_2'] ?? '-',
+            'target_3' => $v_iku['target_3'] ?? '-',
+            'target_4' => $v_iku['target_4'] ?? '-',
+            'target_5' => $v_iku['target_5'] ?? '-',
+            'realisasi_1' => $v_iku['realisasi_1'] ?? '-',
+            'realisasi_2' => $v_iku['realisasi_2'] ?? '-',
+            'realisasi_3' => $v_iku['realisasi_3'] ?? '-',
+            'realisasi_4' => $v_iku['realisasi_4'] ?? '-',
+            'realisasi_5' => $v_iku['realisasi_5'] ?? '-',
+            'id_jadwal' => $v_iku['id_jadwal'] ?? '-',
         ];
         $html_iku .= '<tr>';
         $html_iku .= '<td class="text-left atas kanan bawah kiri">' . $no_iku++ . '</td>';
@@ -209,7 +209,7 @@ $nama_tahapan = array();
 if (!empty($data_tahapan)) {
     foreach ($data_tahapan as $v) {
         $tanggal_dokumen = $this->format_tanggal_indo($v['tanggal_dokumen']);
-        $get_nama_tahapan = $v['nama_tahapan'] . '|' . $tanggal_dokumen . '|'. $v['id'];
+        $get_nama_tahapan = $v['nama_tahapan'] . '|' . $tanggal_dokumen . '|' . $v['id'];
 
         if (!isset($nama_tahapan[$get_nama_tahapan])) {
             $nama_tahapan[$get_nama_tahapan] = [];
@@ -249,7 +249,7 @@ if (!empty($data_tahapan)) {
             </div>
         </div>';
     }
-} 
+}
 $generate_page = $this->functions->generatePage(array(
     'nama_page' => 'Cetak Laporan IKU',
     'content' => '[cetak_laporan_iku_pemda]',
@@ -273,8 +273,8 @@ $generate_page = $this->functions->generatePage(array(
     .btn-action-group .btn {
         margin: 0 5px;
     }
-    
-    a.btn{
+
+    a.btn {
         text-decoration: none !important;
     }
 
@@ -283,22 +283,26 @@ $generate_page = $this->functions->generatePage(array(
         font-size: small;
         text-align: center;
     }
+
     .table_dokumen_rencana_aksi {
-        font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; 
-        border-collapse: collapse; 
+        font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        border-collapse: collapse;
         /* width: 2900px;  */
-        table-layout: fixed; 
-        overflow-wrap: break-word; 
+        table-layout: fixed;
+        overflow-wrap: break-word;
         font-size: 90%;
     }
+
     .table_dokumen_rencana_aksi thead {
         position: sticky;
         top: -6px;
     }
+
     .table_dokumen_rencana_aksi .badge {
         white-space: normal;
         line-height: 1.3;
     }
+
     /* carousel */
     .cr-container {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
@@ -454,11 +458,23 @@ $generate_page = $this->functions->generatePage(array(
     .cr-scroll-btn-right {
         right: -8px;
     }
-    .atas { border-top: 1px solid black; }
-    .kanan { border-right: 1px solid black; }
-    .bawah { border-bottom: 1px solid black; }
-    .kiri { border-left: 1px solid black; }
-    
+
+    .atas {
+        border-top: 1px solid black;
+    }
+
+    .kanan {
+        border-right: 1px solid black;
+    }
+
+    .bawah {
+        border-bottom: 1px solid black;
+    }
+
+    .kiri {
+        border-left: 1px solid black;
+    }
+
     td.formulasi img {
         max-width: 100%;
         height: auto;
@@ -473,9 +489,9 @@ $generate_page = $this->functions->generatePage(array(
 <div class="container-md">
     <div title="Pengisian IKU Pemerintah Daerah <?php echo $nama_jadwal ?>">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 style="text-align: center; margin: 10px auto; min-width: 450px;">Pengisian IKU <br>Pemerintah Daerah <br><?php echo $nama_jadwal ?></h1> 
+            <h1 style="text-align: center; margin: 10px auto; min-width: 450px;">Pengisian IKU <br>Pemerintah Daerah <br><?php echo $nama_jadwal ?></h1>
             <div class="cr-container hide-display-print">
-               <h2 class="cr-title">Pilih Pengisian Indikator Kegiatan Utama</h2>
+                <h2 class="cr-title">Pilih Pengisian Indikator Kegiatan Utama</h2>
                 <div class="cr-carousel-wrapper">
                     <div id="card-carousel" class="cr-carousel">
                         <div class="cr-item" title="Indikator Kegiatan Utama Real Time">
@@ -534,7 +550,7 @@ $generate_page = $this->functions->generatePage(array(
                             <?php
                             // Baris tahun
                             for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
-                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">' . $i . '</th>';
                             }
                             ?>
                             <th rowspan="2" class="text-center atas kanan bawah kiri hide-excel" style="width: 150px;">Aksi</th>
@@ -555,7 +571,7 @@ $generate_page = $this->functions->generatePage(array(
             </div>
             <div id="cetak" class="wrap-table">
                 <table cellpadding="2" cellspacing="0" class="table_edit_dokumen_iku table table-bordered" style="display: none;">
-                   <thead style="background: #ffc491;">
+                    <thead style="background: #ffc491;">
                         <tr>
                             <th rowspan="2" class="text-center atas kanan bawah kiri">No</th>
                             <?php if (!empty($id_jadwal_murni)): ?>
@@ -570,7 +586,7 @@ $generate_page = $this->functions->generatePage(array(
                             <?php
                             // Baris tahun
                             for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
-                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                                echo '<th class="text-center atas kanan bawah kiri" colspan="2">' . $i . '</th>';
                             }
                             ?>
                         </tr>
@@ -592,7 +608,7 @@ $generate_page = $this->functions->generatePage(array(
     </div>
 </div>
 <!-- Modal crud -->
-<div class="modal fade" id="modal-iku" data-backdrop="static"  role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
+<div class="modal fade" id="modal-iku" data-backdrop="static" role="dialog" aria-labelledby="modal-crud-label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -610,7 +626,7 @@ $generate_page = $this->functions->generatePage(array(
                             <?php if (!empty($id_jadwal_murni)): ?>
                                 <div class="form-group">
                                     <label>Sasaran Sebelum</label>
-                                    <input class="form-control" id="sasaran_sebelum" disabled/>
+                                    <input class="form-control" id="sasaran_sebelum" disabled />
                                 </div>
                             <?php endif; ?>
                             <div class="form-group">
@@ -630,16 +646,16 @@ $generate_page = $this->functions->generatePage(array(
                             </div>
                             <div class="form-group">
                                 <label for="formulasi">Definisi Operasional/Formulasi</label>
-                                <?php 
-                                    $content = ''; 
-                                    $editor_id = 'formulasi';
-                                    $settings = array(
-                                        'textarea_name' => 'formulasi',
-                                        'media_buttons' => true, 
-                                        'teeny' => false, 
-                                        'quicktags' => true
-                                    );
-                                    wp_editor($content, $editor_id, $settings);
+                                <?php
+                                $content = '';
+                                $editor_id = 'formulasi';
+                                $settings = array(
+                                    'textarea_name' => 'formulasi',
+                                    'media_buttons' => true,
+                                    'teeny' => false,
+                                    'quicktags' => true
+                                );
+                                wp_editor($content, $editor_id, $settings);
                                 ?>
                             </div>
                             <div class="form-group">
@@ -652,7 +668,21 @@ $generate_page = $this->functions->generatePage(array(
                             </div>
                             <div class="form-group">
                                 <label for="satuan">Satuan</label>
-                                <input type="text" class="form-control" id="satuan" name="satuan"/>
+                                <input type="text" class="form-control" id="satuan" name="satuan" />
+                            </div>
+                            <div class="form-group">
+                                <label for="rumus_capaian_kinerja">Rumus Capaian Kinerja</label>
+                                <select name="rumus_capaian_kinerja" id="rumus_capaian_kinerja" onchange="setDataIku();">
+                                    <option value="1">Tren Positif</option>
+                                    <option value="2">Nilai Akhir</option>
+                                </select>
+                                <small class="text-muted">
+                                    <ul>
+                                        <li>Tren Positif : (Akumulasi Realisasi / Akumulasi Target) * 100.</li>
+                                        <li>Nilai Akhir : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
+                                        <li>Kedua rumus dihitung berdasarkan Realisasi dan Target triwulan berjalan.</li>
+                                    </ul>
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -664,13 +694,13 @@ $generate_page = $this->functions->generatePage(array(
                                 <div class="form-group row">
                                     <div class="col-md-6">
                                         <label for="target_<?php echo $i + 1; ?>">Target <?php echo $data_jadwal['tahun_anggaran'] + $i; ?></label>
-                                        <input type="number" min="0" class="form-control" id="target_<?php echo $i + 1; ?>" name="target_<?php echo $i + 1; ?>"/>
+                                        <input type="number" min="0" class="form-control" id="target_<?php echo $i + 1; ?>" name="target_<?php echo $i + 1; ?>" />
                                     </div>
 
                                     <?php if ($i + 2 <= $data_jadwal['lama_pelaksanaan']): ?>
                                         <div class="col-md-6">
                                             <label for="target_<?php echo $i + 2; ?>">Target <?php echo $data_jadwal['tahun_anggaran'] + $i + 1; ?></label>
-                                            <input type="number" min="0" class="form-control" id="target_<?php echo $i + 2; ?>" name="target_<?php echo $i + 2; ?>"/>
+                                            <input type="number" min="0" class="form-control" id="target_<?php echo $i + 2; ?>" name="target_<?php echo $i + 2; ?>" />
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -681,21 +711,21 @@ $generate_page = $this->functions->generatePage(array(
                     <!-- Realisasi -->
                     <div class="card bg-light shadow-md mb-3">
                         <div class="card-body">
-                        <?php for ($i = 0; $i < $data_jadwal['lama_pelaksanaan']; $i += 2): ?>
-                            <div class="form-group row">
-                                <div class="col-md-6">
-                                    <label for="realisasi_<?php echo $i + 1; ?>">Realisasi <?php echo $data_jadwal['tahun_anggaran'] + $i; ?></label>
-                                    <input type="number" min="0" class="form-control" id="realisasi_<?php echo $i + 1; ?>" name="realisasi_<?php echo $i + 1; ?>"/>
-                                </div>
-
-                                <?php if ($i + 2 <= $data_jadwal['lama_pelaksanaan']): ?>
+                            <?php for ($i = 0; $i < $data_jadwal['lama_pelaksanaan']; $i += 2): ?>
+                                <div class="form-group row">
                                     <div class="col-md-6">
-                                        <label for="realisasi_<?php echo $i + 2; ?>">Realisasi <?php echo $data_jadwal['tahun_anggaran'] + $i + 1; ?></label>
-                                        <input type="number" min="0" class="form-control" id="realisasi_<?php echo $i + 2; ?>" name="realisasi_<?php echo $i + 2; ?>"/>
+                                        <label for="realisasi_<?php echo $i + 1; ?>">Realisasi <?php echo $data_jadwal['tahun_anggaran'] + $i; ?></label>
+                                        <input type="number" min="0" class="form-control" id="realisasi_<?php echo $i + 1; ?>" name="realisasi_<?php echo $i + 1; ?>" />
                                     </div>
-                                <?php endif; ?>
-                            </div>
-                        <?php endfor; ?>
+
+                                    <?php if ($i + 2 <= $data_jadwal['lama_pelaksanaan']): ?>
+                                        <div class="col-md-6">
+                                            <label for="realisasi_<?php echo $i + 2; ?>">Realisasi <?php echo $data_jadwal['tahun_anggaran'] + $i + 1; ?></label>
+                                            <input type="number" min="0" class="form-control" id="realisasi_<?php echo $i + 2; ?>" name="realisasi_<?php echo $i + 2; ?>" />
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endfor; ?>
                         </div>
                     </div>
                 </form>
@@ -743,7 +773,7 @@ $generate_page = $this->functions->generatePage(array(
                                         <?php
                                         // Baris tahun
                                         for ($i = $tahun_mulai_anggaran; $i <= $tahun_periode; $i++) {
-                                            echo '<th class="text-center atas kanan bawah kiri" colspan="2">'.$i.'</th>';
+                                            echo '<th class="text-center atas kanan bawah kiri" colspan="2">' . $i . '</th>';
                                         }
                                         ?>
                                     </tr>
@@ -826,633 +856,647 @@ $generate_page = $this->functions->generatePage(array(
     </div>
 </div>
 <script type="text/javascript">
-jQuery(document).ready(function() {
-    let id_jadwal = <?php echo $cek_id_jadwal; ?>;
-    if(id_jadwal == 0){
-        alert("Jadwal RENSTRA untuk data Sasaran belum disetting.\nPastikan Jadwal RENSTRA tersedia.")
-    }
+    jQuery(document).ready(function() {
+        let id_jadwal = <?php echo $cek_id_jadwal; ?>;
+        if (id_jadwal == 0) {
+            alert("Jadwal RENSTRA untuk data Sasaran belum disetting.\nPastikan Jadwal RENSTRA tersedia.")
+        }
 
-    window.id_jadwal = <?php echo $id_jadwal; ?>;
+        window.id_jadwal = <?php echo $id_jadwal; ?>;
 
-    getTableIKUPemda().then(function(){
-        run_download_excel_sakip();
-        run_download_word_sakip(jQuery('#cetak').html(), jQuery('#cetak').attr('title'));
-        jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku-pemda" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
-        // jQuery('#action-sakip').prepend('<button style="margin-right: 10px;" class="btn btn-success hide-print" onclick="cetak_laporan()"><i class="dashicons dashicons-edit"></i> Cetak/Print Laporan</button>');
-        jQuery("#tambah-iku-pemda").on('click', function(){
-            tambahIkuPemda();
+        getTableIKUPemda().then(function() {
+            run_download_excel_sakip();
+            run_download_word_sakip(jQuery('#cetak').html(), jQuery('#cetak').attr('title'));
+            jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-iku-pemda" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
+            // jQuery('#action-sakip').prepend('<button style="margin-right: 10px;" class="btn btn-success hide-print" onclick="cetak_laporan()"><i class="dashicons dashicons-edit"></i> Cetak/Print Laporan</button>');
+            jQuery("#tambah-iku-pemda").on('click', function() {
+                tambahIkuPemda();
+            });
         });
     });
-});
-function getTableIKUPemda() {
-    jQuery('#wrap-loading').show();
-    return new Promise(function(resolve, reject){
+
+    function getTableIKUPemda() {
+        jQuery('#wrap-loading').show();
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_table_input_iku_pemda',
+                    api_key: esakip.api_key,
+                    id_jadwal: id_jadwal
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    console.log(response);
+                    if (response.status === 'success') {
+                        jQuery('.table_dokumen_iku tbody').html(response.data);
+                        style_css_download_excel_sakip();
+                    } else {
+                        alert(response.message);
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat data IKU!');
+                    resolve();
+                }
+            });
+        });
+    }
+
+    function tambahIkuPemda() {
+        jQuery('#wrap-loading').show();
+        return getSasaran()
+            .then(function() {
+                return new Promise(function(resolve, reject) {
+                    jQuery('#wrap-loading').hide();
+                    document.input_iku.reset();
+                    jQuery('#id_iku').val("");
+
+                    if (typeof data_sasaran_rpjmd != 'undefined') {
+                        jQuery("#modal-iku").modal('show');
+                        jQuery("#modal-iku").find('.modal-title').html('Tambah IKU');
+                        jQuery("#modal-iku").find('.modal-footer').html('' +
+                            '<button type="button" class="btn btn-danger" data-dismiss="modal">' +
+                            'Tutup' +
+                            '</button>' +
+                            '<button type="button" class="btn btn-success" onclick="simpanDataIkuPemda()">' +
+                            'Simpan' +
+                            '</button>');
+
+                        jQuery('#sumber-data-iku').val(2).trigger('onchange');
+                        resolve();
+                    }
+                })
+            })
+    }
+
+    function setDataIku() {
+        var sumber_data = jQuery('#sumber-data-iku').val();
+        var html_iku = '';
+        if (sumber_data == 1) {
+            html_iku = '<option value="">Pilih Tujuan</option>';
+            data_sasaran_rpjmd.data_tujuan.map(function(value) {
+                if (value.id_unik_indikator == null) {
+                    html_iku += '<option value="' + value.id_unik + '">' + value.tujuan_teks + '</option>';
+                }
+            });
+
+            jQuery("#label-tujuan-sasaran").text('Tujuan');
+            jQuery('#tujuan-sasaran').attr("onchange", 'getIndikatorTujuan(this.value)');
+        } else {
+            html_iku = '<option value="">Pilih Sasaran Strategis</option>';
+            data_sasaran_rpjmd.data.map(function(value) {
+                if (value.id_unik_indikator == null) {
+                    html_iku += '<option value="' + value.id_unik + '">' + value.sasaran_teks + '</option>';
+                }
+            });
+
+            jQuery("#label-tujuan-sasaran").text('Sasaran');
+            jQuery('#tujuan-sasaran').attr("onchange", 'getIndikator(this.value)');
+        }
+
+        jQuery("#tujuan-sasaran").html(html_iku);
+        jQuery('#tujuan-sasaran').select2({
+            width: '100%'
+        });
+    }
+
+    function simpanDataIkuPemda() {
+        let id_iku = jQuery('#id_iku').val();
+        let id_unik = jQuery('#tujuan-sasaran').val();
+        let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
+        let id_indikator = jQuery('#indikator').val();
+        let label_indikator = jQuery('#indikator option:selected').text();
+        let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
+        let sumber_data = jQuery('#sumber-data').val();
+        let penanggung_jawab = jQuery('#penanggung-jawab').val();
+        let satuan = jQuery('#satuan').val();
+        let id_sasaran_murni = jQuery('#id_sasaran_murni').val();
+
+        let target_1 = jQuery("#target_1").val();
+        let target_2 = jQuery("#target_2").val();
+        let target_3 = jQuery("#target_3").val();
+        let target_4 = jQuery("#target_4").val();
+        let target_5 = jQuery("#target_5").val();
+
+        let realisasi_1 = jQuery("#realisasi_1").val();
+        let realisasi_2 = jQuery("#realisasi_2").val();
+        let realisasi_3 = jQuery("#realisasi_3").val();
+        let realisasi_4 = jQuery("#realisasi_4").val();
+        let realisasi_5 = jQuery("#realisasi_5").val();
+
+        let rumus_capaian_kinerja = jQuery("#rumus_capaian_kinerja").val();
+
+
+        if (id_unik == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == '' || satuan == '') {
+            return alert('Ada Input Data Yang Kosong!');
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: "post",
+            data: {
+                "action": 'tambah_iku_pemda',
+                "api_key": esakip.api_key,
+                "tipe_iku": "opd",
+                "id_unik": id_unik,
+                "label_tujuan_sasaran": label_tujuan_sasaran,
+                "id_indikator": id_indikator,
+                "label_indikator": label_indikator,
+                "formulasi": formulasi,
+                "sumber_data": sumber_data,
+                "penanggung_jawab": penanggung_jawab,
+                "id_jadwal": id_jadwal,
+                "id_iku": id_iku,
+                "satuan": satuan,
+                "target_1": target_1,
+                "target_2": target_2,
+                "target_3": target_3,
+                "target_4": target_4,
+                "target_5": target_5,
+                "realisasi_1": realisasi_1,
+                "realisasi_2": realisasi_2,
+                "realisasi_3": realisasi_3,
+                "realisasi_4": realisasi_4,
+                "realisasi_5": realisasi_5,
+                "id_sasaran_murni": id_sasaran_murni,
+                "rumus_capaian_kinerja": rumus_capaian_kinerja,
+            },
+            dataType: "json",
+            success: function(res) {
+                jQuery('#wrap-loading').hide();
+                alert(res.message);
+                if (res.status == 'success') {
+                    jQuery("#modal-iku").modal('hide');
+                    location.reload();
+                }
+            }
+        });
+    }
+
+    function edit_iku(id) {
+        tambahIkuPemda().then(function() {
+            jQuery('#wrap-loading').show();
+
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_iku_by_id',
+                    api_key: esakip.api_key,
+                    id: id,
+                    tipe: 'pemda'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    console.log(response);
+
+                    if (response.status === 'success') {
+                        let data = response.data;
+                        jQuery('#id_iku').val(id);
+
+                        // cek sumber iku dari tujuan atau sasaran
+                        var cek_sumber = false;
+                        data_sasaran_rpjmd.data.map(function(b, i) {
+                            if (b.id_unik == data.id_sasaran) {
+                                cek_sumber = 2;
+                            }
+                        });
+                        if (cek_sumber == false) {
+                            data_sasaran_rpjmd.data_tujuan.map(function(b, i) {
+                                if (b.id_unik == data.id_sasaran) {
+                                    cek_sumber = 1;
+                                }
+                            });
+                        }
+                        jQuery('#sumber-data-iku').val(cek_sumber).trigger('change');
+                        setTimeout(function() {
+                            jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
+                            setTimeout(function() {
+                                jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
+                            }, 500);
+                        }, 500);
+
+                        if (tinymce.get('formulasi')) {
+                            tinymce.get('formulasi').setContent(data.formulasi);
+                        } else {
+                            jQuery('#formulasi').val(data.formulasi);
+                        }
+                        jQuery("#sumber-data").val(data.sumber_data);
+                        jQuery("#penanggung-jawab").val(data.penanggung_jawab);
+                        jQuery("#satuan").val(data.satuan);
+                        jQuery("#target_1").val(data.target_1);
+                        jQuery("#target_2").val(data.target_2);
+                        jQuery("#target_3").val(data.target_3);
+                        jQuery("#target_4").val(data.target_4);
+                        jQuery("#target_5").val(data.target_5);
+                        jQuery("#realisasi_1").val(data.realisasi_1);
+                        jQuery("#realisasi_2").val(data.realisasi_2);
+                        jQuery("#realisasi_3").val(data.realisasi_3);
+                        jQuery("#realisasi_4").val(data.realisasi_4);
+                        jQuery("#realisasi_5").val(data.realisasi_5);
+                        jQuery("#rumus_capaian_kinerja").val(data.rumus_capaian_kinerja);
+                        jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
+                        jQuery('#modal-iku').modal('show');
+
+                    } else {
+                        alert(response.message || 'Data tidak ditemukan!');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat data!');
+                }
+            });
+        });
+    }
+
+
+    function hapus_iku(id) {
+        if (!confirm('Apakah anda yakin ingin menghapus data ini?')) {
+            return;
+        }
+        jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
-                action: 'get_table_input_iku_pemda',
+                action: 'hapus_iku',
                 api_key: esakip.api_key,
-                id_jadwal: id_jadwal
+                id: id,
+                tipe: "pemda"
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat mengirim data!');
+            }
+        });
+    }
+
+    function SasaranSebelum(id_sasaran) {
+        jQuery.ajax({
+            url: esakip.url,
+            type: "POST",
+            data: {
+                action: 'get_sasaran_sebelum',
+                api_key: esakip.api_key,
+                id_sasaran: id_sasaran
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.status) {
+                    jQuery("#sasaran_sebelum").val(response.sasaran_sebelum || '');
+                    jQuery("#id_sasaran_murni").val(response.id_sasaran_murni || '');
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function() {
+                alert("Gagal mengambil data sasaran sebelumnya.");
+            }
+        });
+    }
+
+    function getIndikatorTujuan(current_val) {
+        jQuery('#wrap-loading').show();
+        return getSasaran()
+            .then(function() {
+                return new Promise(function(resolve, reject) {
+                    jQuery('#wrap-loading').hide();
+                    if (typeof data_sasaran_rpjmd != 'undefined' && data_sasaran_rpjmd !== undefined) {
+                        let html_indikator = '<option value="">Pilih Indikator Tujuan</option>';
+                        let id_sasaran = null;
+
+                        if (data_sasaran_rpjmd.data !== null) {
+                            data_sasaran_rpjmd.data_tujuan.map(function(value) {
+                                if (value.id_unik_indikator != null && value.id_unik == current_val) {
+                                    html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
+                                }
+                                if (value.id_unik_indikator == null && value.id_unik == current_val) {
+                                    id_sasaran = value.id_sasaran_murni;
+                                }
+                            });
+                        }
+
+                        jQuery("#indikator").html(html_indikator);
+                        jQuery("#indikator").select2({
+                            width: '100%'
+                        });
+
+                        if (id_sasaran !== null) {
+                            SasaranSebelum(id_sasaran);
+                        }
+
+                        resolve();
+                    }
+                });
+            });
+    }
+
+    function getIndikator(current_val) {
+        jQuery('#wrap-loading').show();
+        return getSasaran()
+            .then(function() {
+                return new Promise(function(resolve, reject) {
+                    jQuery('#wrap-loading').hide();
+                    if (typeof data_sasaran_rpjmd != 'undefined' && data_sasaran_rpjmd !== undefined) {
+                        let html_indikator = '<option value="">Pilih Indikator Sasaran</option>';
+                        let id_sasaran = null;
+
+                        if (data_sasaran_rpjmd.data !== null) {
+                            data_sasaran_rpjmd.data.map(function(value) {
+                                if (value.id_unik_indikator != null && value.id_unik == current_val) {
+                                    html_indikator += '<option value="' + value.id_unik_indikator + '">' + value.indikator_teks + '</option>';
+                                }
+                                if (value.id_unik_indikator == null && value.id_unik == current_val) {
+                                    id_sasaran = value.id_sasaran_murni;
+                                }
+                            });
+                        }
+
+                        jQuery("#indikator").html(html_indikator);
+                        jQuery("#indikator").select2({
+                            width: '100%'
+                        });
+
+                        if (id_sasaran !== null) {
+                            SasaranSebelum(id_sasaran);
+                        }
+
+                        resolve();
+                    }
+                });
+            });
+    }
+
+    function getSasaran() {
+        return new Promise(function(resolve, reject) {
+            if (typeof data_sasaran_rpjmd == 'undefined') {
+                jQuery('#wrap-loading').show();
+                jQuery.ajax({
+                    url: esakip.url,
+                    type: "post",
+                    data: {
+                        "action": 'get_sasaran_rpjmd',
+                        "api_key": esakip.api_key,
+                        "id_jadwal": id_jadwal
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.status) {
+                            window.data_sasaran_rpjmd = response;
+                        } else {
+                            alert("Data sasaran tidak ditemukan")
+                        }
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    function scrollCarousel(direction) {
+        const carousel = jQuery('#card-carousel');
+        const scrollAmount = carousel[0].offsetWidth;
+        const currentScroll = carousel.scrollLeft();
+
+        carousel.animate({
+            scrollLeft: currentScroll + direction * scrollAmount
+        }, 500);
+    }
+
+    function showModalFinalisasi() {
+        jQuery('#modalFinalisasi').modal('show')
+    }
+
+    function showModalEditFinalisasi() {
+        jQuery('#modalEditFinalisasi').modal('show')
+    }
+
+    function finalisasi_iku_pemda(id) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'finalisasi_iku_pemda',
+                api_key: esakip.api_key,
+                id: id
             },
             dataType: 'json',
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
                 if (response.status === 'success') {
-                    jQuery('.table_dokumen_iku tbody').html(response.data);
-                    style_css_download_excel_sakip();
+                    let data = response.data;
+                    jQuery("#id_data").val(data.id);
+                    jQuery('#modalFinalisasi').modal('show')
                 } else {
                     alert(response.message);
                 }
-                resolve();
             },
             error: function(xhr, status, error) {
-                jQuery('#wrap-loading').hide();
-                console.error(xhr.responseText);
-                alert('Terjadi kesalahan saat memuat data IKU!');
-                resolve();
-            }
-        });
-    });
-}
-
-function tambahIkuPemda(){
-    jQuery('#wrap-loading').show();
-    return getSasaran()
-    .then(function(){
-        return new Promise(function(resolve, reject){
-            jQuery('#wrap-loading').hide();
-            document.input_iku.reset();
-            jQuery('#id_iku').val("");
-
-            if(typeof data_sasaran_rpjmd != 'undefined'){
-                jQuery("#modal-iku").modal('show');
-                jQuery("#modal-iku").find('.modal-title').html('Tambah IKU');
-                jQuery("#modal-iku").find('.modal-footer').html(''
-                    +'<button type="button" class="btn btn-danger" data-dismiss="modal">'
-                        +'Tutup'
-                    +'</button>'
-                    +'<button type="button" class="btn btn-success" onclick="simpanDataIkuPemda()">'
-                        +'Simpan'
-                    +'</button>');
-
-               jQuery('#sumber-data-iku').val(2).trigger('onchange');
-                resolve();
-            }
-        })
-    })
-}
-
-function setDataIku(){
-    var sumber_data = jQuery('#sumber-data-iku').val();
-    var html_iku = '';
-    if(sumber_data == 1){
-        html_iku = '<option value="">Pilih Tujuan</option>';
-        data_sasaran_rpjmd.data_tujuan.map(function(value){
-            if(value.id_unik_indikator == null){
-                html_iku += '<option value="'+value.id_unik+'">'+value.tujuan_teks+'</option>';
-            }
-        });
-
-        jQuery("#label-tujuan-sasaran").text('Tujuan');
-        jQuery('#tujuan-sasaran').attr("onchange", 'getIndikatorTujuan(this.value)');
-    }else{
-        html_iku = '<option value="">Pilih Sasaran Strategis</option>';
-        data_sasaran_rpjmd.data.map(function(value){
-            if(value.id_unik_indikator == null){
-                html_iku += '<option value="'+value.id_unik+'">'+value.sasaran_teks+'</option>';
-            }
-        });
-
-        jQuery("#label-tujuan-sasaran").text('Sasaran');
-        jQuery('#tujuan-sasaran').attr("onchange", 'getIndikator(this.value)');
-    }
-
-    jQuery("#tujuan-sasaran").html(html_iku);
-    jQuery('#tujuan-sasaran').select2({width: '100%'});
-}
-
-function simpanDataIkuPemda(){
-    let id_iku = jQuery('#id_iku').val();
-    let id_unik = jQuery('#tujuan-sasaran').val();
-    let label_tujuan_sasaran = jQuery('#tujuan-sasaran option:selected').text();
-    let id_indikator = jQuery('#indikator').val();
-    let label_indikator = jQuery('#indikator option:selected').text();
-    let formulasi = tinymce.get('formulasi') ? tinymce.get('formulasi').getContent() : jQuery('#formulasi').val();
-    let sumber_data = jQuery('#sumber-data').val();
-    let penanggung_jawab = jQuery('#penanggung-jawab').val();
-    let satuan = jQuery('#satuan').val();
-    let id_sasaran_murni = jQuery('#id_sasaran_murni').val();
-
-    let target_1 = jQuery("#target_1").val();
-    let target_2 = jQuery("#target_2").val();    
-    let target_3 = jQuery("#target_3").val();    
-    let target_4 = jQuery("#target_4").val();    
-    let target_5 = jQuery("#target_5").val();
-
-    let realisasi_1 = jQuery("#realisasi_1").val();
-    let realisasi_2 = jQuery("#realisasi_2").val();    
-    let realisasi_3 = jQuery("#realisasi_3").val();    
-    let realisasi_4 = jQuery("#realisasi_4").val();    
-    let realisasi_5 = jQuery("#realisasi_5").val();
-
-
-    if(id_unik == '' || id_indikator == '' || formulasi == '' || sumber_data == '' || penanggung_jawab == '' || satuan == ''){
-        return alert('Ada Input Data Yang Kosong!');
-    }
-
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: "post",
-        data: {
-            "action": 'tambah_iku_pemda',
-            "api_key": esakip.api_key,
-            "tipe_iku": "opd",
-            "id_unik": id_unik,
-            "label_tujuan_sasaran": label_tujuan_sasaran,
-            "id_indikator": id_indikator,
-            "label_indikator": label_indikator,
-            "formulasi": formulasi,
-            "sumber_data": sumber_data,
-            "penanggung_jawab": penanggung_jawab,
-            "id_jadwal": id_jadwal,
-            "id_iku": id_iku,
-            "satuan": satuan,
-            "target_1": target_1,
-            "target_2": target_2,
-            "target_3": target_3,
-            "target_4": target_4,
-            "target_5": target_5,
-            "realisasi_1": realisasi_1,
-            "realisasi_2": realisasi_2,
-            "realisasi_3": realisasi_3,
-            "realisasi_4": realisasi_4,
-            "realisasi_5": realisasi_5,
-            "id_sasaran_murni": id_sasaran_murni
-        },
-        dataType: "json",
-        success: function(res){
-            jQuery('#wrap-loading').hide();
-            alert(res.message);
-            if(res.status=='success'){
-                jQuery("#modal-iku").modal('hide');
-                location.reload();
-            }
-        }
-    });
-}
-
-function edit_iku(id) {
-    tambahIkuPemda().then(function () {
-        jQuery('#wrap-loading').show();
-
-        jQuery.ajax({
-            url: esakip.url,
-            type: 'POST',
-            data: {
-                action: 'get_iku_by_id',
-                api_key: esakip.api_key,
-                id: id,
-                tipe: 'pemda'
-            },
-            dataType: 'json',
-            success: function (response) {
-                jQuery('#wrap-loading').hide();
-                console.log(response);
-
-                if (response.status === 'success') {
-                    let data = response.data;
-                    jQuery('#id_iku').val(id);
-
-                    // cek sumber iku dari tujuan atau sasaran
-                    var cek_sumber = false;
-                    data_sasaran_rpjmd.data.map(function(b, i){
-                        if(b.id_unik == data.id_sasaran){
-                            cek_sumber = 2;
-                        }
-                    });
-                    if(cek_sumber == false){
-                        data_sasaran_rpjmd.data_tujuan.map(function(b, i){
-                            if(b.id_unik == data.id_sasaran){
-                                cek_sumber = 1;
-                            }
-                        });
-                    }
-                    jQuery('#sumber-data-iku').val(cek_sumber).trigger('change');
-                    setTimeout(function(){
-                        jQuery("#tujuan-sasaran").val(data.id_sasaran).trigger('change');
-                        setTimeout(function(){
-                            jQuery("#indikator").val(data.id_unik_indikator).trigger('change');
-                        }, 500);
-                    }, 500);
-
-                    if (tinymce.get('formulasi')) {
-                        tinymce.get('formulasi').setContent(data.formulasi);
-                    } else {
-                        jQuery('#formulasi').val(data.formulasi); 
-                    }
-                    jQuery("#sumber-data").val(data.sumber_data);
-                    jQuery("#penanggung-jawab").val(data.penanggung_jawab);
-                    jQuery("#satuan").val(data.satuan);
-                    jQuery("#target_1").val(data.target_1);
-                    jQuery("#target_2").val(data.target_2);
-                    jQuery("#target_3").val(data.target_3);
-                    jQuery("#target_4").val(data.target_4);
-                    jQuery("#target_5").val(data.target_5);
-                    jQuery("#realisasi_1").val(data.realisasi_1);
-                    jQuery("#realisasi_2").val(data.realisasi_2);
-                    jQuery("#realisasi_3").val(data.realisasi_3);
-                    jQuery("#realisasi_4").val(data.realisasi_4);
-                    jQuery("#realisasi_5").val(data.realisasi_5);
-                    jQuery("#modal-iku").find('.modal-title').html('Edit IKU');
-                    jQuery('#modal-iku').modal('show');
-
-                } else {
-                    alert(response.message || 'Data tidak ditemukan!');
-                }
-            },
-            error: function (xhr, status, error) {
                 jQuery('#wrap-loading').hide();
                 console.error(xhr.responseText);
                 alert('Terjadi kesalahan saat memuat data!');
             }
         });
-    });
-}
-
-
-function hapus_iku(id) {
-    if (!confirm('Apakah anda yakin ingin menghapus data ini?')) {
-        return;
     }
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'hapus_iku',
-            api_key: esakip.api_key,
-            id: id,
-            tipe: "pemda"
-        },
-        dataType: 'json',
-        success: function(response) {
-            console.log(response);
-            jQuery('#wrap-loading').hide();
-            if (response.status === 'success') {
-                alert(response.message);
+
+    function simpanFinalisasi() {
+        let confirmFinalisasi = confirm('Apakah anda yakin ingin menyimpan data ini?');
+        if (!confirmFinalisasi) {
+            return;
+        }
+
+        let dataiku = {
+            nama_tahapan: jQuery('#nama_tahapan').val(),
+            tanggal_dokumen: jQuery('#tanggal_dokumen').val()
+        };
+        let data_simpan = <?php echo json_encode($data_simpan); ?>;
+
+        if (!Array.isArray(data_simpan) || data_simpan.length === 0) {
+            alert('Tidak ada data yang dapat disimpan!');
+            return;
+        }
+
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "simpan_finalisasi_iku_pemda",
+                api_key: esakip.api_key,
+                data_iku: dataiku,
+                data_simpan: data_simpan
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    alert(response.message);
+                    location.reload();
+                    jQuery('#modalFinalisasi').modal('hide');
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
+    }
+
+    function simpanEditFinalisasi() {
+        let confirmFinalisasi = confirm('Apakah anda yakin ingin perbarui data ini?');
+        if (!confirmFinalisasi) {
+            return;
+        }
+
+        const id_data = jQuery('#id_data').val()
+        const namaTahapan = jQuery('#nama_tahap_finalisasi').val()
+        const tanggalTahapan = jQuery('#tanggal_tahap_finalisasi').val()
+
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "edit_finalisasi_iku_pemda",
+                api_key: esakip.api_key,
+                id_data: id_data,
+                nama_tahap: namaTahapan,
+                id_jadwal: id_jadwal,
+                tanggal_tahap: tanggalTahapan
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide()
+                if (response.status === 'success') {
+                    alert(response.message);
+                    id_data.split(',').forEach(id => {
+                        jQuery(`#nama-tahapan-${id}`).text(namaTahapan);
+                        jQuery(`#card-tahap-${id}`).attr("title", `${namaTahapan}`);
+                        jQuery(`#tanggal-tahapan-${id}`).text(formatTanggalIndonesia(tanggalTahapan));
+                    });
+                    jQuery('#modalEditFinalisasi').modal('hide')
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
                 location.reload();
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error(xhr.responseText);
-            jQuery('#wrap-loading').hide();
-            alert('Terjadi kesalahan saat mengirim data!');
-        }
-    });
-}
-
-function SasaranSebelum(id_sasaran) {
-    jQuery.ajax({
-        url: esakip.url,
-        type: "POST",
-        data: {
-            action: 'get_sasaran_sebelum',
-            api_key: esakip.api_key,
-            id_sasaran: id_sasaran
-        },
-        dataType: "json",
-        success: function(response) {
-            if(response.status) {
-                jQuery("#sasaran_sebelum").val(response.sasaran_sebelum || '');
-                jQuery("#id_sasaran_murni").val(response.id_sasaran_murni || '');
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function() {
-            alert("Gagal mengambil data sasaran sebelumnya.");
-        }
-    });
-}
-
-function getIndikatorTujuan(current_val){
-    jQuery('#wrap-loading').show();
-    return getSasaran()
-    .then(function(){
-        return new Promise(function(resolve, reject){
-            jQuery('#wrap-loading').hide();
-            if(typeof data_sasaran_rpjmd != 'undefined' && data_sasaran_rpjmd !== undefined){
-                let html_indikator = '<option value="">Pilih Indikator Tujuan</option>';
-                let id_sasaran = null;
-
-                if (data_sasaran_rpjmd.data !== null) {
-                    data_sasaran_rpjmd.data_tujuan.map(function(value){
-                        if(value.id_unik_indikator != null && value.id_unik == current_val){
-                            html_indikator += '<option value="'+value.id_unik_indikator+'">'+value.indikator_teks+'</option>';
-                        }
-                        if (value.id_unik_indikator == null && value.id_unik == current_val) {
-                            id_sasaran = value.id_sasaran_murni;  
-                        }
-                    });
-                }
-
-                jQuery("#indikator").html(html_indikator);
-                jQuery("#indikator").select2({width: '100%'});
-
-                if (id_sasaran !== null) {
-                    SasaranSebelum(id_sasaran);
-                }
-
-                resolve();
-            }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide()
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
         });
-    });
-}
+    }
 
-function getIndikator(current_val){
-    jQuery('#wrap-loading').show();
-    return getSasaran()
-    .then(function(){
-        return new Promise(function(resolve, reject){
-            jQuery('#wrap-loading').hide();
-            if(typeof data_sasaran_rpjmd != 'undefined' && data_sasaran_rpjmd !== undefined){
-                let html_indikator = '<option value="">Pilih Indikator Sasaran</option>';
-                let id_sasaran = null;
+    function deleteDokumen(idTahap) {
+        let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
+        if (!confirmHapus) {
+            return;
+        }
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "hapus_finalisasi_iku_pemda",
+                api_key: esakip.api_key,
+                id_tahap: idTahap
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    alert(response.message);
+                    jQuery(`#card-tahap-${idTahap}`).hide()
 
-                if (data_sasaran_rpjmd.data !== null) {
-                    data_sasaran_rpjmd.data.map(function(value){
-                        if(value.id_unik_indikator != null && value.id_unik == current_val){
-                            html_indikator += '<option value="'+value.id_unik_indikator+'">'+value.indikator_teks+'</option>';
-                        }
-                        if (value.id_unik_indikator == null && value.id_unik == current_val) {
-                            id_sasaran = value.id_sasaran_murni;  
-                        }
-                    });
-                }
+                    if (idTahap == jQuery(`#id_data`).val()) {
+                        location.reload()
 
-                jQuery("#indikator").html(html_indikator);
-                jQuery("#indikator").select2({width: '100%'});
-
-                if (id_sasaran !== null) {
-                    SasaranSebelum(id_sasaran);
-                }
-
-                resolve();
-            }
-        });
-    });
-}
-
-function getSasaran() {
-    return new Promise(function(resolve, reject){
-        if(typeof data_sasaran_rpjmd == 'undefined'){
-            jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: "post",
-                data: {
-                    "action": 'get_sasaran_rpjmd',
-                    "api_key": esakip.api_key,
-                    "id_jadwal": id_jadwal
-                },
-                dataType: "json",
-                success: function(response){
-                    if(response.status){
-                        window.data_sasaran_rpjmd = response;
-                    }else{
-                        alert("Data sasaran tidak ditemukan")
+                        jQuery(".cr-actions .cr-view-btn, .cr-actions .cr-view-btn-danger").prop("disabled", true).css("pointer-events", "none").css("opacity", "0.5");
+                    } else {
+                        jQuery('#wrap-loading').hide()
                     }
-                    resolve();
-                }
-            });
-        }else{
-            resolve();
-        }
-    });
-}
-
-function scrollCarousel(direction) {
-    const carousel = jQuery('#card-carousel');
-    const scrollAmount = carousel[0].offsetWidth;
-    const currentScroll = carousel.scrollLeft();
-
-    carousel.animate({
-        scrollLeft: currentScroll + direction * scrollAmount
-    }, 500);
-}
-
-function showModalFinalisasi() {
-    jQuery('#modalFinalisasi').modal('show')
-}
-
-function showModalEditFinalisasi() {
-    jQuery('#modalEditFinalisasi').modal('show')
-}
-
-function finalisasi_iku_pemda(id) {
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'finalisasi_iku_pemda',
-            api_key: esakip.api_key,
-            id: id
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            console.log(response);
-            if (response.status === 'success') {
-                let data = response.data;
-                jQuery("#id_data").val(data.id);
-                jQuery('#modalFinalisasi').modal('show')
-            } else {
-                alert(response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error(xhr.responseText);
-            alert('Terjadi kesalahan saat memuat data!');
-        }
-    });
-}
-function simpanFinalisasi() {
-    let confirmFinalisasi = confirm('Apakah anda yakin ingin menyimpan data ini?');
-    if (!confirmFinalisasi) {
-        return;
-    }
-
-    let dataiku = {
-        nama_tahapan: jQuery('#nama_tahapan').val(),
-        tanggal_dokumen: jQuery('#tanggal_dokumen').val()
-    };
-    let data_simpan = <?php echo json_encode($data_simpan); ?>;
-
-    if (!Array.isArray(data_simpan) || data_simpan.length === 0) {
-        alert('Tidak ada data yang dapat disimpan!');
-        return;
-    }
-
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        url: esakip.url,
-        method: 'POST',
-        data: {
-            action: "simpan_finalisasi_iku_pemda",
-            api_key: esakip.api_key,
-            data_iku: dataiku,            
-            data_simpan: data_simpan
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            if (response.status === 'success') {
-                alert(response.message);
-                location.reload();
-                jQuery('#modalFinalisasi').modal('hide');
-            } else {
-                alert('Terjadi kesalahan: ' + response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error('AJAX Error:', error);
-            alert('Gagal menyimpan data. Silakan coba lagi.');
-        },
-    });
-}
-function simpanEditFinalisasi() {
-    let confirmFinalisasi = confirm('Apakah anda yakin ingin perbarui data ini?');
-    if (!confirmFinalisasi) {
-        return;
-    }
-
-    const id_data = jQuery('#id_data').val()
-    const namaTahapan = jQuery('#nama_tahap_finalisasi').val()
-    const tanggalTahapan = jQuery('#tanggal_tahap_finalisasi').val()
-
-    jQuery('#wrap-loading').show()
-    jQuery.ajax({
-        url: esakip.url,
-        method: 'POST',
-        data: {
-            action: "edit_finalisasi_iku_pemda",
-            api_key: esakip.api_key,
-            id_data: id_data,
-            nama_tahap: namaTahapan,
-            id_jadwal: id_jadwal,
-            tanggal_tahap: tanggalTahapan
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide()
-            if (response.status === 'success') {
-                alert(response.message);
-                id_data.split(',').forEach(id => {
-                    jQuery(`#nama-tahapan-${id}`).text(namaTahapan);
-                    jQuery(`#card-tahap-${id}`).attr("title", `${namaTahapan}`);
-                    jQuery(`#tanggal-tahapan-${id}`).text(formatTanggalIndonesia(tanggalTahapan));
-                });
-                jQuery('#modalEditFinalisasi').modal('hide')
-            } else {
-                alert('Terjadi kesalahan: ' + response.message);
-            }
-            location.reload();
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide()
-            console.error('AJAX Error:', error);
-            alert('Gagal menyimpan data. Silakan coba lagi.');
-        },
-    });
-}
-
-function deleteDokumen(idTahap) {
-    let confirmHapus = confirm('Apakah anda yakin ingin menghapus data ini?');
-    if (!confirmHapus) {
-        return;
-    }
-    jQuery('#wrap-loading').show()
-    jQuery.ajax({
-        url: esakip.url,
-        method: 'POST',
-        data: {
-            action: "hapus_finalisasi_iku_pemda",
-            api_key: esakip.api_key,
-            id_tahap: idTahap
-        },
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                alert(response.message);
-                jQuery(`#card-tahap-${idTahap}`).hide()
-
-                if (idTahap == jQuery(`#id_data`).val()) {
-                    location.reload()
-
-                    jQuery(".cr-actions .cr-view-btn, .cr-actions .cr-view-btn-danger").prop("disabled", true).css("pointer-events", "none").css("opacity", "0.5");
                 } else {
                     jQuery('#wrap-loading').hide()
+                    alert('Terjadi kesalahan: ' + response.message);
                 }
-            } else {
+            },
+        });
+    }
+
+    function viewDokumen(idTahap) {
+        jQuery('#wrap-loading').show()
+        jQuery.ajax({
+            url: esakip.url,
+            method: 'POST',
+            data: {
+                action: "get_finalisasi_iku_pemda_by_id",
+                api_key: esakip.api_key,
+                id_jadwal: id_jadwal,
+                id_tahap: idTahap
+            },
+            dataType: 'json',
+            success: function(response) {
                 jQuery('#wrap-loading').hide()
-                alert('Terjadi kesalahan: ' + response.message);
-            }
-        },
-    });
-}
-function viewDokumen(idTahap) {
-    jQuery('#wrap-loading').show()
-    jQuery.ajax({
-        url: esakip.url,
-        method: 'POST',
-        data: {
-            action: "get_finalisasi_iku_pemda_by_id",
-            api_key: esakip.api_key,
-            id_jadwal: id_jadwal,
-            id_tahap: idTahap
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide()
-            console.log(response.message);
-            if (response.status === 'success') {
-                jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
-                jQuery(".cr-view-btn").show();
-                jQuery(`#view-btn-${idTahap}`).hide();
+                console.log(response.message);
+                if (response.status === 'success') {
+                    jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
+                    jQuery(".cr-view-btn").show();
+                    jQuery(`#view-btn-${idTahap}`).hide();
 
-                
-                jQuery('.table_edit_dokumen_iku').show();
-                jQuery('.table_dokumen_iku').hide();
-                jQuery('#tambah-iku-pemda').hide();
 
-                jQuery('.table_edit_dokumen_iku tbody').html(response.data);
+                    jQuery('.table_edit_dokumen_iku').show();
+                    jQuery('.table_dokumen_iku').hide();
+                    jQuery('#tambah-iku-pemda').hide();
 
-                jQuery('#id_data').val(idTahap);
-                jQuery('#nama_tahap_finalisasi').val(response.nama_tahapan);
-                jQuery('#tanggal_tahap_finalisasi').val(response.tanggal_dokumen);
+                    jQuery('.table_edit_dokumen_iku tbody').html(response.data);
 
-                jQuery(`.badge-sedang-dilihat`).hide(); 
-                jQuery(`#badge-sedang-dilihat-${idTahap}`).show();
-                jQuery('#finalisasi-btn').hide();
-                jQuery('#display-btn-first').show(); 
-                jQuery('#edit-btn').show();
-            } else {
-                alert('Terjadi kesalahan: ' + response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide()
-            console.error('AJAX Error:', error);
-            alert('Gagal menyimpan data. Silakan coba lagi.');
-        },
-    });
-}
+                    jQuery('#id_data').val(idTahap);
+                    jQuery('#nama_tahap_finalisasi').val(response.nama_tahapan);
+                    jQuery('#tanggal_tahap_finalisasi').val(response.tanggal_dokumen);
+
+                    jQuery(`.badge-sedang-dilihat`).hide();
+                    jQuery(`#badge-sedang-dilihat-${idTahap}`).show();
+                    jQuery('#finalisasi-btn').hide();
+                    jQuery('#display-btn-first').show();
+                    jQuery('#edit-btn').show();
+                } else {
+                    alert('Terjadi kesalahan: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide()
+                console.error('AJAX Error:', error);
+                alert('Gagal menyimpan data. Silakan coba lagi.');
+            },
+        });
+    }
 </script>
