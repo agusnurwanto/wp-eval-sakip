@@ -8732,6 +8732,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$total_target = $target['target_' . $limit_quarter] ?? 0;
 				break;
 
+			case 3: // Indikator Tren Negatif (Kumulatif)
+				for ($i = 1; $i <= $limit_quarter; $i++) {
+					$total_realisasi += $target['target_' . $i] ?? 0;
+					$total_target += $realisasi['realisasi_' . $i] ?? 0;
+				}
+				break;
+
 			default:
 				return false; // unknown type
 		}
