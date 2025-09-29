@@ -28980,16 +28980,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] === get_option(ESAKIP_APIKEY)) {
-				if (!empty(get_option(ESAKIP_URL_WPSIPD))) {
-					$url = get_option(ESAKIP_URL_WPSIPD);
-				} else {
+				$url = get_option(ESAKIP_URL_WPSIPD);
+				if (empty($url)) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'URL WP-SIPD Kosong!';
 					die(json_encode($ret));
 				}
-				if (!empty(get_option(ESAKIP_APIKEY_WPSIPD))) {
-					$api_key = get_option(ESAKIP_APIKEY_WPSIPD);
-				} else {
+				$api_key = get_option(ESAKIP_APIKEY_WPSIPD);
+				if (empty($api_key)) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'API-Key WP-SIPD Kosong!';
 					die(json_encode($ret));
@@ -33065,6 +33063,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 	function process_tbody_capaian_kinerja_pk(array $data_unit_simpeg, int $tahun_anggaran)
 	{
+		global $wpdb;
 		if (empty($data_unit_simpeg)) {
 			return "<tr><td class='text-center' colspan='14'>Tidak ada data tersedia</td></tr>";
 		}
@@ -33103,8 +33102,43 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				];
 				$skpd_total_rowspan += $sasaran_rowspan;
 			}
+
+			// get data realisasi pagu, program dan fisik wp-sipd
+			$capaian_anggaran = '';
+			$capaian_program = '';
+			$capaian_fisik = '';
+			$url_api = get_option(ESAKIP_URL_WPSIPD);
+			$api_key = get_option(ESAKIP_APIKEY_WPSIPD);
+			if(
+				!empty($url_api)
+				&& !empty($api_key)
+			){
+				$opsi_param = array(
+					'action' => 'get_serapan_anggaran_capaian_kinerja',
+					'api_key' => $api_key,
+					'tahun_anggaran' => $tahun_anggaran,
+					'id_skpd' => $perangkat_daerah['id_skpd']
+				);
+				$response = wp_remote_post($url_api, [
+					'body' => $opsi_param
+				]);
+
+				if (!is_wp_error($response)) {
+					$data_wpsipd = json_decode(wp_remote_retrieve_body($response), true);
+					if(
+						!empty($data_wpsipd)
+						&& $data_wpsipd['status'] == 'success'
+					){
+						$capaian_anggaran = '<b>'.($data_wpsipd['data']['serapan_anggaran']['total'] == '0%' ? '' : $data_wpsipd['data']['serapan_anggaran']['total']).'</b>';
+						$capaian_program = '<b>'.($data_wpsipd['data']['capaian_kinerja']['total'] == '0%' ? '' : $data_wpsipd['data']['capaian_kinerja']['total']).'</b>';
+					}
+				}
+			}
+
 			
 			$is_first_row_for_skpd = true;
+			$multi_id_indikator = array();
+			$multi_id_rhk = array();
 
 			foreach ($processed_sasarans as $proc_sasaran) {
 				$sasaran_data   = $proc_sasaran['sasaran_data'];
@@ -33119,14 +33153,20 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$is_first_row_for_skpd = false;
 					}
 					$tbody .= "<td class='text-left'>{$sasaran_data['label']}</td>";
-					$tbody .= "<td class='text-center' colspan='11'>Indikator belum tersedia</td>";
-					$tbody .= "</tr>";
+					$tbody .= "<td class='text-center' colspan='8'>Indikator sasaran belum ada</td>";
+					$tbody .= "
+						<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
+						<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
+						<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
+					</tr>";
 					continue;
 				}
 
 				$is_first_indicator = true;
 				foreach ($indikators as $indikator) {
 					$tbody .= "<tr>";
+					$multi_id_indikator[] = $indikator['id'];
+					$multi_id_rhk[$indikator['id_renaksi']] = $indikator['id_renaksi'];
 					
 					$tbody_2 = "</tr>";
 					if ($is_first_row_for_skpd) {
@@ -33135,9 +33175,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$is_first_row_for_skpd = false;
 
 						$tbody_2 = "
-							<td class='text-center' rowspan='{$skpd_total_rowspan}'>-</td>
-							<td class='text-center' rowspan='{$skpd_total_rowspan}'>-</td>
-							<td class='text-center' rowspan='{$skpd_total_rowspan}'>-</td>
+							<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
+							<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
+							<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
 						</tr>";
 					}
 
@@ -33180,9 +33220,33 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<td class='text-center'>{$indikator['realisasi_target_4']}</td>
 						<td class='text-center'>{$anti_zero_capaian}</td>"
 						. $tbody_2;
-					}
+				}
 			}
 			$no++;
+
+			// perlu melakukan singkron data realisasi kinerja
+			if(!empty($multi_id_indikator)){
+				$multi_id_rhk = array_values($multi_id_rhk);
+				$selected_rhk = $wpdb->get_row(
+					$wpdb->prepare("
+				        SELECT *
+				        FROM esakip_data_rencana_aksi_opd
+				        WHERE id = %d
+				    ", $multi_id_rhk[0]),
+					ARRAY_A
+				);
+				$opsi_param = array(
+			        'tahun' => $tahun_anggaran,
+			        'satker_id' => $selected_rhk['satker_id'],
+			        'nip' => $selected_rhk['nip'],
+			        'id_indikator' => $multi_id_indikator, 
+			        'id_rhk' => $multi_id_rhk,
+			        'id_skpd' => $perangkat_daerah['id_skpd'],
+			        'tipe' => 'indikator'
+			    );
+			    // print_r($opsi_param); die();
+			    $this->get_data_perbulan_ekinerja($opsi_param);
+			}
 		}
 
 		return $tbody;

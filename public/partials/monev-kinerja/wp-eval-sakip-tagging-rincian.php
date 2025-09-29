@@ -1513,8 +1513,16 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 
 		<div class="card bg-light shadow-lg m-3 p-3">
 			<h3 class="text-center">Rincian Belanja Teknis Kegiatan</h3>
-			<div class="m-2 text-center">
-				<?php if ($hak_akses_user_pegawai == 1 || $hak_akses_user_pegawai == 2): ?>
+			<?php 
+				if (
+					$selected_rhk['input_rencana_pagu_level'] != 0
+					&& (
+						$hak_akses_user_pegawai == 1 
+						|| $hak_akses_user_pegawai == 2
+					)
+				): 
+			?>
+				<div class="m-2 text-center">
 					<button class="btn btn-primary m-2 text-center rincian_manual" onclick="handleTambahDataManual()" title="Tambah Data" <?php echo $disabled_manual; ?>>
 						<span class="dashicons dashicons-plus"></span> Tambah Rincian Belanja Manual
 					</button>
@@ -1522,8 +1530,8 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 						<span class="dashicons dashicons-insert"></span> Tambah Rincian Belanja dari RKA/DPA
 					</button>
 					<br><small class="text-muted"><?php echo $text_pesan; ?></small>
-				<?php endif; ?>
-			</div>
+				</div>
+			<?php endif; ?>
 			<div class="wrap-table">
 				<table>
 					<thead style="background-color: #bde0fe; color: #212529;">
@@ -1548,26 +1556,28 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 					</tbody>
 				</table>
 			</div>
-			<div class="wrap-table">
-				<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
-					<thead style="background-color: #dee2e6; text-align: center;">
-						<tr>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">KODE REKENING</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">URAIAN</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 120px;">AKSI</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 90px;">JUMLAH</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">TOTAL</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">REALISASI</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">CATATAN</th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php echo $tbody; ?>
-					</tbody>
-				</table>
-			</div>
+			<?php if ($selected_rhk['input_rencana_pagu_level'] != 0): ?>
+				<div class="wrap-table">
+					<table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi">
+						<thead style="background-color: #dee2e6; text-align: center;">
+							<tr>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">KODE REKENING</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 150px;">URAIAN</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 120px;">AKSI</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">HARGA SATUAN</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 90px;">JUMLAH</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 100px;">SATUAN</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">TOTAL</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 140px;">REALISASI</th>
+								<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" rowspan="2" style="width: 160px;">CATATAN</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php echo $tbody; ?>
+						</tbody>
+					</table>
+				</div>
+			<?php endif; ?>
 		</div>
 	</div>
 </div>

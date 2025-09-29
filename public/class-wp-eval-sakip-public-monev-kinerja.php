@@ -8726,20 +8726,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		switch ($type) {
 			case 1: // Indikator Tren Positif (Kumulatif)
 				for ($i = 1; $i <= $limit_quarter; $i++) {
-					$total_realisasi += $realisasi['realisasi_' . $i] ?? 0;
-					$total_target += $target['target_' . $i] ?? 0;
+					$total_realisasi += empty($realisasi['realisasi_' . $i]) ? 0 : $realisasi['realisasi_' . $i];
+					$total_target += empty($target['target_' . $i]) ? 0 : $target['target_' . $i];
 				}
 				break;
 
 			case 2: // Nilai Akhir (Mengambil nilai pada triwulan terakhir)
-				$total_realisasi = $realisasi['realisasi_' . $limit_quarter] ?? 0;
-				$total_target = $target['target_' . $limit_quarter] ?? 0;
+				$total_realisasi = empty($realisasi['realisasi_' . $limit_quarter]) ? 0 : $realisasi['realisasi_' . $limit_quarter];
+				$total_target = empty($target['target_' . $limit_quarter]) ? 0 : $target['target_' . $limit_quarter];
 				break;
 
 			case 3: // Indikator Tren Negatif (Kumulatif)
 				for ($i = 1; $i <= $limit_quarter; $i++) {
-					$total_realisasi += $target['target_' . $i] ?? 0;
-					$total_target += $realisasi['realisasi_' . $i] ?? 0;
+					$total_realisasi += empty($target['target_' . $i]) ? 0 : $target['target_' . $i];
+					$total_target += empty($realisasi['realisasi_' . $i]) ? 0 : $realisasi['realisasi_' . $i];
 				}
 				break;
 
