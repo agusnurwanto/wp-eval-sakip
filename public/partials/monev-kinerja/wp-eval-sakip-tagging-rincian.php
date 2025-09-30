@@ -972,6 +972,21 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 } else {
 	$capaian_total = "";
 }
+
+$target_tahunan = (float) $indikator_rhk['target_akhir'] ?? 0;
+$all_realisasi = [
+	'realisasi_1' => (float) $indikator_rhk['realisasi_tw_1'] ?? 0, 
+	'realisasi_2' => (float) $indikator_rhk['realisasi_tw_2'] ?? 0, 
+	'realisasi_3' => (float) $indikator_rhk['realisasi_tw_3'] ?? 0, 
+	'realisasi_4' => (float) $indikator_rhk['realisasi_tw_4'] ?? 0
+];
+
+$capaian_tahunan = $this->get_capaian_realisasi_tahunan_by_type(
+	(int) $indikator_rhk['rumus_capaian_kinerja'],
+	(float) $target_tahunan,
+	(array) $all_realisasi,
+	(int) $indikator_rhk['tahun_anggaran']
+);
 ?>
 <style type="text/css">
 	.wrap-table {
@@ -1499,7 +1514,7 @@ if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_a
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['realisasi_akhir']; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $capaian_total; ?></td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $capaian_tahunan; ?> %</td>
 											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['ket_total']; ?></td>
 										</tr>
 									</tbody>

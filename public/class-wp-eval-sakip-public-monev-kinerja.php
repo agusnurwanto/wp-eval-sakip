@@ -3145,7 +3145,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 										$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 										$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-										$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+										$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
 										if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
 											$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
 										} else {

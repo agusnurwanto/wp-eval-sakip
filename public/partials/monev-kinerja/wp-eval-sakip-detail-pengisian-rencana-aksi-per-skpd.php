@@ -2844,14 +2844,18 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 
                                 });
 
-                                // ----- capaian total -----
-                                let data_capaian_target_realisasi_total = '';
-                                if(b['realisasi_akhir'] && b.target_akhir){
-                                    data_capaian_target_realisasi_total = setToFixed((b['realisasi_akhir'] / b.target_akhir) * 100)+'%';
-                                }else if(b.target_akhir){
-                                    data_capaian_target_realisasi_total = "0%";
-                                }else{
-                                    data_capaian_target_realisasi_total = "";
+                                // ----- capaian tahunan -----
+                                let all_realisasi_tw = {
+                                    'realisasi_1': b['realisasi_tw_1'] || 0,
+                                    'realisasi_2': b['realisasi_tw_2'] || 0,
+                                    'realisasi_3': b['realisasi_tw_3'] || 0,
+                                    'realisasi_4': b['realisasi_tw_4'] || 0
+                                };
+                                let capaian_kinerja_tahunan = getCapaianRealisasiTahunanByType(b['rumus_capaian_kinerja'], b.target_akhir, all_realisasi_tw, <?php echo $input['tahun']; ?>);
+                                if (capaian_kinerja_tahunan == null) {
+                                    capaian_kinerja_tahunan = 'N/A';
+                                } else {
+                                    capaian_kinerja_tahunan = capaian_kinerja_tahunan + '%';
                                 }
 
                                 renaksi += '' +
@@ -2861,7 +2865,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                         `<td class="text-center">${b.target_akhir}</td>` +
                                         `<td class="text-center">${b.satuan}</td>` +
                                         `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${b['realisasi_akhir'] || ''}" ${isdisabled ? 'disabled' : ''}></td>` +
-                                        `<td class="text-center">${data_capaian_target_realisasi_total}</td>` +
+                                        `<td class="text-center">${capaian_kinerja_tahunan}</td>` +
                                         `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}" ${isdisabled ? 'disabled' : ''}>${b['ket_total'] || ''}</textarea></td>` +
                                         `<td class="text-center">`;
                                 if (
@@ -2917,6 +2921,69 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         } else {
             jQuery('.data_bulanan_' + id_ind).hide();
         }
+    }
+
+    function getCapaianRealisasiTahunanByType(type, targetTahunan, realisasi, tahunAnggaran) {
+        type = Number(type);
+        targetTahunan = Number(targetTahunan);
+        tahunAnggaran = Number(tahunAnggaran);
+
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        let limitQuarter;
+
+        if (tahunAnggaran < currentYear) {
+            limitQuarter = 4;
+        } else if (tahunAnggaran === currentYear) {
+            const currentMonth = today.getMonth() + 1; 
+            limitQuarter = Math.ceil(currentMonth / 3);
+        } else {
+            return 0.0; // Anggaran di masa depan, capaian dianggap 0.
+        }
+
+        let pembilang = 0.0;
+        let penyebut = 0.0;
+
+        // Hitung total realisasi kumulatif
+        let realisasiKumulatif = 0.0;
+        for (let i = 1; i <= limitQuarter; i++) {
+            realisasiKumulatif += Number(realisasi['realisasi_' + i] ?? 0);
+        }
+
+        switch (type) {
+            case 1: // Indikator Tren Positif (Realisasi / Target Tahunan)
+                pembilang = realisasiKumulatif;
+                penyebut = targetTahunan;
+                console.log({pembilang, penyebut});
+                console.log('Tren Positif');
+                break;
+
+            case 2: // Nilai Akhir (Realisasi Triwulan Terakhir / Target Tahunan)
+                pembilang = Number(realisasi['realisasi_' + limitQuarter] ?? 0);
+                penyebut = targetTahunan;
+                console.log({pembilang, penyebut});
+                console.log('Nilai Akhir');
+                break;
+
+            case 3: // Indikator Tren Negatif (Target Tahunan / Realisasi)
+                pembilang = targetTahunan;
+                penyebut = realisasiKumulatif;
+                console.log({pembilang, penyebut});
+                console.log('Tren Negatif');
+                break;
+
+            default:
+                return null; // Tipe tidak dikenal, null lebih idiomatik di JS daripada false
+        }
+
+        // Menghindari pembagian dengan nol
+        if (penyebut === 0) {
+            return (pembilang === 0) ? 100.0 : 0.0;
+        }
+
+        const hasil = (pembilang / penyebut) * 100;
+
+        return parseFloat(hasil.toFixed(2));
     }
 
     function detail_parent(tipe_parent) {

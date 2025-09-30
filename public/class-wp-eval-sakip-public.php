@@ -33284,6 +33284,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		if (!empty($data)) {
 			$no = 1;
+			$tbody = '';
 			
 			$all_skpd = $this->get_all_skpd_data_unit_by_tahun_anggaran($tahun_anggaran);
 			
@@ -33347,7 +33348,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				// jika capaian 0 tampilkan kosong.
 				$anti_zero_capaian = ($capaian_display == 0) ? '' : $capaian;
 
-				$tbody = "
+				$tbody .= "
 				<tr>
 					<td class='text-left'>" . $no++ . "</td> // no
 					<td class='text-left'>{$label_sasaran}</td> // sasaran
