@@ -2954,22 +2954,16 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
             case 1: // Indikator Tren Positif (Realisasi / Target Tahunan)
                 pembilang = realisasiKumulatif;
                 penyebut = targetTahunan;
-                console.log({pembilang, penyebut});
-                console.log('Tren Positif');
                 break;
 
             case 2: // Nilai Akhir (Realisasi Triwulan Terakhir / Target Tahunan)
                 pembilang = Number(realisasi['realisasi_' + limitQuarter] ?? 0);
                 penyebut = targetTahunan;
-                console.log({pembilang, penyebut});
-                console.log('Nilai Akhir');
                 break;
 
             case 3: // Indikator Tren Negatif (Target Tahunan / Realisasi)
                 pembilang = targetTahunan;
                 penyebut = realisasiKumulatif;
-                console.log({pembilang, penyebut});
-                console.log('Tren Negatif');
                 break;
 
             default:
