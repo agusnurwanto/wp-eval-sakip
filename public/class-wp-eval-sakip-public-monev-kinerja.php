@@ -8497,8 +8497,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$satker_id = $opsi_param['satker_id'];
 			$id_skpd = $opsi_param['id_skpd'];
 			$nip = !empty($opsi_param['nip']) ? $opsi_param['nip'] : null;
-			$id_rhk = !empty($opsi_param['id_rhk']) ? (is_array($opsi_param['id_rhk']) ? implode(',', $opsi_param['id_rhk']) : $opsi_param['id_rhk']) : null;
-			$id_indikator = !empty($opsi_param['id_indikator']) ? (is_array($opsi_param['id_indikator']) ? implode(',', $opsi_param['id_indikator']) : $opsi_param['id_indikator']) : null;
+			$id_rhk = !empty($opsi_param['id_rhk']) ? $opsi_param['id_rhk'] : null;
+			$id_indikator = !empty($opsi_param['id_indikator']) ? $opsi_param['id_indikator'] : null;
 
 			$body_param = array(
 				'tahun' => $tahun,

@@ -33188,10 +33188,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					$target_tahunan = (float) $indikator['target_akhir'] ?? 0;
 					$all_realisasi = [
-						'realisasi_1' => (float) $indikator['realisasi_target_1'] ?? 0, 
-						'realisasi_2' => (float) $indikator['realisasi_target_2'] ?? 0, 
-						'realisasi_3' => (float) $indikator['realisasi_target_3'] ?? 0, 
-						'realisasi_4' => (float) $indikator['realisasi_target_4'] ?? 0
+						'realisasi_1' => (float) $indikator['realisasi_tw_1'] ?? 0, 
+						'realisasi_2' => (float) $indikator['realisasi_tw_2'] ?? 0, 
+						'realisasi_3' => (float) $indikator['realisasi_tw_3'] ?? 0, 
+						'realisasi_4' => (float) $indikator['realisasi_tw_4'] ?? 0
 					];
 					
 					$capaian = $this->get_capaian_realisasi_tahunan_by_type(
@@ -33204,16 +33204,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
 					
 					// jika capaian 0 tampilkan kosong.
-					$anti_zero_capaian = ($capaian_display == 0) ? '' : $capaian;
+					$anti_zero_capaian = ($capaian_display == 0) ? '' : '<b>'.$capaian.'%</b>';
 
 					$tbody .= "
 						<td class='text-left'>{$indikator['indikator']}</td>
 						<td class='text-center'>{$indikator['satuan']}</td>
 						<td class='text-center'>{$indikator['target_akhir']}</td>
-						<td class='text-center'>{$indikator['realisasi_target_1']}</td>
-						<td class='text-center'>{$indikator['realisasi_target_2']}</td>
-						<td class='text-center'>{$indikator['realisasi_target_3']}</td>
-						<td class='text-center'>{$indikator['realisasi_target_4']}</td>
+						<td class='text-center'>{$indikator['realisasi_tw_1']}</td>
+						<td class='text-center'>{$indikator['realisasi_tw_2']}</td>
+						<td class='text-center'>{$indikator['realisasi_tw_3']}</td>
+						<td class='text-center'>{$indikator['realisasi_tw_4']}</td>
 						<td class='text-center'>{$anti_zero_capaian}</td>"
 						. $tbody_2;
 				}
@@ -33240,8 +33240,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			        'id_skpd' => $perangkat_daerah['id_skpd'],
 			        'tipe' => 'indikator'
 			    );
-			    // print_r($opsi_param); die();
-			    $this->get_data_perbulan_ekinerja($opsi_param);
+			    $data = $this->get_data_perbulan_ekinerja($opsi_param);
+			    // print_r($data); die();
 			}
 		}
 
