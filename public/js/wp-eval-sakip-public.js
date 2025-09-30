@@ -407,23 +407,34 @@ function formatTanggalIndonesia(dateString) {
 }
 
 function getFormData($form) {
-    let unindexed_array = $form.serializeArray();
-    let indexed_array = {};
+    const data = {};
+    const serialized = $form.serializeArray();
 
-    jQuery.map(unindexed_array, function (n, i) {
-		var nama_baru = n['name'].split('[');
-            if(nama_baru.length > 1){
-                nama_baru = nama_baru[0];
-                if(!indexed_array[nama_baru]){
-                    indexed_array[nama_baru] = [];
-                }
-                indexed_array[nama_baru].push(n['value']);
-            }else{
-				indexed_array[n['name']] = n['value'];
+    jQuery.each(serialized, function() {
+        const isArray = this.name.endsWith('[]');
+        const baseName = isArray ? this.name.substring(0, this.name.length - 2) : this.name;
+
+        if (isArray) {
+            if (!data[baseName]) {
+                data[baseName] = [];
             }
+            data[baseName].push(this.value);
+        } else {
+            data[baseName] = this.value;
+        }
     });
 
-    return indexed_array;
+    $form.find('input[type="checkbox"]:not(:checked)').each(function() {
+        const name = jQuery(this).attr('name');
+        const isArray = name.endsWith('[]');
+        const baseName = isArray ? name.substring(0, name.length - 2) : name;
+
+        if (!(baseName in data)) {
+            data[baseName] = isArray ? [] : '0';
+        }
+    });
+
+    return data;
 }
 
 function style_css_download_excel_sakip(type) {

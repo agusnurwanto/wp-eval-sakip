@@ -672,7 +672,7 @@ $generate_page = $this->functions->generatePage(array(
                             </div>
                             <div class="form-group">
                                 <label for="rumus_capaian_kinerja">Rumus Capaian Kinerja</label>
-                                <select name="rumus_capaian_kinerja" id="rumus_capaian_kinerja" onchange="setDataIku();">
+                                <select name="rumus_capaian_kinerja" id="rumus_capaian_kinerja">
                                     <option value="1">Indikator Tren Positif</option>
                                     <option value="2">Nilai Akhir</option>
                                     <option value="3">Indikator Tren Negatif</option>

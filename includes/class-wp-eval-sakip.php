@@ -713,8 +713,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_finalisasi_pk_pemda', $plugin_public, 'hapus_finalisasi_pk_pemda');
 		$this->loader->add_action('wp_ajax_get_finalisasi_pk_pemda_by_id', $plugin_public, 'get_finalisasi_pk_pemda_by_id');
 		$this->loader->add_action('wp_ajax_edit_finalisasi_pk_pemda', $plugin_public, 'edit_finalisasi_pk_pemda');
-		$this->loader->add_action('wp_ajax_submit_target_pk_pemda', $plugin_public, 'submit_target_pk_pemda');
-		$this->loader->add_action('wp_ajax_submit_sasaran_pk', $plugin_public, 'submit_sasaran_pk');
+		$this->loader->add_action('wp_ajax_get_data_pk_pemda_by_id_ajax', $plugin_public, 'get_data_pk_pemda_by_id_ajax');
+		$this->loader->add_action('wp_ajax_get_all_data_pk_pemda_by_tahun_and_id_jadwal_ajax', $plugin_public, 'get_all_data_pk_pemda_by_tahun_and_id_jadwal_ajax');
+		$this->loader->add_action('wp_ajax_submit_data_pk_pemda', $plugin_public, 'submit_data_pk_pemda');
 		$this->loader->add_action('wp_ajax_hapus_sasaran_pk', $plugin_public, 'hapus_sasaran_pk');
 		
 		$this->loader->add_action('wp_ajax_get_table_pegawai_simpeg', $plugin_public, 'get_table_pegawai_simpeg');

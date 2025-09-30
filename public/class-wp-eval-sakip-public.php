@@ -33186,25 +33186,21 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$is_first_indicator = false;
 					}
 
-					$all_target = [
-						'target_1' => $indikator['target_1'] ?? 0, 
-						'target_2' => $indikator['target_2'] ?? 0, 
-						'target_3' => $indikator['target_3'] ?? 0, 
-						'target_4' => $indikator['target_4'] ?? 0
-					];
+					$target_tahunan = (float) $indikator['target_akhir'] ?? 0;
 					$all_realisasi = [
-						'realisasi_1' => $indikator['realisasi_target_1'] ?? 0, 
-						'realisasi_2' => $indikator['realisasi_target_2'] ?? 0, 
-						'realisasi_3' => $indikator['realisasi_target_3'] ?? 0, 
-						'realisasi_4' => $indikator['realisasi_target_4'] ?? 0
+						'realisasi_1' => (float) $indikator['realisasi_target_1'] ?? 0, 
+						'realisasi_2' => (float) $indikator['realisasi_target_2'] ?? 0, 
+						'realisasi_3' => (float) $indikator['realisasi_target_3'] ?? 0, 
+						'realisasi_4' => (float) $indikator['realisasi_target_4'] ?? 0
 					];
 					
-					$capaian = $this->get_capaian_realisasi_by_type(
-						$indikator['rumus_capaian_kinerja'],
-						$all_target,
-						$all_realisasi,
-						$indikator['tahun_anggaran']
+					$capaian = $this->get_capaian_realisasi_tahunan_by_type(
+						(int) $indikator['rumus_capaian_kinerja'],
+						(float) $target_tahunan,
+						(array) $all_realisasi,
+						(int) $indikator['tahun_anggaran']
 					);
+
 					$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
 					
 					// jika capaian 0 tampilkan kosong.
@@ -33284,68 +33280,86 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	function process_tbody_capaian_pk_kepala_daerah(int $tahun_anggaran, int $id_jadwal) {
 		global $wpdb;
 
-		$data = $wpdb->get_results(
-			$wpdb->prepare("
-				SELECT 
-					pk.*,
-					ik.label_sasaran as label_sasaran_iku,
-					ik.label_indikator as label_indikator_iku,
-					ik.rumus_capaian_kinerja,
-					ik.penanggung_jawab
-				FROM esakip_laporan_pk_pemda pk
-				LEFT JOIN esakip_data_iku_pemda ik
-					   ON pk.id_iku = ik.id 
-					  AND pk.id_jadwal = ik.id_jadwal
-				WHERE pk.active = 1
-				  AND pk.tahun_anggaran = %d
-				  AND pk.id_jadwal = %d
-				ORDER BY pk.id ASC
-			", $tahun_anggaran, $id_jadwal),
-			ARRAY_A
-		);
+		$data = $this->get_all_data_pk_pemda_by_tahun_and_id_jadwal($tahun_anggaran, $id_jadwal);
 
 		if (!empty($data)) {
 			$no = 1;
 			
+			$all_skpd = $this->get_all_skpd_data_unit_by_tahun_anggaran($tahun_anggaran);
+			
 			foreach ($data as $v) {
-				$all_target = [
-					'target_1' => $v['target_1'] ?? 0, 
-					'target_2' => $v['target_2'] ?? 0, 
-					'target_3' => $v['target_3'] ?? 0, 
-					'target_4' => $v['target_4'] ?? 0
-				];
+				$is_hidden = $v['is_hidden'] == 1;
+				if ($is_hidden) {
+					continue;
+				}
+				
+				$is_target_realisasi_teks = $v['is_target_teks'] == 1;
+
+				$target = ($is_target_realisasi_teks) ? $v['target_teks'] : $v['target'];
+				$realisasi_1 = ($is_target_realisasi_teks) ? $v['realisasi_teks_1'] : $v['realisasi_1'];
+				$realisasi_2 = ($is_target_realisasi_teks) ? $v['realisasi_teks_2'] : $v['realisasi_2'];
+				$realisasi_3 = ($is_target_realisasi_teks) ? $v['realisasi_teks_3'] : $v['realisasi_3'];
+				$realisasi_4 = ($is_target_realisasi_teks) ? $v['realisasi_teks_4'] : $v['realisasi_4'];
+
+				if (!empty($v['id_iku'])) {
+					// jika dari iku pemda
+					$label_sasaran  = $v['ik_label_sasaran'];
+					$indikator      = $v['ik_label_indikator'];
+					$satuan         = $v['ik_satuan'];
+
+				} else {
+					// jika custom (dari pk pemda tambah manual)
+					$label_sasaran          = $v['label_sasaran'];
+					$indikator              = $v['label_indikator'];
+					$satuan                 = $v['satuan'];
+				}
+
+				$penanggung_jawab = $this->get_renaksi_opd_by_pk_pemda($v['id'], $v['tahun_anggaran']);
+				if (!empty($penanggung_jawab)) {
+					$all_penanggung_jawab = '';
+					foreach ($penanggung_jawab as $pj) {
+						if (isset($all_skpd[$pj['id_skpd']])) {
+							$all_penanggung_jawab .= $all_skpd[$pj['id_skpd']]['nama_skpd'] . ', ';
+						}
+					}
+					$all_penanggung_jawab = rtrim($all_penanggung_jawab, ', ');
+				} else {
+					$all_penanggung_jawab = '-';
+				}
+
+				$target_tahunan = (float) $v['target'] ?? 0;
 				$all_realisasi = [
-					'realisasi_1' => $v['realisasi_1'] ?? 0, 
-					'realisasi_2' => $v['realisasi_2'] ?? 0, 
-					'realisasi_3' => $v['realisasi_3'] ?? 0, 
-					'realisasi_4' => $v['realisasi_4'] ?? 0
+					'realisasi_1' => (float) $v['realisasi_1'] ?? 0, 
+					'realisasi_2' => (float) $v['realisasi_2'] ?? 0, 
+					'realisasi_3' => (float) $v['realisasi_3'] ?? 0, 
+					'realisasi_4' => (float) $v['realisasi_4'] ?? 0
 				];
 				
-				$capaian = $this->get_capaian_realisasi_by_type(
-					$v['rumus_capaian_kinerja'],
-					$all_target,
-					$all_realisasi,
-					$v['tahun_anggaran']
+				$capaian = $this->get_capaian_realisasi_tahunan_by_type(
+					(int) $v['rumus_capaian_kinerja'],
+					(float) $target_tahunan,
+					(array) $all_realisasi,
+					(int) $v['tahun_anggaran']
 				);
 
 				$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
-					
+				
 				// jika capaian 0 tampilkan kosong.
 				$anti_zero_capaian = ($capaian_display == 0) ? '' : $capaian;
 
 				$tbody .= "
 				<tr>
 					<td class='text-left'>" . $no++ . "</td> // no
-					<td class='text-left'>{$v['label_sasaran_iku']}</td> // sasaran
-					<td class='text-left'>{$v['label_indikator_iku']}</td> // indikator
-					<td class='text-center'>{$v['satuan']}</td> // satuan
-					<td class='text-center'>{$v['target']}</td> // target
-					<td class='text-center'>{$v['realisasi_1']}</td> // realisasi tw 1
-					<td class='text-center'>{$v['realisasi_2']}</td> // realisasi tw 2
-					<td class='text-center'>{$v['realisasi_3']}</td> // realisasi tw 3
-					<td class='text-center'>{$v['realisasi_4']}</td> // realisasi tw 4
+					<td class='text-left'>{$label_sasaran}</td> // sasaran
+					<td class='text-left'>{$indikator}</td> // indikator
+					<td class='text-center'>{$satuan}</td> // satuan
+					<td class='text-center'>{$target}</td> // target
+					<td class='text-center'>{$realisasi_1}</td> // realisasi tw 1
+					<td class='text-center'>{$realisasi_2}</td> // realisasi tw 2
+					<td class='text-center'>{$realisasi_3}</td> // realisasi tw 3
+					<td class='text-center'>{$realisasi_4}</td> // realisasi tw 4
 					<td class='text-center'>{$anti_zero_capaian}</td> // capaian
-					<td class='text-left'>{$v['penanggung_jawab']}</td> // opd penanggung jawab
+					<td class='text-left'>{$all_penanggung_jawab}</td> // opd penanggung jawab
 				</tr>
 				";
 			}
@@ -33354,6 +33368,53 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		return $tbody;
+	}
+
+	function get_renaksi_opd_by_pk_pemda($id_pk, $tahun_anggaran) 
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT *
+				FROM esakip_detail_rencana_aksi_pemda
+				WHERE active = 1
+				  AND id_pk = %d
+				  AND tahun_anggaran = %d
+			", $id_pk, $tahun_anggaran),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	function get_all_skpd_data_unit_by_tahun_anggaran($tahun_anggaran)
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					id_skpd, 
+					nama_skpd, 
+					kode_skpd 
+				FROM esakip_data_unit 
+				WHERE active = 1 
+				  AND is_skpd = 1 
+				  AND tahun_anggaran = %d
+				ORDER BY kode_skpd ASC
+			", $tahun_anggaran),
+			ARRAY_A
+		);
+
+		$return = [];
+		if (!empty($data)) {
+			foreach ($data as $v) {
+				$return[$v['id_skpd']] = $v;
+			}
+		}
+
+		return $return;
 	}
 
 	function get_datatable_iku_publish_opd() 
