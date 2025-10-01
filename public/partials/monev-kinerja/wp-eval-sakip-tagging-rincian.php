@@ -902,27 +902,46 @@ $bulan = array(
 	12 => 'Desember'
 );
 
+$current_year = (int)date('Y');
+if ($indikator_rhk['tahun_anggaran'] < $current_year) {
+	$current_triwulan = 4;
+} elseif ($indikator_rhk['tahun_anggaran'] == $current_year) {
+	$current_month = (int)date('n');
+	$current_triwulan = (int)ceil($current_month / 3);
+}
+
+$target_tahunan = (float) str_replace(',', '.', $indikator_rhk['target_akhir'] ?? 0);
+$all_realisasi = [
+    'realisasi_1' => (float) str_replace(',', '.', $indikator_rhk['realisasi_tw_1'] ?? 0), 
+    'realisasi_2' => (float) str_replace(',', '.', $indikator_rhk['realisasi_tw_2'] ?? 0), 
+    'realisasi_3' => (float) str_replace(',', '.', $indikator_rhk['realisasi_tw_3'] ?? 0), 
+    'realisasi_4' => (float) str_replace(',', '.', $indikator_rhk['realisasi_tw_4'] ?? 0)
+];
+
 $tbody_target_realisasi_bulanan = '';
 $triwulan = 1;
 foreach ($bulan as $k_bulan => $v_bulan) {
 	$tbody_triwulanan = '';
 	if ($k_bulan % 3 == 0) {
-		// ----- capaian triwulan -----
-		if (!empty($indikator_rhk['target_' . $triwulan]) && !empty($indikator_rhk['realisasi_tw_' . $triwulan])) {
-			$capaian_triwulan = number_format(($indikator_rhk['realisasi_tw_' . $triwulan] / $indikator_rhk['target_' . $triwulan]) * 100, 0) . "%";
-		} elseif (!empty($indikator_rhk['target_' . $triwulan])) {
-			$capaian_triwulan = "0%";
-		} else {
-			$capaian_triwulan = "";
-		}
+
+		$target_tw = (float) str_replace(',', '.', $indikator_rhk['target_' . $triwulan] ?? 0);
+		
+		$capaian_tw = $this->get_capaian_realisasi_tahunan_by_type(
+			(int) $indikator_rhk['rumus_capaian_kinerja'],
+			(float) $target_tw,
+			(array) $all_realisasi,
+			(int) $indikator_rhk['tahun_anggaran'],
+			$triwulan
+		);
+		$capaian_tw_display = ($capaian_tw === false) ? 'N/A' : $capaian_tw;
 
 		$tbody_triwulanan .= '<tr style="background-color:#FDFFB6;">
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan ' . $triwulan . '</td>
 			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['indikator'] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['target_' . $triwulan] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['satuan'] . '</td>
-			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['realisasi_tw_' . $triwulan] . '</td>
-			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $capaian_triwulan . '</td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $all_realisasi['realisasi_' . $triwulan] . '</td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b>' . $capaian_tw_display . '%</b></td>
 			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $indikator_rhk['ket_tw_' . $triwulan] . '</td>
 		</tr>';
 		$triwulan++;
@@ -964,29 +983,13 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 	}
 }
 
-// ----- capaian total -----
-if (!empty($indikator_rhk['target_akhir']) && !empty($indikator_rhk['realisasi_akhir'])) {
-	$capaian_total = number_format(($indikator_rhk['realisasi_akhir'] / $indikator_rhk['target_akhir']) * 100, 0) . "%";
-} elseif (!empty($indikator_rhk['target_akhir'])) {
-	$capaian_total = "0%";
-} else {
-	$capaian_total = "";
-}
-
-$target_tahunan = (float) $indikator_rhk['target_akhir'] ?? 0;
-$all_realisasi = [
-	'realisasi_1' => (float) $indikator_rhk['realisasi_tw_1'] ?? 0, 
-	'realisasi_2' => (float) $indikator_rhk['realisasi_tw_2'] ?? 0, 
-	'realisasi_3' => (float) $indikator_rhk['realisasi_tw_3'] ?? 0, 
-	'realisasi_4' => (float) $indikator_rhk['realisasi_tw_4'] ?? 0
-];
-
 $capaian_tahunan = $this->get_capaian_realisasi_tahunan_by_type(
 	(int) $indikator_rhk['rumus_capaian_kinerja'],
 	(float) $target_tahunan,
 	(array) $all_realisasi,
 	(int) $indikator_rhk['tahun_anggaran']
 );
+$capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahunan;
 ?>
 <style type="text/css">
 	.wrap-table {
@@ -1513,8 +1516,8 @@ $capaian_tahunan = $this->get_capaian_realisasi_tahunan_by_type(
 											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['indikator']; ?></td>
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['realisasi_akhir']; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $capaian_tahunan; ?> %</td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $all_realisasi['realisasi_' . $current_triwulan]; ?></td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b><?php echo $capaian_tahunan_display; ?>%</b></td>
 											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['ket_total']; ?></td>
 										</tr>
 									</tbody>
