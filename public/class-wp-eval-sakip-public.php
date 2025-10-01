@@ -33131,6 +33131,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					){
 						$capaian_anggaran = '<b>'.($data_wpsipd['data']['serapan_anggaran']['total'] == '0%' ? '' : $data_wpsipd['data']['serapan_anggaran']['total']).'</b>';
 						$capaian_program = '<b>'.($data_wpsipd['data']['capaian_kinerja']['total'] == '0%' ? '' : $data_wpsipd['data']['capaian_kinerja']['total']).'</b>';
+						$capaian_fisik = '<b>'.($data_wpsipd['data']['capaian_fisik']['total'] == '0%' ? '' : $data_wpsipd['data']['capaian_fisik']['total']).'</b>';
 					}
 				}
 			}
