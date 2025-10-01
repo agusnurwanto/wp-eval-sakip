@@ -3402,8 +3402,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-renaksi-pemda" data-label-sasaran="' . $label_sasaran . '" data-label-indikator="' . $label_indikator . '" data-id_renaksi_pemda="' . $id_renaksi . '" title="Verifikasi Rencana Aksi"><span class="dashicons dashicons-yes"></span></a>';
 							$html_get_data_pemda .= '
 					            <tr>
-					                <td class="text-left">' . $v_get_data_pemda['label_sasaran'] . '</td>
-					                <td class="text-left">' . $v_get_data_pemda['label_indikator'] . '</td>
+					                <td class="text-left">' . $label_sasaran . '</td>
+					                <td class="text-left">' . $label_indikator . '</td>
 					                <td>' . $aksi . '</td>
 					            </tr>';
 						}
@@ -10416,6 +10416,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        LEFT JOIN esakip_data_label_rencana_aksi AS l
 					            ON l.parent_renaksi_pemda = r.id 
 					            AND l.active = r.active 
+					            AND l.tahun_anggaran = r.tahun_anggaran 
 					        WHERE r.active = 1
 					            AND r.id_pk = %d
 					            AND r.tahun_anggaran = %d
