@@ -2279,7 +2279,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 							$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 							$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-							$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+							$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
 							if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
 								$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
 							} else {
@@ -2511,7 +2511,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 								$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 								$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-								$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+								$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
 								if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
 									$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
 								} else {
@@ -2875,7 +2875,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 									$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 									$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-									$total_realisasi_tw = $ind['realisasi_tw_1'] + $ind['realisasi_tw_2'] + $ind['realisasi_tw_3'] + $ind['realisasi_tw_4'];
+									$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
 									if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
 										$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
 									} else {
@@ -3402,8 +3402,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$aksi = '<a href="javascript:void(0)" class="btn btn-sm btn-success verifikasi-renaksi-pemda" data-label-sasaran="' . $label_sasaran . '" data-label-indikator="' . $label_indikator . '" data-id_renaksi_pemda="' . $id_renaksi . '" title="Verifikasi Rencana Aksi"><span class="dashicons dashicons-yes"></span></a>';
 							$html_get_data_pemda .= '
 					            <tr>
-					                <td class="text-left">' . $v_get_data_pemda['label_sasaran'] . '</td>
-					                <td class="text-left">' . $v_get_data_pemda['label_indikator'] . '</td>
+					                <td class="text-left">' . $label_sasaran . '</td>
+					                <td class="text-left">' . $label_indikator . '</td>
 					                <td>' . $aksi . '</td>
 					            </tr>';
 						}
@@ -8720,26 +8720,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			return 0.0; // Anggaran di masa depan, belum ada realisasi.
 		}
 
-		$total_target = 0.0;
-		$total_realisasi = 0.0;
+		$penyebut = 0.0;
+		$pembilang = 0.0;
 
 		switch ($type) {
 			case 1: // Indikator Tren Positif (Kumulatif)
 				for ($i = 1; $i <= $limit_quarter; $i++) {
-					$total_realisasi += empty($realisasi['realisasi_' . $i]) ? 0 : $realisasi['realisasi_' . $i];
-					$total_target += empty($target['target_' . $i]) ? 0 : $target['target_' . $i];
+					$pembilang += empty($realisasi['realisasi_' . $i]) ? 0 : $realisasi['realisasi_' . $i];
+					$penyebut += empty($target['target_' . $i]) ? 0 : $target['target_' . $i];
 				}
 				break;
 
 			case 2: // Nilai Akhir (Mengambil nilai pada triwulan terakhir)
-				$total_realisasi = empty($realisasi['realisasi_' . $limit_quarter]) ? 0 : $realisasi['realisasi_' . $limit_quarter];
-				$total_target = empty($target['target_' . $limit_quarter]) ? 0 : $target['target_' . $limit_quarter];
+				$pembilang = empty($realisasi['realisasi_' . $limit_quarter]) ? 0 : $realisasi['realisasi_' . $limit_quarter];
+				$penyebut = empty($target['target_' . $limit_quarter]) ? 0 : $target['target_' . $limit_quarter];
 				break;
 
 			case 3: // Indikator Tren Negatif (Kumulatif)
 				for ($i = 1; $i <= $limit_quarter; $i++) {
-					$total_realisasi += empty($target['target_' . $i]) ? 0 : $target['target_' . $i];
-					$total_target += empty($realisasi['realisasi_' . $i]) ? 0 : $realisasi['realisasi_' . $i];
+					$pembilang += empty($target['target_' . $i]) ? 0 : $target['target_' . $i];
+					$penyebut += empty($realisasi['realisasi_' . $i]) ? 0 : $realisasi['realisasi_' . $i];
 				}
 				break;
 
@@ -8747,65 +8747,89 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				return false; // unknown type
 		}
 		
-		if ($total_target == 0) {
+		if ($penyebut == 0) {
+			if ($type === 3) {
+				// Jika Realisasi adalah 0, kita cek Targetnya ('pembilang').
+				// Jika Target juga 0, maka capaian 100%. Jika tidak, capaian 0%.
+				return ($pembilang === 0) ? 100.0 : 0.0;
+			}
 			return 0.0; // Menghindari pembagian dengan nol
 		}
 
-		$hasil = ($total_realisasi / $total_target) * 100;
+		$hasil = ($pembilang / $penyebut) * 100;
 
 		return round($hasil, 2);
 	}
 
-	public function get_capaian_realisasi_tahunan_by_type(int $type, float $target_tahunan, array $realisasi, int $tahun_anggaran)
+	public function get_capaian_realisasi_tahunan_by_type(int $type, float $target_tahunan, array $realisasi, int $tahun_anggaran, ?int $triwulan = null)
 	{
-		$current_year = (int)date('Y');
+		$limit_quarter = 0;
+		$targetUntukPerhitungan = 0.0;
 
-		// Jika tahun anggaran sudah lewat, hitung semua 4 triwulan.
-		// Jika tahun anggaran adalah tahun ini, hitung sampai triwulan saat ini.
-		// Jika tahun anggaran di masa depan, capaian 0.
-		if ($tahun_anggaran < $current_year) {
-			$limit_quarter = 4;
-		} elseif ($tahun_anggaran == $current_year) {
-			$current_month = (int)date('n');
-			$limit_quarter = (int)ceil($current_month / 3);
+		if ($triwulan !== null) {
+			// KASUS 1: 'triwulan' DIISI -> Hitung spesifik untuk triwulan tersebut.
+			
+			if ($triwulan < 1 || $triwulan > 4) {
+				return false;
+			}
+			
+			$limit_quarter = $triwulan;
+			$targetUntukPerhitungan = $target_tahunan;
+
 		} else {
-			return 0.0; // Anggaran di masa depan, capaian dianggap 0.
+			// KASUS 2: 'triwulan' TIDAK DIISI -> Gunakan logika waktu (default).
+			
+			$current_year = (int)date('Y');
+			if ($tahun_anggaran < $current_year) {
+				$limit_quarter = 4;
+			} elseif ($tahun_anggaran == $current_year) {
+				$current_month = (int)date('n');
+				$limit_quarter = (int)ceil($current_month / 3);
+			} else {
+				return 0.0; // capaian masa depan
+			}
+
+			$targetUntukPerhitungan = $target_tahunan;
 		}
 
-		$pembilang = 0.0; 
-		$penyebut = 0.0; 
+		$pembilang = 0.0;
+		$penyebut = 0.0;
 
-		// Hitung total realisasi kumulatif
 		$realisasi_kumulatif = 0.0;
 		for ($i = 1; $i <= $limit_quarter; $i++) {
 			$realisasi_kumulatif += $realisasi['realisasi_' . $i] ?? 0;
 		}
 
 		switch ($type) {
-			case 1: // Indikator Tren Positif (Realisasi / Target Tahunan)
+			case 1:
 				$pembilang = $realisasi_kumulatif;
-				$penyebut = $target_tahunan;
+				$penyebut = $targetUntukPerhitungan;
 				break;
-
-			case 2: // Nilai Akhir (Realisasi Triwulan Terakhir / Target Tahunan)
+			case 2:
 				$pembilang = $realisasi['realisasi_' . $limit_quarter] ?? 0;
-				$penyebut = $target_tahunan;
+				$penyebut = $targetUntukPerhitungan;
 				break;
-
-			case 3: // Indikator Tren Negatif (Target Tahunan / Realisasi)
-				$pembilang = $target_tahunan;
+			case 3:
+				$pembilang = $targetUntukPerhitungan;
 				$penyebut = $realisasi_kumulatif;
 				break;
-
 			default:
-				return false; // Tipe tidak dikenal
+				return false;
 		}
 		
 		if ($penyebut == 0) {
-			return 0.0; // Menghindari pembagian dengan nol
+			if ($type === 3) {
+				return ($pembilang == 0) ? 100.0 : 0.0;
+			}
+			return 0.0;
 		}
 
-		$hasil = ($pembilang / $penyebut) * 100;
+		$hasil = 0.0;
+		if ($type === 3) {
+			$hasil = (($pembilang - $penyebut) / $pembilang) * 100;
+		} else {
+			$hasil = ($pembilang / $penyebut) * 100;
+		}
 
 		return round($hasil, 2);
 	}
@@ -10416,6 +10440,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					        LEFT JOIN esakip_data_label_rencana_aksi AS l
 					            ON l.parent_renaksi_pemda = r.id 
 					            AND l.active = r.active 
+					            AND l.tahun_anggaran = r.tahun_anggaran 
 					        WHERE r.active = 1
 					            AND r.id_pk = %d
 					            AND r.tahun_anggaran = %d
