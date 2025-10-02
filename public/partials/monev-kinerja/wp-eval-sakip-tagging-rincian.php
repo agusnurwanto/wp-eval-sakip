@@ -935,7 +935,8 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 		);
 		$capaian_tw_display = ($capaian_tw === false) ? 'N/A' : $capaian_tw;
 
-		$tbody_triwulanan .= '<tr style="background-color:#FDFFB6;">
+		$tbody_triwulanan .= '
+		<tr style="background-color:#FDFFB6;">
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Triwulan ' . $triwulan . '</td>
 			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['indikator'] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['target_' . $triwulan] . '</td>
@@ -948,7 +949,8 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 	}
 
 	if (!isset($data_target_realisasi_bulanan[$k_bulan])) {
-		$tbody_target_realisasi_bulanan .= "<tr>
+		$tbody_target_realisasi_bulanan .= "
+		<tr>
 	        <td class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'>$v_bulan</td>
 	        <td colspan='6' class='esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah'></td>
 	    </tr>" . $tbody_triwulanan;
@@ -978,8 +980,9 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-bawah">' . ($get_capaian[$i] ?? '') . '</td>';
 			$tbody_target_realisasi_bulanan .= '<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-bawah">' . ($get_keterangan[$i] ?? '') . '</td>';
 
-			$tbody_target_realisasi_bulanan .= '</tr>' . $tbody_triwulanan;
+			$tbody_target_realisasi_bulanan .= '</tr>';
 		}
+		$tbody_target_realisasi_bulanan .= $tbody_triwulanan;
 	}
 }
 
