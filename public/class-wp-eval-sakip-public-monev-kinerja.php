@@ -8596,7 +8596,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											foreach ($v_indikator['kinerja_triwulan'] as $k_tw => $v_tw) {
 												if(!empty($v_tw['kinerja'])){
 													$tw = intval(str_replace('tw', '', strtolower($v_tw['triwulan'])));
-													$data_triwulan['realisasi_tw_'.$tw] = $v_tw['kinerja']['realisasi_kuantitas'];
+													$data_triwulan['realisasi_tw_'.$tw] = 0;
+													if (!empty($v_tw['kinerja']['realisasi_kuantitas'])) {
+														$data_triwulan['realisasi_tw_'.$tw] = $v_tw['kinerja']['realisasi_kuantitas'];
+													}
 													$data_triwulan['ket_tw_'.$tw] = $v_tw['kinerja']['catatan'];
 												}
 											}

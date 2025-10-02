@@ -2766,14 +2766,22 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                         }
                                     };
 
-                                    let parseSerializedData = (data) => {
-                                        if (!data) return [];
-                                        try {
-                                            let matches = data.match(/s:\d+:"(.*?)";/g);
-                                            return matches ? matches.map(m => m.match(/s:\d+:"(.*?)";/)[1]) : [];
-                                        } catch (e) {
-                                            return [data];
+                                   let parseSerializedData = (data) => {
+                                        if (!data) {
+                                            return [];
                                         }
+                                        
+                                        const matches = data.matchAll(/N;|s:\d+:"(.*?)"/g);
+                                        
+                                        const result = Array.from(matches, m => {
+                                            if (m[1] !== undefined) {
+                                                return m[1];
+                                            } else {
+                                                return "";
+                                            }
+                                        });
+
+                                        return result;
                                     };
 
                                     let rencana_aksi = parseSerializedData(get_data_bulanan.rencana_aksi);
