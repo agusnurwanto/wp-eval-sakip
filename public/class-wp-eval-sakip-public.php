@@ -33177,9 +33177,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$title_rumus = $this->get_rumus_capaian_kinerja_tahunan_by_tipe(1);
 						$tbody_2 = "
-							<td class='text-center' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
-							<td class='text-center' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
-							<td class='text-center' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
+							<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
+							<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
+							<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
 						</tr>";
 					}
 
