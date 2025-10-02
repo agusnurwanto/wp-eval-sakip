@@ -107,6 +107,7 @@ $tahun_anggaran = intval($_GET['tahun']);
                 if (response.status) {
                     jQuery('#tableDataOpd tbody').html(response.data);
                     jQuery('#tableDataPemda tbody').html(response.data_kepala_daerah);
+                    jQuery('[data-toggle="tooltip"]').tooltip();
                 } else {
                     alert(response.message);
                 }

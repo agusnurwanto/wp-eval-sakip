@@ -33217,7 +33217,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<td class='text-center'>{$all_realisasi['realisasi_2']}</td>
 						<td class='text-center'>{$all_realisasi['realisasi_3']}</td>
 						<td class='text-center'>{$all_realisasi['realisasi_4']}</td>
-						<td class='text-center' title='{$title_rumus}'>{$anti_zero_capaian}</td>"
+						<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td>"
 						. $tbody_2;
 				}
 			}
@@ -33375,7 +33375,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<td class='text-center'>{$realisasi_2}</td> // realisasi tw 2
 					<td class='text-center'>{$realisasi_3}</td> // realisasi tw 3
 					<td class='text-center'>{$realisasi_4}</td> // realisasi tw 4
-					<td class='text-center font-weight-bold' title='{$title_rumus}'>{$anti_zero_capaian}</td> // capaian
+					<td class='text-center font-weight-bold' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td> // capaian
 					<td class='text-left'>{$all_penanggung_jawab}</td> // opd penanggung jawab
 				</tr>
 				";
