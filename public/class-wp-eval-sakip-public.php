@@ -33175,10 +33175,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</td>";
 						$is_first_row_for_skpd = false;
 
+						$title_rumus = $this->get_rumus_capaian_kinerja_tahunan_by_tipe(1);
 						$tbody_2 = "
-							<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
-							<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
-							<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
+							<td class='text-center' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
+							<td class='text-center' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
+							<td class='text-center' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
 						</tr>";
 					}
 
@@ -33254,9 +33255,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	function get_rumus_capaian_kinerja_tahunan_by_tipe(int $tipe)
 	{
 		$rumus = [
-			1 => 'Indikator Tren Positif - (Akumulasi Realisasi TW Berjalan / Target Akhir) * 100',
-			2 => 'Nilai Akhir - (Realisasi TW Akhir Berjalan / Target Akhir) * 100',
-			3 => 'Indikator Tren Negatif - ((Nilai Akhir - Akumulasi Realisasi TW Berjalan) / Target Akhir) * 100'
+			1 => 'Rumus Capaian: Indikator Tren Positif ((Akumulasi Realisasi TW Berjalan / Target Akhir) * 100)',
+			2 => 'Rumus Capaian: Nilai Akhir ((Realisasi TW Akhir Berjalan / Target Akhir) * 100)',
+			3 => 'Rumus Capaian: Indikator Tren Negatif (((Nilai Akhir - Akumulasi Realisasi TW Berjalan) / Target Akhir) * 100)'
 		];
 
 		return $rumus[$tipe] ?? 'N/A';
