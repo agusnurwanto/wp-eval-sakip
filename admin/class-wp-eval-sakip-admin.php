@@ -2932,7 +2932,7 @@ class Wp_Eval_Sakip_Admin
 						? $v['tahun_selesai_anggaran']
 						: $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
 
-					$html .= '<p style="margin-left: 10px">' . $v['nama_jadwal'] . ' Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum diset di pengaturan menu)</p>';
+					$html .= '<p style="margin-left: 10px"><b>' . $v['nama_jadwal'] . '</b> Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum pernah digunakan di pengaturan menu tahunan)</p>';
 				}
 			}
 		} else {
@@ -3594,7 +3594,7 @@ class Wp_Eval_Sakip_Admin
 						? $v['tahun_selesai_anggaran']
 						: $v['tahun_anggaran'] + $v['lama_pelaksanaan'];
 
-					$html .= '<p style="margin-left: 10px">' . $v['nama_jadwal'] . ' Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum diset di pengaturan menu)</p>';
+					$html .= '<p style="margin-left: 10px"><b>' . $v['nama_jadwal'] . '</b> Periode ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . ' (Periode belum pernah digunakan di pengaturan menu tahunan)</p>';
 				}
 			}
 		} else {
