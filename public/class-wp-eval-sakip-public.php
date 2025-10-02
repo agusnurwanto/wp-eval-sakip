@@ -33207,6 +33207,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					// jika capaian 0 tampilkan kosong.
 					$anti_zero_capaian = ($capaian_display == 0) ? '' : '<b>'.$capaian.'%</b>';
 
+					$title_rumus = $this->get_rumus_capaian_kinerja_tahunan_by_tipe((int) $indikator['rumus_capaian_kinerja']);
+
 					$tbody .= "
 						<td class='text-left'>{$indikator['indikator']}</td>
 						<td class='text-center'>{$indikator['satuan']}</td>
@@ -33215,7 +33217,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<td class='text-center'>{$all_realisasi['realisasi_2']}</td>
 						<td class='text-center'>{$all_realisasi['realisasi_3']}</td>
 						<td class='text-center'>{$all_realisasi['realisasi_4']}</td>
-						<td class='text-center'>{$anti_zero_capaian}</td>"
+						<td class='text-center' title='{$title_rumus}'>{$anti_zero_capaian}</td>"
 						. $tbody_2;
 				}
 			}
@@ -33247,6 +33249,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		return $tbody;
+	}
+
+	function get_rumus_capaian_kinerja_tahunan_by_tipe(int $tipe)
+	{
+		$rumus = [
+			1 => 'Indikator Tren Positif - (Akumulasi Realisasi TW Berjalan / Target Akhir) * 100',
+			2 => 'Nilai Akhir - (Realisasi TW Akhir Berjalan / Target Akhir) * 100',
+			3 => 'Indikator Tren Negatif - ((Nilai Akhir - Akumulasi Realisasi TW Berjalan) / Target Akhir) * 100'
+		];
+
+		return $rumus[$tipe] ?? 'N/A';
 	}
 
 	function get_rpjmd_settings($tahun_anggaran)
@@ -33349,6 +33362,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				// jika capaian 0 tampilkan kosong.
 				$anti_zero_capaian = ($capaian_display == 0) ? '' : $capaian . '%';
 
+				$title_rumus = $this->get_rumus_capaian_kinerja_tahunan_by_tipe((int) $v['rumus_capaian_kinerja']);
+
 				$tbody .= "
 				<tr>
 					<td class='text-left'>" . $no++ . "</td> // no
@@ -33360,7 +33375,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<td class='text-center'>{$realisasi_2}</td> // realisasi tw 2
 					<td class='text-center'>{$realisasi_3}</td> // realisasi tw 3
 					<td class='text-center'>{$realisasi_4}</td> // realisasi tw 4
-					<td class='text-center font-weight-bold'>{$anti_zero_capaian}</td> // capaian
+					<td class='text-center font-weight-bold' title='{$title_rumus}'>{$anti_zero_capaian}</td> // capaian
 					<td class='text-left'>{$all_penanggung_jawab}</td> // opd penanggung jawab
 				</tr>
 				";

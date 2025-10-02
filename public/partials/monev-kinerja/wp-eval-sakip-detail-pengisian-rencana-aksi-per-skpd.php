@@ -3035,8 +3035,13 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
             return 0.0; // Hindari pembagian dengan nol
         }
 
-        const hasil = (pembilang / penyebut) * 100;
-        console.log(`Hasil perhitungan: ${hasil} (Pembilang: ${pembilang}, Penyebut: ${penyebut})`);
+        let hasil = 0.0;
+        if (type === 3) {
+            hasil = ((pembilang - penyebut) / pembilang) * 100;
+        } else {
+            hasil = (pembilang / penyebut) * 100;
+        }
+
         return parseFloat(hasil.toFixed(2));
     }
 

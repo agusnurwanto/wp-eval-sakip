@@ -89,10 +89,10 @@ $tahun_anggaran = intval($_GET['tahun']);
 </div>
 <script>
     jQuery(document).ready(() => {
-        getDataTable()
+        getTable();
     });
 
-    function getDataTable() {
+    function getTable() {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
