@@ -33367,7 +33367,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$tbody .= "
 				<tr>
-					<td class='text-left'>" . $no++ . "</td> // no
+					<td class='text-center'>" . $no++ . "</td> // no
 					<td class='text-left'>{$label_sasaran}</td> // sasaran
 					<td class='text-left'>{$indikator}</td> // indikator
 					<td class='text-center'>{$satuan}</td> // satuan
