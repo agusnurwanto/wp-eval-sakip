@@ -2265,7 +2265,13 @@ if (!empty($data_sasaran_existing)) {
                 jQuery('#program-sasaran-teks-indikator').html(jQuery('tr[id-sasaran="' + jQuery('#tambah-data-program').attr('id-sasaran') + '"] td').eq(1).html());
                 jQuery('#program-teks-indikator').html(res.data[0].nama_program);
                 get_bidang_urusan(true).then(function() {
-                    get_skpd(res.data[0].id_program);
+                    get_skpd(res.data[0].id_program); 
+                    jQuery('#skpd-teks').select2({
+                        dropdownParent: jQuery('#skpd-teks').closest('.modal-body'),
+                        width: '100%',
+                        placeholder: 'Pilih OPD',
+                        allowClear: true
+                    });
                     get_indikator_sasaran(jQuery('#tambah-data-program').attr('id-sasaran')).then((data) => {
                         jQuery('#indikator-teks-program-sasaran').val('');
                         jQuery('#indikator-teks-program').val('');
@@ -2298,19 +2304,23 @@ if (!empty($data_sasaran_existing)) {
             selected = "selected";
         }
         var html = "" +
-            "<option value=''>Pilih SKPD</option>";
-        // +"<option "+selected+" data-kode='' value='*'>Semua Perangkat Daerah</option>";
+            "<option value=''>Pilih OPD</option>";
+            // +"<option "+selected+" data-kode='' value='*'>Semua Perangkat Daerah</option>";
         if (current_id_program && all_skpd_program[current_id_program]) {
             all_skpd_program[current_id_program].map(function(program) {
                 var selected = '';
                 if (current_id_skpd == program.id_skpd) {
                     selected = 'selected';
                 }
-                html += "<option " + selected + " value='" + program.id_skpd + "' data-kode='" + program.kode_skpd + "'>" + program.nama_skpd + "</option>";
+                html += "<option " + selected + " value='" + program.id_skpd + "' data-kode='" + program.kode_skpd + "'>" +program.kode_skpd+' '+ program.nama_skpd + "</option>";
             })
         } else {
             for (var id_skpd in all_skpd) {
-                html += "<option value='" + all_skpd[id_skpd].id_skpd + "' data-kode='" + all_skpd[id_skpd].kode_skpd + "'>" + all_skpd[id_skpd].nama_skpd + "</option>";
+                var selected = '';
+                if (current_id_skpd == id_skpd) {
+                    selected = 'selected';
+                }
+                html += "<option "+selected+" value='" + all_skpd[id_skpd].id_skpd + "' data-kode='" + all_skpd[id_skpd].kode_skpd + "'>" +all_skpd[id_skpd].kode_skpd+' '+ all_skpd[id_skpd].nama_skpd + "</option>";
             }
         }
         jQuery('#skpd-teks').html(html);
@@ -2937,6 +2947,12 @@ if (!empty($data_sasaran_existing)) {
                 get_bidang_urusan(true).then(function() {
                     for (var b in res.data_all) {
                         get_skpd(res.data_all[b].detail[0].id_program, res.data_all[b].detail[0].id_unit);
+                        jQuery('#skpd-teks').select2({
+                            dropdownParent: jQuery('#skpd-teks').closest('.modal-body'),
+                            width: '100%',
+                            placeholder: 'Pilih OPD',
+                            allowClear: true
+                        });
                         get_indikator_sasaran(jQuery('#tambah-data-program').attr('id-sasaran')).then((data) => {
                             jQuery('#indikator-teks-program-sasaran').val(res.data[0].id_unik_indikator_sasaran)
                             jQuery('#program-teks-indikator').html(res.data_all[b].nama);
