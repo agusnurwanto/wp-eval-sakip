@@ -1397,7 +1397,7 @@ if (!empty($data_tahapan)) {
 
                 if (!isFromIku) {
                     buttonsHtml += `
-                    <button class="btn btn-sm btn-danger" title="Hapus Sasaran" onclick="deleteDataSasaran(${item.id})"><span class="dashicons dashicons-trash"></span></button>
+                    <button class="btn btn-sm btn-danger mt-2" title="Hapus Sasaran" onclick="deleteDataSasaran(${item.id})"><span class="dashicons dashicons-trash"></span></button>
                 `;
                 }
 
@@ -1530,7 +1530,7 @@ if (!empty($data_tahapan)) {
             return;
         }
 
-        container.find('input[type="number"], input[type="text"], input[type="checkbox"], textarea, select').each(function() {
+        container.find('input[type="hidden"], input[type="number"], input[type="text"], input[type="checkbox"], textarea, select').each(function() {
             const input = jQuery(this);
             input.prop('disabled', false);
 

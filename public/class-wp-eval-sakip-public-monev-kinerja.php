@@ -9655,10 +9655,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				'label_indikator'       => $all_data['label_indikator'] ?? null,
 				'satuan'                => $all_data['satuan'] ?? null,
 				'target'                => $all_data['target'] ?? null,
-				'realisasi_1'           => $all_data['realisasi_1'] ?? null,
-				'realisasi_2'           => $all_data['realisasi_2'] ?? null,
-				'realisasi_3'           => $all_data['realisasi_3'] ?? null,
-				'realisasi_4'           => $all_data['realisasi_4'] ?? null,
+				'realisasi_1'           => isset($all_data['realisasi_1']) && $all_data['realisasi_1'] !== '' ? $all_data['realisasi_1'] : null,
+				'realisasi_2'           => isset($all_data['realisasi_2']) && $all_data['realisasi_2'] !== '' ? $all_data['realisasi_2'] : null,
+				'realisasi_3'           => isset($all_data['realisasi_3']) && $all_data['realisasi_3'] !== '' ? $all_data['realisasi_3'] : null,
+				'realisasi_4'           => isset($all_data['realisasi_4']) && $all_data['realisasi_4'] !== '' ? $all_data['realisasi_4'] : null,
 				'target_teks'           => $all_data['target_teks'] ?? null,
 				'realisasi_teks_1'      => $all_data['realisasi_1_teks'] ?? null,
 				'realisasi_teks_2'      => $all_data['realisasi_2_teks'] ?? null,
@@ -9674,7 +9674,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				'message' => $message,
 				'data'    => [
 					'id'     => $result['id'],
-					'action' => $result['action']
+					'action' => $result['action'],
+					'data' => $post_data
 				]
 			]);
 
@@ -9708,25 +9709,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$db_data['satuan']          = $data['satuan'];
 		}
 
+		$db_data['target']      = !empty($data['target']) ? (float) $data['target'] : null;
+		$db_data['realisasi_1'] = $data['realisasi_1'];
+		$db_data['realisasi_2'] = $data['realisasi_2'];
+		$db_data['realisasi_3'] = $data['realisasi_3'];
+		$db_data['realisasi_4'] = $data['realisasi_4'];
 		if ($data['is_target_teks'] == 1) {
 			$db_data['target_teks']      = $data['target_teks'];
 			$db_data['realisasi_teks_1'] = $data['realisasi_teks_1'];
 			$db_data['realisasi_teks_2'] = $data['realisasi_teks_2'];
 			$db_data['realisasi_teks_3'] = $data['realisasi_teks_3'];
 			$db_data['realisasi_teks_4'] = $data['realisasi_teks_4'];
-
-			$db_data['target']      = !empty($data['target']) ? (float) $data['target'] : null;
-			$db_data['realisasi_1'] = !empty($data['realisasi_1']) ? (float) $data['realisasi_1'] : null;
-			$db_data['realisasi_2'] = !empty($data['realisasi_2']) ? (float) $data['realisasi_2'] : null;
-			$db_data['realisasi_3'] = !empty($data['realisasi_3']) ? (float) $data['realisasi_3'] : null;
-			$db_data['realisasi_4'] = !empty($data['realisasi_4']) ? (float) $data['realisasi_4'] : null;
 		} else {
-			$db_data['target']      = !empty($data['target']) ? (float) $data['target'] : null;
-			$db_data['realisasi_1'] = !empty($data['realisasi_1']) ? (float) $data['realisasi_1'] : null;
-			$db_data['realisasi_2'] = !empty($data['realisasi_2']) ? (float) $data['realisasi_2'] : null;
-			$db_data['realisasi_3'] = !empty($data['realisasi_3']) ? (float) $data['realisasi_3'] : null;
-			$db_data['realisasi_4'] = !empty($data['realisasi_4']) ? (float) $data['realisasi_4'] : null;
-
 			$db_data['target_teks']      = null;
 			$db_data['realisasi_teks_1'] = null;
 			$db_data['realisasi_teks_2'] = null;
