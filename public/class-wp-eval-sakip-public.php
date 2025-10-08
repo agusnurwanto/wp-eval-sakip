@@ -33195,6 +33195,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'realisasi_3' => (float) str_replace(',', '.', $indikator['realisasi_tw_3'] ?? 0), 
 						'realisasi_4' => (float) str_replace(',', '.', $indikator['realisasi_tw_4'] ?? 0)
 					];
+
+					$all_realisasi_display = [
+						'realisasi_1' => ($indikator['realisasi_tw_1'] === '' || $indikator['realisasi_tw_1'] === null) ? '' : $indikator['realisasi_tw_1'], 
+						'realisasi_2' => ($indikator['realisasi_tw_2'] === '' || $indikator['realisasi_tw_2'] === null) ? '' : $indikator['realisasi_tw_2'], 
+						'realisasi_3' => ($indikator['realisasi_tw_3'] === '' || $indikator['realisasi_tw_3'] === null) ? '' : $indikator['realisasi_tw_3'], 
+						'realisasi_4' => ($indikator['realisasi_tw_4'] === '' || $indikator['realisasi_tw_4'] === null) ? '' : $indikator['realisasi_tw_4']
+					];
 					
 					$capaian = $this->get_capaian_realisasi_tahunan_by_type(
 						(int) $indikator['rumus_capaian_kinerja'],
@@ -33214,10 +33221,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<td class='text-left'>{$indikator['indikator']}</td>
 						<td class='text-center'>{$indikator['satuan']}</td>
 						<td class='text-center'>{$target_tahunan}</td>
-						<td class='text-center'>{$all_realisasi['realisasi_1']}</td>
-						<td class='text-center'>{$all_realisasi['realisasi_2']}</td>
-						<td class='text-center'>{$all_realisasi['realisasi_3']}</td>
-						<td class='text-center'>{$all_realisasi['realisasi_4']}</td>
+						<td class='text-center'>{$all_realisasi_display['realisasi_1']}</td>
+						<td class='text-center'>{$all_realisasi_display['realisasi_2']}</td>
+						<td class='text-center'>{$all_realisasi_display['realisasi_3']}</td>
+						<td class='text-center'>{$all_realisasi_display['realisasi_4']}</td>
 						<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td>"
 						. $tbody_2;
 				}
@@ -33316,6 +33323,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$realisasi_2 = ($is_target_realisasi_teks) ? $v['realisasi_teks_2'] : $v['realisasi_2'];
 				$realisasi_3 = ($is_target_realisasi_teks) ? $v['realisasi_teks_3'] : $v['realisasi_3'];
 				$realisasi_4 = ($is_target_realisasi_teks) ? $v['realisasi_teks_4'] : $v['realisasi_4'];
+				
+				$all_realisasi_display = [
+					'realisasi_1' => ($realisasi_1 === '' || $realisasi_1 === null) ? '' : $realisasi_1,
+					'realisasi_2' => ($realisasi_2 === '' || $realisasi_2 === null) ? '' : $realisasi_2,
+					'realisasi_3' => ($realisasi_3 === '' || $realisasi_3 === null) ? '' : $realisasi_3,
+					'realisasi_4' => ($realisasi_4 === '' || $realisasi_4 === null) ? '' : $realisasi_4
+				];
 
 				if (!empty($v['id_iku'])) {
 					// jika dari iku pemda
@@ -33372,10 +33386,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<td class='text-left'>{$indikator}</td> // indikator
 					<td class='text-center'>{$satuan}</td> // satuan
 					<td class='text-center'>{$target}</td> // target
-					<td class='text-center'>{$realisasi_1}</td> // realisasi tw 1
-					<td class='text-center'>{$realisasi_2}</td> // realisasi tw 2
-					<td class='text-center'>{$realisasi_3}</td> // realisasi tw 3
-					<td class='text-center'>{$realisasi_4}</td> // realisasi tw 4
+					<td class='text-center'>{$all_realisasi_display['realisasi_1']}</td> // realisasi tw 1
+					<td class='text-center'>{$all_realisasi_display['realisasi_2']}</td> // realisasi tw 2
+					<td class='text-center'>{$all_realisasi_display['realisasi_3']}</td> // realisasi tw 3
+					<td class='text-center'>{$all_realisasi_display['realisasi_4']}</td> // realisasi tw 4
 					<td class='text-center font-weight-bold' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td> // capaian
 					<td class='text-left'>{$all_penanggung_jawab}</td> // opd penanggung jawab
 				</tr>

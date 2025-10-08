@@ -1949,6 +1949,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		return number_format((float)$opsi['rencana_pagu'], 0, ",", ".");
 	}
 
+	function format_rupiah_tanpa_rp($angka) {
+		$hasil_format = number_format((float)$angka, 0, ",", ".");
+		
+		return $hasil_format;
+	}
+
 	function get_table_input_rencana_aksi()
 	{
 		global $wpdb;
@@ -2253,6 +2259,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$realisasi_3_html = array();
 						$realisasi_4_html = array();
 						$capaian_realisasi = array();
+						$total_realisasi_tagging_rincian_html = array();
+						$total_harga_tagging_rincian_html = array();
 						$total_harga_tagging_rincian = 0;
 						$total_realisasi_tagging_rincian = 0;
 
@@ -2279,12 +2287,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 							$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 							$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-							$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
-							if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
-								$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
-							} else {
-								$capaian_realisasi[$key] = "0%";
-							}
+
+							$target_tahunan = (float) str_replace(',', '.', $ind['target_akhir'] ?? 0);
+							$all_realisasi = [
+								'realisasi_1' => (float) str_replace(',', '.', $ind['realisasi_tw_1'] ?? 0), 
+								'realisasi_2' => (float) str_replace(',', '.', $ind['realisasi_tw_2'] ?? 0), 
+								'realisasi_3' => (float) str_replace(',', '.', $ind['realisasi_tw_3'] ?? 0), 
+								'realisasi_4' => (float) str_replace(',', '.', $ind['realisasi_tw_4'] ?? 0)
+							];
+						
+							$capaian_realisasi[$key] = $this->get_capaian_realisasi_tahunan_by_type(
+								$ind['rumus_capaian_kinerja'],
+								$target_tahunan,
+								$all_realisasi,
+								$ind['tahun_anggaran'],
+								1
+							);
+							$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
 							$data_tagging = $wpdb->get_results(
 								$wpdb->prepare("
@@ -2302,11 +2321,16 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								foreach ($data_tagging as $value) {
 									$harga_satuan = $value['harga_satuan'];
 									$volume = $value['volume'];
-									$total_harga_tagging_rincian += $volume * $harga_satuan;
+									$total = $volume * $harga_satuan;
+
+									$total_harga_tagging_rincian += $total;
 									$total_realisasi_tagging_rincian += $value['realisasi'];
 								}
 							}
+							$total_harga_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_harga_tagging_rincian) ?? 0;
+							$total_realisasi_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_realisasi_tagging_rincian) ?? 0;
 						}
+						
 						$indikator_html = implode('<br>', $indikator_html);
 						$satuan_html = implode('<br>', $satuan_html);
 						$target_awal_html = implode('<br>', $target_awal_html);
@@ -2315,6 +2339,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$target_2_html = implode('<br>', $target_2_html);
 						$target_3_html = implode('<br>', $target_3_html);
 						$target_4_html = implode('<br>', $target_4_html);
+						$total_harga_tagging_rincian_html = implode('<br>', $total_harga_tagging_rincian_html);
+						$total_realisasi_tagging_rincian_html = implode('<br>', $total_realisasi_tagging_rincian_html);
 						$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 						$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 						$realisasi_1_html = implode('<br>', $realisasi_1_html);
@@ -2460,9 +2486,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-center">' . $realisasi_4_html . '</td>
 							<td class="text-center">' . $capaian_realisasi . '</td>
 							<td class="text-right">' . $rencana_pagu_html . '</td>
-							<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-							<td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
-							<td class=""></td>
+							<td class="text-right anggaran_column">' . $total_harga_tagging_rincian_html . '</td>
+							<td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
+							<td class="text-right anggaran_column"></td>
 							<td class="text-right"></td>
 							<td class="text-left">' . $label_cascading . '</td>
 						</tr>
@@ -2486,6 +2512,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$realisasi_3_html = array();
 							$realisasi_4_html = array();
 							$capaian_realisasi = array();
+							$total_realisasi_tagging_rincian_html = array();
+							$total_harga_tagging_rincian_html = array();
 							$total_harga_tagging_rincian = 0;
 							$total_realisasi_tagging_rincian = 0;
 							foreach ($renaksi['indikator'] as $key => $ind) {
@@ -2511,12 +2539,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 								$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 								$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-								$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
-								if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
-									$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
-								} else {
-									$capaian_realisasi[$key] = "0%";
-								}
+								
+								$target_tahunan = (float) str_replace(',', '.', $ind['target_akhir'] ?? 0);
+								$all_realisasi = [
+									'realisasi_1' => (float) str_replace(',', '.', $ind['realisasi_tw_1'] ?? 0), 
+									'realisasi_2' => (float) str_replace(',', '.', $ind['realisasi_tw_2'] ?? 0), 
+									'realisasi_3' => (float) str_replace(',', '.', $ind['realisasi_tw_3'] ?? 0), 
+									'realisasi_4' => (float) str_replace(',', '.', $ind['realisasi_tw_4'] ?? 0)
+								];
+							
+								$capaian_realisasi[$key] = $this->get_capaian_realisasi_tahunan_by_type(
+									$ind['rumus_capaian_kinerja'],
+									$target_tahunan,
+									$all_realisasi,
+									$ind['tahun_anggaran'],
+									2
+								);
+								$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
 								$data_tagging = $wpdb->get_results(
 									$wpdb->prepare("
@@ -2534,10 +2573,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									foreach ($data_tagging as $value) {
 										$harga_satuan = $value['harga_satuan'];
 										$volume = $value['volume'];
-										$total_harga_tagging_rincian += $volume * $harga_satuan;
+										$total = $volume * $harga_satuan;
+
+										$total_harga_tagging_rincian += $total;
 										$total_realisasi_tagging_rincian += $value['realisasi'];
 									}
 								}
+								$total_harga_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_harga_tagging_rincian) ?? 0;
+								$total_realisasi_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_realisasi_tagging_rincian) ?? 0;
 							}
 							$indikator_html = implode('<br>', $indikator_html);
 							$satuan_html = implode('<br>', $satuan_html);
@@ -2547,6 +2590,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_2_html = implode('<br>', $target_2_html);
 							$target_3_html = implode('<br>', $target_3_html);
 							$target_4_html = implode('<br>', $target_4_html);
+							$total_harga_tagging_rincian_html = implode('<br>', $total_harga_tagging_rincian_html);
+							$total_realisasi_tagging_rincian_html = implode('<br>', $total_realisasi_tagging_rincian_html);
 							$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 							$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 							$keterangan = '';
@@ -2823,9 +2868,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="text-center">' . $realisasi_4_html . '</td>
 							        <td class="text-center">' . $capaian_realisasi . '</td>
 									<td class="text-right">' . $rencana_pagu_html . '</td>
-							        <td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-							        <td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
-							        <td class=""></td>
+							        <td class="text-right anggaran_column">' . $total_harga_tagging_rincian_html . '</td>
+							        <td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
+							        <td class="text-right anggaran_column"></td>
 									<td class="text-right">' . number_format((float)$renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
 							        <td class="text-left">' . $label_cascading . '</td>
 							    </tr>
@@ -2850,6 +2895,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$realisasi_3_html = array();
 								$realisasi_4_html = array();
 								$capaian_realisasi = array();
+								$total_realisasi_tagging_rincian_html = array();
+								$total_harga_tagging_rincian_html = array();
 								$total_harga_tagging_rincian = 0;
 								$total_realisasi_tagging_rincian = 0;
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
@@ -2875,12 +2922,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 									$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
 									$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-									$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
-									if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
-										$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
-									} else {
-										$capaian_realisasi[$key] = "0%";
-									}
+									
+									$target_tahunan = (float) str_replace(',', '.', $ind['target_akhir'] ?? 0);
+									$all_realisasi = [
+										'realisasi_1' => (float) str_replace(',', '.', $ind['realisasi_tw_1'] ?? 0), 
+										'realisasi_2' => (float) str_replace(',', '.', $ind['realisasi_tw_2'] ?? 0), 
+										'realisasi_3' => (float) str_replace(',', '.', $ind['realisasi_tw_3'] ?? 0), 
+										'realisasi_4' => (float) str_replace(',', '.', $ind['realisasi_tw_4'] ?? 0)
+									];
+								
+									$capaian_realisasi[$key] = $this->get_capaian_realisasi_tahunan_by_type(
+										$ind['rumus_capaian_kinerja'],
+										$target_tahunan,
+										$all_realisasi,
+										$ind['tahun_anggaran'],
+										3
+									);
+									$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
 									$data_tagging = $wpdb->get_results(
 										$wpdb->prepare("
@@ -2898,10 +2956,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										foreach ($data_tagging as $value) {
 											$harga_satuan = $value['harga_satuan'];
 											$volume = $value['volume'];
-											$total_harga_tagging_rincian += $volume * $harga_satuan;
+											$total = $volume * $harga_satuan;
+
+											$total_harga_tagging_rincian += $total;
 											$total_realisasi_tagging_rincian += $value['realisasi'];
 										}
 									}
+									$total_harga_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_harga_tagging_rincian) ?? 0;
+									$total_realisasi_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_realisasi_tagging_rincian) ?? 0;
 								}
 								$indikator_html = implode('<br>', $indikator_html);
 								$satuan_html = implode('<br>', $satuan_html);
@@ -2911,6 +2973,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_2_html = implode('<br>', $target_2_html);
 								$target_3_html = implode('<br>', $target_3_html);
 								$target_4_html = implode('<br>', $target_4_html);
+								$total_harga_tagging_rincian_html = implode('<br>', $total_harga_tagging_rincian_html);
+								$total_realisasi_tagging_rincian_html = implode('<br>', $total_realisasi_tagging_rincian_html);
 								$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 								$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 								$realisasi_1_html = implode('<br>', $realisasi_1_html);
@@ -3100,9 +3164,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center">' . $realisasi_4_html . '</td>
 									<td class="text-center">' . $capaian_realisasi . '</td>	
 									<td class="text-right">' . $rencana_pagu_html . '</td>
-									<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-									<td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
-									<td class=""></td>
+									<td class="text-right anggaran_column">' . $total_harga_tagging_rincian_html . '</td>
+									<td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
+									<td class="text-right anggaran_column"></td>
 									<td class="text-right">' . number_format((float)$uraian_renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
 									<td class="text-left">' . $label_cascading . '</td>
 								</tr>
@@ -3122,6 +3186,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$realisasi_2_html = array();
 									$realisasi_3_html = array();
 									$realisasi_4_html = array();
+									$total_realisasi_tagging_rincian_html = array();
+									$total_harga_tagging_rincian_html = array();
 									$capaian_realisasi = array();
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
@@ -3144,13 +3210,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
 										$realisasi_2_html[$key] = !empty($ind['realisasi_tw_2']) ? $ind['realisasi_tw_2'] : 0;
 										$realisasi_3_html[$key] = !empty($ind['realisasi_tw_3']) ? $ind['realisasi_tw_3'] : 0;
-										$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;
-										$total_realisasi_tw = (float)$ind['realisasi_tw_1'] + (float)$ind['realisasi_tw_2'] + (float)$ind['realisasi_tw_3'] + (float)$ind['realisasi_tw_4'];
-										if (!empty($total_realisasi_tw) && !empty($ind['target_akhir'])) {
-											$capaian_realisasi[$key] = number_format(($total_realisasi_tw / $ind['target_akhir']) * 100, 0) . "%";
-										} else {
-											$capaian_realisasi[$key] = "0%";
-										}
+										$realisasi_4_html[$key] = !empty($ind['realisasi_tw_4']) ? $ind['realisasi_tw_4'] : 0;										
+
+										$target_tahunan = (float) str_replace(',', '.', $ind['target_akhir'] ?? 0);
+										$all_realisasi = [
+											'realisasi_1' => (float) str_replace(',', '.', $ind['realisasi_tw_1'] ?? 0), 
+											'realisasi_2' => (float) str_replace(',', '.', $ind['realisasi_tw_2'] ?? 0), 
+											'realisasi_3' => (float) str_replace(',', '.', $ind['realisasi_tw_3'] ?? 0), 
+											'realisasi_4' => (float) str_replace(',', '.', $ind['realisasi_tw_4'] ?? 0)
+										];
+									
+										$capaian_realisasi[$key] = $this->get_capaian_realisasi_tahunan_by_type(
+											$ind['rumus_capaian_kinerja'],
+											$target_tahunan,
+											$all_realisasi,
+											$ind['tahun_anggaran'],
+											4
+										);
+										$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
 										$data_tagging = $wpdb->get_results(
 											$wpdb->prepare("
@@ -3168,10 +3245,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											foreach ($data_tagging as $value) {
 												$harga_satuan = $value['harga_satuan'];
 												$volume = $value['volume'];
-												$total_harga_tagging_rincian += $volume * $harga_satuan;
+												$total = $volume * $harga_satuan;
+
+												$total_harga_tagging_rincian += $total;
 												$total_realisasi_tagging_rincian += $value['realisasi'];
 											}
 										}
+										$total_harga_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_harga_tagging_rincian) ?? 0;
+										$total_realisasi_tagging_rincian_html[$key] = $this->format_rupiah_tanpa_rp($total_realisasi_tagging_rincian) ?? 0;
 									}
 									$indikator_html = implode('<br>', $indikator_html);
 									$satuan_html = implode('<br>', $satuan_html);
@@ -3181,6 +3262,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$target_2_html = implode('<br>', $target_2_html);
 									$target_3_html = implode('<br>', $target_3_html);
 									$target_4_html = implode('<br>', $target_4_html);
+									$total_harga_tagging_rincian_html = implode('<br>', $total_harga_tagging_rincian_html);
+									$total_realisasi_tagging_rincian_html = implode('<br>', $total_realisasi_tagging_rincian_html);
 									$rencana_pagu_html = implode('<br>', $rencana_pagu_html);
 									$realisasi_pagu_html = implode('<br>', $realisasi_pagu_html);
 									$realisasi_1_html = implode('<br>', $realisasi_1_html);
@@ -3329,9 +3412,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-center">' . $realisasi_4_html . '</td>
 										<td class="text-center">' . $capaian_realisasi . '</td>
 										<td class="text-right">' . $rencana_pagu_html . '</td>
-										<td class="text-right">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
-										<td class="text-right">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
-										<td class=""></td>
+										<td class="text-right anggaran_column">' . $total_harga_tagging_rincian_html . '</td>
+										<td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
+										<td class="text-right anggaran_column"></td>
 										<td class="text-right">' . number_format((float)$uraian_teknis_kegiatan['detail']['pagu_cascading'], 0, ",", ".") . '</td>
 										<td class="text-left">' . $label_cascading . '</td>
 									</tr>
@@ -4664,7 +4747,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$target_3_html = array();
 							$target_4_html = array();
 							$rencana_pagu_html = array();
-							$realisasi_pagu_html = array();
 
 							foreach ($renaksi['indikator'] as $key => $ind) {
 								$indikator_html[$key] = $ind['indikator'];
@@ -9654,11 +9736,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				'label_sasaran'         => $all_data['label_sasaran'] ?? null,
 				'label_indikator'       => $all_data['label_indikator'] ?? null,
 				'satuan'                => $all_data['satuan'] ?? null,
-				'target'                => $all_data['target'] ?? null,
-				'realisasi_1'           => $all_data['realisasi_1'] ?? null,
-				'realisasi_2'           => $all_data['realisasi_2'] ?? null,
-				'realisasi_3'           => $all_data['realisasi_3'] ?? null,
-				'realisasi_4'           => $all_data['realisasi_4'] ?? null,
+				'target'                => $all_data['target'],
+				'realisasi_1'           => $all_data['realisasi_1'],
+				'realisasi_2'           => $all_data['realisasi_2'],
+				'realisasi_3'           => $all_data['realisasi_3'],
+				'realisasi_4'           => $all_data['realisasi_4'],
 				'target_teks'           => $all_data['target_teks'] ?? null,
 				'realisasi_teks_1'      => $all_data['realisasi_1_teks'] ?? null,
 				'realisasi_teks_2'      => $all_data['realisasi_2_teks'] ?? null,
@@ -9715,17 +9797,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$db_data['realisasi_teks_3'] = $data['realisasi_teks_3'];
 			$db_data['realisasi_teks_4'] = $data['realisasi_teks_4'];
 
-			$db_data['target']      = !empty($data['target']) ? (float) $data['target'] : null;
-			$db_data['realisasi_1'] = !empty($data['realisasi_1']) ? (float) $data['realisasi_1'] : null;
-			$db_data['realisasi_2'] = !empty($data['realisasi_2']) ? (float) $data['realisasi_2'] : null;
-			$db_data['realisasi_3'] = !empty($data['realisasi_3']) ? (float) $data['realisasi_3'] : null;
-			$db_data['realisasi_4'] = !empty($data['realisasi_4']) ? (float) $data['realisasi_4'] : null;
+			$db_data['target']      = (float) $data['target'];
+			$db_data['realisasi_1'] = (float) $data['realisasi_1'];
+			$db_data['realisasi_2'] = (float) $data['realisasi_2'];
+			$db_data['realisasi_3'] = (float) $data['realisasi_3'];
+			$db_data['realisasi_4'] = (float) $data['realisasi_4'];
 		} else {
-			$db_data['target']      = !empty($data['target']) ? (float) $data['target'] : null;
-			$db_data['realisasi_1'] = !empty($data['realisasi_1']) ? (float) $data['realisasi_1'] : null;
-			$db_data['realisasi_2'] = !empty($data['realisasi_2']) ? (float) $data['realisasi_2'] : null;
-			$db_data['realisasi_3'] = !empty($data['realisasi_3']) ? (float) $data['realisasi_3'] : null;
-			$db_data['realisasi_4'] = !empty($data['realisasi_4']) ? (float) $data['realisasi_4'] : null;
+			$db_data['target']      = (float) $data['target'];
+			$db_data['realisasi_1'] = (float) $data['realisasi_1'];
+			$db_data['realisasi_2'] = (float) $data['realisasi_2'];
+			$db_data['realisasi_3'] = (float) $data['realisasi_3'];
+			$db_data['realisasi_4'] = (float) $data['realisasi_4'];
 
 			$db_data['target_teks']      = null;
 			$db_data['realisasi_teks_1'] = null;
