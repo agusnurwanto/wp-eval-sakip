@@ -2261,10 +2261,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$capaian_realisasi = array();
 						$total_realisasi_tagging_rincian_html = array();
 						$total_harga_tagging_rincian_html = array();
-						$total_harga_tagging_rincian = 0;
-						$total_realisasi_tagging_rincian = 0;
-
+						
 						foreach ($v['indikator'] as $key => $ind) {
+							$total_harga_tagging_rincian = 0;
+							$total_realisasi_tagging_rincian = 0;
 							$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 							$satuan_html[$key] = $ind['satuan'];
 							$target_awal_html[$key] = $ind['target_awal'];
@@ -2514,9 +2514,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$capaian_realisasi = array();
 							$total_realisasi_tagging_rincian_html = array();
 							$total_harga_tagging_rincian_html = array();
-							$total_harga_tagging_rincian = 0;
-							$total_realisasi_tagging_rincian = 0;
 							foreach ($renaksi['indikator'] as $key => $ind) {
+								$total_harga_tagging_rincian = 0;
+								$total_realisasi_tagging_rincian = 0;
 								$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 								$satuan_html[$key] = $ind['satuan'];
 								$target_awal_html[$key] = $ind['target_awal'];
@@ -2897,9 +2897,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$capaian_realisasi = array();
 								$total_realisasi_tagging_rincian_html = array();
 								$total_harga_tagging_rincian_html = array();
-								$total_harga_tagging_rincian = 0;
-								$total_realisasi_tagging_rincian = 0;
 								foreach ($uraian_renaksi['indikator'] as $key => $ind) {
+									$total_harga_tagging_rincian = 0;
+									$total_realisasi_tagging_rincian = 0;
 									$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 									$satuan_html[$key] = $ind['satuan'];
 									$target_awal_html[$key] = $ind['target_awal'];
@@ -3191,9 +3191,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$capaian_realisasi = array();
 									$rencana_pagu_html = array();
 									$realisasi_pagu_html = array();
-									$total_harga_tagging_rincian = 0;
-									$total_realisasi_tagging_rincian = 0;
 									foreach ($uraian_teknis_kegiatan['indikator'] as $key => $ind) {
+										$total_harga_tagging_rincian = 0;
+										$total_realisasi_tagging_rincian = 0;
 										$indikator_html[$key] = '<a href="' . $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $_POST['tahun_anggaran'] . '&id_skpd=' . $_POST['id_skpd'] . '&id_indikator=' . $ind['id']) . '" target="_blank">' . $ind['indikator'] . '</a>';
 										$satuan_html[$key] = $ind['satuan'];
 										$target_awal_html[$key] = $ind['target_awal'];
