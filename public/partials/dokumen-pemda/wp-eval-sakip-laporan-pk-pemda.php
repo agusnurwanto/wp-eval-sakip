@@ -1359,8 +1359,6 @@ if (!empty($data_tahapan)) {
 
         try {
             jQuery('#wrap-loading').show();
-            tableBodyWithAction.empty();
-            tableBodyWithoutAction.empty();
 
             const response = await getAllDataPkPemdaAjax(tahun, id_jadwal);
 
@@ -1445,6 +1443,9 @@ if (!empty($data_tahapan)) {
                 no_2++;
             });
 
+            tableBodyWithAction.empty();
+            tableBodyWithoutAction.empty();
+            
             tableBodyWithAction.html(htmlWithAction);
             tableBodyWithoutAction.html(htmlWithoutAction);
 

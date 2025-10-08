@@ -416,9 +416,9 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             <th class="text-center" colspan="4" style="width: 250px;">REALISASI KEGIATAN PER TRIWULAN</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI (%)</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">RENCANA PAGU</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">PAGU RINCIAN</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
+                            <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">PAGU RINCIAN</th>
+                            <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
+                            <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">PAGU RENJA</th>
                             <th class="text-center" rowspan="2" style="width: 300px;">NOMENKLATUR RENJA</th>
                         </tr>
@@ -458,9 +458,9 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             <th>21</th>
                             <th>22</th>
                             <th>23</th>
-                            <th>24</th>
-                            <th>25</th>
-                            <th>26</th>
+                            <th class="anggaran_column">24</th>
+                            <th class="anggaran_column">25</th>
+                            <th class="anggaran_column">26</th>
                             <th>27</th>
                             <th>28</th>
                         </tr>
@@ -647,6 +647,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         if (hak_akses_pegawai != 0) {
             jQuery('#action-sakip').prepend('<a style="margin-right: 10px;" id="tambah-rencana-aksi" onclick="return false;" href="#" class="btn btn-primary hide-print"><i class="dashicons dashicons-plus"></i> Tambah Data</a>');
         }
+        jQuery('#action-sakip').append('<div class="text-center mt-2"><label><input type="checkbox" class="form-check-input" id="show_anggaran_column"> Tampilkan Kolom Rincian Pagu</label></div>');
 
         window.id_jadwal = <?php echo $id_jadwal; ?>;
         window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;
@@ -676,6 +677,16 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
 		}
 		console.log(get_data_bulanan_message)
 
+
+        jQuery('#show_anggaran_column').on('change', function() {
+            if (jQuery(this).is(':checked')) {
+                jQuery('.anggaran_column').show();
+            } else {
+                jQuery('.anggaran_column').hide();
+            }
+        });
+
+        jQuery('#show_anggaran_column').trigger('change');
     });
 
     jQuery(document).on('change', '#set_input_rencana_pagu', function() {
@@ -1627,6 +1638,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             pageLength: 10, // Default number of rows per page
                             lengthMenu: [10, 25, 50, 100, 200] // Options for rows per page
                         });
+                        
                     } else {
                         jQuery('#notifikasi-title').hide();
                         jQuery('.table_notifikasi_pemda').hide();
@@ -1635,6 +1647,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             jQuery('.table_notifikasi_pemda').DataTable().clear().destroy();
                         }
                     }
+                    jQuery('#show_anggaran_column').trigger('change');
                 } else {
                     alert(response.message);
                 }

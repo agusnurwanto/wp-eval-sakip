@@ -2139,25 +2139,25 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 								}
 								list_labels = `
 									<tr class="no-hover-but-input">
-										<td class="align-middle text-left">
+										<td class="text-left">
 											${label_nama_rhk}
 										</td>
-										<td class="align-middle text-left">
+										<td class="text-left">
 											${label_nama_indikator}
 										</td>
 										<td>
-											<input type="number" class="align-middle form-control text-center volume-pisah" onkeyup="handleChangeVolume(${rinci.id_rinci_sub_bl}, ${rinci.rincian}, ${rinci.volume})" id="volumePisah${rinci.id_rinci_sub_bl}" value="${label_volume}">
+											<input type="number" class="form-control text-center volume-pisah" onkeyup="handleChangeVolume(${rinci.id_rinci_sub_bl}, ${rinci.rincian}, ${rinci.volume})" id="volumePisah${rinci.id_rinci_sub_bl}" value="${label_volume}">
 										</td>
-										<td class="align-middle text-center">
+										<td class="text-center">
 											${rinci.satuan}
 										</td>
-										<td class="align-middle text-right" id="anggaranPisah${rinci.id_rinci_sub_bl}">
+										<td class="text-right" id="anggaranPisah${rinci.id_rinci_sub_bl}">
 										</td>
 										<td>
-											<input type="number" class="align-middle form-control text-right" id="realisasiPisah${rinci.id_rinci_sub_bl}" value="${label_realisasi}">
+											<input type="number" class="form-control text-right" id="realisasiPisah${rinci.id_rinci_sub_bl}" value="${label_realisasi}">
 										</td>
 										<td>
-											<textarea class="align-middle form-control text-right" id="keteranganPisah${rinci.id_rinci_sub_bl}">${label_keterangan}</textarea>
+											<textarea class="form-control text-right" id="keteranganPisah${rinci.id_rinci_sub_bl}">${label_keterangan}</textarea>
 										</td>
 									</tr>
 								` + list_labels.join('');
