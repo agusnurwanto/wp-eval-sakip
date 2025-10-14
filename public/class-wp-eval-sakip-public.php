@@ -33491,12 +33491,49 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				WHERE u.tahun_anggaran = %d
 				  	AND u.active = 1
 				  	AND j.status != 0
-				LIMIT 1
 			", $tahun_anggaran),
 			ARRAY_A
 		);
 
 		return $data;
+	}
+
+	function get_rpjmd_setting_by_id_jadwal(int $id_jadwal) 
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT 
+					j.id,
+					j.nama_jadwal,
+					j.nama_jadwal_renstra,
+					j.tahun_anggaran,
+					j.lama_pelaksanaan,
+					j.tahun_selesai_anggaran,
+					j.jenis_jadwal_khusus,
+					u.id_jadwal_wp_sipd
+				FROM esakip_data_jadwal j
+				LEFT JOIN esakip_pengaturan_upload_dokumen u
+				   		ON u.id_jadwal_rpjmd = j.id
+				WHERE j.id = %d
+			", $id_jadwal),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	public function get_carbon_multiselect($field)
+	{
+		global $wpdb;
+		$table = $wpdb->prefix . "options";
+		return $wpdb->get_results($wpdb->prepare("
+			select 
+				option_value as value
+			from " . $table . "
+			where option_name like %s
+		", '_' . $field . '%'), ARRAY_A);
 	}
 
     public function sso_login($atts)

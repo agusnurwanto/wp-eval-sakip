@@ -2272,16 +2272,16 @@ class Wp_Eval_Sakip_Admin
                     <a onclick="sql_migrate_esakip(); return false;" href="#" class="button button-secondary button-large">SQL Migrate</a>
                 </div>
             ')
-			->set_width(33.33)
-			->set_help_text('Tombol untuk menjalankan database migration.'),
+				->set_width(33.33)
+				->set_help_text('Tombol untuk menjalankan database migration.'),
 			Field::make('html', 'crb_generate_master_data_buttons')
 				->set_html('
                 <div>
                     <a id="btn-generate-master" onclick="generate_master_data(this); return false;" href="#" class="button button-primary button-large">Generate Master Data</a>
                 </div>
-            ')				
-			->set_width(33.33)
-			->set_help_text('Tombol untuk generate data master.'),
+            ')
+				->set_width(33.33)
+				->set_help_text('Tombol untuk generate data master.'),
 		];
 	}
 
@@ -2539,32 +2539,74 @@ class Wp_Eval_Sakip_Admin
 		];
 	}
 
+	private $status_jadwal_lokal = ['DIHAPUS', 'AKTIF', 'DIKUNCI'];
+
 	public function generate_fields_front_page()
 	{
 		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_tampilan_beranda.php') {
 			return array();
 		}
 
+		$all_jadwal = $this->get_rpjmd();
+		$jadwal_key_value[''] = '— Default —'; 
+		if (!empty($all_jadwal)) {
+			foreach ($all_jadwal as $v) {
+				$jadwal_key_value[$v['id']] = $v['nama_jadwal'] . ' (' . $v['tahun_anggaran'] . ' - ' . $v['tahun_selesai_anggaran'] . ') [' . $this->status_jadwal_lokal[$v['status']] . ']';
+			}
+		}
+
+		$get_tahun = $this->get_tahun();
+
+		$fields = [];
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$fields[] = Field::make('multiselect', 'crb_daftar_jadwal_rpjm_' . $v['tahun_anggaran'], 'Daftar Jadwal RPJM/RPD ' . $v['tahun_anggaran'])
+					->add_options($jadwal_key_value)
+					->set_width(33.33);
+			}
+		} else {
+			$fields[] = Field::make('html', 'crb_no_tahun_notice')
+				->set_html('<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">Tahun Anggaran tidak tersedia</span>');
+		}
+
 		return [
-			Field::make('html', 'crb_menu_depan_note')
-				->set_html('<p style="font-weight: bold;">Tampilan Beranda dapat diaktifkan melalui shortcode <code>[menu_depan]</code>.</p>'),
+			Field::make('html', 'crb_menu_depan_note_1')
+				->set_html('
+					<div style="text-align: center;">
+						<h3 style="font-weight: bold;">IKON MENU</h3>
+						<p>Tampilan Beranda dapat diaktifkan melalui shortcode <code>[menu_depan]</code></p>.
+					</div>'
+				),
 
 			Field::make('image', 'crb_icon_pohon_kinerja', __('Ikon Pohon Kinerja'))
 				->set_value_type('url')
-				->set_help_text('Upload ikon untuk Pohon Kinerja.'),
+				->set_help_text('Upload ikon untuk Pohon Kinerja.')
+				->set_width(33.33),
 
 			Field::make('image', 'crb_icon_cascading', __('Ikon Cascading'))
 				->set_value_type('url')
-				->set_help_text('Upload ikon untuk Cascading.'),
+				->set_help_text('Upload ikon untuk Cascading.')
+				->set_width(33.33),
 
 			Field::make('image', 'crb_icon_capaian_kinerja', __('Ikon Capaian Kinerja'))
 				->set_value_type('url')
-				->set_help_text('Upload ikon untuk Capaian Kinerja.'),
+				->set_help_text('Upload ikon untuk Capaian Kinerja.')
+				->set_width(33.33),
 
 			Field::make('text', 'crb_icon_size', __('Ukuran Ikon (px)'))
 				->set_attribute('type', 'number')
 				->set_default_value(150)
 				->set_help_text('Tentukan ukuran ikon dalam pixel. Contoh: 150 (default). Pastikan nilai yang dimasukkan adalah angka.'),
+
+			Field::make('html', 'crb_menu_depan_note_2')
+				->set_html('
+					<div style="text-align: center;">
+						<h3 style="font-weight: bold;">PENGATURAN JADWAL MENU DEPAN</h3>
+						<p>Tambahkan jadwal lain di tampilan menu depan <code>(Menu Pohon Kinerja dan Menu Cascading)</code>. Kosongkan jika ingin tahun diset <code>default (sesuai di pengaturan upload dokumen)</code>.</p>
+					</div>'
+				),
+
+			...$fields
 		];
 	}
 
@@ -4006,12 +4048,12 @@ class Wp_Eval_Sakip_Admin
 
 		// Seeding data untuk tabel LKE
 		$lke_data = [
-			['id' => 1,'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 12 dan 17', 'keterangan' => 'Ukuran Keberhasilan (Indikator Kinerja) Tujuan, Sasaran dan Kegiatan telah SMART'],
-			['id' => 2,'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 18', 'keterangan' => 'Setiap Dokumen Perencanaan Kinerja Menggambarkan Hubungan Kausal Kinerja'],
-			['id' => 3,'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 21', 'keterangan' => 'Anggaran yang Ditetapkan Telah Mengacu Pada Kinerja'],
-			['id' => 4,'nama' => 'KKE EVALUASI PENGUKURAN KINERJA - 4', 'keterangan' => 'Pimpinan Selalu Terlibat Sebagai Pengambil Keputusan Atas Pengukuran Kinerja'],
-			['id' => 5,'nama' => 'KKE EVALUASI PENGUKURAN KINERJA - 5,6', 'keterangan' => 'Data Kinerja yang Dikumpulkan Telah Relevan Untuk Mengukur Kinerja dan Telah Dimanfaatkan Dalam Pengambilan Keputusan'],
-			['id' => 6,'nama' => 'KKE EVALUASI AKUNTABILITAS KINERJA INTERNAL - NO 6', 'keterangan' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja internal telah ditindaklanjuti']
+			['id' => 1, 'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 12 dan 17', 'keterangan' => 'Ukuran Keberhasilan (Indikator Kinerja) Tujuan, Sasaran dan Kegiatan telah SMART'],
+			['id' => 2, 'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 18', 'keterangan' => 'Setiap Dokumen Perencanaan Kinerja Menggambarkan Hubungan Kausal Kinerja'],
+			['id' => 3, 'nama' => 'KKE EVALUASI PERENCANAAN KINERJA - 21', 'keterangan' => 'Anggaran yang Ditetapkan Telah Mengacu Pada Kinerja'],
+			['id' => 4, 'nama' => 'KKE EVALUASI PENGUKURAN KINERJA - 4', 'keterangan' => 'Pimpinan Selalu Terlibat Sebagai Pengambil Keputusan Atas Pengukuran Kinerja'],
+			['id' => 5, 'nama' => 'KKE EVALUASI PENGUKURAN KINERJA - 5,6', 'keterangan' => 'Data Kinerja yang Dikumpulkan Telah Relevan Untuk Mengukur Kinerja dan Telah Dimanfaatkan Dalam Pengambilan Keputusan'],
+			['id' => 6, 'nama' => 'KKE EVALUASI AKUNTABILITAS KINERJA INTERNAL - NO 6', 'keterangan' => 'Seluruh rekomendasi atas hasil evaluasi akuntabilitas kinerja internal telah ditindaklanjuti']
 		];
 		foreach ($lke_data as $data) {
 			$wpdb->insert($table_lke, $data);
@@ -4110,11 +4152,13 @@ class Wp_Eval_Sakip_Admin
 		$ret['message'] = 'Berhasil Generate User Wordpress dari DB Lokal SIPD';
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_apikey_esakip')) {
-				$users_pa = $wpdb->get_results("
+				$users_pa = $wpdb->get_results(
+					"
 						SELECT * 
 						FROM esakip_data_unit 
 						WHERE active = 1
-					", ARRAY_A
+					",
+					ARRAY_A
 				);
 				$update_pass = false;
 				if (
@@ -4631,7 +4675,7 @@ class Wp_Eval_Sakip_Admin
 				} else {
 					if (!empty($_POST['id'])) {
 						$user = wp_get_current_user();
-						if(in_array('administrator', $user->roles)){
+						if (in_array('administrator', $user->roles)) {
 							$user = get_user_by('id', $_POST['user_id']);
 						}
 						$ret['url_login'] = $this->functions->login_to_other_site(array(
