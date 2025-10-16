@@ -820,6 +820,7 @@ CREATE TABLE `esakip_menu_dokumen` (
   `tahun_anggaran` year NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp,
   `updated_at` datetime NOT NULL DEFAULT current_timestamp,
+  `verifikasi_upload_dokumen` tinyint DEFAULT NULL,
   `id_jadwal` int(11) DEFAULT NULL,
   PRIMARY key (id),
   KEY `jenis_role` (`jenis_role`),
@@ -827,7 +828,6 @@ CREATE TABLE `esakip_menu_dokumen` (
   KEY `tahun_anggaran` (`tahun_anggaran`),
   KEY `active` (`active`)
 );
-  `verifikasi_upload_dokumen` tinyint DEFAULT NULL,
 
 CREATE TABLE `esakip_dokumen_lainnya_pemda` (
   `id` int(11) NOT NULL auto_increment,

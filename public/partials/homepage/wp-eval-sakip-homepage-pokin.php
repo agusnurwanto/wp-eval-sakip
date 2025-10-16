@@ -11,14 +11,17 @@ $tahun_anggaran = intval($_GET['tahun']);
 
 $jadwal_rpjmd = $this->get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran);
 
+if (empty($jadwal_rpjmd)) {
+    die('Jadwal RPJMD/RPD di tahun anggaran belum diset!');
+}
+
 $selected_jadwal = '';
 if (!empty($_GET['id_jadwal'])) {
     $selected_jadwal = $_GET['id_jadwal'];
     $jadwal_rpjmd = $this->get_data_jadwal_by_id($selected_jadwal);
-}
-
-if (empty($jadwal_rpjmd)) {
-    die('Jadwal RPJMD/RPD tidak tersedia!');
+    if (empty($jadwal_rpjmd)) {
+        die('Jadwal RPJMD/RPD terpilih tidak tersedia!');
+    }
 }
 
 $setting_jadwal_ids = $this->get_carbon_multiselect('crb_daftar_jadwal_rpjm_' . $tahun_anggaran);

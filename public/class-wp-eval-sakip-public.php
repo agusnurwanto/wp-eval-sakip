@@ -20460,6 +20460,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			echo '<div class="card custom-blur shadow-lg">
 					<div class="card-body">
 					<h1 class="text-center">TAHUN ANGGARAN TERPILIH<br>' . $_GET['tahun'] . '</h1>';
+			$all_jadwal_rpjm_data = $this->get_all_jadwal_rpjmd_by_tahun_anggaran($_GET['tahun']);
+			if (empty($all_jadwal_rpjm_data)) {
+				return 'Pengaturan jadwal di Tahun Anggaran ini belum di atur, mohon hubungi admin.';
+			}
 		}
 		if (empty($user_meta->roles)) {
 			return 'User ini tidak dapat akses sama sekali :)';
@@ -20623,22 +20627,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$periode_input_rpjpd .= '<li><a target="_blank" href="' . $input_rpjpd['url'] . '" class="btn btn-primary">' . $title_rpjpd . '</a></li>';
 		}
 
-		$jadwal_periode = $wpdb->get_results(
-			"
-			 SELECT 
-		        j.id,
-		        j.nama_jadwal,
-		        j.nama_jadwal_renstra,
-		        j.tahun_anggaran,
-		        j.lama_pelaksanaan,
-		        j.tahun_selesai_anggaran
-		    FROM esakip_data_jadwal j
-		    WHERE j.tipe = 'RPJMD'
-		      AND j.status = 1
-		      $where_id_jadwal_rpjmd
-		    ORDER BY j.tahun_anggaran DESC",
-			ARRAY_A
-		);
 		// SAKIP PEMDA
 		$halaman_monitor_upload_dokumen = '';
 		$renja_detail_pemda = '';
@@ -20715,7 +20703,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$pengisian_kuesioner_menpan_detail_skpd = '';
 		$pengisian_kuesioner_mendagri_detail_skpd = '';
 
-		foreach ($jadwal_periode as $jadwal_periode_item) {
+		foreach ($all_jadwal_rpjm_data as $jadwal_periode_item) {
 			if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
 				$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
 			} else {
@@ -22387,25 +22375,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$pengisian_lke_per_skpd_page .= '<li><a target="_blank" href="' . $pengisian_lke_per_skpd['url'] . '&id_skpd=' . $skpd_db['id_skpd'] . '&id_jadwal=' . $get_jadwal_lke_sakip['id'] . '" class="btn btn-primary text-left">' . $get_jadwal_lke_sakip['nama_jadwal'] . ' ['.$status.']</a></li>';
 					}
 	
-					$jadwal_periode_rpjmd_renstra = $wpdb->get_results(
-						"
-						SELECT 
-							j.id,
-							j.nama_jadwal,
-							j.nama_jadwal_renstra,
-							j.tahun_anggaran,
-							j.lama_pelaksanaan,
-							j.tahun_selesai_anggaran
-						FROM esakip_data_jadwal j
-						WHERE j.tipe = 'RPJMD'
-						  AND j.status = 1
-						  $where_id_jadwal_rpjmd
-						ORDER BY j.tahun_anggaran DESC",
-						ARRAY_A
-					);
-	
-					foreach ($jadwal_periode_rpjmd_renstra as $jadwal_periode_item) {
-						if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
+
+					foreach ($all_jadwal_rpjm_data as $jadwal_periode_item) {
+						if (!empty($jadwal_periode_item['tahun_selesai_anggaran'])) {
 							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
 						} else {
 							$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
@@ -22475,7 +22447,6 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$title_pokin = 'Pohon Kinerja & Croscutting | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
 						$input_pohon_kinerja_opd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 						$periode_input_pohon_kinerja_opd .= '<li><a style="text-align: left;" target="_blank" href="' . $input_pohon_kinerja_opd['url'] . '" class="btn btn-primary">' . $title_pokin . '</a></li>';
-						
 					}
 	
 					$api_params = array(
@@ -23217,6 +23188,28 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 	}
 
+	function get_all_jadwal_rpjmd_by_tahun_anggaran(int $tahun_anggaran)
+	{
+		$all_jadwal_data = [];
+
+		$rpjmd_by_tahun = $this->get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran);
+		$all_jadwal_data[$rpjmd_by_tahun['id']] = $rpjmd_by_tahun;
+
+		$setting_jadwal_ids = $this->get_carbon_multiselect('crb_daftar_jadwal_rpjm_' . $tahun_anggaran);
+		if (!empty($setting_jadwal_ids[0]['value'])) {
+
+			foreach ($setting_jadwal_ids as $id_jadwal) {
+				$data_jadwal = $this->get_data_jadwal_by_id($id_jadwal);
+
+				if (!empty($data_jadwal)) {
+					$all_jadwal_data[] = $data_jadwal;
+				}
+			}
+		}
+
+		return $all_jadwal_data;
+	}
+
 	public function pilih_tahun_anggaran()
 	{
 		global $wpdb;
@@ -23228,8 +23221,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		$tahun = $wpdb->get_results('select tahun_anggaran from esakip_data_unit group by tahun_anggaran order by tahun_anggaran asc', ARRAY_A);
 		echo "
-		<h5 class='text-center' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
-		<ul class='daftar-tahun-sakip text-center' style='margin: 0 0 10px 0;'>";
+		<div class='card custom-blur shadow-lg'>
+			<h5 class='esakip-text_tengah' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
+				<ul class='daftar-tahun-sakip esakip-text_tengah' style='margin: 0 !important'>";
 		foreach ($tahun as $k => $v) {
 			$class = 'btn-primary';
 			if ($tahun_aktif == $v['tahun_anggaran']) {
@@ -23237,7 +23231,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 			echo "<li><a href='?tahun=" . $v['tahun_anggaran'] . "' class='btn " . $class . "'>" . $v['tahun_anggaran'] . "</a></li>";
 		}
-		echo "</ul>";
+		echo "
+			</ul>
+		</div>";
 	}
 
 	public function tambah_komponen_lke()
@@ -33470,20 +33466,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		die($res['body']);
 	}
 	
-	function get_rpjmd_setting_by_tahun_anggaran($tahun_anggaran) 
+	function get_rpjmd_setting_by_tahun_anggaran(int $tahun_anggaran) 
 	{
 		global $wpdb;
 
 		$data = $wpdb->get_row(
 			$wpdb->prepare("
 				SELECT 
-					j.id,
-					j.nama_jadwal,
-					j.nama_jadwal_renstra,
-					j.tahun_anggaran,
-					j.lama_pelaksanaan,
-					j.tahun_selesai_anggaran,
-					j.jenis_jadwal_khusus,
+					j.*,
 					u.id_jadwal_wp_sipd
 				FROM esakip_pengaturan_upload_dokumen u
 				INNER JOIN esakip_data_jadwal j
