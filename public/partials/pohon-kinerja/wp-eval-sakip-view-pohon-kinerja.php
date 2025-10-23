@@ -1298,6 +1298,7 @@ if (!empty($data_all['data'])) {
 		// Draw the chart, setting the allowHtml option to true for the tooltips.
 		chart.draw(data, {
 			'allowHtml': true,
+			'compactRows': true,
 			'allowCollapse': true
 		});
 
