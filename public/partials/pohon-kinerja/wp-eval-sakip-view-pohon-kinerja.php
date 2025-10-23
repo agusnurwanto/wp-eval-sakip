@@ -870,35 +870,58 @@ if (!empty($data_all['data'])) {
         padding: 5px;
     }
 </style>
-<div class="text-center" id="action-sakip">
-	<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
-	<div style="display: block;">
-		<?php if ($tipe == 'opd'): ?>
-			<div class="custom-control custom-checkbox custom-control-inline mt-4">
-				<input type="checkbox" class="custom-control-input" id="show_croscutting">
-				<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
+<div class="container-fluid" id="action-sakip">
+	<div class="row">
+		<div class="col-md-6 text-left" style="padding-left: 50px;">
+			<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan:</h4>
+			<ul>
+				<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
+				<li>Background warna <span class="badge" style="background: #efd655; padding: 5px;">kuning tua</span> adalah baris level ke 1</li>
+				<li>Background warna <span class="badge" style="background: #fe7373; padding: 5px;">merah tua</span> adalah baris level ke 2</li>
+				<li>Background warna <span class="badge" style="background: #57b2ec; padding: 5px;">biru tua</span> adalah baris level ke 3</li>
+				<li>Background warna <span class="badge" style="background: #c979e3; padding: 5px;">ungu tua</span> adalah baris level ke 4</li>
+				<?php if ($tipe == 'opd'): ?>
+					<li>Background warna <span class="badge" style="background: #28a745; padding: 5px;">hijau</span> adalah baris level ke 5</li>
+					<li>Background warna <span class="badge" style="background: #b5d9ea; padding: 5px;">abu-abu</span> adalah baris indikator</li>
+					<li>Background warna <span class="badge" style="background: #FDFFB6; padding: 5px;">kuning</span> adalah baris koneksi pokin dengan pemda</li>
+					<li>Background warna <span class="badge" style="background: #FFC6FF; padding: 5px;">ungu</span> adalah baris croscutting</li>
+					<li>Background warna <span class="badge" style="background: #9BF6FF; padding: 5px;">hijau tosca</span> adalah baris croscutting dari perangkat daerah lain</li>
+				<?php else: ?>
+					<li>Background warna <span class="badge" style="background: #28a745; padding: 5px;">hijau</span> adalah baris POKIN perangkat daerah yang terkoneksi ke POKIN Pemerintah daerah</li>
+				<?php endif; ?>
+			</ul>
+		</div>
+		<div class="col-md-6 text-center">
+			<button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button><br>
+			<div style="display: block;">
+				<?php if ($tipe == 'opd'): ?>
+					<div class="custom-control custom-checkbox custom-control-inline mt-4">
+						<input type="checkbox" class="custom-control-input" id="show_croscutting">
+						<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
+					</div>
+					<?php endif; ?>
+					<div class="custom-control custom-checkbox custom-control-inline mt-4">
+						<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
+						<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
+					</div>
+					<div class="custom-control custom-checkbox custom-control-inline mt-4">
+						<input type="checkbox" class="custom-control-input" id="show_all_pokin">
+						<label class="custom-control-label" for="show_all_pokin">Tampilkan Semua Pokin Sampai Level</label>
+						<input type="number" min="1" max="10" value="5" id="show_all_pokin_level" style="width: 65px; margin-top: -8px; margin-left: 5px;"/>
+					</div>
 			</div>
-			<?php endif; ?>
-			<div class="custom-control custom-checkbox custom-control-inline mt-4">
-				<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
-				<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
-			</div>
-			<div class="custom-control custom-checkbox custom-control-inline mt-4">
-				<input type="checkbox" class="custom-control-input" id="show_all_pokin">
-				<label class="custom-control-label" for="show_all_pokin">Tampilkan Semua Pokin Sampai Level</label>
-				<input type="number" min="1" max="10" value="5" id="show_all_pokin_level" style="width: 65px; margin-top: -8px; margin-left: 5px;"/>
-			</div>
+			Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
+			<br>
+			<textarea id="val-range" disabled>100%</textarea>
+			<br>
+		    <div class="input-group" style="max-width: 400px; margin: 10px auto 0;">
+			    <input type="text" class="form-control" placeholder="Cari Pohon Kinerja" title="Cari Pohon Kinerja" aria-label="Search" id="cari_pokin" onkeydown="if(event.keyCode == 13){cari_pokin()};">
+			    <div class="input-group-append">
+			      	<button class="btn btn-success" type="submit" onclick="cari_pokin();"><span class="dashicons dashicons-search"></span></button>
+			    </div>
+		  	</div>
+		</div>
 	</div>
-	Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
-	<br>
-	<textarea id="val-range" disabled>100%</textarea>
-	<br>
-    <div class="input-group" style="max-width: 400px; margin: 10px auto 0;">
-	    <input type="text" class="form-control" placeholder="Cari Pohon Kinerja" title="Cari Pohon Kinerja" aria-label="Search" id="cari_pokin" onkeydown="if(event.keyCode == 13){cari_pokin()};">
-	    <div class="input-group-append">
-	      	<button class="btn btn-success" type="submit" onclick="cari_pokin();"><span class="dashicons dashicons-search"></span></button>
-	    </div>
-  	</div>
 </div>
 <h1 style="text-align: center; margin-top: 30px; font-weight: bold;">Pohon Kinerja<br><?php echo $nama_skpd . $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1><br>
 <div id="cetak" title="Laporan Pohon Kinerja" style="padding: 5px; overflow: auto; max-width: 100vw; max-height: 90vh;">
@@ -1032,28 +1055,7 @@ if (!empty($data_all['data'])) {
 		</div>
 	</div>
 </div>
-
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
-
-<div class="hide-print" id="catatan_dokumentasi" style="max-width: 1200px; margin: auto;">
-	<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan Dokumentasi:</h4>
-	<ul>
-		<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
-		<li>Background warna <span class="badge" style="background: #efd655; padding: 5px;">kuning tua</span> adalah baris level ke 1</li>
-		<li>Background warna <span class="badge" style="background: #fe7373; padding: 5px;">merah tua</span> adalah baris level ke 2</li>
-		<li>Background warna <span class="badge" style="background: #57b2ec; padding: 5px;">biru tua</span> adalah baris level ke 3</li>
-		<li>Background warna <span class="badge" style="background: #c979e3; padding: 5px;">ungu tua</span> adalah baris level ke 4</li>
-		<?php if ($tipe == 'opd'): ?>
-			<li>Background warna <span class="badge" style="background: #28a745; padding: 5px;">hijau</span> adalah baris level ke 5</li>
-			<li>Background warna <span class="badge" style="background: #b5d9ea; padding: 5px;">abu-abu</span> adalah baris indikator</li>
-			<li>Background warna <span class="badge" style="background: #FDFFB6; padding: 5px;">kuning</span> adalah baris koneksi pokin dengan pemda</li>
-			<li>Background warna <span class="badge" style="background: #FFC6FF; padding: 5px;">ungu</span> adalah baris croscutting</li>
-			<li>Background warna <span class="badge" style="background: #9BF6FF; padding: 5px;">hijau tosca</span> adalah baris croscutting dari perangkat daerah lain</li>
-		<?php else: ?>
-			<li>Background warna <span class="badge" style="background: #28a745; padding: 5px;">hijau</span> adalah baris POKIN perangkat daerah yang terkoneksi ke POKIN Pemda</li>
-		<?php endif; ?>
-	</ul>
-</div>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
@@ -1298,6 +1300,7 @@ if (!empty($data_all['data'])) {
 		// Draw the chart, setting the allowHtml option to true for the tooltips.
 		chart.draw(data, {
 			'allowHtml': true,
+			'size': 'small',
 			'compactRows': true,
 			'allowCollapse': true
 		});
