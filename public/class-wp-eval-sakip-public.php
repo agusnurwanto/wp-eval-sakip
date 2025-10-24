@@ -33019,6 +33019,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return $data;
 	}
 
+	function get_class_background_by_persentase_capaian(int $value)
+	{
+		if ($value >= 75) {
+			return 'bg-success-mild'; 
+		} elseif ($value >= 50) {
+			return 'bg-warning-mild';
+		} else {
+			return 'bg-danger-mild'; 
+		}
+	}
+
 	function get_table_pk_publish()
 	{
 		try {
@@ -33125,7 +33136,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						!empty($data_wpsipd)
 						&& $data_wpsipd['status'] == 'success'
 					){
-						$capaian_anggaran = '<b>'.($data_wpsipd['data']['serapan_anggaran']['total'] == '0%' ? '' : $data_wpsipd['data']['serapan_anggaran']['total']).'</b>';
+						$capaian_anggaran_string = $data_wpsipd['data']['serapan_anggaran']['total'];
+						$capaian_anggaran_value = (float)rtrim($capaian_anggaran_string, '%');						
+						$background_color = $this->get_class_background_by_persentase_capaian($capaian_anggaran_value);
+
+						$capaian_anggaran = '<b>'.($data_wpsipd['data']['serapan_anggaran']['total'] == '0%' ? '' : $capaian_anggaran_value . '%').'</b>';
 						$capaian_program = '<b>'.($data_wpsipd['data']['capaian_kinerja']['total'] == '0%' ? '' : $data_wpsipd['data']['capaian_kinerja']['total']).'</b>';
 						$capaian_fisik = '<b>'.($data_wpsipd['data']['capaian_fisik']['total'] == '0%' ? '' : $data_wpsipd['data']['capaian_fisik']['total']).'</b>';
 					}
@@ -33152,7 +33167,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$tbody .= "<td class='text-left'>{$sasaran_data['label']}</td>";
 					$tbody .= "<td class='text-center' colspan='8'>Indikator sasaran belum ada</td>";
 					$tbody .= "
-						<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
+						<td class='text-center {$background_color}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
 						<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
 						<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
 					</tr>";
@@ -33173,7 +33188,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 						$title_rumus = $this->get_rumus_capaian_kinerja_tahunan_by_tipe(1);
 						$tbody_2 = "
-							<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
+							<td class='text-center {$background_color}' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
 							<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
 							<td class='text-center' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
 						</tr>";

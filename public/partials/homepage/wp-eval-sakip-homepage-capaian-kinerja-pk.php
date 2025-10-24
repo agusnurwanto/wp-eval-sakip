@@ -16,10 +16,28 @@ $tahun_anggaran = intval($_GET['tahun']);
     }
 
     .table-sticky thead {
-	    position: sticky;
-	    top: -6px;
+        position: sticky;
+        top: -6px;
         background: #ffc491;
-	}
+    }
+
+    /* Mild Green (Pastel Success) - For achievement >= 75% */
+    .bg-success-mild {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    /* Mild Yellow (Pastel Warning) - For achievement >= 50% and < 75% */
+    .bg-warning-mild {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    /* Mild Red (Pastel Danger) - For achievement < 50% */
+    .bg-danger-mild {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
 </style>
 <div class="mb-5 text-center hide_print">
     <h1 class="fw-bold my-4">
@@ -85,6 +103,15 @@ $tahun_anggaran = intval($_GET['tahun']);
             <tbody>
             </tbody>
         </table>
+    </div>
+
+    <div class="hide-print" id="catatan" style="max-width: 900px; margin: 40px auto; padding: 20px; border: 1px solid #e5e5e5; border-radius: 8px; background-color: #f9f9f9;">
+        <h4 style="font-weight: bold; margin-bottom: 20px; color: #333;">Catatan</h4>
+        <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6; color: #555;">
+            <li>Kolom capaian warna <strong class="bg-success-mild">Hijau</strong> berarti persentase melebihi atau sama dengan 75% <strong>( >= 75% )</strong></li>
+            <li>Kolom capaian warna <strong class="bg-warning-mild">Kuning</strong> berarti persentase kurang dari 75% <strong>( < 75% )</strong></li>
+            <li>Kolom capaian warna <strong class="bg-danger-mild">Merah</strong> berarti persentase kurang dari 50% <strong>( < 50% )</strong></li>
+        </ul>
     </div>
 </div>
 <script>
