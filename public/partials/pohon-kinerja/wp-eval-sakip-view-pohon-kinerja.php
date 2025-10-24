@@ -114,7 +114,7 @@ if (!empty($data_all['data'])) {
 
 		if (!empty($level_1['indikator'])) {
 			foreach ($level_1['indikator'] as $keyindikatorlevel1 => $indikator) {
-                $data_temp[$keylevel1][0]->f .= '<div class="level1 item-rincian" data-id="' . $level_1['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+				$data_temp[$keylevel1][0]->f .= '<div class="level1 item-rincian" data-id="' . $level_1['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 			}
 		}
 
@@ -161,18 +161,17 @@ if (!empty($data_all['data'])) {
 			foreach ($level_1['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 				if ($tipe == 'opd') {
 					$label_parent = $val_koneksi['label_parent'];
-					if (!empty($val_koneksi['id_level_1_parent'])) {
-						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']).")</a>";
+					if (!empty($val_koneksi['id_level_1_parent']) && !empty($val_koneksi['nama_skpd'])) {
+						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
 					}
 				} else {
-					if($val_koneksi['tipe'] == 1){
-						$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".$val_koneksi['label_parent'].")</a>";
-					}else{
-						$show_nama_skpd = "" . $val_koneksi['nama_skpd'] . "<br>(".$val_koneksi['label_parent'].")";
+					if ($val_koneksi['tipe'] == 1) {
+						$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+					} else {
+						$show_nama_skpd = "" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
 					}
 				}
 				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
-
 			}
 		}
 
@@ -189,7 +188,7 @@ if (!empty($data_all['data'])) {
 
 				if (!empty($level_2['indikator'])) {
 					foreach ($level_2['indikator'] as $keyindikatorlevel2 => $indikator) {
-	                    $data_temp[$keylevel2][0]->f .= '<div class="level2 item-rincian" data-id="' . $level_2['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+						$data_temp[$keylevel2][0]->f .= '<div class="level2 item-rincian" data-id="' . $level_2['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 					}
 				}
 
@@ -237,17 +236,16 @@ if (!empty($data_all['data'])) {
 						if ($tipe == 'opd') {
 							$label_parent = $val_koneksi['label_parent'];
 							if (!empty($val_koneksi['id_level_1_parent'])) {
-								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']).")</a>";
+								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
 							}
 						} else {
-							if($val_koneksi['tipe'] == 1){
-								$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")</a>";
-							}else{
-								$show_nama_skpd = $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")";
+							if ($val_koneksi['tipe'] == 1) {
+								$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+							} else {
+								$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
 							}
 						}
 						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
-
 					}
 				}
 
@@ -256,7 +254,7 @@ if (!empty($data_all['data'])) {
 					foreach ($level_2['data'] as $keylevel3 => $level_3) {
 						$data_all_format_json[$level_3['id']] = $level_3;
 						unset($data_all_format_json[$level_3['id']]['data']);
-						
+
 						$data_temp[$keylevel3][0] = (object)[
 							'v' => $level_3['id'],
 							'f' => "<div class=\"" . $style0 . " label3\" data-id=\"" . $level_3['id'] . "\">" . trim($level_3['label']) . "</div>",
@@ -264,7 +262,7 @@ if (!empty($data_all['data'])) {
 
 						if (!empty($level_3['indikator'])) {
 							foreach ($level_3['indikator'] as $keyindikatorlevel3 => $indikator) {
-			                    $data_temp[$keylevel3][0]->f .= '<div class="level3 item-rincian" data-id="' . $level_3['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+								$data_temp[$keylevel3][0]->f .= '<div class="level3 item-rincian" data-id="' . $level_3['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 							}
 						}
 
@@ -312,13 +310,13 @@ if (!empty($data_all['data'])) {
 								if ($tipe == 'opd') {
 									$label_parent = $val_koneksi['label_parent'];
 									if (!empty($val_koneksi['id_level_1_parent'])) {
-										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']).")</a>";
+										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
 									}
 								} else {
-									if($val_koneksi['tipe'] == 1){
-										$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")</a>";
-									}else{
-										$show_nama_skpd = $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")";
+									if ($val_koneksi['tipe'] == 1) {
+										$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+									} else {
+										$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
 									}
 								}
 								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -329,7 +327,7 @@ if (!empty($data_all['data'])) {
 							foreach ($level_3['data'] as $keylevel4 => $level_4) {
 								$data_all_format_json[$level_4['id']] = $level_4;
 								unset($data_all_format_json[$level_4['id']]['data']);
-								
+
 								$data_temp[$keylevel4][0] = (object)[
 									'v' => $level_4['id'],
 									'f' => "<div class=\"" . $style0 . " label4\" data-id=\"" . $level_4['id'] . "\">" . trim($level_4['label']) . "</div>"
@@ -337,7 +335,7 @@ if (!empty($data_all['data'])) {
 
 								if (!empty($level_4['indikator'])) {
 									foreach ($level_4['indikator'] as $keyindikatorlevel4 => $indikator) {
-						                $data_temp[$keylevel4][0]->f .= '<div class="level4 item-rincian" data-id="' . $level_4['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+										$data_temp[$keylevel4][0]->f .= '<div class="level4 item-rincian" data-id="' . $level_4['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 									}
 								}
 
@@ -385,12 +383,12 @@ if (!empty($data_all['data'])) {
 										$label_parent = $val_koneksi['label_parent'];
 										if (!empty($val_koneksi['id_level_1_parent'])) {
 											if ($tipe == 'opd') {
-												$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']) . "</a>";
+												$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . "</a>";
 											} else {
-												if($val_koneksi['tipe'] == 1){
-													$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")</a>";
-												}else{
-													$show_nama_skpd = $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")";
+												if ($val_koneksi['tipe'] == 1) {
+													$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+												} else {
+													$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
 												}
 
 												// get pokin OPD child yang terkoneksi ke pemda
@@ -464,7 +462,7 @@ if (!empty($data_all['data'])) {
 									foreach ($level_4['data'] as $keylevel5 => $level_5) {
 										$data_all_format_json[$level_5['id']] = $level_5;
 										unset($data_all_format_json[$level_5['id']]['data']);
-										
+
 										$data_temp[$keylevel5][0] = (object)[
 											'v' => $level_5['id'],
 											'f' => "<div class=\"" . $style0 . " label5\" data-id=\"" . $level_5['id'] . "\">" . trim($level_5['label']) . "</div>",
@@ -472,7 +470,7 @@ if (!empty($data_all['data'])) {
 
 										if (!empty($level_5['indikator'])) {
 											foreach ($level_5['indikator'] as $keyindikatorlevel5 => $indikator) {
-							                    $data_temp[$keylevel5][0]->f .= '<div class="level5 item-rincian" data-id="' . $level_5['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
+												$data_temp[$keylevel5][0]->f .= '<div class="level5 item-rincian" data-id="' . $level_5['id'] . '">IK: ' . $indikator['label_indikator_kinerja'] . '</div>';
 											}
 										}
 
@@ -506,7 +504,6 @@ if (!empty($data_all['data'])) {
 														<div class='cros-opd'>" . $show_nama_skpd . "</div>
 													</div>
 												";
-
 											}
 										}
 
@@ -868,13 +865,16 @@ if (!empty($data_all['data'])) {
 		margin-bottom: 0;
 	}
 
-    table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
-    }
-    td {
-        padding: 5px;
-    }
+	table,
+	th,
+	td {
+		border: 1px solid black;
+		border-collapse: collapse;
+	}
+
+	td {
+		padding: 5px;
+	}
 </style>
 <div class="container-fluid" id="action-sakip">
 	<div class="row">
@@ -906,27 +906,52 @@ if (!empty($data_all['data'])) {
 						<input type="checkbox" class="custom-control-input" id="show_croscutting">
 						<label class="custom-control-label" for="show_croscutting">Tampilkan Croscutting</label>
 					</div>
-					<?php endif; ?>
-					<div class="custom-control custom-checkbox custom-control-inline mt-4">
-						<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
-						<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
+				<?php endif; ?>
+				<div class="custom-control custom-checkbox custom-control-inline mt-4">
+					<input type="checkbox" class="custom-control-input" id="show_koneksi_pokin_pemda">
+					<label class="custom-control-label" for="show_koneksi_pokin_pemda">Tampilkan Koneksi Pokin <?php echo $nama_pemda; ?></label>
+				</div>
+				<div class="form-group mt-4">
+					<label class="d-block font-weight-bold mb-2" for="pokin_level">Tampilkan Pokin Sampai Level:</label>
+
+					<div class="d-flex flex-wrap justify-content-center">
+						<div class="custom-control custom-radio custom-control-inline">
+							<input type="radio" id="pokin_level_1" name="pokin_level" value="1" class="custom-control-input" checked>
+							<label class="custom-control-label" for="pokin_level_1">Level 1</label>
+						</div>
+
+						<div class="custom-control custom-radio custom-control-inline mr-3">
+							<input type="radio" id="pokin_level_2" name="pokin_level" value="2" class="custom-control-input">
+							<label class="custom-control-label" for="pokin_level_2">Level 2</label>
+						</div>
+
+						<div class="custom-control custom-radio custom-control-inline mr-3">
+							<input type="radio" id="pokin_level_3" name="pokin_level" value="3" class="custom-control-input">
+							<label class="custom-control-label" for="pokin_level_3">Level 3</label>
+						</div>
+
+						<div class="custom-control custom-radio custom-control-inline mr-3">
+							<input type="radio" id="pokin_level_4" name="pokin_level" value="4" class="custom-control-input">
+							<label class="custom-control-label" for="pokin_level_4">Level 4</label>
+						</div>
+
+						<div class="custom-control custom-radio custom-control-inline mr-3">
+							<input type="radio" id="pokin_level_5" name="pokin_level" value="5" class="custom-control-input">
+							<label class="custom-control-label" for="pokin_level_5">Level 5</label>
+						</div>
 					</div>
-					<div class="custom-control custom-checkbox custom-control-inline mt-4">
-						<input type="checkbox" class="custom-control-input" id="show_all_pokin">
-						<label class="custom-control-label" for="show_all_pokin">Tampilkan Semua Pokin Sampai Level</label>
-						<input type="number" min="1" max="10" value="5" id="show_all_pokin_level" style="width: 65px; margin-top: -8px; margin-left: 5px;"/>
-					</div>
+				</div>
 			</div>
 			Perkecil (-) <input title="Perbesar/Perkecil Layar" id="test" min="1" max="15" value='10' step="1" onchange="showVal(this.value)" type="range" style="max-width: 400px; margin-top: 40px;" /> (+) Perbesar
 			<br>
 			<textarea id="val-range" disabled>100%</textarea>
 			<br>
-		    <div class="input-group" style="max-width: 400px; margin: 10px auto 0;">
-			    <input type="text" class="form-control" placeholder="Cari Pohon Kinerja" title="Cari Pohon Kinerja" aria-label="Search" id="cari_pokin" onkeydown="if(event.keyCode == 13){cari_pokin()};">
-			    <div class="input-group-append">
-			      	<button class="btn btn-success" type="submit" onclick="cari_pokin();"><span class="dashicons dashicons-search"></span></button>
-			    </div>
-		  	</div>
+			<div class="input-group" style="max-width: 400px; margin: 10px auto 0;">
+				<input type="text" class="form-control" placeholder="Cari Pohon Kinerja" title="Cari Pohon Kinerja" aria-label="Search" id="cari_pokin" onkeydown="if(event.keyCode == 13){cari_pokin()};">
+				<div class="input-group-append">
+					<button class="btn btn-success" type="submit" onclick="cari_pokin();"><span class="dashicons dashicons-search"></span></button>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -1032,32 +1057,32 @@ if (!empty($data_all['data'])) {
 			<h6><i class="dashicons dashicons-groups"></i> Crosscutting Dengan</h6>
 			<?php if ($tipe == 'opd'): ?>
 				<div class="wrap-table">
-	                <table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
-	                    <thead>
+					<table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
+						<thead>
 							<tr>
 								<th class="text-center" style="border: 1px solid black;">Perangkat Pengusul</th>
 								<th class="text-center" style="border: 1px solid black;">Keterangan Pengusul</th>
 								<th class="text-center" style="border: 1px solid black;">Keterangan Tujuan</th>
 								<th class="text-center" style="border: 1px solid black;">Perangkat Daerah Tujuan</th>
-							</tr>	
-	                    </thead>
-	                    <tbody>
-	                    </tbody>
-	                </table>
-	            </div>
-            <?php else: ?>
-            	<div class="wrap-table">
-	                <table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
-	                    <thead>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			<?php else: ?>
+				<div class="wrap-table">
+					<table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
+						<thead>
 							<tr>
 								<th class="text-center" style="border: 1px solid black;">PD/UPT/Lembaga/Desa</th>
-								<th class="text-center" style="border: 1px solid black;">Informasi Kegiatan	</th>
-							</tr>	
-	                    </thead>
-	                    <tbody>
-	                    </tbody>
-	                </table>
-	            </div>
+								<th class="text-center" style="border: 1px solid black;">Informasi Kegiatan </th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
 			<?php endif; ?>
 		</div>
 	</div>
@@ -1070,9 +1095,9 @@ if (!empty($data_all['data'])) {
 	window.data_all_format_json = <?php echo json_encode($data_all_format_json); ?>;
 	window.pokin_pemda_url = '<?php echo $pokin_pemda['url']; ?>';
 	window.pokin_opd_url = '<?php echo $pokin_opd['url']; ?>';
-	
+
 	jQuery(document).ready(function() {
-		jQuery(document).on('click', '.item-rincian', function () {
+		jQuery(document).on('click', '.item-rincian', function() {
 			var tipe = "<?php echo $tipe; ?>";
 			var id_skpd = "<?php echo $id_skpd; ?>";
 			var idPokin = jQuery(this).data('id');
@@ -1122,7 +1147,7 @@ if (!empty($data_all['data'])) {
 							jQuery("#croscutting tbody").html(response.data_koneksi_croscutting_opd);
 						}
 
-                    <?php else: ?>
+					<?php else: ?>
 
 						jQuery("#pelaksana").text(response.data.pelaksana || '-');
 						if (!response.data_koneksi_croscutting_pemda || response.data_koneksi_croscutting_pemda.length === 0) {
@@ -1217,84 +1242,78 @@ if (!empty($data_all['data'])) {
 		center_div(1);
 	});
 
-	jQuery("#show_all_pokin").on('click', function() {
-		var expand = this.checked; //jika checked = di expan semua
-		tampil_all_pokin(expand);
-	});
+	function tampil_all_pokin(sampai_level) {
+		console.log("Showing Pokin up to Level (after reset):", sampai_level);
 
-	jQuery("#show_all_pokin_level").on('change', function() {
-		var expand = jQuery("#show_all_pokin").is(':checked');
-		tampil_all_pokin(expand);
-	});
-
-	function tampil_all_pokin(expand) {
-		var sampai_level = jQuery('#show_all_pokin_level').val();
+		// --- Collapse/Hide ALL items first ---
+		data_all.forEach(function(b, i) {
+			chart.collapse(i, true);
+		});
 		
-		if (expand) {
-			console.log("expand semua pokin");
-			var collapse = false; // false = dibuka/expand
-		} else {
-			console.log("collapse semua pokin");
-			var collapse = true; // true = collapse/tutup
-		}
-		data_all.forEach(function(b,i){
-			var cek_level = false;
-			for(var level=0; level < sampai_level; level++){
-				var label = ' label'+level+'"';
-				if (b[0] && b[0].f && b[0].f.indexOf(label) !== -1) {
-					cek_level = true;
+		let index = sampai_level - 1;
+
+		data_all.forEach(function(b, i) {
+			let should_be_visible = false;
+
+			for (let level_to_check = 1; level_to_check <= index; level_to_check++) {
+
+				const target_label = ' label' + level_to_check + '"';
+
+				if (b[0] && b[0].f && b[0].f.indexOf(target_label) !== -1) {
+					should_be_visible = true;
+					break;
 				}
 			}
 
-			if(sampai_level==1 && collapse==true){
-				cek_level = true;
-			}
-
-			if(cek_level){
-				chart.collapse(i, collapse);
-			}else{
-				chart.collapse(i, !collapse);
+			if (should_be_visible) {
+				chart.collapse(i, !true);
 			}
 		});
+
 		center_div(sampai_level);
 	}
 
-	function cari_pokin(){
+	jQuery("[name='pokin_level']").on('change', function() {
+		let sampai_level = parseInt(jQuery(this).val(), 10);
+		tampil_all_pokin(sampai_level);
+	});
+
+	function cari_pokin() {
 		var val = jQuery('#cari_pokin').val();
-		if(val == ''){
+		if (val == '') {
 			return;
 		}
 		var cek = false;
-		data_all.forEach(function(b,i){
+		data_all.forEach(function(b, i) {
 			var text = '';
 			if (
-				!cek 
-				&& b[0] 
-				&& b[0].f
-			){
-				var html = jQuery('<div>'+b[0].f+'</div>');
+				!cek &&
+				b[0] &&
+				b[0].f
+			) {
+				var html = jQuery('<div>' + b[0].f + '</div>');
 				var div1 = jQuery(html.find('div')[0]);
 				text += div1.text().toLowerCase();
 				text += jQuery(html.find('.item-rincian')[0]).text().toLowerCase();
 				var _class = div1.attr('class').replace(/ /g, '.');
 				var id = div1.attr('data-id');
-				if(text.indexOf(val.toLowerCase()) !== -1){
+				if (text.indexOf(val.toLowerCase()) !== -1) {
 					cek = true;
-					center_div(false, jQuery('.'+_class+'[data-id="'+id+'"]')[0]);
+					center_div(false, jQuery('.' + _class + '[data-id="' + id + '"]')[0]);
 					cariTeks(val);
 				}
 			}
 		});
-		if(!cek){
-			alert('Kata kunci "'+val+'" tidak ditemukan!');
+		if (!cek) {
+			alert('Kata kunci "' + val + '" tidak ditemukan!');
 		}
 	}
 
 	function cariTeks(query) {
-	  	window.getSelection().removeAllRanges();
-	  	for (let i = 0; i < 2; i++) {
-	  		window.find(query, false, false, true, false, false, false);
-	  	}
+		window.getSelection().removeAllRanges();
+		for (let i = 0; i < 2; i++) {
+			window.find(query, false, false, true, false, false, false);
+		}
 	}
 
 	function drawChart() {
@@ -1318,9 +1337,9 @@ if (!empty($data_all['data'])) {
 		});
 
 		data_all.map(function(b, i) {
-			if (b[0] && b[0] !== '') { 
-	            chart.collapse(i, true); // ditutup
-	        }
+			if (b[0] && b[0] !== '') {
+				chart.collapse(i, true); // ditutup
+			}
 		});
 		jQuery("#show_all_pokin").prop('checked', false);
 		center_div(1);
@@ -1354,18 +1373,18 @@ if (!empty($data_all['data'])) {
 		jQuery('#sidebarBackdrop').toggleClass('show');
 	}
 
-	function center_div(level, html=false){
-		if(html){
+	function center_div(level, html = false) {
+		if (html) {
 			var target = html;
-		}else{
-			var target = document.getElementsByClassName('label'+level)[0];
+		} else {
+			var target = document.getElementsByClassName('label' + level)[0];
 		}
-		if(target){
-		  	target.scrollIntoView({
-			    behavior: 'smooth',
-			    block: 'center',
-			    inline: 'center'
-		  	});
+		if (target) {
+			target.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+				inline: 'center'
+			});
 		}
 	}
 </script>
