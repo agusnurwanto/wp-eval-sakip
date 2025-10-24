@@ -98,11 +98,15 @@ $pokin_pemda = $this->functions->generatePage(array(
 	'post_status' => 'private'
 ));
 
-$data_temp = [];
+$data_all_format_json = array();
+$data_temp = array();
 $show_nama_skpd = '';
 if (!empty($data_all['data'])) {
 
 	foreach ($data_all['data'] as $keylevel1 => $level_1) {
+		$data_all_format_json[$level_1['id']] = $level_1;
+		unset($data_all_format_json[$level_1['id']]['data']);
+
 		$data_temp[$keylevel1][0] = (object)[
 			'v' => $level_1['id'],
 			'f' => "<div class=\"" . $style0 . " label1\" data-id=\"" . $level_1['id'] . "\">" . trim($level_1['label']) . "</div>",
@@ -116,7 +120,7 @@ if (!empty($data_all['data'])) {
 
 		// croscutting level 1
 		if (!empty($level_1['croscutting'])) {
-			$data_temp[$keylevel1][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_1["id"] . "'>CROSCUTTING</div>";
+			$data_temp[$keylevel1][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_1["id"] . "'>Crosscutting Dengan:</div>";
 			foreach ($level_1['croscutting'] as $keyCross => $valCross) {
 				$nama_skpd_all = array();
 				$class_cc_opd_lain = '';
@@ -136,12 +140,12 @@ if (!empty($data_all['data'])) {
 					$class_cc_vertikal = "croscutting-lembaga-vertikal";
 				}
 				$data_temp[$keylevel1][0]->f .= "<div class='croscutting tampil_croscutting item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_1["id"] . "'>
+						<div class='cros-opd'>" . $show_nama_skpd . "</div>
 						<div>" . $label_parent . " 
 							<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 								<i class='dashicons dashicons-info'></i>
 							</a>
 						</div>
-						<div class='cros-opd'>" . $show_nama_skpd . "</div>
 					</div>
 				";
 			}
@@ -149,20 +153,22 @@ if (!empty($data_all['data'])) {
 
 		// data koneksi pokin
 		if (!empty($level_1['koneksi_pokin'])) {
-			$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+			if ($tipe == 'opd') {
+				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'>Crosscutting " . strtoupper($nama_pemda) . ":</div>";
+			} else {
+				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'>Crosscutting Dengan:</div>";
+			}
 			foreach ($level_1['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 				if ($tipe == 'opd') {
 					$label_parent = $val_koneksi['label_parent'];
 					if (!empty($val_koneksi['id_level_1_parent'])) {
-						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "<br>(".$val_koneksi['nama_skpd'].")</a>";
+						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']).")</a>";
 					}
-	
-					//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
 				} else {
 					if($val_koneksi['tipe'] == 1){
-						$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "<br>(".$val_koneksi['nama_skpd'].")</a>";
+						$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".$val_koneksi['label_parent'].")</a>";
 					}else{
-						$show_nama_skpd = "" . $val_koneksi['label_parent'] . "<br>(".$val_koneksi['nama_skpd'].")";
+						$show_nama_skpd = "" . $val_koneksi['nama_skpd'] . "<br>(".$val_koneksi['label_parent'].")";
 					}
 				}
 				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -173,6 +179,9 @@ if (!empty($data_all['data'])) {
 		if (!empty($level_1['data'])) {
 
 			foreach ($level_1['data'] as $keylevel2 => $level_2) {
+				$data_all_format_json[$level_2['id']] = $level_2;
+				unset($data_all_format_json[$level_2['id']]['data']);
+
 				$data_temp[$keylevel2][0] = (object)[
 					'v' => $level_2['id'],
 					'f' => "<div class=\"" . $style0 . " label2\" data-id=\"" . $level_2['id'] . "\">" . trim($level_2['label']) . "</div>",
@@ -186,7 +195,7 @@ if (!empty($data_all['data'])) {
 
 				// croscutting level 2
 				if (!empty($level_2['croscutting'])) {
-					$data_temp[$keylevel2][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_2["id"] . "'>CROSCUTTING</div>";
+					$data_temp[$keylevel2][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_2["id"] . "'>Crosscutting Dengan:</div>";
 					foreach ($level_2['croscutting'] as $keyCross => $valCross) {
 						$nama_skpd_all = array();
 						$class_cc_opd_lain = '';
@@ -206,12 +215,12 @@ if (!empty($data_all['data'])) {
 							$class_cc_vertikal = "croscutting-lembaga-vertikal";
 						}
 						$data_temp[$keylevel2][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_2["id"] . "'>
+								<div class='cros-opd'>" . $show_nama_skpd . "</div>
 								<div>" . $label_parent . " 
 									<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 										<i class='dashicons dashicons-info'></i>
 									</a>
 								</div>
-								<div class='cros-opd'>" . $show_nama_skpd . "</div>
 							</div>
 						";
 					}
@@ -219,18 +228,22 @@ if (!empty($data_all['data'])) {
 
 				// data koneksi pokin
 				if (!empty($level_2['koneksi_pokin'])) {
-					$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+					if ($tipe == 'opd') {
+						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'>Crosscutting " . strtoupper($nama_pemda) . ":</div>";
+					} else {
+						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'>Crosscutting Dengan:</div>";
+					}
 					foreach ($level_2['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 						if ($tipe == 'opd') {
 							$label_parent = $val_koneksi['label_parent'];
 							if (!empty($val_koneksi['id_level_1_parent'])) {
-								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "<br>(".$val_koneksi['nama_skpd'].")</a>";
+								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']).")</a>";
 							}
 						} else {
 							if($val_koneksi['tipe'] == 1){
-								$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['label_parent']. "<br>(".$val_koneksi['nama_skpd'].")</a>";
+								$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")</a>";
 							}else{
-								$show_nama_skpd = $val_koneksi['label_parent']. "<br>(".$val_koneksi['nama_skpd'].")";
+								$show_nama_skpd = $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")";
 							}
 						}
 						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -241,6 +254,9 @@ if (!empty($data_all['data'])) {
 				if (!empty($level_2['data'])) {
 
 					foreach ($level_2['data'] as $keylevel3 => $level_3) {
+						$data_all_format_json[$level_3['id']] = $level_3;
+						unset($data_all_format_json[$level_3['id']]['data']);
+						
 						$data_temp[$keylevel3][0] = (object)[
 							'v' => $level_3['id'],
 							'f' => "<div class=\"" . $style0 . " label3\" data-id=\"" . $level_3['id'] . "\">" . trim($level_3['label']) . "</div>",
@@ -254,7 +270,7 @@ if (!empty($data_all['data'])) {
 
 						// croscutting level 3
 						if (!empty($level_3['croscutting'])) {
-							$data_temp[$keylevel3][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_3["id"] . "'>CROSCUTTING</div>";
+							$data_temp[$keylevel3][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_3["id"] . "'>Crosscutting Dengan:</div>";
 							foreach ($level_3['croscutting'] as $keyCross => $valCross) {
 								$nama_skpd_all = array();
 								$class_cc_opd_lain = '';
@@ -274,12 +290,12 @@ if (!empty($data_all['data'])) {
 									$class_cc_vertikal = "croscutting-lembaga-vertikal";
 								}
 								$data_temp[$keylevel3][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_3["id"] . "'>
+										<div class='cros-opd'>" . $show_nama_skpd . "</div>
 										<div>" . $label_parent . " 
 											<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 												<i class='dashicons dashicons-info'></i>
 											</a>
 										</div>
-										<div class='cros-opd'>" . $show_nama_skpd . "</div>
 									</div>
 								";
 							}
@@ -287,18 +303,22 @@ if (!empty($data_all['data'])) {
 
 						// data koneksi pokin
 						if (!empty($level_3['koneksi_pokin'])) {
-							$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+							if ($tipe == 'opd') {
+								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'>Crosscutting " . strtoupper($nama_pemda) . ":</div>";
+							} else {
+								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'>Crosscutting Dengan:</div>";
+							}
 							foreach ($level_3['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 								if ($tipe == 'opd') {
 									$label_parent = $val_koneksi['label_parent'];
 									if (!empty($val_koneksi['id_level_1_parent'])) {
-										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "<br>(".$val_koneksi['nama_skpd'].")</a>";
+										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']).")</a>";
 									}
 								} else {
 									if($val_koneksi['tipe'] == 1){
-										$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['label_parent']. "<br>(".$val_koneksi['nama_skpd'].")</a>";
+										$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")</a>";
 									}else{
-										$show_nama_skpd = $val_koneksi['label_parent']. "<br>(".$val_koneksi['nama_skpd'].")";
+										$show_nama_skpd = $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")";
 									}
 								}
 								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -307,6 +327,9 @@ if (!empty($data_all['data'])) {
 
 						if (!empty($level_3['data'])) {
 							foreach ($level_3['data'] as $keylevel4 => $level_4) {
+								$data_all_format_json[$level_4['id']] = $level_4;
+								unset($data_all_format_json[$level_4['id']]['data']);
+								
 								$data_temp[$keylevel4][0] = (object)[
 									'v' => $level_4['id'],
 									'f' => "<div class=\"" . $style0 . " label4\" data-id=\"" . $level_4['id'] . "\">" . trim($level_4['label']) . "</div>"
@@ -320,7 +343,7 @@ if (!empty($data_all['data'])) {
 
 								// croscutting level 4
 								if (!empty($level_4['croscutting'])) {
-									$data_temp[$keylevel4][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_4["id"] . "'>CROSCUTTING</div>";
+									$data_temp[$keylevel4][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_4["id"] . "'>Crosscutting Dengan:</div>";
 									foreach ($level_4['croscutting'] as $keyCross => $valCross) {
 										$nama_skpd_all = array();
 										$class_cc_opd_lain = '';
@@ -340,12 +363,12 @@ if (!empty($data_all['data'])) {
 											$class_cc_vertikal = "croscutting-lembaga-vertikal";
 										}
 										$data_temp[$keylevel4][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_4["id"] . "'>
+												<div class='cros-opd'>" . $show_nama_skpd . "</div>
 												<div>" . $label_parent . " 
 													<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 														<i class='dashicons dashicons-info'></i>
 													</a>
 												</div>
-												<div class='cros-opd'>" . $show_nama_skpd . "</div>
 											</div>
 										";
 									}
@@ -353,45 +376,24 @@ if (!empty($data_all['data'])) {
 
 								// data koneksi pokin
 								if (!empty($level_4['koneksi_pokin'])) {
+									if ($tipe == 'opd') {
+										$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'>Crosscutting " . strtoupper($nama_pemda) . ":</div>";
+									} else {
+										$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'>Crosscutting Dengan:</div>";
+									}
 									foreach ($level_4['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 										$label_parent = $val_koneksi['label_parent'];
 										if (!empty($val_koneksi['id_level_1_parent'])) {
 											if ($tipe == 'opd') {
-												$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
-												$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "</a>";
-												$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
+												$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(".ucfirst($val_koneksi['label_parent']) . "</a>";
 											} else {
-												// sebagai tanda untuk mengexpand/collapse pokin OPD
-												$data_temp[$keylevel4][0]->f .= "<span class=\"show-hide-pokin-opd\"></span>";
-
-												$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank' class='btn btn-primary'>" . $val_koneksi['nama_skpd'] . "</a>";
-
-												// tampilkan pokin OPD parent yang terkoneksi ke pemda
-												$data_temp[$val_koneksi['id_parent']][0] = (object)[
-													'v' => $val_koneksi['id_parent'],
-													'f' => "<div class=\"" . $style0 . " label5 koneksi-pokin-pemda tampil_koneksi_pokin\"><div class='cros-opd'>" . $show_nama_skpd . "</div><div>" . trim($label_parent) . "</div></div>",
-												];
-
-												$indikator_pohon_kinerja_opd = $wpdb->get_results($wpdb->prepare("
-													SELECT 
-														* 
-													FROM esakip_pohon_kinerja_opd 
-													WHERE parent=%d 
-														AND level=%d 
-														AND active=1 
-														AND id_jadwal=%d
-														$where_skpd
-													ORDER BY nomor_urut
-												", $val_koneksi['id_parent'], $val_koneksi['level_parent'], $input['periode']), ARRAY_A);
-												if (!empty($indikator_pohon_kinerja_opd)) {
-													foreach ($indikator_pohon_kinerja_opd as $indikator_opd) {
-														$data_temp[$val_koneksi['id_parent']][0]->f .= "<div " . $style5 . ">IK: " . $indikator_opd['label_indikator_kinerja'] . "</div>";
-													}
+												if($val_koneksi['tipe'] == 1){
+													$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")</a>";
+												}else{
+													$show_nama_skpd = $val_koneksi['nama_skpd']. "<br>(".$val_koneksi['label_parent'].")";
 												}
-												$data_temp[$val_koneksi['id_parent']][1] = $level_4['id'];
-												$data_temp[$val_koneksi['id_parent']][2] = $val_koneksi['id_parent'];
 
-												// tampilkan pokin OPD child yang terkoneksi ke pemda
+												// get pokin OPD child yang terkoneksi ke pemda
 												$data_all_koneksi = array('data' => $this->get_pokin(array(
 													'id' => $val_koneksi['id_parent'],
 													'level' => $val_koneksi['level_parent'] + 1,
@@ -400,57 +402,59 @@ if (!empty($data_all['data'])) {
 													'id_skpd' => $val_koneksi['id_skpd_view_pokin']
 												)));
 												if (!empty($data_all_koneksi['data'])) {
-
+													$data_temp2 = array();
 													foreach ($data_all_koneksi['data'] as $keylevel2opd => $level_3_opd) {
-														$data_temp[$keylevel2opd][0] = (object)[
+														$data_temp2[$keylevel2opd][0] = (object)[
 															'v' => $level_3_opd['id'],
 															'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_3_opd['label']) . "</div>",
 														];
 
 														if (!empty($level_3_opd['indikator'])) {
 															foreach ($level_3_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
-																$data_temp[$keylevel2opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+																$data_temp2[$keylevel2opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
 															}
 														}
-														$data_temp[$keylevel2opd][1] = $val_koneksi['id_parent'];
-														$data_temp[$keylevel2opd][2] = $level_3_opd['id'];
+														$data_temp2[$keylevel2opd][1] = $val_koneksi['id_parent'];
+														$data_temp2[$keylevel2opd][2] = $level_3_opd['id'];
 
 														if (!empty($level_3_opd['data'])) {
 															foreach ($level_3_opd['data'] as $keylevel3opd => $level_4_opd) {
-																$data_temp[$keylevel3opd][0] = (object)[
+																$data_temp2[$keylevel3opd][0] = (object)[
 																	'v' => $level_4_opd['id'],
 																	'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_4_opd['label']) . "</div>",
 																];
 
 																if (!empty($level_4_opd['indikator'])) {
 																	foreach ($level_4_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
-																		$data_temp[$keylevel3opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+																		$data_temp2[$keylevel3opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
 																	}
 																}
-																$data_temp[$keylevel3opd][1] = $level_3_opd['id'];
-																$data_temp[$keylevel3opd][2] = $level_4_opd['id'];
+																$data_temp2[$keylevel3opd][1] = $level_3_opd['id'];
+																$data_temp2[$keylevel3opd][2] = $level_4_opd['id'];
 
 																if (!empty($level_4_opd['data'])) {
 																	foreach ($level_4_opd['data'] as $keylevel4opd => $level_5_opd) {
-																		$data_temp[$keylevel4opd][0] = (object)[
+																		$data_temp2[$keylevel4opd][0] = (object)[
 																			'v' => $level_5_opd['id'],
 																			'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_5_opd['label']) . "</div>",
 																		];
 
 																		if (!empty($level_5_opd['indikator'])) {
 																			foreach ($level_5_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
-																				$data_temp[$keylevel4opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
+																				$data_temp2[$keylevel4opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
 																			}
 																		}
-																		$data_temp[$keylevel4opd][1] = $level_4_opd['id'];
-																		$data_temp[$keylevel4opd][2] = $level_5_opd['id'];
+																		$data_temp2[$keylevel4opd][1] = $level_4_opd['id'];
+																		$data_temp2[$keylevel4opd][2] = $level_5_opd['id'];
 																	}
 																}
 															}
 														}
 													}
+													$data_all_format_json[$level_4['id']]['data_org'] = $data_temp2;
 												}
 											}
+											$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 										}
 									}
 								}
@@ -458,6 +462,9 @@ if (!empty($data_all['data'])) {
 								if (!empty($level_4['data'])) {
 
 									foreach ($level_4['data'] as $keylevel5 => $level_5) {
+										$data_all_format_json[$level_5['id']] = $level_5;
+										unset($data_all_format_json[$level_5['id']]['data']);
+										
 										$data_temp[$keylevel5][0] = (object)[
 											'v' => $level_5['id'],
 											'f' => "<div class=\"" . $style0 . " label5\" data-id=\"" . $level_5['id'] . "\">" . trim($level_5['label']) . "</div>",
@@ -471,7 +478,7 @@ if (!empty($data_all['data'])) {
 
 										// croscutting level 5
 										if (!empty($level_5['croscutting'])) {
-											$data_temp[$keylevel5][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_5["id"] . "'>CROSCUTTING</div>";
+											$data_temp[$keylevel5][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_5["id"] . "'>Crosscutting Dengan:</div>";
 											foreach ($level_5['croscutting'] as $keyCross => $valCross) {
 												$nama_skpd_all = array();
 												$class_cc_opd_lain = '';
@@ -505,7 +512,7 @@ if (!empty($data_all['data'])) {
 
 										// data koneksi pokin
 										if (!empty($level_5['koneksi_pokin'])) {
-											$data_temp[$keylevel5][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_5["id"] . "'>KONEKSI POKIN " . strtoupper($nama_pemda) . "</div>";
+											$data_temp[$keylevel5][0]->f .= "<div class='koneksi-pokin-2 tampil_koneksi_pokin item-rincian' data-id='" . $level_5["id"] . "'>Crosscutting " . strtoupper($nama_pemda) . ":</div>";
 											foreach ($level_5['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 
 												$label_parent = $val_koneksi['label_parent'];
@@ -513,7 +520,6 @@ if (!empty($data_all['data'])) {
 													$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "</a>";
 												}
 
-												//  <a href='javascript:void(0)' data-id='". $val_koneksi['id'] ."' class='detail-cc' onclick='detail_cc(" . $valCross['id'] . "); return false;'  title='Detail'><i class='dashicons dashicons-info'></i></a>
 												$data_temp[$keylevel5][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_5["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 											}
 										}
@@ -875,6 +881,7 @@ if (!empty($data_all['data'])) {
 		<div class="col-md-6 text-left" style="padding-left: 50px;">
 			<h4 style="margin: 30px 0 10px; font-weight: bold;">Catatan:</h4>
 			<ul>
+				<li>Klik 2x pada judul card atau kotak untuk membuka atau menutup pokin anaknya. Klik pada kotak indikator untuk melihat detail informasi Pohon kinerja terkait.</li>
 				<li>Pohon kinerja bisa dilihat ketika data terisi minimal sampai dengan level ke-2.</li>
 				<li>Background warna <span class="badge" style="background: #efd655; padding: 5px;">kuning tua</span> adalah baris level ke 1</li>
 				<li>Background warna <span class="badge" style="background: #fe7373; padding: 5px;">merah tua</span> adalah baris level ke 2</li>
@@ -1059,6 +1066,11 @@ if (!empty($data_all['data'])) {
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
+	window.data_all_json = <?php echo json_encode($data_all['data']); ?>;
+	window.data_all_format_json = <?php echo json_encode($data_all_format_json); ?>;
+	window.pokin_pemda_url = '<?php echo $pokin_pemda['url']; ?>';
+	window.pokin_opd_url = '<?php echo $pokin_opd['url']; ?>';
+	
 	jQuery(document).ready(function() {
 		jQuery(document).on('click', '.item-rincian', function () {
 			var tipe = "<?php echo $tipe; ?>";
