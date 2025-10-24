@@ -2460,6 +2460,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						<tr class="keg-utama">
 							<td>' . $no . '</td>
 							<td class="ket_rhk">' . $keterangan . '</td>
+							<td class="text-left">' . $label_cascading . '</td>
 							<td class="kegiatan_utama">' . $v['detail']['label'] . '
 							    <a href="javascript:void(0)" data-id="' . $v['detail']['id'] . '" data-tipe="1" 
 								   class="help-rhk" onclick="help_rhk(' . $v['detail']['id'] . ', 1); return false;" title="Detail">
@@ -2490,7 +2491,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
 							<td class="text-right anggaran_column"></td>
 							<td class="text-right"></td>
-							<td class="text-left">' . $label_cascading . '</td>
 						</tr>
 						';
 
@@ -2842,6 +2842,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							    <tr class="re-naksi">
 							        <td>' . $no . '.' . $no_renaksi . '</td>
 							        <td class="ket">' . $keterangan . '</td>
+							        <td class="text-left">' . $label_cascading . '</td>
 							        <td class="kegiatan_utama"></td>
 							        <td class="indikator_kegiatan_utama"></td>
 							        <td class="recana_aksi">' . $renaksi_html . '' . $renaksi['detail']['label'] . '
@@ -2872,7 +2873,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        <td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
 							        <td class="text-right anggaran_column"></td>
 									<td class="text-right">' . number_format((float)$renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
-							        <td class="text-left">' . $label_cascading . '</td>
 							    </tr>
 							';
 
@@ -3138,6 +3138,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								<tr class="ur-kegiatan">
 									<td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '</td>
 									<td class="">' . $keterangan . '</td>
+									<td class="text-left">' . $label_cascading . '</td>
 									<td class="kegiatan_utama"></td>
 									<td class="indikator_kegiatan_utama"></td>
 									<td class="recana_aksi"></td>
@@ -3168,7 +3169,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
 									<td class="text-right anggaran_column"></td>
 									<td class="text-right">' . number_format((float)$uraian_renaksi['detail']['pagu_cascading'], 0, ",", ".") . '</td>
-									<td class="text-left">' . $label_cascading . '</td>
 								</tr>
 								';
 
@@ -3386,6 +3386,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<tr>
 										<td>' . $no . '.' . $no_renaksi . '.' . $no_uraian_renaksi . '.' . $no_uraian_teknis . '</td>
 										<td class="">' . $keterangan . '</td>
+										<td class="text-left">' . $label_cascading . '</td>
 										<td class="kegiatan_utama"></td>
 										<td class="indikator_kegiatan_utama"></td>
 										<td class="recana_aksi"></td>
@@ -3416,7 +3417,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										<td class="text-right anggaran_column">' . $total_realisasi_tagging_rincian_html . '</td>
 										<td class="text-right anggaran_column"></td>
 										<td class="text-right">' . number_format((float)$uraian_teknis_kegiatan['detail']['pagu_cascading'], 0, ",", ".") . '</td>
-										<td class="text-left">' . $label_cascading . '</td>
 									</tr>
 									';
 								}
@@ -10543,6 +10543,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$get_renaksi_opd = $wpdb->get_results($wpdb->prepare("
 					                SELECT 
 					                    label,
+					                    kode_cascading_program,
 					                    label_cascading_program,
 					                    pagu_cascading
 					                FROM esakip_data_rencana_aksi_opd
@@ -10559,6 +10560,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$group_by_skpd[$id_skpd]['renaksi'][] = [
 											'label' => $renaksi['label'],
 											'label_cascading_program' => $renaksi['label_cascading_program'],
+											'kode_cascading_program' => $renaksi['kode_cascading_program'],
 											'pagu_cascading' => $renaksi['pagu_cascading']
 										];
 									}
@@ -10566,6 +10568,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$group_by_skpd[$id_skpd]['renaksi'][] = [
 										'label' => '',
 										'label_cascading_program' => '',
+										'kode_cascading_program' => '',
 										'pagu_cascading' => 0
 									];
 								}
@@ -10577,6 +10580,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								'renaksi' => [[
 									'label' => '',
 									'label_cascading_program' => '',
+									'kode_cascading_program' => '',
 									'pagu_cascading' => 0
 								]]
 							];
@@ -10618,7 +10622,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								}
 
 								$html .= '<td style="border: 1px solid black;">' . $renaksi['label'] . '</td>';
-								$html .= '<td style="border: 1px solid black;">' . $renaksi['label_cascading_program'] . '</td>';
+								$html .= '<td style="border: 1px solid black;">' . $renaksi['kode_cascading_program'] . ' ' . $renaksi['label_cascading_program'] . '</td>';
 								$html .= '<td style="border: 1px solid black; text-align: right;">' . number_format((float)$renaksi['pagu_cascading'], 0, ",", ".") . '</td>';
 
 								$html .= '</tr>';

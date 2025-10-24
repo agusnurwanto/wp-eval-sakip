@@ -403,6 +403,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                         <tr>
                             <th class="text-center" rowspan="2" style="width: 85px;">No</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">KETERANGAN</th>
+                            <th class="text-center" rowspan="2" style="width: 300px;">NOMENKLATUR RENJA</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">KEGIATAN UTAMA<br>RHK LEVEL 1<br>POKIN LEVEL 2</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">INDIKATOR KEGIATAN UTAMA</th>
                             <th class="text-center" rowspan="2" style="width: 200px;">RENCANA HASIL KERJA<br>RHK LEVEL 2<br>POKIN LEVEL 3</th>
@@ -420,7 +421,6 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                             <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
                             <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">PAGU RENJA</th>
-                            <th class="text-center" rowspan="2" style="width: 300px;">NOMENKLATUR RENJA</th>
                         </tr>
                         <tr>
                             <th>AWAL</th>
