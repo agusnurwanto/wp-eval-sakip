@@ -84,11 +84,11 @@ $style3 = 'class="level3"';
 $style4 = 'class="level4"';
 $style5 = 'class="level5"';
 
-$pokin_opd = $this->functions->generatePage(array(
-	'nama_page' => 'Pohon Kinerja Perangkat Daerah',
-	'content' => '[view_pohon_kinerja_opd periode=' . $input['periode'] . ']',
+$new_view_pokin_page = $this->functions->generatePage(array(
+	'nama_page' => 'Lihat Pohon Kinerja',
+	'content' => '[new_view_pohon_kinerja]',
 	'show_header' => 1,
-	'post_status' => 'private'
+	'post_status' => 'publish'
 ));
 
 $pokin_pemda = $this->functions->generatePage(array(
@@ -124,14 +124,16 @@ if (!empty($data_all['data'])) {
 			foreach ($level_1['croscutting'] as $keyCross => $valCross) {
 				$nama_skpd_all = array();
 				$class_cc_opd_lain = '';
+				$id_pokin_cc = $valCross['parent_croscutting'];
 				if ($valCross['croscutting_opd_lain'] == 1) {
 					$class_cc_opd_lain = 'cc-opd-lain';
+					$id_pokin_cc = $valCross['parent_croscutting'];
 				}
 
 				$show_nama_skpd = $valCross['nama_skpd'];
 				$label_parent = $valCross['label_parent'];
-				if (!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1) {
-					$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+				if ($valCross['is_lembaga_lainnya'] != 1) {
+					$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 				}
 
 				$class_cc_vertikal = '';
@@ -161,12 +163,12 @@ if (!empty($data_all['data'])) {
 			foreach ($level_1['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 				if ($tipe == 'opd') {
 					$label_parent = $val_koneksi['label_parent'];
-					if (!empty($val_koneksi['id_level_1_parent']) && !empty($val_koneksi['nama_skpd'])) {
-						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
+					if (!empty($val_koneksi['id_level_1_parent'])) {
+						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
 					}
 				} else {
 					if ($val_koneksi['tipe'] == 1) {
-						$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+						$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 					} else {
 						$show_nama_skpd = "" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
 					}
@@ -198,14 +200,16 @@ if (!empty($data_all['data'])) {
 					foreach ($level_2['croscutting'] as $keyCross => $valCross) {
 						$nama_skpd_all = array();
 						$class_cc_opd_lain = '';
+						$id_pokin_cc = $valCross['parent_croscutting'];
 						if ($valCross['croscutting_opd_lain'] == 1) {
 							$class_cc_opd_lain = 'cc-opd-lain';
+							$id_pokin_cc = $valCross['parent_croscutting'];
 						}
 
 						$show_nama_skpd = $valCross['nama_skpd'];
 						$label_parent = $valCross['label_parent'];
-						if (!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1) {
-							$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+						if ($valCross['is_lembaga_lainnya'] != 1) {
+							$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 						}
 
 						$class_cc_vertikal = '';
@@ -236,11 +240,11 @@ if (!empty($data_all['data'])) {
 						if ($tipe == 'opd') {
 							$label_parent = $val_koneksi['label_parent'];
 							if (!empty($val_koneksi['id_level_1_parent'])) {
-								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
+								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . ")</a>";
 							}
 						} else {
 							if ($val_koneksi['tipe'] == 1) {
-								$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+								$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 							} else {
 								$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
 							}
@@ -272,14 +276,16 @@ if (!empty($data_all['data'])) {
 							foreach ($level_3['croscutting'] as $keyCross => $valCross) {
 								$nama_skpd_all = array();
 								$class_cc_opd_lain = '';
+								$id_pokin_cc = $valCross['parent_croscutting'];
 								if ($valCross['croscutting_opd_lain'] == 1) {
 									$class_cc_opd_lain = 'cc-opd-lain';
+									$id_pokin_cc = $valCross['parent_pohon_kinerja'];
 								}
 
 								$show_nama_skpd = $valCross['nama_skpd'];
 								$label_parent = $valCross['label_parent'];
-								if (!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1) {
-									$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+								if ($valCross['is_lembaga_lainnya'] != 1) {
+									$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 								}
 
 								$class_cc_vertikal = '';
@@ -310,11 +316,11 @@ if (!empty($data_all['data'])) {
 								if ($tipe == 'opd') {
 									$label_parent = $val_koneksi['label_parent'];
 									if (!empty($val_koneksi['id_level_1_parent'])) {
-										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
+										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
 									}
 								} else {
 									if ($val_koneksi['tipe'] == 1) {
-										$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+										$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 									} else {
 										$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
 									}
@@ -341,18 +347,21 @@ if (!empty($data_all['data'])) {
 
 								// croscutting level 4
 								if (!empty($level_4['croscutting'])) {
+
 									$data_temp[$keylevel4][0]->f .= "<div class='croscutting-2 tampil_croscutting item-rincian' data-id='" . $level_4["id"] . "'>Crosscutting Dengan:</div>";
 									foreach ($level_4['croscutting'] as $keyCross => $valCross) {
 										$nama_skpd_all = array();
 										$class_cc_opd_lain = '';
+										$id_pokin_cc = $valCross['parent_croscutting'];
 										if ($valCross['croscutting_opd_lain'] == 1) {
 											$class_cc_opd_lain = 'cc-opd-lain';
+											$id_pokin_cc = $valCross['parent_pohon_kinerja'];
 										}
 
 										$show_nama_skpd = $valCross['nama_skpd'];
 										$label_parent = $valCross['label_parent'];
-										if (!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1) {
-											$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+										if ($valCross['is_lembaga_lainnya'] != 1) {
+											$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 										}
 
 										$class_cc_vertikal = '';
@@ -383,13 +392,9 @@ if (!empty($data_all['data'])) {
 										$label_parent = $val_koneksi['label_parent'];
 										if (!empty($val_koneksi['id_level_1_parent'])) {
 											if ($tipe == 'opd') {
-												$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . ucfirst($val_koneksi['label_parent']) . "</a>";
+												$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . "</a>";
 											} else {
-												if ($val_koneksi['tipe'] == 1) {
-													$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $val_koneksi['id_skpd_view_pokin']  . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
-												} else {
-													$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
-												}
+												$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 
 												// get pokin OPD child yang terkoneksi ke pemda
 												$data_all_koneksi = array('data' => $this->get_pokin(array(
@@ -399,6 +404,7 @@ if (!empty($data_all['data'])) {
 													'tipe' => 'opd',
 													'id_skpd' => $val_koneksi['id_skpd_view_pokin']
 												)));
+
 												if (!empty($data_all_koneksi['data'])) {
 													$data_temp2 = array();
 													foreach ($data_all_koneksi['data'] as $keylevel2opd => $level_3_opd) {
@@ -480,14 +486,16 @@ if (!empty($data_all['data'])) {
 											foreach ($level_5['croscutting'] as $keyCross => $valCross) {
 												$nama_skpd_all = array();
 												$class_cc_opd_lain = '';
+												$id_pokin_cc = $valCross['parent_croscutting'];
 												if ($valCross['croscutting_opd_lain'] == 1) {
 													$class_cc_opd_lain = 'cc-opd-lain';
+													$id_pokin_cc = $valCross['parent_pohon_kinerja'];
 												}
 
 												$show_nama_skpd = $valCross['nama_skpd'];
 												$label_parent = $valCross['label_parent'];
-												if (!empty($valCross['id_level_1_parent']) && $valCross['is_lembaga_lainnya'] != 1) {
-													$show_nama_skpd = "<a href='" . $pokin_opd['url'] . "&id_skpd=" . $valCross['id_skpd_view_pokin']  . "&id=" . $valCross['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
+												if ($valCross['is_lembaga_lainnya'] != 1) {
+													$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
 												}
 
 												$class_cc_vertikal = '';
@@ -1093,8 +1101,6 @@ if (!empty($data_all['data'])) {
 <script type="text/javascript">
 	window.data_all_json = <?php echo json_encode($data_all['data']); ?>;
 	window.data_all_format_json = <?php echo json_encode($data_all_format_json); ?>;
-	window.pokin_pemda_url = '<?php echo $pokin_pemda['url']; ?>';
-	window.pokin_opd_url = '<?php echo $pokin_opd['url']; ?>';
 
 	jQuery(document).ready(function() {
 		jQuery(document).on('click', '.item-rincian', function() {
@@ -1249,7 +1255,7 @@ if (!empty($data_all['data'])) {
 		data_all.forEach(function(b, i) {
 			chart.collapse(i, true);
 		});
-		
+
 		let index = sampai_level - 1;
 
 		data_all.forEach(function(b, i) {
