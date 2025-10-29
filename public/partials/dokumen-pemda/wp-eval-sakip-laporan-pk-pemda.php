@@ -225,648 +225,546 @@ if (!empty($data_tahapan)) {
     }
 }
 ?>
+<style>
+    body {
+        font-size: 16px;
+        line-height: 24px;
+    }
 
-<head>
-    <style>
-        body {
-            font-size: 16px;
-            line-height: 24px;
-        }
-
-        @media print {
-            .page-print {
-                max-width: 900px !important;
-                height: auto !important;
-                margin: 0 auto;
-                /* font-size: 12pt; */
-            }
-
-            @page {
-                size: portrait;
-            }
-
-            #action-sakip,
-            .site-header,
-            .site-footer,
-            .hide-display-print {
-                display: none;
-            }
-
-            .break-print {
-                break-after: page;
-            }
-
-            td[contenteditable="true"] {
-                background: none !important;
-            }
-        }
-
-        #action-sakip {
-            padding-top: 20px;
-        }
-
-        .wrap-table {
-            overflow: auto;
-            max-height: 100vh;
-            width: 100%;
-        }
-
-        #table_dokumen_perjanjian_kinerja th {
-            vertical-align: middle;
-        }
-
+    @media print {
         .page-print {
-            font-family: Arial, Helvetica, sans-serif;
-            margin-right: auto;
-            margin-left: auto;
-            background-color: var(--white-color);
-            padding: 30px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .page-print p {
-            margin: 0pt;
-        }
-
-        .page-print table,
-        td {
-            border: none;
-        }
-
-        #table-1 tr td:first-child {
-            padding-left: 0;
-        }
-
-        #table-1 td:nth-child(1) {
-            width: 130px;
-        }
-
-        #table-1 td:nth-child(2) {
-            width: 0%;
-        }
-
-        tr,
-        td {
-            vertical-align: top;
-        }
-
-        .ttd-pejabat {
-            padding: 0;
-            font-weight: 700;
-            text-decoration: underline;
-            width: 60%;
-        }
-
-        .title-laporan {
-            font-weight: 700;
-            font-size: 16pt;
-        }
-
-        .title-pk-1 {
-            font-size: 14pt;
-        }
-
-        .title-pk-2 {
-            font-size: 16pt;
-            font-weight: 700;
-        }
-
-        .table_pk tr,
-        .table_pk td,
-        .table_pk th {
-            border: solid 1px #000;
-        }
-
-        .table_finalisasi_pk tr,
-        .table_finalisasi_pk td,
-        .table_finalisasi_pk th {
-            border: solid 1px #000;
-        }
-
-        .table_finalisasi_pk tr td:first-child {
-            width: 3rem;
-        }
-
-        td[contenteditable="true"] {
-            background: #ff00002e;
-        }
-
-        /* carousel */
-        .cr-container {
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-            max-width: 1200px;
+            max-width: 900px !important;
+            height: auto !important;
             margin: 0 auto;
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            /* font-size: 12pt; */
         }
 
-        .cr-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            color: #23282d;
-            padding-left: 10px;
+        @page {
+            size: portrait;
         }
 
-        .cr-carousel-wrapper {
-            position: relative;
-            padding: 0 10px;
-        }
-
-        .cr-carousel {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            gap: 20px;
-            padding: 10px 0;
-        }
-
-        .cr-carousel::-webkit-scrollbar {
+        #action-sakip,
+        .site-header,
+        .site-footer,
+        .hide-display-print {
             display: none;
         }
 
+        .break-print {
+            break-after: page;
+        }
+
+        td[contenteditable="true"] {
+            background: none !important;
+        }
+    }
+
+    #action-sakip {
+        padding-top: 20px;
+    }
+
+    .wrap-table {
+        overflow: auto;
+        max-height: 100vh;
+        width: 100%;
+    }
+
+    #table_dokumen_perjanjian_kinerja th {
+        vertical-align: middle;
+    }
+
+    .page-print {
+        font-family: Arial, Helvetica, sans-serif;
+        margin-right: auto;
+        margin-left: auto;
+        background-color: var(--white-color);
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .page-print p {
+        margin: 0pt;
+    }
+
+    .page-print table,
+    td {
+        border: none;
+    }
+
+    #table-1 tr td:first-child {
+        padding-left: 0;
+    }
+
+    #table-1 td:nth-child(1) {
+        width: 130px;
+    }
+
+    #table-1 td:nth-child(2) {
+        width: 0%;
+    }
+
+    tr,
+    td {
+        vertical-align: top;
+    }
+
+    .ttd-pejabat {
+        padding: 0;
+        font-weight: 700;
+        text-decoration: underline;
+        width: 60%;
+    }
+
+    .title-laporan {
+        font-weight: 700;
+        font-size: 16pt;
+    }
+
+    .title-pk-1 {
+        font-size: 14pt;
+    }
+
+    .title-pk-2 {
+        font-size: 16pt;
+        font-weight: 700;
+    }
+
+    .table_pk tr,
+    .table_pk td,
+    .table_pk th {
+        border: solid 1px #000;
+    }
+
+    .table_finalisasi_pk tr,
+    .table_finalisasi_pk td,
+    .table_finalisasi_pk th {
+        border: solid 1px #000;
+    }
+
+    .table_finalisasi_pk tr td:first-child {
+        width: 3rem;
+    }
+
+    td[contenteditable="true"] {
+        background: #ff00002e;
+    }
+
+    /* carousel */
+    .cr-container {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    }
+
+    .cr-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: #23282d;
+        padding-left: 10px;
+    }
+
+    .cr-carousel-wrapper {
+        position: relative;
+        padding: 0 10px;
+    }
+
+    .cr-carousel {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 20px;
+        padding: 10px 0;
+    }
+
+    .cr-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .cr-item {
+        flex: 0 0 calc(25% - 15px);
+        scroll-snap-align: start;
+    }
+
+    .cr-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #dcdcde;
+        border-radius: 8px;
+        padding: 20px;
+        width: 250px;
+        /* Atur ukuran card */
+        height: 220px;
+        /* Atur tinggi card */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .cr-card h3 {
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        margin: 0;
+        word-wrap: break-word;
+        /* Menghindari teks keluar dari batas */
+    }
+
+    .cr-card .year {
+        font-size: 14px;
+        color: #666;
+        margin: 4px 0;
+    }
+
+    .cr-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .cr-card .cr-view-btn,
+    .cr-card .cr-view-btn-danger {
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-card .cr-view-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn .dashicons {
+        font-size: 18px;
+        color: #007cba;
+    }
+
+    .cr-card .cr-view-btn-danger:hover {
+        border-color: #ff686b;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-card .cr-view-btn-danger .dashicons {
+        font-size: 18px;
+        color: #ff686b;
+    }
+
+    .badge-container {
+        text-align: center;
+    }
+
+
+    .cr-card:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #fff;
+        border: 1px solid #dcdcde;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .cr-scroll-btn:hover {
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .cr-scroll-btn-left {
+        left: -8px;
+    }
+
+    .cr-scroll-btn-right {
+        right: -8px;
+    }
+
+    .truncate-multiline {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
         .cr-item {
-            flex: 0 0 calc(25% - 15px);
-            scroll-snap-align: start;
+            flex: 0 0 calc(33.333% - 14px);
         }
+    }
 
-        .cr-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #dcdcde;
-            border-radius: 8px;
-            padding: 20px;
-            width: 250px;
-            /* Atur ukuran card */
-            height: 220px;
-            /* Atur tinggi card */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
+    @media (max-width: 768px) {
+        .cr-item {
+            flex: 0 0 calc(33.333% - 10px);
         }
+    }
 
-        .cr-card h3 {
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            margin: 0;
-            word-wrap: break-word;
-            /* Menghindari teks keluar dari batas */
+    @media (max-width: 480px) {
+        .cr-item {
+            flex: 0 0 33.333%;
         }
+    }
 
-        .cr-card .year {
-            font-size: 14px;
-            color: #666;
-            margin: 4px 0;
-        }
+    .badge-lg {
+        font-size: 14px;
+        padding: 0.6em 1em;
+        margin: 4px 10px;
+    }
 
-        .cr-actions {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-        }
+    .table_pk thead th,
+    .table_finalisasi_pk thead th {
+        vertical-align: middle;
+    }
+</style>
+<div class="container-md mx-auto" style="width: 900px;">
+    <div class="text-center" id="action-sakip">
+        <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
 
-        .cr-card .cr-view-btn,
-        .cr-card .cr-view-btn-danger {
-            background-color: #fff;
-            border: 1px solid #dcdcde;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
+        <div class="d-inline-flex align-items-center ml-2">
+            <button class="btn btn-warning" onclick="showModalEditPK();"><i class="dashicons dashicons-edit"></i>Edit Target</button>
 
-        .cr-card .cr-view-btn:hover {
-            border-color: #007cba;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-card .cr-view-btn .dashicons {
-            font-size: 18px;
-            color: #007cba;
-        }
-
-        .cr-card .cr-view-btn-danger:hover {
-            border-color: #ff686b;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-card .cr-view-btn-danger .dashicons {
-            font-size: 18px;
-            color: #ff686b;
-        }
-
-        .badge-container {
-            text-align: center;
-        }
-
-
-        .cr-card:hover {
-            border-color: #007cba;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-scroll-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: #fff;
-            border: 1px solid #dcdcde;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .cr-scroll-btn:hover {
-            border-color: #007cba;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cr-scroll-btn-left {
-            left: -8px;
-        }
-
-        .cr-scroll-btn-right {
-            right: -8px;
-        }
-
-        .truncate-multiline {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        @media (max-width: 1024px) {
-            .cr-item {
-                flex: 0 0 calc(33.333% - 14px);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .cr-item {
-                flex: 0 0 calc(33.333% - 10px);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .cr-item {
-                flex: 0 0 33.333%;
-            }
-        }
-
-        .badge-lg {
-            font-size: 14px;
-            padding: 0.6em 1em;
-            margin: 4px 10px;
-        }
-
-        .table_pk thead th,
-        .table_finalisasi_pk thead th {
-            vertical-align: middle;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container-md mx-auto" style="width: 900px;">
-        <div class="text-center" id="action-sakip">
-            <button class="btn btn-primary btn-large" onclick="window.print();"><i class="dashicons dashicons-printer"></i> Cetak / Print</button>
-
-            <div class="d-inline-flex align-items-center ml-2">
-                <button class="btn btn-warning" onclick="showModalEditPK();"><i class="dashicons dashicons-edit"></i>Edit Target</button>
-
-                <div class="form-inline">
-                    <label for="font-select" class="mr-2" style="padding-left: 10px">Jenis Font:</label>
-                    <select id="font-select" class="form-control form-control-sm mr-3" onchange="updateFont()">
-                        <option value="Arial" selected>Arial</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Calibri">Calibri</option>
-                        <option value="inherit">Inherit</option>
-                        <option value="Courier">Courier</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Trebuchet">Trebuchet</option>
-                        <option value="Verdana">Verdana</option>
-                    </select>
-                    <label for="font-size" class="mr-2">Ukuran Font:</label>
-                    <input type="number" min="0" id="font-size" class="form-control form-control-sm mr-3" value="16" min="1" max="48" onkeyup="updateFont()" style="width: 80px;">
-                </div>
+            <div class="form-inline">
+                <label for="font-select" class="mr-2" style="padding-left: 10px">Jenis Font:</label>
+                <select id="font-select" class="form-control form-control-sm mr-3" onchange="updateFont()">
+                    <option value="Arial" selected>Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Calibri">Calibri</option>
+                    <option value="inherit">Inherit</option>
+                    <option value="Courier">Courier</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Trebuchet">Trebuchet</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+                <label for="font-size" class="mr-2">Ukuran Font:</label>
+                <input type="number" min="0" id="font-size" class="form-control form-control-sm mr-3" value="16" min="1" max="48" onkeyup="updateFont()" style="width: 80px;">
             </div>
         </div>
+    </div>
 
-        <div class="cr-container m-4 hide-display-print">
-            <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
-            <div class="cr-carousel-wrapper">
-                <div id="card-carousel" class="cr-carousel">
-                    <div class="cr-item" title="Perjanjian Kinerja Real Time">
-                        <div class="cr-card">
-                            <h3>Perjanjian Kinerja Sekarang</h3>
-                            <div class="badge badge-sm badge-primary m-2 text-light text-wrap">Pemerintah Daerah </div>
-                            <div class="year"></div>
-                            <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
-                                <span class="dashicons dashicons-visibility"></span>
-                            </div>
-                            <span class="badge badge-info mt-2">
-                                <i class="dashicons dashicons-clock align-middle"></i> Real Time
-                            </span>
-                            <div class="text-center badge-sedang-dilihat">
-                                <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
-                            </div>
+    <div class="cr-container m-4 hide-display-print">
+        <h2 class="cr-title">Pilih Laporan Perjanjian Kinerja</h2>
+        <div class="cr-carousel-wrapper">
+            <div id="card-carousel" class="cr-carousel">
+                <div class="cr-item" title="Perjanjian Kinerja Real Time">
+                    <div class="cr-card">
+                        <h3>Perjanjian Kinerja Sekarang</h3>
+                        <div class="badge badge-sm badge-primary m-2 text-light text-wrap">Pemerintah Daerah </div>
+                        <div class="year"></div>
+                        <div class="cr-view-btn" style="display: none;" id="display-btn-first" onclick="location.reload()">
+                            <span class="dashicons dashicons-visibility"></span>
+                        </div>
+                        <span class="badge badge-info mt-2">
+                            <i class="dashicons dashicons-clock align-middle"></i> Real Time
+                        </span>
+                        <div class="text-center badge-sedang-dilihat">
+                            <span class='badge badge-sm badge-warning m-2'>Sedang Dilihat</span>
                         </div>
                     </div>
-                    <?php echo $card; ?>
                 </div>
-                <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
-                    <span class="dashicons dashicons-arrow-left-alt2"></span>
-                </div>
-                <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
-                    <span class="dashicons dashicons-arrow-right-alt2"></span>
-                </div>
+                <?php echo $card; ?>
+            </div>
+            <div class="cr-scroll-btn cr-scroll-btn-left" onclick="scrollCarousel(-1)">
+                <span class="dashicons dashicons-arrow-left-alt2"></span>
+            </div>
+            <div class="cr-scroll-btn cr-scroll-btn-right" onclick="scrollCarousel(1)">
+                <span class="dashicons dashicons-arrow-right-alt2"></span>
             </div>
         </div>
+    </div>
 
-        <div class="text-center page-print">
-            <div class="text-right m-2">
-                <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
-                    <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
-                    Finalisasi Dokumen
-                </button>
-                <button class="btn btn-sm btn-warning hide-display-print" id="edit-btn" onclick="showModalEditFinalisasi()" style="display: none;">
-                    <span class="dashicons dashicons-edit" title="Edit Label"></span>
-                    Edit Finalisasi Dokumen
-                </button>
-            </div>
-            <div class="d-flex p-2 justify-content-center">
-                <?php if (!empty($logo_garuda)) : ?>
-                    <img style="max-width: 15%; height: auto;" src="<?php echo $logo_garuda; ?>" alt="Logo Garuda">
-                <?php endif; ?>
-            </div>
-            <p class="title-laporan mt-3 mb-2">BUPATI <?php echo strtoupper($pemda); ?></p>
-            <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA<br>TAHUN <?php echo $input['tahun']; ?></p>
-            <p class="text-left mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
-            <table id="table-1" class="text-left ">
-                <tr>
-                    <td>Nama</td>
-                    <td>:</td>
-                    <td class="nama-pegawai-view"><?php echo $nama_kepala_daerah; ?></td>
-                </tr>
-                <tr>
-                    <td>Jabatan</td>
-                    <td>:</td>
-                    <td class="status-jabatan-pegawai-1 jabatan-pegawai-view"><?php echo $status_jabatan_kepala_daerah; ?> <?php echo $pemda; ?></td>
-                </tr>
-            </table>
-            <p class="text-left ">Berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan.</p>
-            </br>
-            <p class="text-left ">Keberhasilan dan kegagalan pencapaian target kinerja tersebut menjadi tanggung jawab kami.</p>
-            <table id="table_data_pejabat" style="margin-top: 3rem;" class="">
-                <thead>
-                    <tr class="text-center">
-                        <td></td>
-                        <td contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
-                            <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <td></td>
-                        <td><?php echo $status_jabatan_kepala_daerah; ?> <?php echo $pemda; ?></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="height: 7em;">
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="text-center">
-                        <td class="ttd-pejabat"></td>
-                        <td class="ttd-pejabat nama-pegawai-view"></td>
-                    </tr>
-                    <tr class="text-center">
-                        <td></td>
-                        <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $nama_kepala_daerah; ?>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="text-center page-print">
+        <div class="text-right m-2">
+            <button class="btn btn-sm btn-success hide-display-print" id="finalisasi-btn" onclick="showModalFinalisasi()">
+                <span class="dashicons dashicons-saved" title="Finalisasikan dokumen (Menyimpan dokumen sesuai data terkini)"></span>
+                Finalisasi Dokumen
+            </button>
+            <button class="btn btn-sm btn-warning hide-display-print" id="edit-btn" onclick="showModalEditFinalisasi()" style="display: none;">
+                <span class="dashicons dashicons-edit" title="Edit Label"></span>
+                Edit Finalisasi Dokumen
+            </button>
         </div>
-
-        <div class="break-print"></div>
-
-        <div class="page-print mt-5 text-center">
-            <div class="d-flex p-2 justify-content-center">
-                <?php if (!empty($logo_garuda)) : ?>
-                    <img style="max-width: 15%; height: auto;" src="<?php echo $logo_garuda; ?>" alt="Logo Garuda">
-                <?php endif; ?>
-            </div>
-            <table class="table_pk mt-5 table-sm">
-                <thead>
-                    <tr>
-                        <th rowspan="2" class="text-center">No</th>
-                        <th rowspan="2" class="text-center">Sasaran Strategis</th>
-                        <th rowspan="2" class="text-center">Indikator Kinerja</th>
-                        <th rowspan="2" class="text-center">Target</th>
-                        <th colspan="4" class="text-center">Realisasi</th>
-                        <th rowspan="2" class="text-center">Satuan</th>
-                    </tr>
-                    <tr>
-                        <th class="text-center">TW 1</th>
-                        <th class="text-center">TW 2</th>
-                        <th class="text-center">TW 3</th>
-                        <th class="text-center">TW 4</th>
-                    </tr>
-                </thead>
-                <tbody class="table-pk-body-without-action">
-                </tbody>
-            </table>
-            <!-- menampilkan data program dan pagu opd -->
-            <?php if (!empty($html_renaksi_opd)) : ?>
-                <?php echo $html_renaksi_opd; ?>
+        <div class="d-flex p-2 justify-content-center">
+            <?php if (!empty($logo_garuda)) : ?>
+                <img style="max-width: 15%; height: auto;" src="<?php echo $logo_garuda; ?>" alt="Logo Garuda">
             <?php endif; ?>
-
-            <table class="table_finalisasi_pk mt-5" style="display: none;">
-                <thead>
-                    <tr>
-                        <th class="esakip-text_tengah" style="width: 45px;">No</th>
-                        <th class="esakip-text_tengah" style="width: 300px;">Sasaran Strategis</th>
-                        <th class="esakip-text_tengah" style="width: 150px;">Indikator Kinerja</th>
-                        <th class="esakip-text_tengah" style="width: 10px;">Target</th>
-                        <th class="esakip-text_tengah" style="width: 150px;">Pagu Anggaran</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-            <table id="table_data_pejabat" style="margin-top: 3rem;" class="">
-                <thead>
-                    <tr class="text-center">
-                        <td></td>
-                        <td contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
-                            <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <td></td>
-                        <td><?php echo $status_jabatan_kepala_daerah; ?> <?php echo $pemda; ?></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="height: 7em;">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="text-center">
-                        <td class="ttd-pejabat">
-
-                        </td>
-                        <td class="ttd-pejabat nama-pegawai-view">
-
-                        </td>
-                    </tr>
-                    <tr class="text-center">
-                        <td></td>
-                        <td style="padding: 0;" class="pangkat-pegawai-view">
-                            <?php echo $nama_kepala_daerah; ?>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
+        <p class="title-laporan mt-3 mb-2">BUPATI <?php echo strtoupper($pemda); ?></p>
+        <p class="title-laporan mt-3 mb-2">PERJANJIAN KINERJA<br>TAHUN <?php echo $input['tahun']; ?></p>
+        <p class="text-left mt-5">Dalam rangka mewujudkan manajemen pemerintahan yang efektif, transparan dan akuntabel serta berorientasi pada hasil, kami yang bertanda tangan dibawah ini :</p>
+        <table id="table-1" class="text-left ">
+            <tr>
+                <td>Nama</td>
+                <td>:</td>
+                <td class="nama-pegawai-view"><?php echo $nama_kepala_daerah; ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>:</td>
+                <td class="status-jabatan-pegawai-1 jabatan-pegawai-view"><?php echo $status_jabatan_kepala_daerah; ?> <?php echo $pemda; ?></td>
+            </tr>
+        </table>
+        <p class="text-left ">Berjanji akan mewujudkan target kinerja yang seharusnya sesuai lampiran perjanjian ini dalam rangka mencapai target kinerja jangka menengah seperti yang telah ditetapkan dalam dokumen perencanaan.</p>
+        </br>
+        <p class="text-left ">Keberhasilan dan kegagalan pencapaian target kinerja tersebut menjadi tanggung jawab kami.</p>
+        <table id="table_data_pejabat" style="margin-top: 3rem;" class="">
+            <thead>
+                <tr class="text-center">
+                    <td></td>
+                    <td contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td></td>
+                    <td><?php echo $status_jabatan_kepala_daerah; ?> <?php echo $pemda; ?></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="height: 7em;">
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="text-center">
+                    <td class="ttd-pejabat"></td>
+                    <td class="ttd-pejabat nama-pegawai-view"></td>
+                </tr>
+                <tr class="text-center">
+                    <td></td>
+                    <td style="padding: 0;" class="pangkat-pegawai-view">
+                        <?php echo $nama_kepala_daerah; ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <!-- Modal finalisasi -->
-    <div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="title-label">Finalisasi Perjanjian Kinerja</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="id_data" value="">
-                    <!-- Informasi IKU -->
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">
-                            <strong>Data Perjanjian Kinerja</strong>
-                        </div>
-                        <div class="card-body">
-                            <table class="table_pk">
-                                <thead class="bg-dark text-light">
-                                    <tr>
-                                        <th rowspan="2" class="text-center">No</th>
-                                        <th rowspan="2" class="text-center">Sasaran Strategis</th>
-                                        <th rowspan="2" class="text-center">Indikator Kinerja</th>
-                                        <th rowspan="2" class="text-center">Target</th>
-                                        <th colspan="4" class="text-center">Realisasi</th>
-                                        <th rowspan="2" class="text-center">Satuan</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-center" style="min-width: 100px">TW 1</th>
-                                        <th class="text-center" style="min-width: 100px">TW 2</th>
-                                        <th class="text-center" style="min-width: 100px">TW 3</th>
-                                        <th class="text-center" style="min-width: 100px">TW 4</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-pk-body-without-action">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card bg-light mb-3">
-                        <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="nama_tahapan">Nama Tahapan</label>
-                                    <input type="text" class="form-control" id="nama_tahapan" name="nama_tahapan" placeholder="ex : Perjanjian Kinerja" maxlength="48" required>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="tanggal_dokumen">Tanggal Finalisasi</label>
-                                    <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
-                                </div>
-                            </div>
-                            <small class="form-text text-muted">Pastikan data yang tertera benar, data yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()" disabled>Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
-                </div>
+
+    <div class="break-print"></div>
+
+    <div class="page-print mt-5 text-center">
+        <div class="d-flex p-2 justify-content-center">
+            <?php if (!empty($logo_garuda)) : ?>
+                <img style="max-width: 15%; height: auto;" src="<?php echo $logo_garuda; ?>" alt="Logo Garuda">
+            <?php endif; ?>
+        </div>
+        <table class="table_pk mt-5 table-sm">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="text-center">No</th>
+                    <th rowspan="2" class="text-center">Sasaran Strategis</th>
+                    <th rowspan="2" class="text-center">Indikator Kinerja</th>
+                    <th rowspan="2" class="text-center">Target</th>
+                    <th colspan="4" class="text-center">Realisasi</th>
+                    <th rowspan="2" class="text-center">Satuan</th>
+                </tr>
+                <tr>
+                    <th class="text-center">TW 1</th>
+                    <th class="text-center">TW 2</th>
+                    <th class="text-center">TW 3</th>
+                    <th class="text-center">TW 4</th>
+                </tr>
+            </thead>
+            <tbody class="table-pk-body-without-action">
+            </tbody>
+        </table>
+        <!-- menampilkan data program dan pagu opd -->
+        <?php if (!empty($html_renaksi_opd)) : ?>
+            <?php echo $html_renaksi_opd; ?>
+        <?php endif; ?>
+
+        <table class="table_finalisasi_pk mt-5" style="display: none;">
+            <thead>
+                <tr>
+                    <th class="esakip-text_tengah" style="width: 45px;">No</th>
+                    <th class="esakip-text_tengah" style="width: 300px;">Sasaran Strategis</th>
+                    <th class="esakip-text_tengah" style="width: 150px;">Indikator Kinerja</th>
+                    <th class="esakip-text_tengah" style="width: 10px;">Target</th>
+                    <th class="esakip-text_tengah" style="width: 150px;">Pagu Anggaran</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table id="table_data_pejabat" style="margin-top: 3rem;" class="">
+            <thead>
+                <tr class="text-center">
+                    <td></td>
+                    <td contenteditable="true" title="Klik untuk ganti teks!" class="editable-field">
+                        <?php echo $pemda; ?>, <span class="tanggal-dokumen-view"><?php echo $text_tanggal_hari_ini; ?></span>
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td></td>
+                    <td><?php echo $status_jabatan_kepala_daerah; ?> <?php echo $pemda; ?></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="height: 7em;">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr class="text-center">
+                    <td class="ttd-pejabat">
+
+                    </td>
+                    <td class="ttd-pejabat nama-pegawai-view">
+
+                    </td>
+                </tr>
+                <tr class="text-center">
+                    <td></td>
+                    <td style="padding: 0;" class="pangkat-pegawai-view">
+                        <?php echo $nama_kepala_daerah; ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Modal finalisasi -->
+<div class="modal fade mt-4" id="modalFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalFinalisasi" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-label">Finalisasi Perjanjian Kinerja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        </div>
-    </div>
-    <!-- Modal edit finalisasi -->
-    <div class="modal fade mt-4" id="modalEditFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalEditFinalisasi" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="title-label">Edit Finalisasi Dokumen Perjanjian Kinerja</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="id_data" name="id_data" value="">
-
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">
-                            <strong>Perjanjian Kinerja</strong>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="nama_tahap_finalisasi">Nama Tahapan</label>
-                                    <input type="text" class="form-control" id="nama_tahap_finalisasi" name="nama_tahap_finalisasi" placeholder="ex : Perjanjian Kinerja" maxlength="48">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="tanggal_tahap_finalisasi">Tanggal Dokumen</label>
-                                    <input type="date" class="form-control" id="tanggal_tahap_finalisasi" name="tanggal_tahap_finalisasi">
-                                </div>
-                            </div>
-                            <small class="form-text text-muted">Dokumen yang sudah difinalisasi hanya dapat diubah nama label nya.</small>
-                        </div>
+            <div class="modal-body">
+                <input type="hidden" name="id_data" value="">
+                <!-- Informasi IKU -->
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Data Perjanjian Kinerja</strong>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" onclick="simpanEditFinalisasi()">Perbarui</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal Target -->
-    <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Perjanjian Kinerja</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div style="max-height: 90vh; overflow-y: auto;">
-                        <button type="button" class="btn btn-primary mb-2" onclick="addSasaran()"><span class="dashicons dashicons-insert"></span> Tambah Sasaran</button>
+                    <div class="card-body">
                         <table class="table_pk">
                             <thead class="bg-dark text-light">
                                 <tr>
@@ -876,174 +774,270 @@ if (!empty($data_tahapan)) {
                                     <th rowspan="2" class="text-center">Target</th>
                                     <th colspan="4" class="text-center">Realisasi</th>
                                     <th rowspan="2" class="text-center">Satuan</th>
-                                    <th rowspan="2" class="text-center">Aksi</th>
                                 </tr>
                                 <tr>
-                                    <th class="text-center">TW 1</th>
-                                    <th class="text-center">TW 2</th>
-                                    <th class="text-center">TW 3</th>
-                                    <th class="text-center">TW 4</th>
+                                    <th class="text-center" style="min-width: 100px">TW 1</th>
+                                    <th class="text-center" style="min-width: 100px">TW 2</th>
+                                    <th class="text-center" style="min-width: 100px">TW 3</th>
+                                    <th class="text-center" style="min-width: 100px">TW 4</th>
                                 </tr>
                             </thead>
-                            <tbody class="table-pk-body-with-action">
+                            <tbody class="table-pk-body-without-action">
                             </tbody>
                         </table>
                     </div>
                 </div>
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nama_tahapan">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_tahapan" name="nama_tahapan" placeholder="ex : Perjanjian Kinerja" maxlength="48" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_dokumen">Tanggal Finalisasi</label>
+                                <input type="date" class="form-control" id="tanggal_dokumen" name="tanggal_dokumen" value="<?php echo date('Y-m-d'); ?>" required>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">Pastikan data yang tertera benar, data yang sudah difinalisasi akan disimpan dan tidak dapat di edit kembali.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="simpanFinalisasi()" disabled>Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
             </div>
         </div>
     </div>
+</div>
+<!-- Modal edit finalisasi -->
+<div class="modal fade mt-4" id="modalEditFinalisasi" tabindex="-1" role="dialog" aria-labelledby="modalEditFinalisasi" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-label">Edit Finalisasi Dokumen Perjanjian Kinerja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="id_data" name="id_data" value="">
 
-    <!-- Modal crud tambah / edit sasaran -->
-    <div class="modal fade" id="modal-crud-sasaran">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="form-sasaran">
-                        <input type="hidden" name="id_data" value="">
-                        <input type="hidden" name="id_iku" value="">
-                        <div class="card bg-light shadow-md mb-3">
-                            <div class="card-header">
-                                <strong>Data Sasaran</strong>
+                <div class="card bg-light mb-3">
+                    <div class="card-header">
+                        <strong>Perjanjian Kinerja</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="nama_tahap_finalisasi">Nama Tahapan</label>
+                                <input type="text" class="form-control" id="nama_tahap_finalisasi" name="nama_tahap_finalisasi" placeholder="ex : Perjanjian Kinerja" maxlength="48">
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="label_sasaran">Sasaran</label>
-                                            <input type="text" class="form-control" name="label_sasaran">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="label_indikator">Indikator</label>
-                                            <input type="text" class="form-control" name="label_indikator">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="satuan">Satuan</label>
-                                            <input type="text" class="form-control" name="satuan">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="rumus_capaian_kinerja">Rumus Capaian Kinerja</label>
-                                            <select name="rumus_capaian_kinerja">
-                                                <option value="1">Indikator Tren Positif</option>
-                                                <option value="2">Nilai Akhir</option>
-                                                <option value="3">Indikator Tren Negatif</option>
-                                            </select>
-                                            <small class="text-muted">
-                                                <ul>
-                                                    <li>Tren Positif : (Akumulasi Realisasi / Akumulasi Target) * 100.</li>
-                                                    <li>Nilai Akhir : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
-                                                    <li>Tren Negatif : (Akumulasi Target / Akumulasi Realisasi) * 100.</li>
-                                                    <li>Kedua rumus dihitung berdasarkan Realisasi dan Target triwulan berjalan.</li>
-                                                </ul>
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="hide-iku-pemda">
-                                    </div>
-                                    <div class="col-md-12">
-                                        <small id="help_text"></small>
-                                    </div>
-                                </div>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_tahap_finalisasi">Tanggal Dokumen</label>
+                                <input type="date" class="form-control" id="tanggal_tahap_finalisasi" name="tanggal_tahap_finalisasi">
                             </div>
                         </div>
-                        <div class="card p-3">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card bg-light shadow-md mb-3">
-                                        <div class="card-header">
-                                            <strong>Target dan Realisasi</strong>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="target">Target Tahunan</label>
-                                                    <input type="number" min="0" class="form-control" name="target">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_1">Realisasi TW 1</label>
-                                                    <input type="number" min="0" class="form-control" name="realisasi_1">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_2">Realisasi TW 2</label>
-                                                    <input type="number" min="0" class="form-control" name="realisasi_2">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_3">Realisasi TW 3</label>
-                                                    <input type="number" min="0" class="form-control" name="realisasi_3">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_4">Realisasi TW 4</label>
-                                                    <input type="number" min="0" class="form-control" name="realisasi_4">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 d-none" id="card-target-teks">
-                                    <div class="card bg-light shadow-md mb-3">
-                                        <div class="card-header">
-                                            <strong>Target dan Realisasi Teks</strong>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="target_teks">Target Tahunan Teks</label>
-                                                    <input type="text" class="form-control" name="target_teks">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_1_teks">Realisasi TW 1 Teks</label>
-                                                    <input type="text" class="form-control" name="realisasi_1_teks">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_2_teks">Realisasi TW 2 Teks</label>
-                                                    <input type="text" class="form-control" name="realisasi_2_teks">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_3_teks">Realisasi TW 3 Teks</label>
-                                                    <input type="text" class="form-control" name="realisasi_3_teks">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label for="realisasi_4_teks">Realisasi TW 4 Teks</label>
-                                                    <input type="text" class="form-control" name="realisasi_4_teks">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <label for="is_target_teks">
-                                <input type="checkbox" id="is_target_teks" name="is_target_teks" value="1"> Target dan Realisasi Berupa Teks.
-                            </label>
-                        </div>
-                    </form>
+                        <small class="form-text text-muted">Dokumen yang sudah difinalisasi hanya dapat diubah nama label nya.</small>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" onclick="upsertIku()">Simpan</button>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="simpanEditFinalisasi()">Perbarui</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" aria-label="Close">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Target -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Perjanjian Kinerja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="max-height: 90vh; overflow-y: auto;">
+                    <button type="button" class="btn btn-primary mb-2" onclick="addSasaran()"><span class="dashicons dashicons-insert"></span> Tambah Sasaran</button>
+                    <table class="table_pk">
+                        <thead class="bg-dark text-light">
+                            <tr>
+                                <th rowspan="2" class="text-center">No</th>
+                                <th rowspan="2" class="text-center">Sasaran Strategis</th>
+                                <th rowspan="2" class="text-center">Indikator Kinerja</th>
+                                <th rowspan="2" class="text-center">Target</th>
+                                <th colspan="4" class="text-center">Realisasi</th>
+                                <th rowspan="2" class="text-center">Satuan</th>
+                                <th rowspan="2" class="text-center">Aksi</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">TW 1</th>
+                                <th class="text-center">TW 2</th>
+                                <th class="text-center">TW 3</th>
+                                <th class="text-center">TW 4</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-pk-body-with-action">
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-</body>
+</div>
+
+<!-- Modal crud tambah / edit sasaran -->
+<div class="modal fade" id="modal-crud-sasaran">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-sasaran">
+                    <input type="hidden" name="id_data" value="">
+                    <input type="hidden" name="id_iku" value="">
+                    <div class="card bg-light shadow-md mb-3">
+                        <div class="card-header">
+                            <strong>Data Sasaran</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="label_sasaran">Sasaran</label>
+                                        <input type="text" class="form-control" name="label_sasaran">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="label_indikator">Indikator</label>
+                                        <input type="text" class="form-control" name="label_indikator">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="satuan">Satuan</label>
+                                        <input type="text" class="form-control" name="satuan">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="rumus_capaian_kinerja">Rumus Capaian Kinerja</label>
+                                        <select name="rumus_capaian_kinerja">
+                                            <option value="1">Indikator Tren Positif</option>
+                                            <option value="2">Nilai Akhir</option>
+                                            <option value="3">Indikator Tren Negatif</option>
+                                        </select>
+                                        <small class="text-muted">
+                                            <ul>
+                                                <li>Tren Positif : (Akumulasi Realisasi / Akumulasi Target) * 100.</li>
+                                                <li>Nilai Akhir : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
+                                                <li>Tren Negatif : (Akumulasi Target / Akumulasi Realisasi) * 100.</li>
+                                                <li>Kedua rumus dihitung berdasarkan Realisasi dan Target triwulan berjalan.</li>
+                                            </ul>
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" id="hide-iku-pemda">
+                                </div>
+                                <div class="col-md-12">
+                                    <small id="help_text"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light shadow-md mb-3">
+                                    <div class="card-header">
+                                        <strong>Target dan Realisasi</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="target">Target Tahunan</label>
+                                                <input type="number" min="0" class="form-control" name="target">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="realisasi_1">Realisasi TW 1</label>
+                                                <input type="number" min="0" class="form-control" name="realisasi_1">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="realisasi_2">Realisasi TW 2</label>
+                                                <input type="number" min="0" class="form-control" name="realisasi_2">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="realisasi_3">Realisasi TW 3</label>
+                                                <input type="number" min="0" class="form-control" name="realisasi_3">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="realisasi_4">Realisasi TW 4</label>
+                                                <input type="number" min="0" class="form-control" name="realisasi_4">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-none" id="card-target-teks">
+                                <div class="card bg-light shadow-md mb-3">
+                                    <div class="card-header">
+                                        <strong>Target dan Realisasi Teks</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="target_teks">Target Tahunan Teks</label>
+                                                <input type="text" class="form-control" name="target_teks">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="realisasi_1_teks">Realisasi TW 1 Teks</label>
+                                                <input type="text" class="form-control" name="realisasi_1_teks">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="realisasi_2_teks">Realisasi TW 2 Teks</label>
+                                                <input type="text" class="form-control" name="realisasi_2_teks">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="realisasi_3_teks">Realisasi TW 3 Teks</label>
+                                                <input type="text" class="form-control" name="realisasi_3_teks">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="realisasi_4_teks">Realisasi TW 4 Teks</label>
+                                                <input type="text" class="form-control" name="realisasi_4_teks">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <label for="is_target_teks">
+                            <input type="checkbox" id="is_target_teks" name="is_target_teks" value="1"> Target dan Realisasi Berupa Teks.
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" onclick="upsertIku()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     jQuery(document).ready(function() {
         upsertDataFromIkuPemda();

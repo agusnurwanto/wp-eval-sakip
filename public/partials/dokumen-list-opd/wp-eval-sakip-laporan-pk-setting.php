@@ -19,6 +19,12 @@ $idtahun = $wpdb->get_results(
 );
 $upload_dir = ESAKIP_PLUGIN_URL . 'public/media/dokumen/';
 $path_logo_pemda_laporan_pk = get_option('_logo_pemda_laporan_pk');
+$user = wp_get_current_user();
+$tahun_anggaran = get_option('_crb_tahun_wpsipd');
+if (in_array('admin_panrb', $user->roles)) {
+	$tahun_anggaran = isset($_GET['tahun']) ? sanitize_text_field($_GET['tahun']) : $input['tahun'];
+}
+$id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
 ?>
 <style type="text/css">
 	.wrap-table {
@@ -64,18 +70,20 @@ $path_logo_pemda_laporan_pk = get_option('_logo_pemda_laporan_pk');
 <div class="container-md">
 	<div class="cetak">
 		<div style="padding: 10px;margin:0 0 3rem 0;">
-			<h1 class="text-center table-title">Laporan Perjanjian Kinerja Setting</br>Profile Perangkat Daerah</h1>
+			<h1 class="text-center table-title">Profile Perangkat Daerah</h1>
 			<div id="action" class="action-section hide-excel"></div>
 			<!-- <div style="margin-bottom: 25px;" class="d-flex">
                 <button class="btn btn-success mx-auto" onclick="tambah_logo_pemda();"><i class="dashicons dashicons-plus"></i> Tambah Logo Pemda</button>
             </div> -->
 			<div class="wrap-table mt-2">
-				<table id="cetak" title="Laporan Perjanjian Kinerja Perangkat Daerah Setting" class="table table-bordered table_list_skpd" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;">
+				<table id="cetak" title="Profile Perangkat Daerah" class="table table-bordered table_list_skpd" cellpadding="2" cellspacing="0">
 					<thead style="background: #ffc491;">
 						<tr>
 							<th class="text-center">Nama Perangkat Daerah</th>
+							<th class="text-center">NIP</th>
+							<th class="text-center">Nama Kepala</th>
 							<th class="text-center" style="width: 50rem;">Alamat</th>
-							<th class="text-center">Aksi</th>
+							<th class="text-center" style="width: 5rem;">Aksi</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -168,7 +176,8 @@ $path_logo_pemda_laporan_pk = get_option('_logo_pemda_laporan_pk');
 			data: {
 				action: 'get_table_skpd_laporan_pk_setting',
 				api_key: esakip.api_key,
-				tahun_anggaran: <?php echo $input['tahun']; ?>,
+				tahun_anggaran: <?php echo $tahun_anggaran; ?>,
+				id_login: '<?php echo $id; ?>'
 			},
 			dataType: 'json',
 			success: function(response) {
@@ -317,5 +326,40 @@ $path_logo_pemda_laporan_pk = get_option('_logo_pemda_laporan_pk');
 
 	function toDetailUrl(url) {
 		window.open(url, '_blank');
+	}
+
+	function login_to_profile(user_id, tahun, nip_kepala) {
+	    jQuery('#wrap-loading').show();
+	    
+	    jQuery.ajax({
+	        url: esakip.url,
+	        type: 'POST',
+	        data: {
+	            action: 'coba_auto_login',
+	            api_key: esakip.api_key,
+	            user_id: user_id,
+	            id: 'sakip',
+	            url: 'view_profile|' + user_id + '|' + tahun
+	        },
+	        dataType: 'json',
+	        success: function(response) {
+	            jQuery('#wrap-loading').hide();
+	            console.log(response);
+	            if (response.status === 'success') {
+	                if (response.url_login) {
+	                    window.open(response.url_login, '_blank');
+	                } else {
+	                    alert('URL login tidak ditemukan!');
+	                }
+	            } else {
+	                alert(response.message);
+	            }
+	        },
+	        error: function(xhr, status, error) {
+	            jQuery('#wrap-loading').hide();
+	            console.error(xhr.responseText);
+	            alert('Terjadi kesalahan saat melakukan login!');
+	        }
+	    });
 	}
 </script>

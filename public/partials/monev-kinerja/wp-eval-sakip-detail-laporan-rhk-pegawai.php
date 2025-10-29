@@ -222,8 +222,6 @@ foreach ($ret['rhk_unik'] as $v) {
             }
         }
 
-        $capaian_realisasi = $get_capaian_realisasi . ' (' . $rumus_teks . ')' . '</br>';
-
         $data_tagging = $wpdb->get_results($wpdb->prepare("
                 SELECT 
                     * 
@@ -344,7 +342,7 @@ foreach ($ret['rhk_unik'] as $v) {
             <td class="text_tengah">' . $realisasi_tw_2 . '</td>
             <td class="text_tengah">' . $realisasi_tw_3 . '</td>
             <td class="text_tengah">' . $realisasi_tw_4 . '</td>     
-            <td class="text_tengah">' . $capaian_realisasi . '</td>     
+            <td class="text_tengah" title="' . htmlspecialchars($rumus_teks, ENT_QUOTES, 'UTF-8') . '">' . $get_capaian_realisasi . '%</td>     
             <td class="text_kanan">' . $rencana_pagu . '</td>     
             <td class="text_kanan">' . number_format((float)$total_harga_tagging_rincian, 0, ",", ".") . '</td>
             <td class="text_kanan">' . number_format((float)$total_realisasi_tagging_rincian, 0, ",", ".") . '</td>
