@@ -168,9 +168,9 @@ if (!empty($data_all['data'])) {
 					}
 				} else {
 					if ($val_koneksi['tipe'] == 1) {
-						$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+						$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 					} else {
-						$show_nama_skpd = "" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
+						$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
 					}
 				}
 				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -240,13 +240,13 @@ if (!empty($data_all['data'])) {
 						if ($tipe == 'opd') {
 							$label_parent = $val_koneksi['label_parent'];
 							if (!empty($val_koneksi['id_level_1_parent'])) {
-								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . ")</a>";
+								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
 							}
 						} else {
 							if ($val_koneksi['tipe'] == 1) {
-								$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+								$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 							} else {
-								$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
+								$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
 							}
 						}
 						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -320,9 +320,9 @@ if (!empty($data_all['data'])) {
 									}
 								} else {
 									if ($val_koneksi['tipe'] == 1) {
-										$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+										$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 									} else {
-										$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")";
+										$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
 									}
 								}
 								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -390,76 +390,81 @@ if (!empty($data_all['data'])) {
 									}
 									foreach ($level_4['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 										$label_parent = $val_koneksi['label_parent'];
-										if (!empty($val_koneksi['id_level_1_parent'])) {
-											if ($tipe == 'opd') {
-												$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . "</a>";
+										if ($tipe == 'opd') {
+											$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . "</a>";
+										} else {
+											if ($val_koneksi['tipe'] == 1) {
+												$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
 											} else {
-												$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "' target='_blank'>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</a>";
+												$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
+											}
+											// echo '<pre>';
+											// print_r($level_4['koneksi_pokin']);
+											// echo '</pre>';
+											// die();
+											// get pokin OPD child yang terkoneksi ke pemda
+											$data_all_koneksi = array('data' => $this->get_pokin(array(
+												'id' => $val_koneksi['id_parent'],
+												'level' => $val_koneksi['level_parent'] + 1,
+												'periode' => $input['periode'],
+												'tipe' => 'opd',
+												'id_skpd' => $val_koneksi['id_skpd_view_pokin']
+											)));
 
-												// get pokin OPD child yang terkoneksi ke pemda
-												$data_all_koneksi = array('data' => $this->get_pokin(array(
-													'id' => $val_koneksi['id_parent'],
-													'level' => $val_koneksi['level_parent'] + 1,
-													'periode' => $input['periode'],
-													'tipe' => 'opd',
-													'id_skpd' => $val_koneksi['id_skpd_view_pokin']
-												)));
+											if (!empty($data_all_koneksi['data'])) {
+												$data_temp2 = array();
+												foreach ($data_all_koneksi['data'] as $keylevel2opd => $level_3_opd) {
+													$data_temp2[$keylevel2opd][0] = (object)[
+														'v' => $level_3_opd['id'],
+														'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_3_opd['label']) . "</div>",
+													];
 
-												if (!empty($data_all_koneksi['data'])) {
-													$data_temp2 = array();
-													foreach ($data_all_koneksi['data'] as $keylevel2opd => $level_3_opd) {
-														$data_temp2[$keylevel2opd][0] = (object)[
-															'v' => $level_3_opd['id'],
-															'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_3_opd['label']) . "</div>",
-														];
-
-														if (!empty($level_3_opd['indikator'])) {
-															foreach ($level_3_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
-																$data_temp2[$keylevel2opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
-															}
+													if (!empty($level_3_opd['indikator'])) {
+														foreach ($level_3_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
+															$data_temp2[$keylevel2opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
 														}
-														$data_temp2[$keylevel2opd][1] = $val_koneksi['id_parent'];
-														$data_temp2[$keylevel2opd][2] = $level_3_opd['id'];
+													}
+													$data_temp2[$keylevel2opd][1] = $val_koneksi['id_parent'];
+													$data_temp2[$keylevel2opd][2] = $level_3_opd['id'];
 
-														if (!empty($level_3_opd['data'])) {
-															foreach ($level_3_opd['data'] as $keylevel3opd => $level_4_opd) {
-																$data_temp2[$keylevel3opd][0] = (object)[
-																	'v' => $level_4_opd['id'],
-																	'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_4_opd['label']) . "</div>",
-																];
+													if (!empty($level_3_opd['data'])) {
+														foreach ($level_3_opd['data'] as $keylevel3opd => $level_4_opd) {
+															$data_temp2[$keylevel3opd][0] = (object)[
+																'v' => $level_4_opd['id'],
+																'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_4_opd['label']) . "</div>",
+															];
 
-																if (!empty($level_4_opd['indikator'])) {
-																	foreach ($level_4_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
-																		$data_temp2[$keylevel3opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
-																	}
+															if (!empty($level_4_opd['indikator'])) {
+																foreach ($level_4_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
+																	$data_temp2[$keylevel3opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
 																}
-																$data_temp2[$keylevel3opd][1] = $level_3_opd['id'];
-																$data_temp2[$keylevel3opd][2] = $level_4_opd['id'];
+															}
+															$data_temp2[$keylevel3opd][1] = $level_3_opd['id'];
+															$data_temp2[$keylevel3opd][2] = $level_4_opd['id'];
 
-																if (!empty($level_4_opd['data'])) {
-																	foreach ($level_4_opd['data'] as $keylevel4opd => $level_5_opd) {
-																		$data_temp2[$keylevel4opd][0] = (object)[
-																			'v' => $level_5_opd['id'],
-																			'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_5_opd['label']) . "</div>",
-																		];
+															if (!empty($level_4_opd['data'])) {
+																foreach ($level_4_opd['data'] as $keylevel4opd => $level_5_opd) {
+																	$data_temp2[$keylevel4opd][0] = (object)[
+																		'v' => $level_5_opd['id'],
+																		'f' => "<div class=\"{$style0} label5 koneksi-pokin-pemda tampil_koneksi_pokin\">" . trim($level_5_opd['label']) . "</div>",
+																	];
 
-																		if (!empty($level_5_opd['indikator'])) {
-																			foreach ($level_5_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
-																				$data_temp2[$keylevel4opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
-																			}
+																	if (!empty($level_5_opd['indikator'])) {
+																		foreach ($level_5_opd['indikator'] as $keyindikatorlevel5 => $indikator) {
+																			$data_temp2[$keylevel4opd][0]->f .= "<div " . $style5 . " class='koneksi-pokin-pemda tampil_koneksi_pokin'>IK: " . $indikator['label_indikator_kinerja'] . "</div>";
 																		}
-																		$data_temp2[$keylevel4opd][1] = $level_4_opd['id'];
-																		$data_temp2[$keylevel4opd][2] = $level_5_opd['id'];
 																	}
+																	$data_temp2[$keylevel4opd][1] = $level_4_opd['id'];
+																	$data_temp2[$keylevel4opd][2] = $level_5_opd['id'];
 																}
 															}
 														}
 													}
-													$data_all_format_json[$level_4['id']]['data_org'] = $data_temp2;
 												}
+												$data_all_format_json[$level_4['id']]['data_org'] = $data_temp2;
 											}
-											$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 										}
+										$data_temp[$keylevel4][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_4["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
 									}
 								}
 

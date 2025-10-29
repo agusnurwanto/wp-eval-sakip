@@ -337,7 +337,8 @@ thead {
 
 .borderless-table,
 .borderless-table tr,
-.borderless-table td {
+.borderless-table td,
+.borderless-table th {
     border: 0;
 }
 

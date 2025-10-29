@@ -2025,7 +2025,7 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
                         </div>
 					</form>`);
 				jQuery("#modal-crud").find(`.modal-footer`).html(`
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">
 						Tutup
 					</button>
 					<button type="button" class="btn btn-success" onclick="handleUpdateIndikatorPokin(${response.data.level}, ${idParentPokin})">
@@ -2237,15 +2237,15 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 
 							html += `
 							<tr class="bg-light">
-								<td class="text-center align-middle font-weight-bold">${index + 1}.</td>
-								<td class="align-middle font-weight-bold">${value.label}</td>
-								<td class="align-middle">${value.pelaksana}</td>
-								<td class="align-top" rowspan="${indikator.length + 1}">
+								<td class="text-center font-weight-bold">${index + 1}.</td>
+								<td class="font-weight-bold">${value.label}</td>
+								<td class="text-left">${value.pelaksana}</td>
+								<td class="align-top pt-0" rowspan="${indikator.length + 1}">
 									<ul class="mb-0 pl-3">
 										${value.crosscutting.map(item => `<li>${item}</li>`).join('')}
 									</ul>
 								</td>
-								<td class="text-center align-middle">
+								<td class="text-center">
 									<div class="btn-group d-flex flex-wrap justify-content-center">
 										<button class="btn btn-sm btn-success mr-1 mb-1" title="Tambah Indikator" onclick="handleFormCreateIndikatorPokin('${value.label}', ${value.id}, ${level}, ${last_urutan}, ${idParent})">
 											<i class="dashicons dashicons-plus"></i>

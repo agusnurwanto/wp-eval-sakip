@@ -512,9 +512,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			$data_pokin = $this->get_pokin_child_by_id($_POST['id']);
 			$data_jadwal = $this->get_data_jadwal_by_id($data_pokin['data']['id_jadwal']);
 			$data_unit = $this->get_data_unit_by_id_skpd_tahun_anggaran($data_pokin['data']['id_skpd'], $tahun_anggaran);
-			// if (!empty($_POST['id_koneksi'])) {
-			// 	$data_koneksi = $this->get_pokin_koneksi_parent_by_id($_POST['id_koneksi']);
-			// }
+			if (!empty($_POST['id_koneksi_pokin'])) {
+				$data_koneksi = $this->get_parent_pokin_koneksi_by_id($_POST['id_koneksi_pokin'], $_POST['id']);
+			}
 
 			echo json_encode([
 				'status'  	=> true,
@@ -538,46 +538,41 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		wp_die();
 	}
 
-	// public function get_pokin_koneksi_parent_by_id(int $id)
-	// {
-	// 	global $wpdb;
-		
-	// 	$check_id = $wpdb->get_var(
-	// 		$wpdb->prepare("
-	// 			SELECT id
-	// 			FROM esakip_koneksi_pokin_pemda_opd
-	// 			WHERE id = %d
-	// 			  AND active = 1
-	// 		", $id)
-	// 	);
+	public function get_parent_pokin_koneksi_by_id(int $id_koneksi_pokin, int $id_pokin_opd)
+	{		
+		$current_koneksi = $this->get_koneksi_pokin_pemda_by_id($id_koneksi_pokin);
 
-	// 	$data = null;
-	// 	if (!empty($check_id)) {
-	// 		$data = $wpdb->get_row(
-	// 			$wpdb->prepare("
-	// 				SELECT *
-	// 				FROM esakip_pohon_kinerja
-	// 				WHERE id = %d
-	// 				  AND active = 1
-	// 				  AND (label_indikator_kinerja IS NULL OR label_indikator_kinerja = '')
-	// 			", $id),
-	// 			ARRAY_A
-	// 		);
-	// 	}
+		$is_empty = empty($current_koneksi);
+		if ($is_empty) {
+			return null;
+        }
 
-	// 	return $data;
-	// }
+		$is_not_its_parent = $id_pokin_opd != $current_koneksi['parent_pohon_kinerja_koneksi'];
+		if ($is_not_its_parent) {
+			return null;
+		}
 
-	// public function get_pokin_parent_by_id(int $id)
-    // {
-    //     $current_pokin = $this->get_pokin_koneksi_parent_by_id($id);
+		$current_pokin_data = $this->get_pokin_pemda_by_id($current_koneksi['parent_pohon_kinerja']);
 
-    //     if (empty($current_pokin)) {
-    //         throw new Exception("Parent pokin koneksi dengan ID $id tidak ditemukan!", 400);
-    //     }
+        return $this->process_get_parent_pokin_recursive($current_pokin_data);
+	}
 
-    //     return $this->build_subtree_parent_koneksi_recursive($current_pokin);
-    // }
+	private function process_get_parent_pokin_recursive(array $current_pokin_data)
+    {
+        $parent_id = $current_pokin_data['parent'];
+
+		$get_parent = $this->get_parent_pokin_pemda_by_parent_id($parent_id);
+
+		$grand_parent = [];
+		if (!empty($get_parent)) {
+			$grand_parent = $this->process_get_parent_pokin_recursive($get_parent);
+		}
+
+        return [
+            'data'      => $current_pokin_data,
+            'parent'    => $grand_parent
+        ];
+    }
 
 	public function get_data_unit_by_id_skpd_tahun_anggaran(int $id_skpd, int $tahun_anggaran)
 	{
@@ -630,7 +625,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
         $indicators = $this->get_pokin_indikator_by_parent_id($node_id);
 
-        $child_nodes_data = $this->get_pokin_nodes_by_parent_id($node_id);
+        $child_nodes_data = $this->get_pokin_opd_by_parent_id($node_id);
 
         $child_subtree = [];
         if (!empty($child_nodes_data)) {
@@ -663,7 +658,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
         return $data;
 	}
 
-    public function get_pokin_nodes_by_parent_id(int $id)
+    public function get_pokin_opd_by_parent_id(int $id)
     {
         global $wpdb;
 
@@ -681,6 +676,24 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
         return $data;
     }
 
+    public function get_parent_pokin_pemda_by_parent_id(int $id)
+    {
+        global $wpdb;
+
+        $data = $wpdb->get_row(
+            $wpdb->prepare("
+                SELECT *
+                FROM esakip_pohon_kinerja
+                WHERE id = %d
+                  AND active = 1
+                  AND (label_indikator_kinerja IS NULL OR label_indikator_kinerja = '')
+            ", $id),
+            ARRAY_A
+        );
+
+        return $data;
+    }
+
     public function get_pokin_opd_by_id(int $id)
     {
         global $wpdb;
@@ -689,6 +702,40 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
             $wpdb->prepare("
                 SELECT *
                 FROM esakip_pohon_kinerja_opd
+                WHERE id = %d
+                  AND active = 1
+            ", $id),
+            ARRAY_A
+        );
+
+        return $data;
+    }
+
+    public function get_koneksi_pokin_pemda_by_id(int $id)
+    {
+        global $wpdb;
+
+        $data = $wpdb->get_row(
+            $wpdb->prepare("
+                SELECT *
+                FROM esakip_koneksi_pokin_pemda_opd
+                WHERE id = %d
+                  AND active = 1
+            ", $id),
+            ARRAY_A
+        );
+
+        return $data;
+    }
+
+    public function get_pokin_pemda_by_id(int $id)
+    {
+        global $wpdb;
+
+        $data = $wpdb->get_row(
+            $wpdb->prepare("
+                SELECT *
+                FROM esakip_pohon_kinerja
                 WHERE id = %d
                   AND active = 1
             ", $id),
