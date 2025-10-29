@@ -568,13 +568,26 @@ class Esakip_Functions
             'login' => $opsi['user']->user_login,
             'time'  => time()
         );
-
         $payload = base64_encode(json_encode($user_data));
+        
         $url_asli = '';
         if (!empty($opsi['url_asli'])) {
-            $url_asli = $opsi['url_asli'];
+            if (strpos($opsi['url_asli'], 'user/') === 0 && strpos($opsi['url_asli'], '|') !== false) {
+                // Format untuk admin_panrb dan administator
+                $url_parts = explode('|', $opsi['url_asli']);
+                $custom_path = $url_parts[0];
+                $tahun = isset($url_parts[1]) ? sanitize_text_field($url_parts[1]) : '';
+                
+                $url_asli = $custom_path;
+                if (!empty($tahun)) {
+                    $url_asli .= '?tahun=' . $tahun;
+                }
+            } else {
+                // Format selain admin_panrb
+                $url_asli = $opsi['url_asli'];
+            }
         }
-
+        
         $url = '';
         if (!empty($opsi['domain'])) {
             $signature = hash_hmac('sha256', $payload, $opsi['api_key']);
@@ -582,7 +595,7 @@ class Esakip_Functions
             if (substr($opsi['domain'], -1) !== '/') {
                 $opsi['domain'] .= '/';
             }
-            $url = $opsi['domain'] . 'sso-login?token=' . urlencode($token) . '&redirect=' . $url_asli;
+            $url = $opsi['domain'] . 'sso-login?token=' . urlencode($token) . '&redirect=' . urlencode($url_asli);
         } else if (!empty($opsi['id_login'])) {
             $data = $this->get_option_complex('_crb_auto_login');
             $url = $url_asli;
@@ -597,7 +610,7 @@ class Esakip_Functions
                     if (substr($v['app_url'], -1) !== '/') {
                         $v['app_url'] .= '/';
                     }
-                    $url = $v['app_url'] . 'sso-login?token=' . urlencode($token) . '&redirect=' . $url_asli;
+                    $url = $v['app_url'] . 'sso-login?token=' . urlencode($token) . '&redirect=' . urlencode($url_asli);
                 }
             }
         }

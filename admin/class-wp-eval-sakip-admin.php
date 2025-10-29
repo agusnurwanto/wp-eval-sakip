@@ -4661,55 +4661,178 @@ class Wp_Eval_Sakip_Admin
 	}
 
 	function coba_auto_login()
-	{
-		global $wpdb;
-		$ret = array(
-			'status'    => 'success',
-			'message'   => 'Berhasil login!'
-		);
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if (is_user_logged_in() == false) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Anda tidak dapat akses ke halaman ini!';
-				} else {
-					if (!empty($_POST['id'])) {
-						$user = wp_get_current_user();
-						if (in_array('administrator', $user->roles)) {
-							$user = get_user_by('id', $_POST['user_id']);
-						}
-						$ret['url_login'] = $this->functions->login_to_other_site(array(
-							'user' => $user,
-							'id_login' => $_POST['id'],
-							'url_asli' => $_POST['url']
-						));
-					} else {
-						if (empty($_POST['domain'])) {
-							$ret['status'] = 'error';
-							$ret['message'] = 'Domain tidak boleh kosong!';
-						} elseif (empty($_POST['api_key_tujuan'])) {
-							$ret['status'] = 'error';
-							$ret['message'] = 'API KEY tujuan tidak boleh kosong!';
-						} else {
-							$user = wp_get_current_user();
-							$ret['url_login'] = $this->functions->login_to_other_site(array(
-								'user' => $user,
-								'domain' => $_POST['domain'],
-								'api_key' => $_POST['api_key_tujuan']
-							));
-						}
-					}
-				}
-			} else {
-				$ret['status'] = 'error';
-				$ret['message'] = 'APIKEY tidak sesuai!';
-			}
-		} else {
-			$ret['status'] = 'error';
-			$ret['message'] = 'Format Salah!';
-		}
-		die(json_encode($ret));
-	}
+    {
+        global $wpdb;
+        $ret = array(
+            'status'    => 'success',
+            'message'   => 'Berhasil login!'
+        );
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if (is_user_logged_in() == false) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Anda tidak dapat akses ke halaman ini!';
+                } else {
+                    if (!empty($_POST['id'])) {
+                        $user = wp_get_current_user();
+                        if (in_array('administrator', $user->roles)) {
+                            $user_target = get_user_by('id', $_POST['user_id']);
+    
+						    if ($user_target) {
+						        $is_view_profile = false;
+						        $tahun = '';
+						        
+						        if (!empty($_POST['url'])) {
+						            $url_parts = explode('|', $_POST['url']);
+						            if ($url_parts[0] == 'view_profile') {
+						                $is_view_profile = true;
+						                if (count($url_parts) > 2) {
+						                    $tahun = sanitize_text_field($url_parts[2]);
+						                }
+						            }
+						        }
+						        
+						        if ($is_view_profile) {
+						            $redirect_url = um_user_profile_url($_POST['user_id']);
+						            
+						            if (!empty($tahun)) {
+						                $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+						            }
+						            
+						            $ret['url_login'] = $redirect_url;
+						        } else {
+						            $ret['url_login'] = $this->functions->login_to_other_site(array(
+						                'user' => $user_target,
+						                'id_login' => $_POST['id'],
+						                'url_asli' => $_POST['url']
+						            ));
+						        }
+						    } else {
+						        $ret['status'] = 'error';
+						        $ret['message'] = 'User tidak ditemukan!';
+						    }
+                        } elseif (in_array('admin_panrb', $user->roles)) {
+                            if ($user->ID == $_POST['user_id']) {
+                                $is_view_profile = false;
+                                $tahun = '';
+                                
+                                if (!empty($_POST['url'])) {
+                                    $url_parts = explode('|', $_POST['url']);
+                                    if ($url_parts[0] == 'view_profile') {
+                                        $is_view_profile = true;
+                                        if (count($url_parts) > 2) {
+                                            $tahun = sanitize_text_field($url_parts[2]);
+                                        }
+                                    }
+                                }
+                                
+                                if ($is_view_profile) {
+                                    $redirect_url = um_user_profile_url($_POST['user_id']);
+                                    
+                                    if (!empty($tahun)) {
+                                        $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                    }
+                                    
+                                    $ret['url_login'] = $redirect_url;
+                                } else {
+                                    $list_skpd_page = get_page_by_path('laporan-pk-setting');
+                                    
+                                    $tahun = '';
+                                    if (!empty($_POST['url'])) {
+                                        $url_parts = explode('|', $_POST['url']);
+                                        if (count($url_parts) > 1) {
+                                            $tahun = sanitize_text_field($url_parts[1]);
+                                        }
+                                    }
+                                    
+                                    if (!$list_skpd_page) {
+                                        $list_skpd_laporan_pk_setting = $this->functions->generatePage(array(
+                                            'nama_page'   => 'Laporan PK Setting',
+                                            'content'     => '[halaman_laporan_pk_setting]',
+                                            'show_header' => 1,
+                                            'post_status' => 'private'
+                                        ));
+                                        $redirect_url = get_permalink($list_skpd_laporan_pk_setting);
+                                    } else {
+                                        $redirect_url = get_permalink($list_skpd_page->ID);
+                                    }
+                                    
+                                    if (!empty($tahun)) {
+                                        $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                    }
+                                    
+                                    $ret['url_login'] = $redirect_url;
+                                }
+                            } else {
+                                $user_target = get_user_by('id', $_POST['user_id']);
+                                if ($user_target) {
+                                    $is_view_profile = false;
+                                    $tahun = '';
+                                    
+                                    if (!empty($_POST['url'])) {
+                                        $url_parts = explode('|', $_POST['url']);
+                                        if ($url_parts[0] == 'view_profile') {
+                                            $is_view_profile = true;
+                                            if (count($url_parts) > 2) {
+                                                $tahun = sanitize_text_field($url_parts[2]);
+                                            }
+                                        }
+                                    }
+                                    
+                                    if ($is_view_profile) {
+                                        $redirect_url = um_user_profile_url($_POST['user_id']);
+                                        
+                                        if (!empty($tahun)) {
+                                            $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                        }
+                                        
+                                        $ret['url_login'] = $redirect_url;
+                                    } else {
+                                        $ret['url_login'] = $this->functions->login_to_other_site(array(
+                                            'user' => $user_target,
+                                            'id_login' => $_POST['id'],
+                                            'url_asli' => $_POST['url']
+                                        ));
+                                    }
+                                } else {
+                                    $ret['status'] = 'error';
+                                    $ret['message'] = 'User tidak ditemukan!';
+                                }
+                            }
+                        } else {
+                            $ret['url_login'] = $this->functions->login_to_other_site(array(
+                                'user' => $user,
+                                'id_login' => $_POST['id'],
+                                'url_asli' => $_POST['url']
+                            ));
+                        }
+                    } else {
+                        if (empty($_POST['domain'])) {
+                            $ret['status'] = 'error';
+                            $ret['message'] = 'Domain tidak boleh kosong!';
+                        } elseif (empty($_POST['api_key_tujuan'])) {
+                            $ret['status'] = 'error';
+                            $ret['message'] = 'API KEY tujuan tidak boleh kosong!';
+                        } else {
+                            $user = wp_get_current_user();
+                            $ret['url_login'] = $this->functions->login_to_other_site(array(
+                                'user' => $user,
+                                'domain' => $_POST['domain'],
+                                'api_key' => $_POST['api_key_tujuan']
+                            ));
+                        }
+                    }
+                }
+            } else {
+                $ret['status'] = 'error';
+                $ret['message'] = 'APIKEY tidak sesuai!';
+            }
+        } else {
+            $ret['status'] = 'error';
+            $ret['message'] = 'Format Salah!';
+        }
+        die(json_encode($ret));
+    }
 
 	function handle_sso_login()
 	{
