@@ -785,6 +785,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_dokumen_bukti_dukung_kuesioner',  $plugin_public, 'get_dokumen_bukti_dukung_kuesioner');
 		$this->loader->add_action('wp_ajax_submit_bukti_dukung_kuesioner',  $plugin_public, 'submit_bukti_dukung_kuesioner');
 
+		$this->loader->add_action('wp_ajax_handle_view_pokin',  $plugin_public, 'handle_view_pokin');
+		$this->loader->add_action('wp_ajax_nopriv_handle_view_pokin',  $plugin_public, 'handle_view_pokin');
 		$this->loader->add_action('wp_ajax_generate_fields_dokumen_kuesioner',  $plugin_public, 'generate_fields_dokumen_kuesioner');
 		$this->loader->add_action('wp_ajax_get_table_skpd_dokumen_kuesioner',  $plugin_public, 'get_table_skpd_dokumen_kuesioner');
 		$this->loader->add_action('wp_ajax_get_table_dokumen_kuesioner',  $plugin_public, 'get_table_dokumen_kuesioner');
@@ -955,6 +957,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('list_kuesioner_dokumen', array($plugin_public, 'list_kuesioner_dokumen'));
 		add_shortcode('dokumen_detail_kuesioner', array($plugin_public, 'dokumen_detail_kuesioner'));
 		add_shortcode('capaian_iku_opd', array($plugin_public, 'capaian_iku_opd'));
+
+		add_shortcode('new_view_pohon_kinerja', array($plugin_public, 'new_view_pohon_kinerja'));
 	}
 
 	/**

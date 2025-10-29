@@ -20664,6 +20664,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$periode_input_croscutting_pemda = '';
 		$periode_dokumen_pohon_kinerja_pemda = '';
 		$periode_input_iku_pemda = '';
+		$pk_pemda = '';
+		$pengisian_rencana_aksi_pemda = '';
 		$periode_iku_pemda = '';
 		$halaman_iku_pemda = '';
 		$pengisian_kuesioner_menpan_detail_pemda = '';
@@ -20912,7 +20914,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title = 'Rencana Aksi Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
-			$pengisian_rencana_aksi_pemda = '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
+			$pengisian_rencana_aksi_pemda .= '<li><a target="_blank" href="' . $list_pemda_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
 
 			$list_pemda_pk = $this->functions->generatePage(array(
 				'nama_page' => 'Laporan PK Pemerintah Daerah Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -20921,7 +20923,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'post_status' => 'private'
 			));
 			$title = 'PK (Perjanjian Kinerja) Tahun ' . $_GET['tahun'] . ' | ' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
-			$pk_pemda = '<li><a target="_blank" href="' . $list_pemda_pk['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
+			$pk_pemda .= '<li><a target="_blank" href="' . $list_pemda_pk['url'] . '" class="btn btn-primary">' .  $title . '</a></li>';
 		}
 		// PEMDA
 
