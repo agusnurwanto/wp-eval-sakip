@@ -2621,16 +2621,20 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     $ret['message'] = 'Tahun Anggaran kosong!';
                 }
 
+                $user_id = um_user('ID');
+                $user_meta = get_userdata($user_id);
+
                 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
                 if ($ret['status'] == 'success') {
                     $unit = $wpdb->get_results(
                         $wpdb->prepare("
-                        SELECT 
+                        SELECT
                             nama_skpd, 
                             id_skpd, 
                             kode_skpd, 
-                            nipkepala 
+                            nipkepala,
+                            namakepala 
                         FROM esakip_data_unit 
                         WHERE active=1 
                           AND tahun_anggaran=%d
@@ -2645,11 +2649,11 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         foreach ($unit as $kk => $vv) {
                             $data_detail = $wpdb->get_row(
                                 $wpdb->prepare(
-                                    "SELECT 
+                                    "SELECT
                                         *
                                     FROM 
-                                        esakip_detail_data_unit 
-                                    WHERE 
+                                        esakip_detail_data_unit
+                                    WHERE
                                         id_skpd = %d
                                 ",
                                     $vv['id_skpd']
@@ -2658,12 +2662,41 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             );
 
                             $alamat_kantor = !empty($data_detail['alamat_kantor']) ? $data_detail['alamat_kantor'] : '';
+                            $nip_kepala = !empty($vv['nipkepala']) ? $vv['nipkepala'] : '';
+                            $nama_kepala = !empty($vv['namakepala']) ? $vv['namakepala'] : '';
 
                             $tbody .= "<tr>";
                             $tbody .= "<td>" . $vv['kode_skpd'] . " " . $vv['nama_skpd'] . "</td>";
+                            $tbody .= "<td class='text-center'>" . $nip_kepala . "</td>";
+                            $tbody .= "<td class='text-left'>" . $nama_kepala . "</td>";
                             $tbody .= "<td class='text-left'>" . $alamat_kantor . "</td>";
 
-                            $btn = '<button class="btn btn-sm btn-warning" onclick="edit_setting_laporan_pk(\'' . $vv['id_skpd'] . '\'); return false;" href="#" title="Edit Setting laporan PK"><span class="dashicons dashicons-edit"></span></button>';
+                            $btn = '';
+                            if (in_array('administrator', $user_meta->roles)) {
+                                $btn .= '
+                                    <button class="btn btn-sm btn-warning" onclick="edit_setting_laporan_pk(\'' . $vv['id_skpd'] . '\'); return false;" title="Edit Setting laporan PK">
+                                        <span class="dashicons dashicons-edit"></span>
+                                    </button>
+                                ';
+                            }
+
+                            $id_by_nip = $wpdb->get_row($wpdb->prepare("
+                                SELECT
+                                    user_id 
+                                FROM {$wpdb->prefix}usermeta 
+                                WHERE meta_key = 'nip'
+                                    AND meta_value = %s 
+                                LIMIT 1
+                            ", $nip_kepala),ARRAY_A);
+
+                            $id_kepala = !empty($id_by_nip['user_id']) ? $id_by_nip['user_id'] : '';
+
+                            if (!empty($id_kepala) && in_array('admin_panrb', $user_meta->roles) || in_array('administrator', $user_meta->roles)) {
+                                $btn .= '
+                                    <button class="btn btn-sm btn-secondary" onclick="login_to_profile(\'' . $id_kepala . '\', \'' . $tahun_anggaran . '\', \'' . $nip_kepala . '\'); return false;" title="Login ke User"><span class="dashicons dashicons-controls-forward"></span>
+                                    </button>
+                                ';
+                            }
 
                             $tbody .= "<td class='text-center'>" . $btn . "</td>";
                             $tbody .= "</tr>";
