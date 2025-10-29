@@ -9859,6 +9859,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				if ($ret['status'] != 'error') {
 					$tahun_anggaran = $_POST['tahun_anggaran'];
 					$id_jadwal = $_POST['id_jadwal'];
+					$detail_jadwal = $wpdb->get_row(
+						$wpdb->prepare('
+							SELECT 
+								* 
+							FROM esakip_data_jadwal 
+							WHERE id_jadwal=%d
+						', $id_jadwal),
+						ARRAY_A
+					);
 
 					$get_data_iku = $wpdb->get_results(
 						$wpdb->prepare('
@@ -9874,7 +9883,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					if (!empty($get_data_iku)) {
 						foreach ($get_data_iku as $iku) {
 							$id_iku = $iku['id'];
-							$active = $iku['active'];
+							$tahun_rpjm = $tahun_anggaran - $detail_jadwal['tahun_amggaran'];
+							if($tahun_rpjm <= 0){
+								$tahun_rpjm = 0;
+							}else if($tahun_rpjm >= 4){
+								$tahun_rpjm = 4;
+							}
+							$key_target = 'target_'.($tahun_rpjm+1);
 
 							$get_data_pk = $wpdb->get_row(
 								$wpdb->prepare("
@@ -9882,18 +9897,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										* 
 									FROM esakip_laporan_pk_pemda 
 									WHERE id_iku = %d
-									  AND active = 1
-								", $id_iku),
+									  AND tahun_anggaran = %d
+								", $id_iku, $tahun_anggaran),
 								ARRAY_A
 							);
 
-							if ($get_data_pk) {
+							if (!empty($get_data_pk)) {
 	                            $update_data = array();
-	                            if ($get_data_pk['active'] != $active) {
-	                                $update_data['active'] = $active;
+	                            if ($get_data_pk['active'] != $iku['active']) {
+	                                $update_data['active'] = $iku['active'];
 	                            }
 	                            if ($get_data_pk['satuan'] != $iku['satuan']) {
 	                                $update_data['satuan'] = $iku['satuan'];
+	                            }
+	                            if ($get_data_pk['target'] != $iku[$key_target]) {
+	                                $update_data['target'] = $iku[$key_target];
 	                            }
 
 	                            if (!empty($update_data)) {
@@ -9903,19 +9921,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                                    array('id_iku' => $id_iku)
 	                                );
 	                            }
+							// Insert baru jika belum ada
 	                        } else {
-								// Insert baru jika belum ada
-								if ($active == 1) {
-									$data = array(
-										'id_iku' => $id_iku,
-										'satuan' => $iku['satuan'],
-										'target' => $iku['target_1'],
-										'id_jadwal' => $id_jadwal,
-										'active' => 1,
-										'tahun_anggaran' => $tahun_anggaran
-									);
-									$wpdb->insert('esakip_laporan_pk_pemda', $data);
-								}
+								$data = array(
+									'id_iku' => $id_iku,
+									'satuan' => $iku['satuan'],
+									'target' => $iku[$key_target],
+									'id_jadwal' => $id_jadwal,
+									'active' => $iku['active'],
+									'tahun_anggaran' => $tahun_anggaran
+								);
+								$wpdb->insert('esakip_laporan_pk_pemda', $data);
 							}
 						}
 					}
