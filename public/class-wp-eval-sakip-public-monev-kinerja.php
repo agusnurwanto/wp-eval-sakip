@@ -2300,8 +2300,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$ind['rumus_capaian_kinerja'],
 								$target_tahunan,
 								$all_realisasi,
-								$ind['tahun_anggaran'],
-								1
+								$ind['tahun_anggaran']
 							);
 							$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
@@ -2552,8 +2551,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$ind['rumus_capaian_kinerja'],
 									$target_tahunan,
 									$all_realisasi,
-									$ind['tahun_anggaran'],
-									2
+									$ind['tahun_anggaran']
 								);
 								$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
@@ -2935,8 +2933,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$ind['rumus_capaian_kinerja'],
 										$target_tahunan,
 										$all_realisasi,
-										$ind['tahun_anggaran'],
-										3
+										$ind['tahun_anggaran']
 									);
 									$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
@@ -3224,8 +3221,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											$ind['rumus_capaian_kinerja'],
 											$target_tahunan,
 											$all_realisasi,
-											$ind['tahun_anggaran'],
-											4
+											$ind['tahun_anggaran']
 										);
 										$capaian_realisasi[$key] = ($capaian_realisasi[$key] === false) ? 'N/A' : $capaian_realisasi[$key] . '%';
 
