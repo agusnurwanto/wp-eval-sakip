@@ -132,18 +132,23 @@ if (!empty($data_all['data'])) {
 
 				$show_nama_skpd = $valCross['nama_skpd'];
 				$label_parent = $valCross['label_parent'];
-				if ($valCross['is_lembaga_lainnya'] != 1) {
-					$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
-				}
 
 				$class_cc_vertikal = '';
 				if ($valCross['is_lembaga_lainnya'] == 1) {
 					$label_parent = $valCross['keterangan'];
 					$class_cc_vertikal = "croscutting-lembaga-vertikal";
 				}
-				$data_temp[$keylevel1][0]->f .= "<div class='croscutting tampil_croscutting item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_1["id"] . "'>
-						<div class='cros-opd'>" . $show_nama_skpd . "</div>
-						<div>" . $label_parent . " 
+				
+				if ($valCross['is_lembaga_lainnya'] != 1) {
+					$show_nama_skpd = $valCross['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&tipe_koneksi=opd&id_koneksi_pokin=" . $valCross['id'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $label_parent . "</a>";
+				} else {
+					$show_nama_skpd = $valCross['nama_skpd'] . "<br>" . $label_parent;
+				}
+
+				$data_temp[$keylevel1][0]->f .= "
+					<div class='croscutting tampil_croscutting item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_1["id"] . "'>
+						<div class='cros-opd'>
+							" . $show_nama_skpd . "
 							<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 								<i class='dashicons dashicons-info'></i>
 							</a>
@@ -164,11 +169,11 @@ if (!empty($data_all['data'])) {
 				if ($tipe == 'opd') {
 					$label_parent = $val_koneksi['label_parent'];
 					if (!empty($val_koneksi['id_level_1_parent'])) {
-						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
+						$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "</a>";
 					}
 				} else {
 					if ($val_koneksi['tipe'] == 1) {
-						$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>(" . $val_koneksi['label_parent'] . ")</a>";
+						$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 					} else {
 						$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
 					}
@@ -208,18 +213,21 @@ if (!empty($data_all['data'])) {
 
 						$show_nama_skpd = $valCross['nama_skpd'];
 						$label_parent = $valCross['label_parent'];
-						if ($valCross['is_lembaga_lainnya'] != 1) {
-							$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
-						}
-
 						$class_cc_vertikal = '';
 						if ($valCross['is_lembaga_lainnya'] == 1) {
 							$label_parent = $valCross['keterangan'];
 							$class_cc_vertikal = "croscutting-lembaga-vertikal";
 						}
-						$data_temp[$keylevel2][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_2["id"] . "'>
-								<div class='cros-opd'>" . $show_nama_skpd . "</div>
-								<div>" . $label_parent . " 
+						if ($valCross['is_lembaga_lainnya'] != 1) {
+							$show_nama_skpd = $valCross['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&tipe_koneksi=opd&id_koneksi_pokin=" . $valCross['id'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $label_parent . "</a>";
+						} else {
+							$show_nama_skpd = $valCross['nama_skpd'] . "<br>" . $label_parent;
+						}
+
+						$data_temp[$keylevel2][0]->f .= "
+							<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_2["id"] . "'>
+								<div class='cros-opd'>
+									" . $show_nama_skpd . "
 									<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 										<i class='dashicons dashicons-info'></i>
 									</a>
@@ -240,11 +248,11 @@ if (!empty($data_all['data'])) {
 						if ($tipe == 'opd') {
 							$label_parent = $val_koneksi['label_parent'];
 							if (!empty($val_koneksi['id_level_1_parent'])) {
-								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
+								$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "</a>";
 							}
 						} else {
 							if ($val_koneksi['tipe'] == 1) {
-								$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>(" . $val_koneksi['label_parent'] . ")</a>";
+								$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 							} else {
 								$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
 							}
@@ -284,18 +292,22 @@ if (!empty($data_all['data'])) {
 
 								$show_nama_skpd = $valCross['nama_skpd'];
 								$label_parent = $valCross['label_parent'];
-								if ($valCross['is_lembaga_lainnya'] != 1) {
-									$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
-								}
-
 								$class_cc_vertikal = '';
 								if ($valCross['is_lembaga_lainnya'] == 1) {
 									$label_parent = $valCross['keterangan'];
 									$class_cc_vertikal = "croscutting-lembaga-vertikal";
 								}
-								$data_temp[$keylevel3][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_3["id"] . "'>
-										<div class='cros-opd'>" . $show_nama_skpd . "</div>
-										<div>" . $label_parent . " 
+
+								if ($valCross['is_lembaga_lainnya'] != 1) {
+									$show_nama_skpd = $valCross['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&tipe_koneksi=opd&id_koneksi_pokin=" . $valCross['id'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $label_parent . "</a>";
+								} else {
+									$show_nama_skpd = $valCross['nama_skpd'] . "<br>" . $label_parent;
+								}
+								
+								$data_temp[$keylevel3][0]->f .= "
+									<div class='croscutting tampil_croscutting item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_3["id"] . "'>
+										<div class='cros-opd'>
+											" . $show_nama_skpd . "
 											<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 												<i class='dashicons dashicons-info'></i>
 											</a>
@@ -316,11 +328,11 @@ if (!empty($data_all['data'])) {
 								if ($tipe == 'opd') {
 									$label_parent = $val_koneksi['label_parent'];
 									if (!empty($val_koneksi['id_level_1_parent'])) {
-										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . ")</a>";
+										$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "</a>";
 									}
 								} else {
 									if ($val_koneksi['tipe'] == 1) {
-										$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>(" . $val_koneksi['label_parent'] . ")</a>";
+										$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 									} else {
 										$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
 									}
@@ -360,18 +372,21 @@ if (!empty($data_all['data'])) {
 
 										$show_nama_skpd = $valCross['nama_skpd'];
 										$label_parent = $valCross['label_parent'];
-										if ($valCross['is_lembaga_lainnya'] != 1) {
-											$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
-										}
-
 										$class_cc_vertikal = '';
 										if ($valCross['is_lembaga_lainnya'] == 1) {
 											$label_parent = $valCross['keterangan'];
 											$class_cc_vertikal = "croscutting-lembaga-vertikal";
 										}
-										$data_temp[$keylevel4][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_4["id"] . "'>
-												<div class='cros-opd'>" . $show_nama_skpd . "</div>
-												<div>" . $label_parent . " 
+										if ($valCross['is_lembaga_lainnya'] != 1) {
+											$show_nama_skpd = $valCross['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&tipe_koneksi=opd&id_koneksi_pokin=" . $valCross['id'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $label_parent. "</a>";
+										} else {
+											$show_nama_skpd = $valCross['nama_skpd'] . "<br>" . $label_parent;
+										}
+
+										$data_temp[$keylevel4][0]->f .= "
+											<div class='croscutting tampil_croscutting item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_4["id"] . "'>
+												<div class='cros-opd'>
+													" . $show_nama_skpd . "
 													<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 														<i class='dashicons dashicons-info'></i>
 													</a>
@@ -391,10 +406,10 @@ if (!empty($data_all['data'])) {
 									foreach ($level_4['koneksi_pokin'] as $key_koneksi => $val_koneksi) {
 										$label_parent = $val_koneksi['label_parent'];
 										if ($tipe == 'opd') {
-											$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>(" . ucfirst($val_koneksi['label_parent']) . "</a>";
+											$show_nama_skpd = "<a href='" . $pokin_pemda['url'] . "&id=" . $val_koneksi['id_level_1_parent'] . "&id_jadwal=" . $input['periode'] . "' target='_blank'>" . ucfirst($val_koneksi['label_parent']) . "</a>";
 										} else {
 											if ($val_koneksi['tipe'] == 1) {
-												$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>(" . $val_koneksi['label_parent'] . ")</a>";
+												$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 											} else {
 												$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
 											}
@@ -496,22 +511,26 @@ if (!empty($data_all['data'])) {
 
 												$show_nama_skpd = $valCross['nama_skpd'];
 												$label_parent = $valCross['label_parent'];
-												if ($valCross['is_lembaga_lainnya'] != 1) {
-													$show_nama_skpd = "<a href='" . $new_view_pokin_page['url'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $valCross['nama_skpd'] . "</a>";
-												}
-
+												
 												$class_cc_vertikal = '';
 												if ($valCross['is_lembaga_lainnya'] == 1) {
 													$label_parent = $valCross['keterangan'];
 													$class_cc_vertikal = "croscutting-lembaga-vertikal";
 												}
-												$data_temp[$keylevel5][0]->f .= "<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_5["id"] . "'>
-														<div>" . $show_nama_skpd . " 
+
+												if ($valCross['is_lembaga_lainnya'] != 1) {
+													$show_nama_skpd = $valCross['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&tipe_koneksi=opd&id_koneksi_pokin=" . $valCross['id'] . "&id=" . $id_pokin_cc . "' target='_blank'>" . $label_parent . "</a>";
+												} else {
+													$show_nama_skpd = $valCross['nama_skpd'] . "<br>" . $label_parent;
+												}
+
+												$data_temp[$keylevel5][0]->f .= "
+													<div class='croscutting tampil_croscutting  item-rincian " . $class_cc_opd_lain . " " . $class_cc_vertikal . "' data-id='" . $level_5["id"] . "'>
+														<div class='cros-opd'>" . $show_nama_skpd . " 
 															<a href='javascript:void(0)' data-id='" . $valCross['id'] . "' class='detail-cc' onclick='event.stopPropagation(); detail_cc(" . $valCross['id'] . "); return false;' title='Detail'>
 																<i class='dashicons dashicons-info'></i>
 															</a>
 														</div>
-														<div class='cros-opd'>" . $label_parent . "</div>
 													</div>
 												";
 											}
@@ -1068,7 +1087,7 @@ if (!empty($data_all['data'])) {
 			<?php if ($tipe == 'opd'): ?>
 				<div class="wrap-table">
 					<table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
-						<thead>
+						<thead class="bg-dark text-light">
 							<tr>
 								<th class="text-center" style="border: 1px solid black;">Perangkat Pengusul</th>
 								<th class="text-center" style="border: 1px solid black;">Keterangan Pengusul</th>
@@ -1083,10 +1102,11 @@ if (!empty($data_all['data'])) {
 			<?php else: ?>
 				<div class="wrap-table">
 					<table id="croscutting" cellpadding="2" cellspacing="0" class="table table-bordered">
-						<thead>
+						<thead class="bg-dark text-light">
 							<tr>
 								<th class="text-center" style="border: 1px solid black;">PD/UPT/Lembaga/Desa</th>
-								<th class="text-center" style="border: 1px solid black;">Informasi Kegiatan </th>
+								<th class="text-center" style="border: 1px solid black;">Pohon Kinerja</th>
+								<th class="text-center" style="border: 1px solid black;">Informasi Kegiatan</th>
 							</tr>
 						</thead>
 						<tbody>

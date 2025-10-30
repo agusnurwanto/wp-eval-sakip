@@ -10,7 +10,13 @@ if (empty($_GET) || empty($_GET['id'])) {
     $id_pohon_kinerja = $_GET['id'];
 }
 
-if (!empty($_GET['id_koneksi_pokin'])) {
+if (!empty($_GET['tipe_koneksi'])) {
+    $tipe_koneksi = $_GET['tipe_koneksi'];
+} else {
+    $tipe_koneksi = null;
+}
+
+if (!empty($_GET['id_koneksi_pokin']) && !empty($tipe_koneksi)) {
     $id_koneksi_pokin = $_GET['id_koneksi_pokin'];
 } else {
     $id_koneksi_pokin = null;
@@ -323,8 +329,6 @@ if (!empty($_GET['id_koneksi_pokin'])) {
                     <h4 class="h5 text-muted namaJadwal">Memuat....</h4>
                 </div>
 
-                <hr>
-
                 <div id="koneksi-pokin-section"></div>
 
                 <div id="pokin-chart-wrapper" style="width: 100%; height: 600px; overflow: auto; border: 1px solid #ccc;">
@@ -360,7 +364,8 @@ if (!empty($_GET['id_koneksi_pokin'])) {
             data: {
                 action: 'handle_view_pokin',
                 id: <?php echo $id_pohon_kinerja; ?>,
-                id_koneksi_pokin: <?php echo json_encode($id_koneksi_pokin); ?>,
+                tipe_koneksi: '<?php echo $tipe_koneksi; ?>',
+                id_koneksi_pokin: <?php echo $id_koneksi_pokin; ?>,
             },
             dataType: 'json'
         });
@@ -375,6 +380,7 @@ if (!empty($_GET['id_koneksi_pokin'])) {
             if (response.status && response.data) {
                 gFullPokinData = response.data;
                 const data_unit = response.info.data_unit;
+                const data_unit_koneksi = response.info.data_unit_koneksi;
                 const data_jadwal = response.info.data_jadwal;
                 const data_koneksi = response.info.data_koneksi;
 
@@ -392,7 +398,14 @@ if (!empty($_GET['id_koneksi_pokin'])) {
                 generateLevelRadios(currentLevel, maxLevel);
 
                 if (data_koneksi) {
-                    generateKoneksiPokinSection(data_koneksi);
+                    let tipeKoneksi = '<?php echo $tipe_koneksi; ?>';
+                    let title = '?';
+                    if (tipeKoneksi == 'pemda') {
+                        title = `KONEKSI POHON KINERJA ${namaPemda}`;
+                    } else {
+                        title = `CROSSCUTTING POHON KINERJA ${data_unit_koneksi.nama_skpd || 'N/A'}`;
+                    }
+                    generateKoneksiPokinSection(data_koneksi, title);
                 }
 
                 jQuery(`#level${currentLevel}`).prop('checked', true);
@@ -519,7 +532,7 @@ if (!empty($_GET['id_koneksi_pokin'])) {
         }
     }
 
-    function generateKoneksiPokinSection(data) {
+    function generateKoneksiPokinSection(data, title) {
         let $section = jQuery('#koneksi-pokin-section');
         $section.html(`<span class="text-muted">data koneksi ditemukan, memuat...</span>`);
 
@@ -539,16 +552,17 @@ if (!empty($_GET['id_koneksi_pokin'])) {
 
         // html
         let html = `
+            <hr>
             <div class="pb-2 mb-3">
                 <h5 class="text-center font-weight-bold mb-0">
-                    Koneksi Pohon Kinerja Pemerintah Daerah
+                    ${title.toUpperCase()}
                 </h5>
             </div>
         `;
 
         // Cek jika array-nya kosong
         if (pokinList.length === 0) {
-            html += `<p class="text-muted text-center">Tidak ada koneksi Pokin Pemda yang ditemukan.</p>`;
+            html += `<p class="text-muted text-center">Tidak ada koneksi Pokin yang ditemukan.</p>`;
         } else {
             html += '<table class="borderless-table mb-4">';
 

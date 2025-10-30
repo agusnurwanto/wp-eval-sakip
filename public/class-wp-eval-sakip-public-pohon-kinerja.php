@@ -512,8 +512,20 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 			$data_pokin = $this->get_pokin_child_by_id($_POST['id']);
 			$data_jadwal = $this->get_data_jadwal_by_id($data_pokin['data']['id_jadwal']);
 			$data_unit = $this->get_data_unit_by_id_skpd_tahun_anggaran($data_pokin['data']['id_skpd'], $tahun_anggaran);
-			if (!empty($_POST['id_koneksi_pokin'])) {
-				$data_koneksi = $this->get_parent_pokin_koneksi_by_id($_POST['id_koneksi_pokin'], $_POST['id']);
+			
+			$data_koneksi = null;
+			$data_unit_koneksi = null;
+			if (!empty($_POST['tipe_koneksi'])) {
+				if ($_POST['tipe_koneksi'] == 'opd') {
+					$tipe = 'opd';
+				} else {
+					$tipe = 'pemda';
+				}
+				$data_koneksi = $this->get_parent_pokin_koneksi_by_id($_POST['id_koneksi_pokin'], $_POST['id'], $tipe);
+
+				if ($tipe == 'opd') {
+					$data_unit_koneksi = $this->get_data_unit_by_id_skpd_tahun_anggaran($data_koneksi['data']['id_skpd'], $tahun_anggaran);
+				}
 			}
 
 			echo json_encode([
@@ -521,10 +533,11 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 				'message' 	=> 'Data berhasil ditemukan.',
 				'data'    	=> $data_pokin,
 				'info'		=> [
-					'data_unit' 	=> $data_unit,
-					'data_jadwal' 	=> $data_jadwal,
-					'nama_pemda' 	=> $nama_pemda,
-					'data_koneksi' 	=> $data_koneksi
+					'data_unit' 		=> $data_unit,
+					'data_unit_koneksi' => $data_unit_koneksi,
+					'data_jadwal' 		=> $data_jadwal,
+					'nama_pemda' 		=> $nama_pemda,
+					'data_koneksi' 		=> $data_koneksi
 				],
 			]);
 		} catch (Exception $e) {
@@ -538,34 +551,56 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 		wp_die();
 	}
 
-	public function get_parent_pokin_koneksi_by_id(int $id_koneksi_pokin, int $id_pokin_opd)
+	public function get_parent_pokin_koneksi_by_id(int $id_koneksi_pokin, int $id_pokin_opd, string $tipe)
 	{		
-		$current_koneksi = $this->get_koneksi_pokin_pemda_by_id($id_koneksi_pokin);
+		$current_koneksi = $this->get_koneksi_pokin_by_id_and_tipe($id_koneksi_pokin, $tipe);
 
 		$is_empty = empty($current_koneksi);
 		if ($is_empty) {
 			return null;
         }
 
-		$is_not_its_parent = $id_pokin_opd != $current_koneksi['parent_pohon_kinerja_koneksi'];
-		if ($is_not_its_parent) {
-			return null;
+		if ($tipe == 'pemda') {
+			$is_not_its_parent = $id_pokin_opd != $current_koneksi['parent_pohon_kinerja_koneksi'];
+			if ($is_not_its_parent) {
+				return null;
+			}
+
+			$current_pokin_data = $this->get_pokin_pemda_by_id($current_koneksi['parent_pohon_kinerja']);
+		} else {
+			$is_pengusul = $id_pokin_opd == $current_koneksi['parent_pohon_kinerja'];
+			$is_dituju = $id_pokin_opd == $current_koneksi['parent_croscutting'];
+			if (!($is_pengusul || $is_dituju)) {
+				return null;
+			}
+
+			// jika pengusul, ambil parent tujuan nya
+			// jika dituju, ambil parent pengusulnya
+			$parent_pokin_id = $is_pengusul ? $current_koneksi['parent_croscutting'] : $current_koneksi['parent_pohon_kinerja'];
+
+			$current_pokin_data = $this->get_pokin_opd_by_id($parent_pokin_id);
 		}
 
-		$current_pokin_data = $this->get_pokin_pemda_by_id($current_koneksi['parent_pohon_kinerja']);
+		if (empty($current_pokin_data)) {
+			throw new Exception("Parent pokin dengan ID $id_pokin_opd tidak ditemukan!", 400);
+		}
 
-        return $this->process_get_parent_pokin_recursive($current_pokin_data);
+        return $this->process_get_parent_pokin_recursive($current_pokin_data, $tipe);
 	}
 
-	private function process_get_parent_pokin_recursive(array $current_pokin_data)
+	private function process_get_parent_pokin_recursive(array $current_pokin_data, string $tipe)
     {
         $parent_id = $current_pokin_data['parent'];
 
-		$get_parent = $this->get_parent_pokin_pemda_by_parent_id($parent_id);
+		if ($tipe == 'opd') {
+			$get_parent = $this->get_pokin_opd_by_id($parent_id);
+		} else {
+			$get_parent = $this->get_pokin_pemda_by_id($parent_id);
+		}
 
 		$grand_parent = [];
 		if (!empty($get_parent)) {
-			$grand_parent = $this->process_get_parent_pokin_recursive($get_parent);
+			$grand_parent = $this->process_get_parent_pokin_recursive($get_parent, $tipe);
 		}
 
         return [
@@ -676,7 +711,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
         return $data;
     }
 
-    public function get_parent_pokin_pemda_by_parent_id(int $id)
+    public function get_pokin_pemda_by_id(int $id)
     {
         global $wpdb;
 
@@ -686,7 +721,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                 FROM esakip_pohon_kinerja
                 WHERE id = %d
                   AND active = 1
-                  AND (label_indikator_kinerja IS NULL OR label_indikator_kinerja = '')
             ", $id),
             ARRAY_A
         );
@@ -711,31 +745,20 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
         return $data;
     }
 
-    public function get_koneksi_pokin_pemda_by_id(int $id)
+    public function get_koneksi_pokin_by_id_and_tipe(int $id, string $tipe)
     {
         global $wpdb;
+
+		if ($tipe == 'opd') {
+			$table_name = 'esakip_croscutting_opd';
+		} else {
+			$table_name = 'esakip_koneksi_pokin_pemda_opd';
+		}
 
         $data = $wpdb->get_row(
             $wpdb->prepare("
                 SELECT *
-                FROM esakip_koneksi_pokin_pemda_opd
-                WHERE id = %d
-                  AND active = 1
-            ", $id),
-            ARRAY_A
-        );
-
-        return $data;
-    }
-
-    public function get_pokin_pemda_by_id(int $id)
-    {
-        global $wpdb;
-
-        $data = $wpdb->get_row(
-            $wpdb->prepare("
-                SELECT *
-                FROM esakip_pohon_kinerja
+                FROM $table_name
                 WHERE id = %d
                   AND active = 1
             ", $id),
@@ -1117,7 +1140,10 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$table_croscutting .= '</tr>'; 
 							
 							if (!empty($v_cross) && $v_cross['status_croscutting'] == 1) {
-								if ($v_cross['is_lembaga_lainnya'] == 0) {
+								$is_opd_lain_pengusul = $id_skpd != $this_data_id_skpd ? true : false;
+								$is_opd_lain_tujuan = $id_skpd != $v_cross['id_skpd_croscutting'] ? true : false;
+
+								if ($v_cross['is_lembaga_lainnya'] == 0 && $is_opd_lain_pengusul) {
 									$new_view_pokin_page = $this->functions->generatePage(array(
 										'nama_page' => 'Lihat Pohon Kinerja',
 										'content' => '[new_view_pohon_kinerja]',
@@ -1125,17 +1151,29 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 										'post_status' => 'publish'
 									));
 
-									$link_tujuan_cc = '<a href="' . $new_view_pokin_page['url'] . '&id=' . $v_cross['parent_pohon_kinerja'] . '" target="_blank">' . $this_data_perangkat['nama_perangkat'] . '</a>';
+									$link_pengusul_cc = '<a href="' . $new_view_pokin_page['url'] . '&id=' . $v_cross['parent_pohon_kinerja'] . '" target="_blank">' . $this_data_perangkat['nama_perangkat'] . '</a>';
 								} else {
-									$link_tujuan_cc = $this_data_perangkat['nama_perangkat'];
+									$link_pengusul_cc = $this_data_perangkat['nama_perangkat'];
+								}
+								if ($v_cross['is_lembaga_lainnya'] == 0 && $is_opd_lain_tujuan) {
+									$new_view_pokin_page = $this->functions->generatePage(array(
+										'nama_page' => 'Lihat Pohon Kinerja',
+										'content' => '[new_view_pohon_kinerja]',
+										'show_header' => 1,
+										'post_status' => 'publish'
+									));
+
+									$link_tujuan_cc = '<a href="' . $new_view_pokin_page['url'] . '&id=' . $v_cross['parent_croscutting'] . '" target="_blank">' . $data_perangkat['nama_perangkat'] . '</a>';
+								} else {
+									$link_tujuan_cc = $data_perangkat['nama_perangkat'];
 								}
 								
 							    $table_koneksi_croscutting_opd .= '
 							        <tr style="border: 1px solid black;">
-							            <td class="text-left" style="width: 270px; border: 1px solid black; padding: 8px;">' . $link_tujuan_cc . '</td>
+							            <td class="text-left" style="width: 270px; border: 1px solid black; padding: 8px;">' . $link_pengusul_cc . '</td>
 							            <td class="text-left" style="width: 230px; border: 1px solid black; padding: 8px;">' . $v_cross['keterangan'] . '</td>
 							            <td class="text-left" style="width: 230px; border: 1px solid black; padding: 8px;">' . $v_cross['keterangan_croscutting'] . '</td>
-							            <td class="text-left" style="width: 230px; border: 1px solid black; padding: 8px;">' . $data_perangkat['nama_perangkat'] . '</td>
+							            <td class="text-left" style="width: 230px; border: 1px solid black; padding: 8px;">' . $link_tujuan_cc . '</td>
 							        </tr>
 							    ';
 							}
@@ -1149,11 +1187,15 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					if (empty($_prefix_opd) && !empty($data)) {
 						$data_koneksi_pokin = $wpdb->get_results($wpdb->prepare("
 								SELECT 
-									*
-								FROM esakip_koneksi_pokin_pemda_opd
-								WHERE parent_pohon_kinerja=%d 
-									AND active=%d
-							", $_POST['id'], 1),  ARRAY_A);
+									koneksi.*,
+									pokin_opd.id as id_pokin_opd,
+									pokin_opd.label as label_pokin_opd
+								FROM esakip_koneksi_pokin_pemda_opd as koneksi
+								LEFT JOIN esakip_pohon_kinerja_opd as pokin_opd
+								  ON koneksi.parent_pohon_kinerja_koneksi = pokin_opd.id
+								WHERE koneksi.parent_pohon_kinerja=%d 
+								  AND koneksi.active=%d
+							", $_POST['id'], 1), ARRAY_A);
 					} else if (!empty($_prefix_opd) && $_prefix_opd == '_opd' && !empty($data)) {
 						// get data koneksi pokin pemda
 						$data_koneksi_pokin = $wpdb->get_results($wpdb->prepare("
@@ -1311,9 +1353,20 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text-center">' . $aksi_koneksi . '</td>
 								</tr>';
 								if (!empty($v_koneksi_pokin) && $v_koneksi_pokin['status_koneksi'] == 1) {
+									$pokin_opd_url = '-';
+									if ($v_koneksi_pokin['tipe'] == 1) {
+										$new_view_pokin_page = $this->functions->generatePage(array(
+											'nama_page' => 'Lihat Pohon Kinerja',
+											'content' => '[new_view_pohon_kinerja]',
+											'show_header' => 1,
+											'post_status' => 'publish'
+										));
+										$pokin_opd_url = '<a href="' . $new_view_pokin_page['url'] . '&id=' . $v_koneksi_pokin['id_pokin_opd'] . '&id_koneksi_pokin=' . $v_koneksi_pokin['id'] . '" target="_blank">' . $v_koneksi_pokin['label_pokin_opd'] . '</a>';
+									}
 								    $table_koneksi_croscutting_pemda .= '
 								        <tr style="border: 1px solid black;">
 								            <td class="text-left" style="width: 270px; border: 1px solid black; padding: 8px;">' . $nama_perangkat . '</td>
+								            <td class="text-left" style="border: 1px solid black; padding: 8px;">' . $pokin_opd_url . '</td>
 								            <td class="text-left" style="width: 230px; border: 1px solid black; padding: 8px;">' . $v_koneksi_pokin['keterangan_koneksi'] . '</td>
 								        </tr>';
 								    $list_pd_koneksi_pokin[] = $nama_perangkat;
