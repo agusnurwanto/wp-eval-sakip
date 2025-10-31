@@ -324,12 +324,17 @@ if (!empty($_GET['id_koneksi_pokin']) && !empty($tipe_koneksi)) {
             <!-- Main Content -->
             <div class="main-content-area bg-white p-4 rounded shadow-sm">
                 <div class="text-center mb-4">
-                    <h2 class="h3 font-weight-bold">Pohon Kinerja</h2>
-                    <h3 class="h4 namaSkpd">Memuat....</h3>
-                    <h4 class="h5 text-muted namaJadwal">Memuat....</h4>
+                    <h1 class="h2">Pohon Kinerja</h1>
+                    <h2 class="h4 text-muted namaJadwal">Memuat....</h2>
                 </div>
 
                 <div id="koneksi-pokin-section"></div>
+
+                <hr>
+                
+                <div class="text-center mb-4">
+                    <h3 class="h5" id="link_full_view">Memuat....</h3>
+                </div>
 
                 <div id="pokin-chart-wrapper" style="width: 100%; height: 600px; overflow: auto; border: 1px solid #ccc;">
                     <div id="chart_div_pokin" style="width: 100%; height: 100%;">
@@ -357,15 +362,15 @@ if (!empty($_GET['id_koneksi_pokin']) && !empty($tipe_koneksi)) {
     });
     google.charts.setOnLoadCallback(initPohonKinerja);
 
-    function get_data_pokin() {
+    function handleViewPokin() {
         return jQuery.ajax({
             url: esakip.url,
             type: 'POST',
             data: {
                 action: 'handle_view_pokin',
-                id: <?php echo $id_pohon_kinerja; ?>,
+                id: '<?php echo $id_pohon_kinerja; ?>',
                 tipe_koneksi: '<?php echo $tipe_koneksi; ?>',
-                id_koneksi_pokin: <?php echo $id_koneksi_pokin; ?>,
+                id_koneksi_pokin: '<?php echo $id_koneksi_pokin; ?>',
             },
             dataType: 'json'
         });
@@ -375,7 +380,7 @@ if (!empty($_GET['id_koneksi_pokin']) && !empty($tipe_koneksi)) {
         gChart = new google.visualization.OrgChart($chartContainer[0]);
 
         try {
-            const response = await get_data_pokin();
+            const response = await handleViewPokin();
 
             if (response.status && response.data) {
                 gFullPokinData = response.data;
@@ -383,14 +388,20 @@ if (!empty($_GET['id_koneksi_pokin']) && !empty($tipe_koneksi)) {
                 const data_unit_koneksi = response.info.data_unit_koneksi;
                 const data_jadwal = response.info.data_jadwal;
                 const data_koneksi = response.info.data_koneksi;
+                const url_level_1 = response.info.url_level_1 || '#';
 
                 let namaPemda = response.info.nama_pemda || 'N/A';
                 let namaSkpd = data_unit.nama_skpd || 'N/A';
                 let namaJadwal = `${data_jadwal.nama_jadwal} (${data_jadwal.tahun_anggaran} - ${data_jadwal.tahun_selesai_anggaran})` || 'N/A';
 
                 jQuery('.namaPemda').text(namaPemda);
-                jQuery('.namaSkpd').text(namaSkpd);
                 jQuery('.namaJadwal').text(namaJadwal);
+
+                jQuery('#link_full_view').html(`
+                    <a href="${url_level_1}" target="_blank" rel="noopener noreferrer" title="Lihat Tampilan Penuh">
+                        <i class="dashicons dashicons-external"></i> POHON KINERJA ${namaSkpd}
+                    </a>
+                `);
 
                 let currentLevel = gFullPokinData.data.level;
                 let maxLevel = 5;
@@ -554,9 +565,9 @@ if (!empty($_GET['id_koneksi_pokin']) && !empty($tipe_koneksi)) {
         let html = `
             <hr>
             <div class="pb-2 mb-3">
-                <h5 class="text-center font-weight-bold mb-0">
+                <h3 class="h5 text-center mb-0">
                     ${title.toUpperCase()}
-                </h5>
+                </h3>
             </div>
         `;
 

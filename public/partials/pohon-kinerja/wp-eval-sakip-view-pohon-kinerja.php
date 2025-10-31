@@ -175,7 +175,7 @@ if (!empty($data_all['data'])) {
 					if ($val_koneksi['tipe'] == 1) {
 						$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 					} else {
-						$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
+						$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>" . $val_koneksi['label_parent'] . "</span>";
 					}
 				}
 				$data_temp[$keylevel1][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_1["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -254,7 +254,7 @@ if (!empty($data_all['data'])) {
 							if ($val_koneksi['tipe'] == 1) {
 								$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 							} else {
-								$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
+								$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>" . $val_koneksi['label_parent'] . "</span>";
 							}
 						}
 						$data_temp[$keylevel2][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_2["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -334,7 +334,7 @@ if (!empty($data_all['data'])) {
 									if ($val_koneksi['tipe'] == 1) {
 										$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 									} else {
-										$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
+										$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>" . $val_koneksi['label_parent'] . "</span>";
 									}
 								}
 								$data_temp[$keylevel3][0]->f .= "<div class='koneksi-pokin tampil_koneksi_pokin item-rincian' data-id='" . $level_3["id"] . "'><div class='cros-opd'>" . $show_nama_skpd . "</div></div>";
@@ -411,7 +411,7 @@ if (!empty($data_all['data'])) {
 											if ($val_koneksi['tipe'] == 1) {
 												$show_nama_skpd = $val_koneksi['nama_skpd'] . "<br><a href='" . $new_view_pokin_page['url'] . "&id=" . $val_koneksi['id_parent'] . "&tipe_koneksi=pemda&id_koneksi_pokin=" . $val_koneksi['id'] . "' target='_blank'>" . $val_koneksi['label_parent'] . "</a>";
 											} else {
-												$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>(" . $val_koneksi['label_parent'] . ")</span>";
+												$show_nama_skpd = "<span>" . $val_koneksi['nama_skpd'] . "<br>" . $val_koneksi['label_parent'] . "</span>";
 											}
 											
 											// get pokin OPD child yang terkoneksi ke pemda
