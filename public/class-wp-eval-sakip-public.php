@@ -33178,7 +33178,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				$is_first_indicator = true;
 				foreach ($indikators as $indikator) {
-					$tbody .= "<tr>";
+					$tbody .= "<tr id-skpd-simpeg='".$perangkat_daerah['id_satker_simpeg']."' id-indikator='".$indikator['id']."' id-rhk='".$indikator['id_renaksi']."'>";
 					$multi_id_indikator[] = $indikator['id'];
 					$multi_id_rhk[$indikator['id_renaksi']] = $indikator['id_renaksi'];
 					
