@@ -8877,20 +8877,26 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		$penyebut = 0.0;
 
 		$realisasi_kumulatif = 0.0;
+		$realisasi_nilai_akhir = 0.0;
 		for ($i = 1; $i <= $limit_quarter; $i++) {
 			$realisasi_kumulatif += $realisasi['realisasi_' . $i] ?? 0;
+
+			// nilai akhir diambil dari triwulan pertama dulu
+			if(!empty($realisasi['realisasi_' . $i])){
+				$realisasi_nilai_akhir = $realisasi['realisasi_' . $i];
+			}
 		}
 
 		switch ($type) {
-			case 1:
+			case 1: // tren positif
 				$pembilang = $realisasi_kumulatif;
 				$penyebut = $targetUntukPerhitungan;
 				break;
-			case 2:
-				$pembilang = $realisasi['realisasi_' . $limit_quarter] ?? 0;
+			case 2: // nilai akhir
+				$pembilang = $realisasi_nilai_akhir ?? 0;
 				$penyebut = $targetUntukPerhitungan;
 				break;
-			case 3:
+			case 3: // tren negatif
 				$pembilang = $targetUntukPerhitungan;
 				$penyebut = $realisasi_kumulatif;
 				break;
