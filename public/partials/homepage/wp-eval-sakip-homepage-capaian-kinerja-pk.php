@@ -38,6 +38,16 @@ $tahun_anggaran = intval($_GET['tahun']);
         background-color: #f8d7da;
         color: #721c24;
     }
+
+    :root {
+        --zoom-scale: 1.0; 
+    }
+
+    #main-content-pk {
+        transform: scale(var(--zoom-scale));
+        transform-origin: top left;
+        transition: transform 0.2s ease-out;
+    }
 </style>
 <div class="mb-5 text-center hide_print">
     <h1 class="fw-bold my-4">
@@ -45,8 +55,13 @@ $tahun_anggaran = intval($_GET['tahun']);
         <br>
         <?php echo get_option('_crb_nama_pemda') . '<br>Tahun Anggaran ' . $tahun_anggaran; ?>
     </h1>
+    <div id="zoom-controls" class="btn-group" role="group" aria-label="Zoom controls">
+        <button id="zoom-out" type="button" class="btn btn-secondary">-</button>
+        <button id="zoom-label" type="button" class="btn btn-info disabled" style="width: 70px;">100%</button>
+        <button id="zoom-in" type="button" class="btn btn-secondary">+</button>
+    </div>
 </div>
-<div class="p-1">
+<div class="p-1" id="main-content-pk">
     <h2 class="text-center">Perjanjian Kinerja Kepala Daerah</h2>
     <div class="mb-5 wrap-table" style="max-height: 90vh;">
         <table id="tableDataPemda" class="table table-bordered table-sticky" style="width: 2000px;">
@@ -146,4 +161,41 @@ $tahun_anggaran = intval($_GET['tahun']);
             }
         });
     }
+
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomLabel = document.getElementById('zoom-label');
+    const rootElement = document.documentElement; // Untuk mengakses variabel CSS :root
+    const mainContent = document.getElementById('main-content-pk');
+
+    let currentScale = 0.7;
+    const scaleStep = 0.1; // 10% per langkah
+    const minScale = 0.5;  // Zoom minimum 50%
+    const maxScale = 2.0;  // Zoom maksimum 200%
+
+    function updateZoom(newScale) {
+        newScale = Math.min(Math.max(newScale, minScale), maxScale);
+        currentScale = newScale;
+        rootElement.style.setProperty('--zoom-scale', currentScale);
+        
+        // Update label persentase
+        const percentage = Math.round(currentScale * 100);
+        zoomLabel.textContent = `${percentage}%`;
+
+        const newPhysicalSize = 1 / currentScale;
+        mainContent.style.width = `calc(100% * ${newPhysicalSize})`;
+        // console.log('newPhysicalSize', newPhysicalSize);
+    }
+
+    zoomInBtn.addEventListener('click', () => {
+        updateZoom(currentScale + scaleStep);
+    });
+
+    zoomOutBtn.addEventListener('click', () => {
+        updateZoom(currentScale - scaleStep);
+    });
+
+    setTimeout(function(){
+        updateZoom(currentScale);
+    }, 5000);
 </script>
