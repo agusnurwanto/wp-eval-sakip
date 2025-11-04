@@ -36,6 +36,13 @@ $halaman_pegawai_skpd = $this->functions->generatePage(array(
     'post_status' => 'private'
 ));
 
+$laporan_pk_publik = $this->functions->generatePage(array(
+    'nama_page'     => 'Perjanjian Kinerja Perangkat Daerah | Tahun ' . $input['tahun_anggaran'],
+    'content'       => '[perjanjian_kinerja_publik tahun_anggaran=' . $input['tahun_anggaran'] . ']',
+    'show_header'   => 1,
+    'post_status'   => 'publish'
+));
+
 // Get kepala daerah and status jabatan for option atasan
 $nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
 $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
@@ -172,7 +179,8 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
         run_download_excel_sakip();
         var tombol_aksi = `
             <a id="singkron-pegawai" onclick="ajax_get_pegawai(); return false;" href="#" class="btn btn-danger"><span class="dashicons dashicons-update-alt"></span>Singkron Pegawai Dengan Data SIMPEG</a>
-            <a target="_blank" href="<?php echo $halaman_pegawai_skpd['url'] . "&id_skpd=" . $id_skpd; ?>" class="btn btn-warning"><span class="dashicons dashicons-groups"></span>Daftar Perjanjian Kinerja Pegawai</a>
+            <a target="_blank" href="<?php echo $halaman_pegawai_skpd['url'] . "&id_skpd=" . $id_skpd; ?>" class="btn btn-warning"><span class="dashicons dashicons-groups"></span> Daftar Perjanjian Kinerja Pegawai</a>
+            <a target="_blank" href="<?php echo $laporan_pk_publik['url'] . "&id_skpd=" . $id_skpd; ?>" class="btn btn-info"><span class="dashicons dashicons-admin-site-alt2"></span> Laporan Perjanjian Kinerja Publik</a>
             <br><a onclick="simpan_pegawai(); return false;" href="#" class="btn btn-primary" style="margin-top: 5px;"><span class="dashicons dashicons-saved"></span>Simpan Pegawai Aktif</a>
         `;
         jQuery('#action-sakip').append(tombol_aksi);

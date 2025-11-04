@@ -939,6 +939,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('halaman_laporan_pk_setting', array($plugin_public, 'halaman_laporan_pk_setting'));
 		add_shortcode('list_pegawai_laporan_pk', array($plugin_public, 'list_pegawai_laporan_pk'));
 		add_shortcode('list_perjanjian_kinerja', array($plugin_public, 'list_perjanjian_kinerja'));
+		add_shortcode('perjanjian_kinerja_publik', array($plugin_public, 'perjanjian_kinerja_publik'));
 
 		add_shortcode('detail_laporan_rhk', array($plugin_public, 'detail_laporan_rhk'));
 		add_shortcode('sso_login', array($plugin_public, 'sso_login'));

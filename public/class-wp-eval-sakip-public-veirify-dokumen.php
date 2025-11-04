@@ -66,6 +66,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-list-pegawai-perjanjian-kinerja.php';
     }
 
+    public function perjanjian_kinerja_publik($atts)
+    {
+        // untuk disable render shortcode di halaman edit page/post
+        if (!empty($_GET) && !empty($_GET['POST'])) {
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-perjanjian-kinerja-publik.php';
+    }
+
     public function detail_laporan_rhk($atts)
     {
         // untuk disable render shortcode di halaman edit page/post
