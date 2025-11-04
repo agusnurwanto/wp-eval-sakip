@@ -260,7 +260,7 @@ if (!empty($_GET['id_koneksi_pokin']) && !empty($tipe_koneksi)) {
                             <h6 class="small font-weight-bold">Petunjuk Penggunaan:</h6>
                             <ul class="list-unstyled small pl-2">
                                 <li class="mb-1"><i class="dashicons dashicons-yes-alt text-success mr-1"></i> Klik 2x pada judul card untuk expand/collapse.</li>
-                                <li class="mb-1"><i class="dashicons dashicons-yes-alt text-success mr-1"></i> Klik indikator untuk melihat detail.</li>
+                                <!-- <li class="mb-1"><i class="dashicons dashicons-yes-alt text-success mr-1"></i> Klik indikator untuk melihat detail.</li> -->
                                 <li class="mb-1"><i class="dashicons dashicons-yes-alt text-success mr-1"></i> Pohon kinerja tampil jika data terisi min. level 2.</li>
                             </ul>
                         </div>
