@@ -758,10 +758,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 
                         $data = $wpdb->get_row(
                             $wpdb->prepare("
-								SELECT *
-								FROM esakip_menu_dokumen
-								WHERE id = %d
-							", $_POST['id']),
+                                SELECT *
+                                FROM esakip_menu_dokumen
+                                WHERE id = %d
+                            ", $_POST['id']),
                             ARRAY_A
                         );
                         if (!empty($data)) {
@@ -886,11 +886,11 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     // Cek data verifikasi yg sudah ada
                     $data_menu = $wpdb->get_row(
                         $wpdb->prepare("
-							SELECT *
-							FROM esakip_menu_dokumen
-							WHERE id = %d
-								AND tahun_anggaran=%d
-						", $id_dokumen, $tahun_anggaran),
+                            SELECT *
+                            FROM esakip_menu_dokumen
+                            WHERE id = %d
+                                AND tahun_anggaran=%d
+                        ", $id_dokumen, $tahun_anggaran),
                         ARRAY_A
                     );
 
@@ -1087,13 +1087,13 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 
                     $get_jadwal = $wpdb->get_results(
                         $wpdb->prepare("
-							SELECT 
-								* 
-							FROM esakip_data_jadwal
-							WHERE tipe='verifikasi_upload_dokumen'
-							  AND tahun_anggaran=%d
-							  AND status != 0
-						", $tahun_anggaran),
+                            SELECT 
+                                * 
+                            FROM esakip_data_jadwal
+                            WHERE tipe='verifikasi_upload_dokumen'
+                              AND tahun_anggaran=%d
+                              AND status != 0
+                        ", $tahun_anggaran),
                         ARRAY_A
                     );
 
@@ -1713,7 +1713,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
             'status' => 'success',
             'message' => 'Berhasil get data pengaturan rencana aksi!',
             'data'  => array(),
-            'option_renstra' => ''
+            'data_rencana_aksi' => array(),
+            'option_renstra' => '',
+            'option_rpjmd' => '',
+            'option_rpjmd_rpd' => ''
         );
 
         if (!empty($_POST)) {
@@ -1798,8 +1801,82 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     if (!empty($data)) {
                         $ret['data'] = $data;
                     }
+
+                    $data_rencana_aksi = $wpdb->get_row($wpdb->prepare("
+                                SELECT
+                                    p.*
+                                FROM esakip_pengaturan_rencana_aksi as p
+                                JOIN esakip_data_jadwal as j
+                                ON p.id_jadwal_rpjmd = j.id
+                                WHERE p.tahun_anggaran=%d
+                                    AND p.active=1
+                            ", $_POST['tahun_anggaran']), ARRAY_A);
+
+                    $option_rpjmd_rpd = '';
+                    $default_id = null;
+                    
+                    if (empty($data_rencana_aksi)) {
+                        if (!empty($data) && !empty($data['id_jadwal_rpjmd'])) {
+                            $default_id = $data['id_jadwal_rpjmd'];
+                            
+                            $jadwal_default = $wpdb->get_row($wpdb->prepare("
+                                SELECT 
+                                    id,
+                                    nama_jadwal,
+                                    tahun_anggaran,
+                                    lama_pelaksanaan,
+                                    tahun_selesai_anggaran
+                                FROM esakip_data_jadwal
+                                WHERE id = %d
+                            ", $default_id), ARRAY_A);
+                            
+                            if (!empty($jadwal_default)) {
+                                if (!empty($jadwal_default['tahun_selesai_anggaran']) && $jadwal_default['tahun_selesai_anggaran'] > 1) {
+                                    $tahun_anggaran_selesai = $jadwal_default['tahun_selesai_anggaran'];
+                                } else {
+                                    $tahun_anggaran_selesai = $jadwal_default['tahun_anggaran'] + $jadwal_default['lama_pelaksanaan'];
+                                }
+                                
+                                $option_rpjmd_rpd .= '<option value="' . $jadwal_default['id'] . '" selected>Default Jadwal</option>';
+                            }
+                        }
+                        
+                        if (!empty($jadwal_periode)) {
+                            foreach ($jadwal_periode as $jadwal_periode_item) {
+                                if (!empty($default_id) && $jadwal_periode_item['id'] == $default_id) {
+                                    continue;
+                                }
+                                
+                                if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
+                                } else {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+                                }
+                                
+                                $option_rpjmd_rpd .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal'] . ' Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+                            }
+                        }
+                    } else {
+                        $ret['data_rencana_aksi'] = $data_rencana_aksi;
+                        $selected_id = $data_rencana_aksi['id_jadwal_rpjmd'];
+                        
+                        if (!empty($jadwal_periode)) {
+                            foreach ($jadwal_periode as $jadwal_periode_item) {
+                                if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
+                                } else {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+                                }
+                                
+                                $selected = ($jadwal_periode_item['id'] == $selected_id) ? ' selected' : '';
+                                $option_rpjmd_rpd .= '<option value="' . $jadwal_periode_item['id'] . '"' . $selected . '>' . $jadwal_periode_item['nama_jadwal'] . ' Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+                            }
+                        }
+                    }
+
                     $ret['option_rpjpd'] = $option_rpjpd;
                     $ret['option_rpjmd'] = $option_rpjmd;
+                    $ret['option_rpjmd_rpd'] = $option_rpjmd_rpd;
                     $ret['option_renstra'] = $option_renstra;
                 }
             } else {
@@ -2923,15 +3000,15 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                                 a.id,
                                 a.id_skpd,
                                 a.alamat_kantor
-							FROM 
+                            FROM 
                                 esakip_detail_data_unit a
                             JOIN 
                                 esakip_data_unit b
                             ON b.id_skpd=a.id_skpd 
                                 AND b.tahun_anggaran=%d
-							WHERE 
+                            WHERE 
                                 a.id_skpd = %d
-						",
+                        ",
                             $tahun_anggaran_sakip,
                             $_POST['id_skpd']
                         ),
@@ -3140,17 +3217,17 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                 if ($ret['status'] != 'error') {
                     $unit = $wpdb->get_results(
                         $wpdb->prepare("
-						SELECT 
-							nama_skpd, 
-							id_skpd, 
-							kode_skpd, 
-							nipkepala 
-						FROM esakip_data_unit 
-						WHERE active=1 
-						AND tahun_anggaran=%d
-						AND is_skpd=1 
-						ORDER BY kode_skpd ASC
-						", $tahun_anggaran_sakip),
+                        SELECT 
+                            nama_skpd, 
+                            id_skpd, 
+                            kode_skpd, 
+                            nipkepala 
+                        FROM esakip_data_unit 
+                        WHERE active=1 
+                        AND tahun_anggaran=%d
+                        AND is_skpd=1 
+                        ORDER BY kode_skpd ASC
+                        ", $tahun_anggaran_sakip),
                         ARRAY_A
                     );
 
@@ -3173,13 +3250,13 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             $jumlah_dokumen = $wpdb->get_var(
                                 $wpdb->prepare(
                                     "
-									SELECT 
-										COUNT(id)
-									FROM esakip_dokumen_kuesioner 
-									WHERE id_skpd = %d
-									AND tahun_anggaran = %d
-									AND active = 1
-									",
+                                    SELECT 
+                                        COUNT(id)
+                                    FROM esakip_dokumen_kuesioner 
+                                    WHERE id_skpd = %d
+                                    AND tahun_anggaran = %d
+                                    AND active = 1
+                                    ",
                                     $vv['id_skpd'],
                                     $tahun_anggaran
                                 )
@@ -3360,11 +3437,11 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     }
                 } else if ($ret['status'] != 'error' && !empty($_POST['namaDokumen'])) {
                     $dokumen_lama = $wpdb->get_var($wpdb->prepare("
-						SELECT
-							dokumen
-						FROM esakip_dokumen_kuesioner
-						WHERE id=%d
-					", $id_dokumen));
+                        SELECT
+                            dokumen
+                        FROM esakip_dokumen_kuesioner
+                        WHERE id=%d
+                    ", $id_dokumen));
                     if ($dokumen_lama != $_POST['namaDokumen']) {
                         $ret_rename = $this->functions->renameFile($upload_dir . $dokumen_lama, $upload_dir . $_POST['namaDokumen']);
                         if ($ret_rename['status'] != 'error') {
@@ -3410,11 +3487,11 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         if (!empty($_FILES['fileUpload'])) {
                             $opsi['dokumen'] = $upload['filename'];
                             $dokumen_lama = $wpdb->get_var($wpdb->prepare("
-								SELECT
-									dokumen
-								FROM esakip_dokumen_kuesioner
-								WHERE id=%d
-							", $id_dokumen));
+                                SELECT
+                                    dokumen
+                                FROM esakip_dokumen_kuesioner
+                                WHERE id=%d
+                            ", $id_dokumen));
                             if (is_file($upload_dir . $dokumen_lama)) {
                                 unlink($upload_dir . $dokumen_lama);
                             }
