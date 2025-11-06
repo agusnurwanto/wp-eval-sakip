@@ -2553,3 +2553,17 @@ CREATE TABLE `esakip_rpjmd_misi_detail` (
   KEY `id_misi` (`id_misi`),
   KEY `id_jadwal` (`id_jadwal`)
 );
+
+CREATE TABLE `esakip_pengaturan_rencana_aksi` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_jadwal_rpjmd` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `tahun_anggaran` year(4) DEFAULT NULL,
+  `keterangan` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `update_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY  (id),
+  KEY `id_jadwal` (`id_jadwal`),
+  KEY `active` (`active`),
+  KEY `tahun_anggaran` (`tahun_anggaran`)
+);

@@ -41,6 +41,12 @@ $body = '';
 							<small class="form-text text-muted">Silahkan setting di halaman monitor upload dokumen untuk mendapatkan periode jadwal Pohon Kinerja yang nantinya akan digunakan menginput Rencana Hasil Kerja.</small>
 						</div>
 						<div class="form-group">
+							<label for="jadwal-rpjmd">Pilih Jadwal RPJMD/RPD</label>
+							<select class="form-control" id="jadwal-rpjmd-rpd">
+							</select>
+							<small class="form-text text-muted"></small>
+						</div>
+						<div class="form-group">
 							<label for="jadwal-renstra">Pilih Jadwal RENSTRA WP-SIPD</label>
 							<select class="form-control" id="jadwal-renstra-wpsipd">
 							</select>
@@ -82,34 +88,44 @@ $body = '';
 
 	/** get data pengaturan */
 	function get_data_upload_dokumen() {
-		jQuery("#wrap-loading").show();
-		jQuery.ajax({
-			url: esakip.url,
-			type: 'POST',
-			data: {
-				'action': "get_data_upload_dokumen",
-				'api_key': esakip.api_key,
-				'tahun_anggaran': tahun_anggaran
-			},
-			dataType: 'json',
-			success: function(response) {
-				jQuery('#wrap-loading').hide();
-				if (response.status === 'success') {
-					jQuery('#jadwal-rpjmd').html(response.option_rpjmd)
-					if (response.data.length != 0) {
-						jQuery('#jadwal-rpjmd').val(response.data.id_jadwal_rpjmd);
-					}
-				} else {
-					alert(response.message);
-				}
-			},
-			error: function(xhr, status, error) {
-				jQuery('#wrap-loading').hide();
-				console.error(xhr.responseText);
-				alert('Terjadi kesalahan saat memuat tabel!');
-			}
-		});
-	}
+    jQuery("#wrap-loading").show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            'action': "get_data_upload_dokumen",
+            'api_key': esakip.api_key,
+            'tahun_anggaran': tahun_anggaran
+        },
+        dataType: 'json',
+        success: function(response) {
+            jQuery('#wrap-loading').hide();
+            if (response.status === 'success') {
+                jQuery('#jadwal-rpjmd').html(response.option_rpjmd);
+                if (response.data.length != 0) {
+                    jQuery('#jadwal-rpjmd').val(response.data.id_jadwal_rpjmd);
+                }
+                
+                jQuery('#jadwal-rpjmd-rpd').html(response.option_rpjmd_rpd);
+                
+                if (response.data_rencana_aksi.length == 0 || !response.data_rencana_aksi.id_jadwal_rpjmd) {
+                    if (response.data.length != 0 && response.data.id_jadwal_rpjmd) {
+                        jQuery('#jadwal-rpjmd-rpd').val(response.data.id_jadwal_rpjmd);
+                    }
+                } else {
+                    jQuery('#jadwal-rpjmd-rpd').val(response.data_rencana_aksi.id_jadwal_rpjmd);
+                }
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            jQuery('#wrap-loading').hide();
+            console.error(xhr.responseText);
+            alert('Terjadi kesalahan saat memuat tabel!');
+        }
+    });
+}
 
 	/** get data pengaturan */
 	function get_data_pengaturan_rencana_aksi() {
@@ -148,6 +164,7 @@ $body = '';
 
 	function submit_pengaturan_menu() {
 	    let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
+	    let id_jadwal_rpjmd_rpd = jQuery("#jadwal-rpjmd-rpd").val();
 	    let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
 	    let input_renaksi = jQuery('input[name="crb_input_renaksi"]:checked').val();
 	    let set_pagu_renaksi = jQuery('input[name="crb_set_pagu_renaksi"]:checked').val();
@@ -166,6 +183,7 @@ $body = '';
 	                'action': 'submit_pengaturan_rencana_aksi',
 	                'api_key': esakip.api_key,
 	                'id_jadwal_renstra': id_jadwal_renstra,
+	                'id_jadwal_rpjmd_rpd': id_jadwal_rpjmd_rpd,
 	                'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
 	                'tahun_anggaran': tahun_anggaran,
 	                'input_renaksi': input_renaksi, 
