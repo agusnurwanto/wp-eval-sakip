@@ -752,6 +752,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_skpd_kuesioner_menpan',  $plugin_public, 'get_table_skpd_kuesioner_menpan');
 		$this->loader->add_action('wp_ajax_tambah_kuesioner_menpan',  $plugin_public, 'tambah_kuesioner_menpan');
 		$this->loader->add_action('wp_ajax_get_table_kuesioner_menpan',  $plugin_public, 'get_table_kuesioner_menpan');
+		$this->loader->add_action('wp_ajax_get_table_data_capaian_kinerja_publik',  $plugin_public, 'get_table_data_capaian_kinerja_publik');
+		$this->loader->add_action('wp_ajax_nopriv_get_table_data_capaian_kinerja_publik',  $plugin_public, 'get_table_data_capaian_kinerja_publik');
 		$this->loader->add_action('wp_ajax_get_kuesioner_menpan_by_id',  $plugin_public, 'get_kuesioner_menpan_by_id');
 		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_menpan',  $plugin_public, 'hapus_data_kuesioner_menpan');
 		$this->loader->add_action('wp_ajax_get_detail_pertanyaan_menpan',  $plugin_public, 'get_detail_pertanyaan_menpan');
