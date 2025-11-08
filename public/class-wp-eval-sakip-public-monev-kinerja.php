@@ -2457,8 +2457,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$label_cascading .= '<br>' . $v['detail']['kode_cascading_kegiatan'] . ' ' . $v['detail']['label_cascading_kegiatan'];
 							}
 							if ($v['detail']['label_cascading_sub_kegiatan']) {
-								$label_cascading .= '<br>'.$v['detail']['kode_cascading_sub_kegiatan'] . ' ' . $v['detail']['label_cascading_sub_kegiatan'];
-							}else{
+								$label_cascading .= '<br>' . $v['detail']['kode_cascading_sub_kegiatan'] . ' ' . $v['detail']['label_cascading_sub_kegiatan'];
+							} else {
 								$v['detail']['pagu_cascading'] = 0;
 							}
 						} else {
@@ -2837,8 +2837,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$label_cascading .= '<br>' . $renaksi['detail']['kode_cascading_kegiatan'] . ' ' . $renaksi['detail']['label_cascading_kegiatan'];
 								}
 								if ($renaksi['detail']['label_cascading_sub_kegiatan']) {
-									$label_cascading .= '<br>'.$renaksi['detail']['kode_cascading_sub_kegiatan'] . ' ' . $renaksi['detail']['label_cascading_sub_kegiatan'];
-								}else{
+									$label_cascading .= '<br>' . $renaksi['detail']['kode_cascading_sub_kegiatan'] . ' ' . $renaksi['detail']['label_cascading_sub_kegiatan'];
+								} else {
 									$renaksi['detail']['pagu_cascading'] = 0;
 								}
 							} else {
@@ -3133,8 +3133,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$label_cascading .= $uraian_renaksi['detail']['kode_cascading_kegiatan'] . ' ' . $uraian_renaksi['detail']['label_cascading_kegiatan'];
 									}
 									if ($uraian_renaksi['detail']['label_cascading_sub_kegiatan']) {
-										$label_cascading .= '<br>'.$uraian_renaksi['detail']['kode_cascading_sub_kegiatan'] . ' ' . $uraian_renaksi['detail']['label_cascading_sub_kegiatan'];
-									}else{
+										$label_cascading .= '<br>' . $uraian_renaksi['detail']['kode_cascading_sub_kegiatan'] . ' ' . $uraian_renaksi['detail']['label_cascading_sub_kegiatan'];
+									} else {
 										$uraian_renaksi['detail']['pagu_cascading'] = 0;
 									}
 								} else {
@@ -10419,6 +10419,188 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		}
 
 		wp_die();
+	}
+
+	function get_penanggung_jawab()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'tahun_anggaran' => 'required|numeric',
+				'id_skpd'        => 'required|numeric',
+			]);
+
+			$tahun_anggaran = (int) $_POST['tahun_anggaran'];
+			$id_skpd        = (int) $_POST['id_skpd'];
+
+			$data = $this->get_all_rencana_aksi_by_id_skpd_tahun_anggaran($tahun_anggaran, $id_skpd);
+
+			$penanggung_jawab_cascading = [];
+
+			if (!empty($data)) {
+				foreach ($data as $v) {
+					if (empty($v['nip'])) {
+						continue;
+					}
+
+					switch ($v['level']) {
+						case 1:
+							$key = $v['kode_cascading_sasaran'];
+							break;
+						case 2:
+							$key = $v['kode_cascading_program'];
+							break;
+						case 3:
+							$key = $v['kode_cascading_kegiatan'];
+							break;
+						case 4:
+							$key = $v['kode_cascading_sub_kegiatan'];
+							break;
+					}
+
+					if (empty($penanggung_jawab_cascading[$key])) {
+						$penanggung_jawab_cascading[$key] = [];
+					}
+
+					$unique_key = $v['nip'] . '-' . $v['id_jabatan_asli'];
+
+					if (empty($penanggung_jawab_cascading[$key][$unique_key])) {
+						$penanggung_jawab_cascading[$key][$unique_key] = [
+							'nip'        => $v['nip'],
+							'id_jabatan' => $v['id_jabatan_asli']
+						];
+					}
+				}
+
+				// Ambil data pegawai berdasarkan satker
+				$satker = $this->get_satker_id_by_id_skpd($id_skpd, $tahun_anggaran);
+				$satker_id = $satker['id_satker_simpeg'] ?? null;
+
+				$all_pegawai_by_satker = $satker_id
+					? $this->get_all_pegawai_by_satker_id($satker_id, $tahun_anggaran)
+					: [];
+
+				$pegawai_lookup = [];
+				if (!empty($all_pegawai_by_satker)) {
+					foreach ($all_pegawai_by_satker as $pegawai) {
+						$pegawai_lookup[$pegawai['nip_baru']][$pegawai['id_jabatan']] = $pegawai;
+					}
+				}
+
+				// Gabungkan dengan data pegawai
+				foreach ($penanggung_jawab_cascading as $kode_cascading => $arrPegawai) {
+					$penanggung_jawab_cascading[$kode_cascading] = array_values($arrPegawai);
+
+					$pegawai_ditemukan = [];
+
+					foreach ($arrPegawai as $pj) {
+						$nip = $pj['nip'];
+						$id_jabatan = $pj['id_jabatan'];
+
+						$pegawai = $pegawai_lookup[$nip][$id_jabatan] ?? null;
+
+						if ($pegawai) {
+							if (!empty($pegawai['custom_jabatan'])) {
+								$jabatan = $pegawai['custom_jabatan'];
+							} else {
+								if ($pegawai['plt_plh'] == 1) {
+									$jabatan = "{$pegawai['plt_plh_teks']} {$pegawai['jabatan']} {$pegawai['nama_satker']}";
+								} else {
+									$jabatan = "{$pegawai['jabatan']} {$pegawai['nama_satker']}";
+								}
+							}
+
+							$nama_pegawai = "{$pegawai['gelar_depan']} {$pegawai['nama_pegawai']} {$pegawai['gelar_belakang']}";
+
+							$pegawai_ditemukan[] = [
+								'nama'       => $nama_pegawai,
+								'jabatan'    => $jabatan,
+							];
+						}
+					}
+
+					if (empty($pegawai_ditemukan)) {
+						unset($penanggung_jawab_cascading[$kode_cascading]);
+					} else {
+						$penanggung_jawab_cascading[$kode_cascading] = $pegawai_ditemukan;
+					}
+				}
+			}
+
+			echo json_encode([
+				'status'  => true,
+				'message' => 'Data berhasil diambil.',
+				'data'    => $penanggung_jawab_cascading
+			]);
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+
+		wp_die();
+	}
+
+	public function get_all_pegawai_by_satker_id($satker_id, $tahun_anggaran)
+	{
+		global $wpdb;
+
+		$sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama as nama_satker
+			FROM esakip_data_pegawai_simpeg p
+			LEFT JOIN esakip_data_satker_simpeg s
+				   ON p.satker_id = s.satker_id
+				  AND s.tahun_anggaran = %d
+				  AND s.active = 1
+			WHERE p.satker_id LIKE %s 
+			  AND p.active = 1
+			", $tahun_anggaran, $satker_id . '%'
+		);
+
+		$pegawai = $wpdb->get_results($sql, ARRAY_A);
+
+		return $pegawai;
+	}
+
+
+	public function get_satker_id_by_id_skpd(int $id_skpd, int $tahun_anggaran)
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_row(
+			$wpdb->prepare("
+				SELECT *
+				FROM esakip_data_mapping_unit_sipd_simpeg
+				WHERE id_skpd = %d
+				  AND tahun_anggaran = %d
+			", $id_skpd, $tahun_anggaran),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+
+	public function get_all_rencana_aksi_by_id_skpd_tahun_anggaran(int $tahun_anggaran, int $id_skpd)
+	{
+		global $wpdb;
+
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT *
+				FROM esakip_data_rencana_aksi_opd
+				WHERE tahun_anggaran = %d
+				  AND id_skpd = %d
+				  AND active = 1
+			", $tahun_anggaran, $id_skpd),
+			ARRAY_A
+		);
+
+		return $data;
 	}
 
 	function get_table_data_capaian_kinerja_publik()

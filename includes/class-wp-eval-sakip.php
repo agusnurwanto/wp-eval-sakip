@@ -804,6 +804,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_iku_pemda',  $plugin_public, 'get_table_iku_pemda');
 		$this->loader->add_action('wp_ajax_get_table_iku_opd',  $plugin_public, 'get_table_iku_opd');
 
+		$this->loader->add_action('wp_ajax_get_penanggung_jawab',  $plugin_public, 'get_penanggung_jawab');
+		$this->loader->add_action('wp_ajax_nopriv_get_penanggung_jawab',  $plugin_public, 'get_penanggung_jawab');
+
 		add_shortcode('jadwal_verifikasi_upload_dokumen', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_verifikasi_upload_dokumen_renstra', array($plugin_public, 'jadwal_verifikasi_upload_dokumen'));
 		add_shortcode('jadwal_evaluasi_sakip', array($plugin_public, 'jadwal_evaluasi_sakip'));
