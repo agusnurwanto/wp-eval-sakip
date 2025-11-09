@@ -33453,7 +33453,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				'nip' => $selected_rhk['nip'],
 				'id_indikator' => $multi_id_indikator, 
 				'id_rhk' => $multi_id_rhk,
-				'id_skpd' => $perangkat_daerah['id_skpd'],
+				'id_skpd' => $data_unit['id_skpd'],
 				'tipe' => 'indikator'
 			);
 			$data = $this->get_data_perbulan_ekinerja($opsi_param);
