@@ -64,6 +64,44 @@ $id_skpd = $_GET['id_skpd'];
     #monev-body-renstra {
         word-break: break-word;
     }
+
+     .table thead th {
+        vertical-align: middle;
+    }
+
+    .table-sticky thead {
+        position: sticky;
+        top: -6px;
+        background: #ffc491;
+    }
+
+    /* Mild Green (Pastel Success) - For achievement >= 75% */
+    .bg-success-mild {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    /* Mild Yellow (Pastel Warning) - For achievement >= 50% and < 75% */
+    .bg-warning-mild {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    /* Mild Red (Pastel Danger) - For achievement < 50% */
+    .bg-danger-mild {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    :root {
+        --zoom-scale: 1.0; 
+    }
+
+    #main-content-pk {
+        transform: scale(var(--zoom-scale));
+        transform-origin: top left;
+        transition: transform 0.2s ease-out;
+    }
 </style>
 <div id="body-iku">
     <h1 class="text-center">Memuat halaman ...</h1>
@@ -113,6 +151,10 @@ $id_skpd = $_GET['id_skpd'];
 
                 if (penanggung_jawab.status && penanggung_jawab.data) {
                     renderPenanggungJawab(penanggung_jawab.data);
+                }
+                if (penanggung_jawab.status && penanggung_jawab.table) {
+                    jQuery('#tableDataOpd tbody').html(penanggung_jawab.table);
+                    jQuery('[data-toggle="tooltip"]').tooltip();
                 }
             } else {
                 jQuery('#body-iku').html('<h1 class="text-center">Gagal memuat data.</h1>');

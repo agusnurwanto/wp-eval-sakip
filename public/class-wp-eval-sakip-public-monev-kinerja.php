@@ -10526,10 +10526,18 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				}
 			}
 
+			$data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $tahun_anggaran);
+
+			$table = [];
+			if (!empty($data_skpd)) {
+				$table = $this->process_tbody_capaian_kinerja_pk_publik($data_skpd, $tahun_anggaran);
+			}
+
 			echo json_encode([
 				'status'  => true,
 				'message' => 'Data berhasil diambil.',
-				'data'    => $penanggung_jawab_cascading
+				'data'    => $penanggung_jawab_cascading,
+				'table'    => $table,
 			]);
 		} catch (Exception $e) {
 			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
