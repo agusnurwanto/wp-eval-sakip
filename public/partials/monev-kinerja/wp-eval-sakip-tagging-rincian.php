@@ -920,20 +920,15 @@ $all_realisasi = [
 
 $tbody_target_realisasi_bulanan = '';
 $triwulan = 1;
+$sum_realisasi = 0;
 foreach ($bulan as $k_bulan => $v_bulan) {
 	$tbody_triwulanan = '';
 	if ($k_bulan % 3 == 0) {
 
 		$target_tw = (float) str_replace(',', '.', $indikator_rhk['target_' . $triwulan] ?? 0);
+		$realisasi_tw = (float) str_replace(',', '.', $all_realisasi['realisasi_' . $triwulan] ?? 0);
 		
-		$capaian_tw = $this->get_capaian_realisasi_tahunan_by_type(
-			(int) $indikator_rhk['rumus_capaian_kinerja'],
-			(float) $target_tw,
-			(array) $all_realisasi,
-			(int) $indikator_rhk['tahun_anggaran'],
-			$triwulan
-		);
-		$capaian_tw_display = ($capaian_tw === false) ? 'N/A' : $capaian_tw;
+		$capaian_tw = !empty($target_tw) ? round(($realisasi_tw / $target_tw) * 100, 2) : 0;
 
 		$tbody_triwulanan .= '
 		<tr style="background-color:#FDFFB6;">
@@ -942,10 +937,11 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['target_' . $triwulan] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['satuan'] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $all_realisasi['realisasi_' . $triwulan] . '</td>
-			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b>' . $capaian_tw_display . '%</b></td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b>' . $capaian_tw . '%</b></td>
 			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $indikator_rhk['ket_tw_' . $triwulan] . '</td>
 		</tr>';
 		$triwulan++;
+		$sum_realisasi = $sum_realisasi + $realisasi_tw;
 	}
 
 	if (!isset($data_target_realisasi_bulanan[$k_bulan])) {
@@ -1519,7 +1515,7 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['indikator']; ?></td>
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $all_realisasi['realisasi_' . $current_triwulan]; ?></td>
+											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $sum_realisasi; ?></td>
 											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b><?php echo $capaian_tahunan_display; ?>%</b></td>
 											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['ket_total']; ?></td>
 										</tr>
