@@ -9,6 +9,13 @@ $input = shortcode_atts(array(
 ), $atts);
 $id_skpd = $_GET['id_skpd'];
 
+$pk_gabungan_page = $this->functions->generatePage(array(
+    'nama_page' => 'Perjanjian Kinerja Format Gabungan | Tahun Anggaran ' . $input['tahun_anggaran'],
+    'content' => '[perjanjian_kinerja_publik_baru tahun_anggaran=' . $input['tahun_anggaran'] . ']',
+    'show_header' => 1,
+    'post_status' => 'publish'
+));
+$pk_gabungan_page_url = $pk_gabungan_page['url'] . "&id_skpd=" . $id_skpd;
 ?>
 <style>
     .tr-tujuan {
@@ -65,7 +72,7 @@ $id_skpd = $_GET['id_skpd'];
         word-break: break-word;
     }
 
-     .table thead th {
+    .table thead th {
         vertical-align: middle;
     }
 
@@ -94,7 +101,7 @@ $id_skpd = $_GET['id_skpd'];
     }
 
     :root {
-        --zoom-scale: 1.0; 
+        --zoom-scale: 1.0;
     }
 
     #main-content-pk {
@@ -103,12 +110,17 @@ $id_skpd = $_GET['id_skpd'];
         transition: transform 0.2s ease-out;
     }
 </style>
+<div id="action-section" class="text-center m-4"></div>
 <div id="body-iku">
     <h1 class="text-center">Memuat halaman ...</h1>
 </div>
 <script>
     jQuery(document).ready(() => {
-        getDataTable()
+        getDataTable();
+        let extend_action = '';
+        extend_action += '<a class="btn btn-primary mr-2" href="<?php echo $pk_gabungan_page_url; ?>" target="_blank"><span class="dashicons dashicons-controls-back"></span> Format Gabungan</a>';
+
+        jQuery('#action-section').append(extend_action);
     });
 
     function get_penanggung_jawab() {
@@ -161,7 +173,7 @@ $id_skpd = $_GET['id_skpd'];
             }
         } catch (error) {
             console.error('Terjadi kesalahan saat memuat data:', error);
-            jQuery('#body-iku').html('<h1 class="text-center text-danger">Terjadi kesalahan.</h1>');   
+            jQuery('#body-iku').html('<h1 class="text-center text-danger">Terjadi kesalahan.</h1>');
         } finally {
             jQuery('#wrap-loading').hide();
         }

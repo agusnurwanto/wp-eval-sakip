@@ -754,6 +754,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_table_kuesioner_menpan',  $plugin_public, 'get_table_kuesioner_menpan');
 		$this->loader->add_action('wp_ajax_get_table_data_capaian_kinerja_publik',  $plugin_public, 'get_table_data_capaian_kinerja_publik');
 		$this->loader->add_action('wp_ajax_nopriv_get_table_data_capaian_kinerja_publik',  $plugin_public, 'get_table_data_capaian_kinerja_publik');
+		$this->loader->add_action('wp_ajax_get_table_data_capaian_kinerja_publik_baru',  $plugin_public, 'get_table_data_capaian_kinerja_publik_baru');
+		$this->loader->add_action('wp_ajax_nopriv_get_table_data_capaian_kinerja_publik_baru',  $plugin_public, 'get_table_data_capaian_kinerja_publik_baru');
 		$this->loader->add_action('wp_ajax_get_kuesioner_menpan_by_id',  $plugin_public, 'get_kuesioner_menpan_by_id');
 		$this->loader->add_action('wp_ajax_hapus_data_kuesioner_menpan',  $plugin_public, 'hapus_data_kuesioner_menpan');
 		$this->loader->add_action('wp_ajax_get_detail_pertanyaan_menpan',  $plugin_public, 'get_detail_pertanyaan_menpan');
@@ -945,6 +947,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('list_pegawai_laporan_pk', array($plugin_public, 'list_pegawai_laporan_pk'));
 		add_shortcode('list_perjanjian_kinerja', array($plugin_public, 'list_perjanjian_kinerja'));
 		add_shortcode('perjanjian_kinerja_publik', array($plugin_public, 'perjanjian_kinerja_publik'));
+		add_shortcode('perjanjian_kinerja_publik_baru', array($plugin_public, 'perjanjian_kinerja_publik_baru'));
 
 		add_shortcode('detail_laporan_rhk', array($plugin_public, 'detail_laporan_rhk'));
 		add_shortcode('sso_login', array($plugin_public, 'sso_login'));
