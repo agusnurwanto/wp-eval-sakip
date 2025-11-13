@@ -3595,98 +3595,72 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	function submit_pengaturan_rencana_aksi()
-	{
-		global $wpdb;
-		try {
-			if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					if (empty($_POST['tahun_anggaran'])) {
-						throw new Exception("Ada data yang kosong!", 1);
-					}
+    {
+        global $wpdb;
+        try {
+            if (!empty($_POST)) {
+                if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                    if (empty($_POST['tahun_anggaran'])) {
+                        throw new Exception("Ada data yang kosong!", 1);
+                    }
 
-					$tahun_anggaran = $_POST['tahun_anggaran'];
-					$id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
-					$id_jadwal_rpjmd_rpd = $_POST['id_jadwal_rpjmd_rpd'];
-					$input_renaksi = $_POST['input_renaksi'];
-					$set_pagu_renaksi = $_POST['set_pagu_renaksi'];
+                    $tahun_anggaran = $_POST['tahun_anggaran'];
+                    $id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
+                    $id_jadwal_rpjmd_rhk = !empty($_POST['id_jadwal_rpjmd_rhk']) ? $_POST['id_jadwal_rpjmd_rhk'] : null;
+                    $input_renaksi = $_POST['input_renaksi'];
+                    $set_pagu_renaksi = $_POST['set_pagu_renaksi'];
 
-					// pengaturan rencana aksi
-					$cek_data_pengaturan = $wpdb->get_var(
-						$wpdb->prepare("
-						SELECT 
-							id
-						FROM 
-							esakip_pengaturan_upload_dokumen
-						WHERE tahun_anggaran=%d
-						AND active=1
-					", $tahun_anggaran)
-					);
+                    // Pengaturan rencana aksi
+                    $cek_data_pengaturan = $wpdb->get_var(
+                        $wpdb->prepare("
+                        SELECT 
+                            id
+                        FROM 
+                            esakip_pengaturan_upload_dokumen
+                        WHERE tahun_anggaran=%d
+                        AND active=1
+                    ", $tahun_anggaran)
+                    );
 
-					$data = array(
-						'id_jadwal_wp_sipd' => $id_jadwal_renstra_wpsipd,
-						'tahun_anggaran' => $tahun_anggaran,
-						'active' => 1,
-						'created_at' => current_time('mysql'),
-						'update_at' => current_time('mysql')
-					);
+                    $data = array(
+                        'id_jadwal_wp_sipd' => $id_jadwal_renstra_wpsipd,
+                        'id_jadwal_rpjmd_rhk' => $id_jadwal_rpjmd_rhk,
+                        'tahun_anggaran' => $tahun_anggaran,
+                        'active' => 1,
+                        'update_at' => current_time('mysql')
+                    );
 
-					if (empty($cek_data_pengaturan)) {
-						$wpdb->insert('esakip_pengaturan_upload_dokumen', $data);
-						$message = "Sukses tambah data";
-					} else {
-						$wpdb->update('esakip_pengaturan_upload_dokumen', $data, array('id' => $cek_data_pengaturan));
-						$message = "Sukses edit data";
-					}
+                    if (empty($cek_data_pengaturan)) {
+                        $data['created_at'] = current_time('mysql');
+                        $wpdb->insert('esakip_pengaturan_upload_dokumen', $data);
+                        $message = "Sukses tambah data";
+                    } else {
+                        $wpdb->update('esakip_pengaturan_upload_dokumen', $data, array('id' => $cek_data_pengaturan));
+                        $message = "Sukses edit data";
+                    }
 
-					$cek_data_pengaturan_renaksi = $wpdb->get_var(
-						$wpdb->prepare("
-						SELECT 
-							id
-						FROM 
-							esakip_pengaturan_rencana_aksi
-						WHERE tahun_anggaran=%d
-						AND active=1
-					", $tahun_anggaran)
-					);
+                    update_option('_crb_input_renaksi', $input_renaksi);
+                    update_option('_crb_set_pagu_renaksi', $set_pagu_renaksi);
 
-					$data = array(
-						'id_jadwal_rpjmd' => $id_jadwal_rpjmd_rpd,
-						'tahun_anggaran' => $tahun_anggaran,
-						'active' => 1,
-						'created_at' => current_time('mysql'),
-						'update_at' => current_time('mysql')
-					);
-
-					if (empty($cek_data_pengaturan_renaksi)) {
-						$wpdb->insert('esakip_pengaturan_rencana_aksi', $data);
-						$message = "Sukses tambah data";
-					} else {
-						$wpdb->update('esakip_pengaturan_rencana_aksi', $data, array('id' => $cek_data_pengaturan_renaksi));
-						$message = "Sukses edit data";
-					}
-
-					update_option('_crb_input_renaksi', $input_renaksi);
-					update_option('_crb_set_pagu_renaksi', $set_pagu_renaksi);
-
-					echo json_encode([
-						'status' => true,
-						'message' => $message,
-					]);
-					exit();
-				} else {
-					throw new Exception("API tidak ditemukan!", 1);
-				}
-			} else {
-				throw new Exception("Format tidak sesuai!", 1);
-			}
-		} catch (Exception $e) {
-			echo json_encode([
-				'status' => false,
-				'message' => $e->getMessage()
-			]);
-			exit();
-		}
-	}
+                    echo json_encode([
+                        'status' => 'success',
+                        'message' => $message,
+                    ]);
+                    exit();
+                } else {
+                    throw new Exception("API tidak ditemukan!", 1);
+                }
+            } else {
+                throw new Exception("Format tidak sesuai!", 1);
+            }
+        } catch (Exception $e) {
+            echo json_encode([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+            exit();
+        }
+    }
 
 	function copy_data_rencana_aksi()
 	{

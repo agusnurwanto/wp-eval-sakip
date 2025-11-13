@@ -27,55 +27,59 @@ $body = '';
 	}
 </style>
 <div class="cetak">
-	<div style="padding: 10px;margin:0 0 3rem 0;">
-		<input type="hidden" value="<?php echo get_option('_crb_apikey_esakip'); ?>" id="api_key">
-		<h1 class="text-center" style="margin:3rem;">Halaman Pengaturan Rencana Aksi<br>Tahun Anggaran <?php echo $tahun_anggaran; ?></h1>
-		<div class="d-flex justify-content-center">
-			<div class="card" style="width: 50%;">
-				<div class="card-body">
-					<form>
-						<div class="form-group">
-							<label for="jadwal-rpjmd">Pilih Jadwal RPJMD/RPD</label>
-							<select class="form-control" id="jadwal-rpjmd" disabled>
-							</select>
-							<small class="form-text text-muted">Silahkan setting di halaman monitor upload dokumen untuk mendapatkan periode jadwal Pohon Kinerja yang nantinya akan digunakan menginput Rencana Hasil Kerja.</small>
-						</div>
-						<div class="form-group">
-							<label for="jadwal-rpjmd">Pilih Jadwal RPJMD/RPD</label>
-							<select class="form-control" id="jadwal-rpjmd-rpd">
-							</select>
-							<small class="form-text text-muted"></small>
-						</div>
-						<div class="form-group">
-							<label for="jadwal-renstra">Pilih Jadwal RENSTRA WP-SIPD</label>
-							<select class="form-control" id="jadwal-renstra-wpsipd">
-							</select>
-							<small class="form-text text-muted">Untuk mendapatkan Sasaran Cascading di WP-SIPD sesuai jadwal yang digunakan di input Rencana Hasil Kerja.</small>
-						</div>
-						<div class="form-group">
-							<label for="input-renaksi">Input Rencana Aksi Bulanan dan realisasi Triwulan</label><br>
-							<input type="radio" id="input-renaksi-0" name="crb_input_renaksi" value="0" <?php echo ($set_renaksi == 0) ? 'checked' : ''; ?>>
-							<label for="input-renaksi-0">Iya</label><br>
-							<input type="radio" id="input-renaksi-1" name="crb_input_renaksi" value="1" <?php echo ($set_renaksi == 1) ? 'checked' : ''; ?>>
-							<label for="input-renaksi-1">Tidak</label>
-							<small class="form-text text-muted">Pilih apakah input Rencana Hasil Kerja bulanan diinput atau didisable.</small>
-						</div>
-						<div class="form-group">
-							<label for="set-pagu-renaksi">Menampilkan Rencana Pagu Rencana Hasil Kerja</label><br>
-							<input type="radio" id="set-pagu-renaksi-0" name="crb_set_pagu_renaksi" value="0" <?php echo ($set_pagu_renaksi == 0) ? 'checked' : ''; ?>>
-							<label for="set-pagu-renaksi-0">Iya</label><br>
-							<input type="radio" id="set-pagu-renaksi-1" name="crb_set_pagu_renaksi" value="1" <?php echo ($set_pagu_renaksi == 1) ? 'checked' : ''; ?>>
-							<label for="set-pagu-renaksi-1">Tidak</label>
-							<small class="form-text text-muted">Pilih apakah Rencana Pagu Rencana Hasil Kerja ditampilkan atau disembunyikan.</small>
-						</div>
-						<div class="form-group d-flex">
-							<button onclick="submit_pengaturan_menu(); return false;" class="btn btn-primary ml-auto">Simpan</button>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div style="padding: 10px;margin:0 0 3rem 0;">
+        <input type="hidden" value="<?php echo get_option('_crb_apikey_esakip'); ?>" id="api_key">
+        <h1 class="text-center" style="margin:3rem;">Halaman Pengaturan Rencana Aksi<br>Tahun Anggaran <?php echo $tahun_anggaran; ?></h1>
+        <div class="d-flex justify-content-center">
+            <div class="card" style="width: 50%;">
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="jadwal-rpjmd">Pilih Jadwal RPJMD/RPD</label>
+                            <select class="form-control" id="jadwal-rpjmd" disabled>
+                            </select>
+                            <small class="form-text text-muted">Silahkan setting di halaman monitor upload dokumen untuk mendapatkan periode jadwal Pohon Kinerja yang nantinya akan digunakan menginput Rencana Hasil Kerja.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="tampilkan-ganti-jadwal">Ganti Jadwal RPJMD/RPD untuk RHK</label><br>
+                            <input type="checkbox" id="tampilkan-ganti-jadwal" name="tampilkan_ganti_jadwal" value="1">
+                            <label for="tampilkan-ganti-jadwal">Tampilkan</label>
+                            <small class="form-text text-muted d-block">Centang untuk menampilkan pilihan jadwal RPJMD/RPD untuk RHK.</small>
+                        </div>
+                        <div class="form-group" id="tampil-jadwal-rpjmd-rhk" style="display:none;">
+                            <select class="form-control" id="jadwal-rpjmd-rhk">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jadwal-renstra">Pilih Jadwal RENSTRA WP-SIPD</label>
+                            <select class="form-control" id="jadwal-renstra-wpsipd">
+                            </select>
+                            <small class="form-text text-muted">Untuk mendapatkan Sasaran Cascading di WP-SIPD sesuai jadwal yang digunakan di input Rencana Hasil Kerja.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-renaksi">Input Rencana Aksi Bulanan dan realisasi Triwulan</label><br>
+                            <input type="radio" id="input-renaksi-0" name="crb_input_renaksi" value="0" <?php echo ($set_renaksi == 0) ? 'checked' : ''; ?>>
+                            <label for="input-renaksi-0">Iya</label><br>
+                            <input type="radio" id="input-renaksi-1" name="crb_input_renaksi" value="1" <?php echo ($set_renaksi == 1) ? 'checked' : ''; ?>>
+                            <label for="input-renaksi-1">Tidak</label>
+                            <small class="form-text text-muted">Pilih apakah input Rencana Hasil Kerja bulanan diinput atau didisable.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="set-pagu-renaksi">Menampilkan Rencana Pagu Rencana Hasil Kerja</label><br>
+                            <input type="radio" id="set-pagu-renaksi-0" name="crb_set_pagu_renaksi" value="0" <?php echo ($set_pagu_renaksi == 0) ? 'checked' : ''; ?>>
+                            <label for="set-pagu-renaksi-0">Iya</label><br>
+                            <input type="radio" id="set-pagu-renaksi-1" name="crb_set_pagu_renaksi" value="1" <?php echo ($set_pagu_renaksi == 1) ? 'checked' : ''; ?>>
+                            <label for="set-pagu-renaksi-1">Tidak</label>
+                            <small class="form-text text-muted">Pilih apakah Rencana Pagu Rencana Hasil Kerja ditampilkan atau disembunyikan.</small>
+                        </div>
+                        <div class="form-group d-flex">
+                            <button onclick="submit_pengaturan_menu(); return false;" class="btn btn-primary ml-auto">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -84,48 +88,60 @@ $body = '';
 
 		get_data_upload_dokumen();
 		get_data_pengaturan_rencana_aksi();
+		jQuery('#tampilkan-ganti-jadwal').on('change', function() {
+            if (jQuery(this).is(':checked')) {
+                jQuery('#tampil-jadwal-rpjmd-rhk').show();
+            } else {
+                jQuery('#tampil-jadwal-rpjmd-rhk').hide();
+            }
+        });
 	});
 
 	/** get data pengaturan */
 	function get_data_upload_dokumen() {
-    jQuery("#wrap-loading").show();
-    jQuery.ajax({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            'action': "get_data_upload_dokumen",
-            'api_key': esakip.api_key,
-            'tahun_anggaran': tahun_anggaran
-        },
-        dataType: 'json',
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-            if (response.status === 'success') {
-                jQuery('#jadwal-rpjmd').html(response.option_rpjmd);
-                if (response.data.length != 0) {
-                    jQuery('#jadwal-rpjmd').val(response.data.id_jadwal_rpjmd);
-                }
-                
-                jQuery('#jadwal-rpjmd-rpd').html(response.option_rpjmd_rpd);
-                
-                if (response.data_rencana_aksi.length == 0 || !response.data_rencana_aksi.id_jadwal_rpjmd) {
-                    if (response.data.length != 0 && response.data.id_jadwal_rpjmd) {
-                        jQuery('#jadwal-rpjmd-rpd').val(response.data.id_jadwal_rpjmd);
+        jQuery("#wrap-loading").show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                'action': "get_data_upload_dokumen",
+                'api_key': esakip.api_key,
+                'tahun_anggaran': tahun_anggaran
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                if (response.status === 'success') {
+                    jQuery('#jadwal-rpjmd').html(response.option_rpjmd);
+                    if (response.data.length != 0) {
+                        jQuery('#jadwal-rpjmd').val(response.data.id_jadwal_rpjmd);
+                    }
+                    
+                    jQuery('#jadwal-rpjmd-rhk').html(response.option_rpjmd_rhk);
+                    
+                    if (response.data_rencana_aksi.length != 0 && response.data_rencana_aksi.id_jadwal_rpjmd_rhk) {
+                        jQuery('#tampilkan-ganti-jadwal').prop('checked', true);
+                        jQuery('#tampil-jadwal-rpjmd-rhk').show();
+                        jQuery('#jadwal-rpjmd-rhk').val(response.data_rencana_aksi.id_jadwal_rpjmd_rhk);
+                    } else {
+                        jQuery('#tampilkan-ganti-jadwal').prop('checked', false);
+                        jQuery('#tampil-jadwal-rpjmd-rhk').hide();
+                        
+                        if (response.data.length != 0 && response.data.id_jadwal_rpjmd) {
+                            jQuery('#jadwal-rpjmd-rhk').val(response.data.id_jadwal_rpjmd);
+                        }
                     }
                 } else {
-                    jQuery('#jadwal-rpjmd-rpd').val(response.data_rencana_aksi.id_jadwal_rpjmd);
+                    alert(response.message);
                 }
-            } else {
-                alert(response.message);
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                console.error(xhr.responseText);
+                alert('Terjadi kesalahan saat memuat tabel!');
             }
-        },
-        error: function(xhr, status, error) {
-            jQuery('#wrap-loading').hide();
-            console.error(xhr.responseText);
-            alert('Terjadi kesalahan saat memuat tabel!');
-        }
-    });
-}
+        });
+    }
 
 	/** get data pengaturan */
 	function get_data_pengaturan_rencana_aksi() {
@@ -163,68 +179,76 @@ $body = '';
 	}
 
 	function submit_pengaturan_menu() {
-	    let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
-	    let id_jadwal_rpjmd_rpd = jQuery("#jadwal-rpjmd-rpd").val();
-	    let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
-	    let input_renaksi = jQuery('input[name="crb_input_renaksi"]:checked').val();
-	    let set_pagu_renaksi = jQuery('input[name="crb_set_pagu_renaksi"]:checked').val();
+        let id_jadwal_renstra = jQuery("#jadwal-renstra").val();
+        let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
+        let input_renaksi = jQuery('input[name="crb_input_renaksi"]:checked').val();
+        let set_pagu_renaksi = jQuery('input[name="crb_set_pagu_renaksi"]:checked').val();
+        
+        let id_jadwal_rpjmd_rhk = null;
+        let tampilkan_ganti = jQuery('#tampilkan-ganti-jadwal').is(':checked');
+        
+        if (tampilkan_ganti) {
+            id_jadwal_rpjmd_rhk = jQuery("#jadwal-rpjmd-rhk").val();
+        } else {
+            id_jadwal_rpjmd_rhk = jQuery("#jadwal-rpjmd").val();
+        }
 
-	    if (id_jadwal_renstra == '' || id_jadwal_renstra_wpsipd == '') {
-	        return alert('Ada data yang kosong!');
-	    }
+        if (id_jadwal_renstra_wpsipd == '') {
+            return alert('Ada data yang kosong!');
+        }
 
-	    if (confirm("Apakah kamu yakin?")) {
-	        jQuery('#wrap-loading').show();
-	        jQuery.ajax({
-	            method: 'POST',
-	            url: esakip.url,
-	            dataType: 'json',
-	            data: {
-	                'action': 'submit_pengaturan_rencana_aksi',
-	                'api_key': esakip.api_key,
-	                'id_jadwal_renstra': id_jadwal_renstra,
-	                'id_jadwal_rpjmd_rpd': id_jadwal_rpjmd_rpd,
-	                'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
-	                'tahun_anggaran': tahun_anggaran,
-	                'input_renaksi': input_renaksi, 
-	                'set_pagu_renaksi': set_pagu_renaksi 
-	            },
-	            success: function(response) {
-	                console.log(response);
-	                jQuery('#wrap-loading').hide();
-	                if (response.status === 'success') {
-	                    alert(response.message);
+        if (confirm("Apakah kamu yakin?")) {
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                method: 'POST',
+                url: esakip.url,
+                dataType: 'json',
+                data: {
+                    'action': 'submit_pengaturan_rencana_aksi',
+                    'api_key': esakip.api_key,
+                    'id_jadwal_renstra': id_jadwal_renstra,
+                    'id_jadwal_rpjmd_rhk': id_jadwal_rpjmd_rhk,
+                    'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
+                    'tahun_anggaran': tahun_anggaran,
+                    'input_renaksi': input_renaksi, 
+                    'set_pagu_renaksi': set_pagu_renaksi 
+                },
+                success: function(response) {
+                    console.log(response);
+                    jQuery('#wrap-loading').hide();
+                    if (response.status === 'success') {
+                        alert(response.message);
 
-	                    if (input_renaksi == '1') {
-	                        jQuery('#input-renaksi-0').prop('checked', false);
-	                        jQuery('#input-renaksi-1').prop('checked', true);
-	                    } else {
-	                        jQuery('#input-renaksi-0').prop('checked', true);
-	                        jQuery('#input-renaksi-1').prop('checked', false);
-	                    }
+                        if (input_renaksi == '1') {
+                            jQuery('#input-renaksi-0').prop('checked', false);
+                            jQuery('#input-renaksi-1').prop('checked', true);
+                        } else {
+                            jQuery('#input-renaksi-0').prop('checked', true);
+                            jQuery('#input-renaksi-1').prop('checked', false);
+                        }
 
-	                    if (set_pagu_renaksi == '1') {
-	                        jQuery('#set-pagu-renaksi-0').prop('checked', false);
-	                        jQuery('#set-pagu-renaksi-1').prop('checked', true);
-	                    } else {
-	                        jQuery('#set-pagu-renaksi-0').prop('checked', true);
-	                        jQuery('#set-pagu-renaksi-1').prop('checked', false);
-	                    }
+                        if (set_pagu_renaksi == '1') {
+                            jQuery('#set-pagu-renaksi-0').prop('checked', false);
+                            jQuery('#set-pagu-renaksi-1').prop('checked', true);
+                        } else {
+                            jQuery('#set-pagu-renaksi-0').prop('checked', true);
+                            jQuery('#set-pagu-renaksi-1').prop('checked', false);
+                        }
 
-	                    get_data_pengaturan_rencana_aksi();
-	                    afterSubmitForm();
-	                } else {
-	                    alert(response.message);
-	                }
-	            },
-	            error: function(xhr, status, error) {
-	                console.error(xhr.responseText);
-	                alert('Terjadi kesalahan saat mengirim data!');
-	                jQuery('#wrap-loading').hide();
-	            }
-	        });
-	    }
-	}
+                        get_data_pengaturan_rencana_aksi();
+                        afterSubmitForm();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat mengirim data!');
+                    jQuery('#wrap-loading').hide();
+                }
+            });
+        }
+    }
 
 
 	function afterSubmitForm() {

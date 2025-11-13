@@ -1716,7 +1716,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
             'data_rencana_aksi' => array(),
             'option_renstra' => '',
             'option_rpjmd' => '',
-            'option_rpjmd_rpd' => ''
+            'option_rpjmd_rhk' => ''
         );
 
         if (!empty($_POST)) {
@@ -1743,8 +1743,10 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         ARRAY_A
                     );
 
-                    $option_rpjmd = '<option>Pilih Jadwal RPJMD/RPD</option>';
-                    $option_renstra = '<option>Pilih Jadwal RENSTRA</option>';
+                    $option_rpjmd = '<option value="">Pilih Jadwal RPJMD/RPD</option>';
+                    $option_rpjmd_rhk = '';
+                    $option_renstra = '<option value="">Pilih Jadwal RENSTRA</option>';
+                    
                     if (!empty($jadwal_periode)) {
                         foreach ($jadwal_periode as $jadwal_periode_item) {
                             if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
@@ -1756,6 +1758,59 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             $option_rpjmd .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
 
                             $option_renstra .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+                        }
+                    }
+
+                    $data = $wpdb->get_row($wpdb->prepare("
+                        SELECT
+                            p.*
+                        FROM esakip_pengaturan_upload_dokumen as p
+                        JOIN esakip_data_jadwal as j
+                        ON p.id_jadwal_rpjmd = j.id
+                        WHERE p.tahun_anggaran=%d
+                            AND p.active=1
+                    ", $_POST['tahun_anggaran']), ARRAY_A);
+
+                    if (!empty($data)) {
+                        $ret['data'] = $data;
+                        
+                        $default_id = $data['id_jadwal_rpjmd'];
+                        $option_rpjmd_rhk = '<option value="' . $default_id . '">Default dari Jadwal Monitor Upload Dokumen</option>';
+                        
+                        if (!empty($jadwal_periode)) {
+                            foreach ($jadwal_periode as $jadwal_periode_item) {
+                                if ($jadwal_periode_item['id'] == $default_id) {
+                                    continue;
+                                }
+                                
+                                if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
+                                } else {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+                                }
+
+                                $option_rpjmd_rhk .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+                            }
+                        }
+                        
+                        if (!empty($data['id_jadwal_rpjmd_rhk'])) {
+                            $ret['data_rencana_aksi'] = array(
+                                'id_jadwal_rpjmd_rhk' => $data['id_jadwal_rpjmd_rhk']
+                            );
+                        }
+                    } else {
+                        $option_rpjmd_rhk = '<option value="">Default dari Jadwal Monitor Upload</option>';
+                        
+                        if (!empty($jadwal_periode)) {
+                            foreach ($jadwal_periode as $jadwal_periode_item) {
+                                if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
+                                } else {
+                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+                                }
+
+                                $option_rpjmd_rhk .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
+                            }
                         }
                     }
 
@@ -1775,7 +1830,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         ARRAY_A
                     );
 
-                    $option_rpjpd = '<option>Pilih Jadwal RPJPD</option>';
+                    $option_rpjpd = '<option value="">Pilih Jadwal RPJPD</option>';
                     if (!empty($jadwal_periode_rpjpd)) {
                         foreach ($jadwal_periode_rpjpd as $jadwal_periode_item_rpjpd) {
                             if (!empty($jadwal_periode_item_rpjpd['tahun_selesai_anggaran']) && $jadwal_periode_item_rpjpd['tahun_selesai_anggaran'] > 1) {
@@ -1788,95 +1843,9 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                         }
                     }
 
-                    $data = $wpdb->get_row($wpdb->prepare("
-                                SELECT
-                                    p.*
-                                FROM esakip_pengaturan_upload_dokumen as p
-                                JOIN esakip_data_jadwal as j
-                                ON p.id_jadwal_rpjmd = j.id
-                                WHERE p.tahun_anggaran=%d
-                                    AND p.active=1
-                            ", $_POST['tahun_anggaran']), ARRAY_A);
-
-                    if (!empty($data)) {
-                        $ret['data'] = $data;
-                    }
-
-                    $data_rencana_aksi = $wpdb->get_row($wpdb->prepare("
-                                SELECT
-                                    p.*
-                                FROM esakip_pengaturan_rencana_aksi as p
-                                JOIN esakip_data_jadwal as j
-                                ON p.id_jadwal_rpjmd = j.id
-                                WHERE p.tahun_anggaran=%d
-                                    AND p.active=1
-                            ", $_POST['tahun_anggaran']), ARRAY_A);
-
-                    $option_rpjmd_rpd = '';
-                    $default_id = null;
-                    
-                    if (empty($data_rencana_aksi)) {
-                        if (!empty($data) && !empty($data['id_jadwal_rpjmd'])) {
-                            $default_id = $data['id_jadwal_rpjmd'];
-                            
-                            $jadwal_default = $wpdb->get_row($wpdb->prepare("
-                                SELECT 
-                                    id,
-                                    nama_jadwal,
-                                    tahun_anggaran,
-                                    lama_pelaksanaan,
-                                    tahun_selesai_anggaran
-                                FROM esakip_data_jadwal
-                                WHERE id = %d
-                            ", $default_id), ARRAY_A);
-                            
-                            if (!empty($jadwal_default)) {
-                                if (!empty($jadwal_default['tahun_selesai_anggaran']) && $jadwal_default['tahun_selesai_anggaran'] > 1) {
-                                    $tahun_anggaran_selesai = $jadwal_default['tahun_selesai_anggaran'];
-                                } else {
-                                    $tahun_anggaran_selesai = $jadwal_default['tahun_anggaran'] + $jadwal_default['lama_pelaksanaan'];
-                                }
-                                
-                                $option_rpjmd_rpd .= '<option value="' . $jadwal_default['id'] . '" selected>Default Jadwal</option>';
-                            }
-                        }
-                        
-                        if (!empty($jadwal_periode)) {
-                            foreach ($jadwal_periode as $jadwal_periode_item) {
-                                if (!empty($default_id) && $jadwal_periode_item['id'] == $default_id) {
-                                    continue;
-                                }
-                                
-                                if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
-                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-                                } else {
-                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-                                }
-                                
-                                $option_rpjmd_rpd .= '<option value="' . $jadwal_periode_item['id'] . '">' . $jadwal_periode_item['nama_jadwal'] . ' Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
-                            }
-                        }
-                    } else {
-                        $ret['data_rencana_aksi'] = $data_rencana_aksi;
-                        $selected_id = $data_rencana_aksi['id_jadwal_rpjmd'];
-                        
-                        if (!empty($jadwal_periode)) {
-                            foreach ($jadwal_periode as $jadwal_periode_item) {
-                                if (!empty($jadwal_periode_item['tahun_selesai_anggaran']) && $jadwal_periode_item['tahun_selesai_anggaran'] > 1) {
-                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_selesai_anggaran'];
-                                } else {
-                                    $tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
-                                }
-                                
-                                $selected = ($jadwal_periode_item['id'] == $selected_id) ? ' selected' : '';
-                                $option_rpjmd_rpd .= '<option value="' . $jadwal_periode_item['id'] . '"' . $selected . '>' . $jadwal_periode_item['nama_jadwal'] . ' Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai . '</option>';
-                            }
-                        }
-                    }
-
                     $ret['option_rpjpd'] = $option_rpjpd;
                     $ret['option_rpjmd'] = $option_rpjmd;
-                    $ret['option_rpjmd_rpd'] = $option_rpjmd_rpd;
+                    $ret['option_rpjmd_rhk'] = $option_rpjmd_rhk;
                     $ret['option_renstra'] = $option_renstra;
                 }
             } else {
