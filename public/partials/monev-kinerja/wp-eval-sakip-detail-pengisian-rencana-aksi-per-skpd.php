@@ -2747,6 +2747,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 ];
 
                                 let bulanan = b.bulanan || [];
+                                let sum_realisasi_triwulan = 0;
 
                                 renaksi += '' +
                                     `<tr style="display: none;" class="data_bulanan_${b.id}">` +
@@ -2835,7 +2836,6 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     renaksi += `
                                             </td>
                                             <td class="text-center">`;
-
                                     capaian.forEach((cap, index) => {
                                         renaksi += `<input type="text" class="form-control" name="capaian_${b.id}_${bulan_index + 1}_${index}" id="capaian_${b.id}_${bulan_index + 1}_${index}" value="${cap}" ${isdisabled ? 'disabled' : ''}>`;
                                     });
@@ -2856,23 +2856,17 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                     renaksi += `
                                             </td>
                                         </tr>`;
-
                                     if ((bulan_index + 1) % 3 == 0) {
                                         var triwulan = (bulan_index + 1) / 3;
 
-                                        // ----- capaian triwulan -----
-                                        let capaian_triwulanan = getCapaianTahunanRealisasiByType(
-                                            b['rumus_capaian_kinerja'],
-                                            allTargetTW['target_' + triwulan], 
-                                            allRealisasiTW, 
-                                            <?php echo $input['tahun']; ?>,
-                                            triwulan // current triwulan
-                                        );
-                                        if (capaian_triwulanan === null || isNaN(capaian_triwulanan)) {
-                                            capaian_triwulanan = 'N/A';
-                                        } else {
-                                            capaian_triwulanan = capaian_triwulanan + '%';
-                                        }
+                                        let target = allTargetTW['target_' + triwulan];
+                                        let realisasi = allRealisasiTW['realisasi_' + triwulan];
+
+                                        let capaian_triwulanan = target && target !== 0
+                                        ? parseFloat(((realisasi / target) * 100).toFixed(2))
+                                        : 0;
+
+                                        sum_realisasi_triwulan = sum_realisasi_triwulan + realisasi;
                                         
                                         renaksi += '' +
                                             `<tr style="background: #FDFFB6;">` +
@@ -2883,7 +2877,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                                 `<td class="text-center">` +
                                                     `<input type="number" class="form-control" name="realisasi_${b.id}_tw_${triwulan}" id="realisasi_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''} value="${allRealisasiTW['realisasi_' + triwulan] || 0}">` +
                                                 `</td>` +
-                                                `<td class="text-center font-weight-bold">${capaian_triwulanan}</td>` +
+                                                `<td class="text-center font-weight-bold">${capaian_triwulanan}%</td>` +
                                                 `<td class="text-center">` +
                                                     `<textarea class="form-control" name="keterangan_${b.id}_tw_${triwulan}" id="keterangan_${b.id}_tw_${triwulan}" ${isdisabled ? 'disabled' : ''}>${b['ket_tw_' + triwulan] || ''}</textarea>` +
                                                 `</td>` +
@@ -2922,7 +2916,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                         `<td class="text-center">${b.indikator}</td>` +
                                         `<td class="text-center">${b.target_akhir}</td>` +
                                         `<td class="text-center">${b.satuan}</td>` +
-                                        `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${allRealisasiTW['realisasi_' + currentTW]}" ${isdisabled ? 'disabled' : ''}></td>` +
+                                        `<td class="text-center"><input type="number" class="form-control" name="realisasi_akhir_${b.id}" id="realisasi_akhir_${b.id}" value="${sum_realisasi_triwulan}" ${isdisabled ? 'disabled' : ''}></td>` +
                                         `<td class="text-center font-weight-bold">${capaian_kinerja_tahunan}</td>` +
                                         `<td class="text-center"><textarea class="form-control" name="ket_total_${b.id}" id="ket_total_${b.id}" ${isdisabled ? 'disabled' : ''}>${b['ket_total'] || ''}</textarea></td>` +
                                         `<td class="text-center">`;
