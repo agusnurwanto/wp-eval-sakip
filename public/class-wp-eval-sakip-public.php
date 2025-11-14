@@ -33012,11 +33012,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$data = $wpdb->get_results(
 			$wpdb->prepare("
 				SELECT 
+					id,
 					kode_cascading_program
 				FROM esakip_data_rencana_aksi_opd
 				WHERE parent = %d 
 				  AND level = 2
 				  AND active = 1
+				ORDER BY kode_cascading_program ASC
 			", $parent_id),
 			ARRAY_A
 		);

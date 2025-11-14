@@ -10847,25 +10847,27 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$pendorong_html = implode('<br>', $pendorong_html);
 					$penghambat_html = implode('<br>', $penghambat_html);
 					$body_monev[$kd_program_asli] = '
-							<td class="kanan bawah text_blok" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '" data-bidang-urusan="' . $program['kode_urusan_bidang'] . '">' . $kd_program_asli . '</td>
-							<td class="kanan bawah text_blok nama">' . $program['nama'] . '</td>
-							<td class="kanan bawah text_blok indikator">' . $capaian_prog . '</td>
-							<td class="text_tengah kanan bawah text_blok total_renja target_indikator">' . $target_capaian_prog . '</td>
-							<td class="text_tengah kanan bawah text_blok total_renja satuan_indikator">' . $satuan_capaian_prog . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_1">' . $realisasi_indikator_tw1 . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_1">' . $capaian_anggaran_tw1 . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_2">' . $realisasi_indikator_tw2 . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_2">' . $capaian_anggaran_tw2 . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_3">' . $realisasi_indikator_tw3 . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_3">' . $capaian_anggaran_tw3 . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_4">' . $realisasi_indikator_tw4 . '</td>
-							<td class="text_tengah kanan bawah text_blok triwulan_4">' . $capaian_anggaran_tw4 . '</td>
-							<td class="text_kanan kanan bawah text_blok capaian_renja">' . $total_tw . '</td>
-							<td class="text_tengah kanan bawah text_blok capaian_renja">' . $capaian_realisasi_indikator . '</td>
-							<td class="text_kanan kanan bawah text_blok capaian_renja">' . $capaian . '</td>
-							<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '"></td>
-							<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
-							<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
+						<tr class="tr-program program" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '" data-bidang-urusan="' . $program['kode_urusan_bidang'] . '">
+							<td class="kanan bawah text_blok" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '" data-bidang-urusan="' . $program['kode_urusan_bidang'] . '" style="width: 100px;">' . $kd_program_asli . '</td>
+							<td class="kanan bawah text_blok nama" style="width: 300px;">' . $program['nama'] . '</td>
+							<td class="kanan bawah text_blok indikator" style="width: 200px;">' . $capaian_prog . '</td>
+							<td class="text_tengah kanan bawah text_blok total_renja target_indikator" style="width: 150px;">' . $target_capaian_prog . '</td>
+							<td class="text_tengah kanan bawah text_blok total_renja satuan_indikator" style="width: 150px;">' . $satuan_capaian_prog . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_1" style="width: 150px;">' . $realisasi_indikator_tw1 . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_1" style="width: 150px;">' . $capaian_anggaran_tw1 . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_2" style="width: 150px;">' . $realisasi_indikator_tw2 . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_2" style="width: 150px;">' . $capaian_anggaran_tw2 . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_3" style="width: 150px;">' . $realisasi_indikator_tw3 . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_3" style="width: 150px;">' . $capaian_anggaran_tw3 . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_4" style="width: 150px;">' . $realisasi_indikator_tw4 . '</td>
+							<td class="text_tengah kanan bawah text_blok triwulan_4" style="width: 150px;">' . $capaian_anggaran_tw4 . '</td>
+							<td class="text_kanan kanan bawah text_blok capaian_renja" style="width: 100px;">' . $total_tw . '</td>
+							<td class="text_tengah kanan bawah text_blok capaian_renja" style="width: 100px;">' . $capaian_realisasi_indikator . '</td>
+							<td class="text_kanan kanan bawah text_blok capaian_renja" style="width: 100px;">' . $capaian . '</td>
+							<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '" style="width: 200px;"></td>
+							<td class="kanan bawah text_blok" style="width: 200px;">' . $pendorong_html . '</td>
+							<td class="kanan bawah text_blok" style="width: 200px;">' . $penghambat_html . '</td>
+						</tr>
 					';
 
 					$rowspan++;
@@ -11048,6 +11050,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$penghambat_html = implode('<br>', $penghambat_html);
 
 						$body_monev[$kd_giat1] = '
+							<tr class="tr-kegiatan kegiatan" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '" data-kode_giat="' . $kd_giat1 . '" data-bidang-urusan="' . $giat['kode_urusan_bidang'] . '">
 								<td class="kanan bawah text_blok" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '" data-kode_giat="' . $kd_giat1 . '" data-bidang-urusan="' . $giat['kode_urusan_bidang'] . '">' . $kd_giat1 . '</td>
 								<td class="kanan bawah text_blok nama">' . $giat['nama'] . '</td>
 								<td class="kanan bawah text_blok indikator">' . $output_giat . '</td>
@@ -11067,6 +11070,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '"></td>
 								<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
 								<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
+							</tr>
 							';
 						$rowspan++;
 						foreach ($giat['data'] as $kd_sub_giat1 => $sub_giat) {
@@ -11256,6 +11260,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$penghambat_html = implode('<br>', $penghambat_html);
 
 							$body_monev[$kd_sub_giat1] = '
+								<tr class="tr-sub-kegiatan sub_kegiatan" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '.' . $kd_sub_giat . '">
 									<td class="kanan bawah" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '.' . $kd_sub_giat . '">' . $kd_sub_giat1 . '</td>
 									<td class="kanan bawah nama">' . $nama_sub . '</td>
 									<td class="kanan bawah indikator">' . $output_sub_giat . '</td>
@@ -11275,6 +11280,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="kanan bawah" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '.' . $kd_sub_giat . '"></td>
 									<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
 									<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
+								</tr>
 								';
 							$rowspan++;
 						}
@@ -11342,7 +11348,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			];
 			$skpd_total_rowspan += $sasaran_rowspan;
 		}
-		// die(var_dump($processed_sasarans));
+		// echo '<pre>';
+		// var_dump($processed_sasarans);
+		// echo '</pre>';
+		// die();
 
 		// get data realisasi pagu, program dan fisik wp-sipd
 		$capaian_anggaran = '';
@@ -11435,7 +11444,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$catatan_data = $html_renja['catatan_data'];
 
 					$tbody_catatan = "
-					<td class='kanan bawah text_blok bg-light atas' rowspan='{$skpd_total_rowspan}'>
+					<td class='kanan bawah text_blok atas' rowspan='{$skpd_total_rowspan}'>
 						<div style='display: flex; flex-direction: column; gap: 6px;'>
 							<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
 								<strong>TW 1:</strong><br>{$catatan_data['1']['catatan_verifikator']}
@@ -11451,7 +11460,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							</div>
 						</div>
 					</td>";
-					// === SELESAI ===
 				}
 				$tbody_program = '</tr>';
 
@@ -11463,7 +11471,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$program_rows = [];
 					foreach ($program_data as $program) {
-						$program_rows[] = $html_renja['data'][$program['kode_cascading_program']];
+						$program_rows[$program['kode_cascading_program']] = $html_renja['data'][$program['kode_cascading_program']];
 					}
 					// die(var_dump($program_rows));
 					$tbody_program = $program_rows;
@@ -11527,15 +11535,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td>
 					<td class='kiri kanan atas bawah text_tengah'>{$predikat_capaian}</td>"
 					. $tbody_2
-					.'<td rowspan="'.$sasaran_rowspan.'" colspan="19">
-						<table class="table table-bordered">
+					.'<td rowspan="'.$sasaran_rowspan.'" colspan="19" style="padding:0;">
+						<table style="margin: 0;">
 							<tbody>
 					';
 
 				// jika indikator pertama
 				if ($is_first_indicator) {
 					foreach ($tbody_program as $col) {
-						$tbody .= '<tr>'.$col.'</tr>';
+						$tbody .= $col;
 					}
 					$is_first_indicator = false;
 				}
