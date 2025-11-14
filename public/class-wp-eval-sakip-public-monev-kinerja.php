@@ -10895,7 +10895,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text_kanan kanan bawah text_blok capaian_renja">' . $total_tw . '</td>
 							<td class="text_tengah kanan bawah text_blok capaian_renja">' . $capaian_realisasi_indikator . '</td>
 							<td class="text_kanan kanan bawah text_blok capaian_renja">' . $capaian . '</td>
-							<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '"></td>
+							<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '"></td>
 							<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
 							<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
 					';
@@ -11327,29 +11327,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$monev_triwulan_all[$v['triwulan']]['update_skpd_at'] = $v['update_skpd_at'];
 		}
 
-		$catatan_column = "
-				<td class='kanan bawah text_blok bg-light atas' rowspan='$rowspan'>
-			<div style='display: flex; flex-direction: column; gap: 6px;'>
-				<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
-					<strong>TW 1:</strong><br>{$monev_triwulan_all['1']['catatan_verifikator']}
-				</div>
-				<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
-					<strong>TW 2:</strong><br>{$monev_triwulan_all['2']['catatan_verifikator']}
-				</div>
-				<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
-					<strong>TW 3:</strong><br>{$monev_triwulan_all['3']['catatan_verifikator']}
-				</div>
-				<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
-					<strong>TW 4:</strong><br>{$monev_triwulan_all['4']['catatan_verifikator']}
-				</div>
-			</div>
-		</td>
-
-		";
-
 		$return = [
 			'data' => $body_monev,
-			'catatan' => $catatan_column,
+			'catatan_data' => $monev_triwulan_all,
 		];
 		return $return;
 	}
@@ -11382,16 +11362,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		$skpd_total_rowspan = 0;
 		foreach ($all_sasaran as $sasaran) {
 			$indikators = $this->get_renaksi_indikator_by_id_renaksi($sasaran['id']);
+			$data_renaksi_level_2 = $this->get_renaksi_level_2_data($sasaran['id']);
 
 			$sasaran_rowspan = count($indikators) > 0 ? count($indikators) : 1;
 
 			$processed_sasarans[] = [
 				'sasaran_data' => $sasaran,
+				'program_data' => $data_renaksi_level_2,
 				'indikators'   => $indikators,
 				'rowspan'      => $sasaran_rowspan,
 			];
 			$skpd_total_rowspan += $sasaran_rowspan;
 		}
+		// die(var_dump($processed_sasarans));
 
 		// get data realisasi pagu, program dan fisik wp-sipd
 		$capaian_anggaran = '';
@@ -11439,6 +11422,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$sasaran_data   = $proc_sasaran['sasaran_data'];
 			$indikators     = $proc_sasaran['indikators'];
 			$sasaran_rowspan = $proc_sasaran['rowspan'];
+			$program_data = $proc_sasaran['program_data'];
 
 			if (empty($indikators)) {
 				$tbody .= "<tr>";
@@ -11451,30 +11435,66 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				continue;
 			}
 
+			if (empty($program_data)) {
+				$tbody .= "<tr>";
+				if ($is_first_row_for_skpd) {
+					$is_first_row_for_skpd = false;
+				}
+				$tbody .= "<td class='kiri kanan atas bawah text_tengah'>" . $no++ . "</td>";
+				$tbody .= "<td class='kiri kanan atas bawah text_kiri'>{$sasaran_data['label']}</td>";
+				$tbody .= "<td class='kiri kanan atas bawah text_tengah' colspan='19' rowspan='{$sasaran_rowspan}'>Program Tidak ditemukan</td>";;
+				continue;
+			}
+
 			$is_first_indicator = true;
 			foreach ($indikators as $indikator) {
 				$tbody .= "<tr id-skpd-simpeg='" . $data_unit['id_satker_simpeg'] . "' id-indikator='" . $indikator['id'] . "' id-rhk='" . $indikator['id_renaksi'] . "'>";
 				$multi_id_indikator[] = $indikator['id'];
 				$multi_id_rhk[$indikator['id_renaksi']] = $indikator['id_renaksi'];
 
-				$tbody_2 = "</tr>";
+				$tbody_2 = "";
+				$tbody_catatan = "";
 				if ($is_first_row_for_skpd) {
-					$is_first_row_for_skpd = false;
 
 					$title_rumus = $this->get_rumus_capaian_kinerja_tahunan_by_tipe(1);
 					$tbody_2 = "
-						<td class='kiri kanan atas bawah text_tengah {$background_color}' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
-						<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
-						<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>
-						<td class='kiri kanan atas bawah text_tengah' title='Predikat Capaian' rowspan='{$skpd_total_rowspan}' colspan='19'></td>
-					</tr>";
+					<td class='kiri kanan atas bawah text_tengah {$background_color}' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_anggaran}</td>
+					<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_program}</td>
+					<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}' rowspan='{$skpd_total_rowspan}'>{$capaian_fisik}</td>";
 
+					$catatan_data = $html_renja['catatan_data'];
+
+					$tbody_catatan = "
+					<td class='kanan bawah text_blok bg-light atas' rowspan='{$skpd_total_rowspan}'>
+						<div style='display: flex; flex-direction: column; gap: 6px;'>
+							<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
+								<strong>TW 1:</strong><br>{$catatan_data['1']['catatan_verifikator']}
+							</div>
+							<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
+								<strong>TW 2:</strong><br>{$catatan_data['2']['catatan_verifikator']}
+							</div>
+							<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
+								<strong>TW 3:</strong><br>{$catatan_data['3']['catatan_verifikator']}
+							</div>
+							<div style='background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 4px 6px;'>
+								<strong>TW 4:</strong><br>{$catatan_data['4']['catatan_verifikator']}
+							</div>
+						</div>
+					</td>";
+					// === SELESAI ===
 				}
-
+				$tbody_program = '</tr>';
 				if ($is_first_indicator) {
+
 					$tbody .= "<td class='kiri kanan atas bawah text_tengah' rowspan='{$sasaran_rowspan}'>" . $no++ . "</td>";
 					$tbody .= "<td class='kiri kanan atas bawah text_kiri' rowspan='{$sasaran_rowspan}'>{$sasaran_data['label']}</td>";
-					$is_first_indicator = false;
+
+					$program_rows = [];
+					foreach ($program_data as $program) {
+						$program_rows[] = $html_renja['data'][$program['kode_cascading_program']];
+					}
+					// die(var_dump($program_rows));
+					$tbody_program = $program_rows;
 				}
 
 				$target_tahunan = (float) str_replace(',', '.', $indikator['target_akhir'] ?? 0);
@@ -11507,6 +11527,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
 
+				$predikat_capaian = '-';
+				if ($capaian != false) {
+					$predikat_capaian = $this->get_predikat_capaian($capaian);
+				}
+
 				// jika capaian 0 tampilkan kosong.
 				$anti_zero_capaian = ($capaian_display == 0) ? '' : '<b>' . $capaian . '%</b>';
 
@@ -11528,8 +11553,30 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					<td class='kiri kanan atas bawah text_tengah'>{$all_realisasi_display['realisasi_4']}</td>
 					<td class='kiri kanan atas bawah text_tengah'>{$sum_realisasi}</td>
 					<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td>
-					<td class='kiri kanan atas bawah text_tengah'></td>"
+					<td class='kiri kanan atas bawah text_tengah'>{$predikat_capaian}</td>"
 					. $tbody_2;
+
+				if ($is_first_indicator) {
+					if ($is_first_row_for_skpd) {
+						$tutup = "";
+					} else {
+						$tutup = "</tr>";
+					}
+					foreach ($tbody_program as $col) {
+						$tbody .= $col;
+						if ($is_first_row_for_skpd) {
+							$tbody .= $tbody_catatan;
+							$is_first_row_for_skpd = false;
+						}
+					}
+					$tbody .= $tutup;
+					$is_first_indicator = false;
+				}
+
+				if ($is_first_row_for_skpd) {
+					$tbody .= $tbody_catatan;
+					$is_first_row_for_skpd = false;
+				}
 			}
 		}
 		$no++;
@@ -11560,6 +11607,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		// die(var_dump($tbody));
 		return $tbody;
 	}
+
+	function get_predikat_capaian(float $value)
+	{
+		if ($value >= 100) {
+			return "Sangat Berhasil";
+		} elseif ($value >= 75 && $value < 100) {
+			return "Berhasil";
+		} elseif ($value >= 55 && $value < 75) {
+			return "Cukup Berhasil";
+		} else {
+			return "Kurang Berhasil";
+		}
+	}
+
 
 	function pembulatan($angka)
 	{

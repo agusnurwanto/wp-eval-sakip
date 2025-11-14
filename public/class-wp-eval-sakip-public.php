@@ -33005,6 +33005,24 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return $data;
 	}
 
+	function get_renaksi_level_2_data(int $parent_id) {
+		global $wpdb;
+		
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT 
+					kode_cascading_program
+				FROM esakip_data_rencana_aksi_opd
+				WHERE parent = %d 
+				  AND level = 2
+				  AND active = 1
+			", $parent_id),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
 	function get_renaksi_indikator_by_id_renaksi(int $id_renaksi) {
 		global $wpdb;
 
@@ -33077,11 +33095,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			return "<tr><td class='text-center' colspan='14'>Tidak ada data tersedia</td></tr>";
 		}
 
-		$laporan_pk_publik = $this->functions->generatePage(array(
-			'nama_page'     => 'Perjanjian Kinerja Perangkat Daerah | Tahun ' . $tahun_anggaran,
-			'content'       => '[perjanjian_kinerja_publik tahun_anggaran=' . $tahun_anggaran . ']',
-			'show_header'   => 1,
-			'post_status'   => 'publish'
+		$pk_gabungan_page = $this->functions->generatePage(array(
+			'nama_page' => 'Pemantauan Rencana Aksi | Tahun Anggaran ' . $input['tahun_anggaran'],
+			'content' => '[perjanjian_kinerja_publik_baru tahun_anggaran=' . $input['tahun_anggaran'] . ']',
+			'show_header' => 1,
+			'post_status' => 'publish'
 		));
 
 		$tbody = '';
@@ -33097,7 +33115,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$tbody .= "
 					<tr>
 						<td class='text-center'>{$no}</td>
-						<td class='text-left'><a href='{$laporan_pk_publik['url']}&id_skpd={$perangkat_daerah['id_skpd']}' target='_blank'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</a></td>
+						<td class='text-left'><a href='{$pk_gabungan_page['url']}&id_skpd={$perangkat_daerah['id_skpd']}' target='_blank'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</a></td>
 						<td class='text-center' colspan='12'>Sasaran belum tersedia</td>
 					</tr>";
 				$no++;
@@ -33170,7 +33188,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$tbody .= "<tr>";
 					if ($is_first_row_for_skpd) {
 						$tbody .= "<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$no}</td>";
-						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'><a href='{$laporan_pk_publik['url']}&id_skpd={$perangkat_daerah['id_skpd']}' target='_blank'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</a></td>";
+						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'><a href='{$pk_gabungan_page['url']}&id_skpd={$perangkat_daerah['id_skpd']}' target='_blank'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</a></td>";
 						$is_first_row_for_skpd = false;
 					}
 					$tbody .= "<td class='text-left'>{$sasaran_data['label']}</td>";
@@ -33187,7 +33205,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					$tbody_2 = "</tr>";
 					if ($is_first_row_for_skpd) {
 						$tbody .= "<td class='text-center' rowspan='{$skpd_total_rowspan}'>{$no}</td>";
-						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'><a href='{$laporan_pk_publik['url']}&id_skpd={$perangkat_daerah['id_skpd']}' target='_blank'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</a></td>";
+						$tbody .= "<td class='text-left' rowspan='{$skpd_total_rowspan}'><a href='{$pk_gabungan_page['url']}&id_skpd={$perangkat_daerah['id_skpd']}' target='_blank'>{$perangkat_daerah['kode_skpd']} - {$perangkat_daerah['nama_skpd']}</a></td>";
 						$is_first_row_for_skpd = false;
 
 						$title_rumus = $this->get_rumus_capaian_kinerja_tahunan_by_tipe(1);

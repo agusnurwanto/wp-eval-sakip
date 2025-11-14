@@ -235,7 +235,7 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
     }
 </style>
 <div id="action-section" class="text-center m-4"></div>
-<h1 class="text-center">Detail Perjanjian Kinerja<br><?php echo $data_skpd['nama_skpd']; ?><br> Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
+<h1 class="text-center">Pemantauan Rencana Aksi<br><?php echo $data_skpd['nama_skpd']; ?><br> Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
 <div id="cetak" title="Laporan Perjanjian Kinerja" style="padding: 5px; overflow: auto; max-height: 80vh;">
     <table id="tabel-monev-renja" cellpadding="2" cellspacing="0" contenteditable="false">
         <thead>
@@ -316,7 +316,7 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
     jQuery(document).ready(() => {
         getDataTable()
         let extend_action = '';
-        extend_action += '<a class="btn btn-primary mr-2" href="<?php echo $url_pk_pisah_page; ?>" target="_blank"><span class="dashicons dashicons-controls-forward"></span> Format Pisah</a>';
+        extend_action += '<a class="btn btn-primary mr-2" href="<?php echo $url_pk_pisah_page; ?>" target="_blank"><span class="dashicons dashicons-controls-forward"></span> Perjanjian Kinerja</a>';
     
         jQuery('#action-section').append(extend_action);
     });

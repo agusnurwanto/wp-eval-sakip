@@ -10,7 +10,7 @@ $input = shortcode_atts(array(
 $id_skpd = $_GET['id_skpd'];
 
 $pk_gabungan_page = $this->functions->generatePage(array(
-    'nama_page' => 'Perjanjian Kinerja Format Gabungan | Tahun Anggaran ' . $input['tahun_anggaran'],
+    'nama_page' => 'Pemantauan Rencana Aksi | Tahun Anggaran ' . $input['tahun_anggaran'],
     'content' => '[perjanjian_kinerja_publik_baru tahun_anggaran=' . $input['tahun_anggaran'] . ']',
     'show_header' => 1,
     'post_status' => 'publish'
@@ -118,7 +118,7 @@ $pk_gabungan_page_url = $pk_gabungan_page['url'] . "&id_skpd=" . $id_skpd;
     jQuery(document).ready(() => {
         getDataTable();
         let extend_action = '';
-        extend_action += '<a class="btn btn-primary mr-2" href="<?php echo $pk_gabungan_page_url; ?>" target="_blank"><span class="dashicons dashicons-controls-back"></span> Format Gabungan</a>';
+        extend_action += '<a class="btn btn-secondary mr-2" href="<?php echo $pk_gabungan_page_url; ?>" target="_blank"><span class="dashicons dashicons-controls-back"></span> Kembali</a>';
 
         jQuery('#action-section').append(extend_action);
     });
