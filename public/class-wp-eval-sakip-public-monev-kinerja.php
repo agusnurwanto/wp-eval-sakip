@@ -11398,6 +11398,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			$sasaran_rowspan = $proc_sasaran['rowspan'];
 			$program_data = $proc_sasaran['program_data'];
 
+			// jika indikator sasaran kosong
 			if (empty($indikators)) {
 				$tbody .= "<tr>";
 				if ($is_first_row_for_skpd) {
@@ -11409,6 +11410,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				continue;
 			}
 
+			// jika cascading program sasaran kosong
 			if (empty($program_data)) {
 				$tbody .= "<tr>";
 				if ($is_first_row_for_skpd) {
@@ -11458,6 +11460,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					// === SELESAI ===
 				}
 				$tbody_program = '</tr>';
+
+				// jika indikator sasaran pertama
 				if ($is_first_indicator) {
 
 					$tbody .= "<td class='kiri kanan atas bawah text_tengah' rowspan='{$sasaran_rowspan}'>" . $no++ . "</td>";
@@ -11528,29 +11532,30 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					<td class='kiri kanan atas bawah text_tengah'>{$sum_realisasi}</td>
 					<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td>
 					<td class='kiri kanan atas bawah text_tengah'>{$predikat_capaian}</td>"
-					. $tbody_2;
+					. $tbody_2
+					.'<td rowspan="'.$sasaran_rowspan.'" colspan="19">
+						<table class="table table-bordered">
+							<tbody>
+					';
 
+				// jika indikator pertama
 				if ($is_first_indicator) {
-					if ($is_first_row_for_skpd) {
-						$tutup = "";
-					} else {
-						$tutup = "</tr>";
-					}
 					foreach ($tbody_program as $col) {
-						$tbody .= $col;
-						if ($is_first_row_for_skpd) {
-							$tbody .= $tbody_catatan;
-							$is_first_row_for_skpd = false;
-						}
+						$tbody .= '<tr>'.$col.'</tr>';
 					}
-					$tbody .= $tutup;
 					$is_first_indicator = false;
 				}
+				$tbody .= '
+							</tbody>
+						</table>';
 
 				if ($is_first_row_for_skpd) {
 					$tbody .= $tbody_catatan;
 					$is_first_row_for_skpd = false;
 				}
+				$tbody .= '
+					<td>
+				</tr>';
 			}
 		}
 		$no++;

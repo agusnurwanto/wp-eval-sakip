@@ -109,6 +109,10 @@ $pk_gabungan_page_url = $pk_gabungan_page['url'] . "&id_skpd=" . $id_skpd;
         transform-origin: top left;
         transition: transform 0.2s ease-out;
     }
+
+    #tabel-monev-renja tr td {
+        vertical-align: top;
+    }
 </style>
 <div id="action-section" class="text-center m-4"></div>
 <div id="body-iku">

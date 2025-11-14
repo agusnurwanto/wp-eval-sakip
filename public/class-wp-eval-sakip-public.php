@@ -32977,7 +32977,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				WHERE unit.active = 1
 				  AND mapping.active = 1
 				  AND unit.is_skpd = 1
-				  AND unit.tahun_anggaran = %d;
+				  AND unit.tahun_anggaran = %d
+				ORDER BY unit.kode_skpd ASC;
 			", $tahun_anggaran, $tahun_anggaran),
 			ARRAY_A
 		);

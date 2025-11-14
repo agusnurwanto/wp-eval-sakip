@@ -198,8 +198,6 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
     }
 
     #tabel-monev-renja {
-        font-family: \'Open Sans\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', sans-serif;
-        border-collapse: collapse;
         font-size: 70%;
         border: 0;
         table-layout: fixed;
@@ -232,6 +230,10 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
 
     .transition-shadow:hover {
         transform: translateY(-3px);
+    }
+
+    #tabel-monev-renja tr td {
+        vertical-align: top;
     }
 </style>
 <div id="action-section" class="text-center m-4"></div>
