@@ -199,7 +199,7 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
 
     #tabel-monev-renja {
         font-size: 70%;
-        border: 0;
+        border: solid black 1 px;
         table-layout: fixed;
     }
 
@@ -252,9 +252,6 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
                 <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Realisasi Kinerja</th>
                 <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Terhadap Target Tahun<br><small>%</small></th>
                 <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Predikat Capaian</th>
-                <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Serapan Anggaran<br><small>%</small></th>
-                <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Kinerja Program<br><small>%</small></th>
-                <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Realisasi Fisik<br><small>%</small></th>
 
                 <th rowspan="3" style="width: 100px;" class="atas kanan bawah text_tengah text_blok">Kode</th>
                 <th rowspan="3" style="width: 300px;" class="atas kanan bawah text_tengah text_blok">Program, Kegiatan, Sub Kegiatan</th>
@@ -270,6 +267,9 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
                 <th rowspan="3" style="width: 200px;" class="atas kanan bawah text_tengah text_blok">Faktor Pendukung</th>
                 <th rowspan="3" style="width: 200px;" class="atas kanan bawah text_tengah text_blok">Faktor Penghambat</th>
                 <th rowspan="3" style="width: 200px;" class="atas kanan bawah text_tengah text_blok">Catatan Verifikator / Rekomendasi</th>
+                <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Serapan Anggaran<br><small>%</small></th>
+                <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Kinerja Program<br><small>%</small></th>
+                <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Realisasi Fisik<br><small>%</small></th>
             </tr>
 
             <tr>
@@ -304,22 +304,42 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
             </tr>
 
             <tr>
-				<?php for ($i = 0; $i <= 38; $i++): ?>
-					<th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?></th>
-				<?php endfor; ?>
-			</tr>
+                <?php for ($i = 0; $i <= 38; $i++): ?>
+                    <th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?></th>
+                <?php endfor; ?>
+            </tr>
         </thead>
 
         <tbody id="body-pk">
-		</tbody>
+        </tbody>
     </table>
+</div>
+<div class="hide-print" id="catatan" style="max-width: 900px; margin: 40px auto; padding: 20px; border: 1px solid #e5e5e5; border-radius: 8px; background-color: #f9f9f9;">
+    <h4 style="font-weight: bold; margin-bottom: 20px; color: #333;">Catatan</h4>
+    <ul style="list-style-type: disc; padding-left: 20px; line-height: 1.6; color: #555;">
+        <li>Kolom nomor 15 (Predikat Capaian) warna <strong class="bg-success-mild">Hijau, Sangat Berhasil</strong> adalah <strong>( >= 100% )</strong></li>
+        <li>Kolom nomor 15 (Predikat Capaian) warna <strong class="bg-success-mild">Hijau, Berhasil</strong> adalah <strong>( 75% s.d 99% )</strong></li>
+        <li>Kolom nomor 15 (Predikat Capaian) warna <strong class="bg-warning-mild">Kuning, Cukup Berhasil</strong> adalah <strong>( 55% s.d 74% )</strong>
+        </li>
+        <li>Kolom nomor 15 (Predikat Capaian) warna <strong class="bg-danger-mild">Merah, Kurang Berhasil</strong> adalah <strong>( < 55% )</strong>
+        </li>
+        <li>Kolom nomor 16 s.d 34 adalah data MONEV RENJA Program, Kegiatan dan Sub Kegiatan. dibedakan melalui warna :</li>
+        <li class="ml-5">Baris warna <strong class="tr-program">Hijau</strong>, merupakan baris Program.</li>
+        <li class="ml-5">Baris warna <strong class="tr-kegiatan">Biru</strong>, merupakan baris Kegiatan.</li>
+        <li class="ml-5">Baris warna <strong>Putih</strong>, merupakan baris Sub Kegiatan.</li>
+        <li>Kolom nomor 36 (Capaian Serapan Anggaran) warna <strong class="bg-success-mild">Hijau</strong> adalah <strong>( 75% s.d 100% )</strong></li>
+        <li>Kolom nomor 36 (Capaian Serapan Anggaran) warna <strong class="bg-warning-mild">Kuning</strong> adalah <strong>( 50% s.d 74% )</strong>
+        </li>
+        <li>Kolom nomor 36 (Capaian Serapan Anggaran) warna <strong class="bg-danger-mild">Merah</strong> adalah <strong>( < 50% )</strong>
+        </li>
+    </ul>
 </div>
 <script>
     jQuery(document).ready(() => {
         getDataTable()
         let extend_action = '';
-        extend_action += '<a class="btn btn-primary mr-2" href="<?php echo $url_pk_pisah_page; ?>" target="_blank"><span class="dashicons dashicons-controls-forward"></span> Perjanjian Kinerja</a>';
-    
+        extend_action += '<a class="btn btn-primary mr-2" href="<?php echo $url_pk_pisah_page; ?>" target="_blank" style="text-decoration: none;"><span class="dashicons dashicons-controls-forward"></span> Perjanjian Kinerja</a>';
+
         jQuery('#action-section').append(extend_action);
     });
 

@@ -33099,8 +33099,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$pk_gabungan_page = $this->functions->generatePage(array(
-			'nama_page' => 'Pemantauan Rencana Aksi | Tahun Anggaran ' . $input['tahun_anggaran'],
-			'content' => '[perjanjian_kinerja_publik_baru tahun_anggaran=' . $input['tahun_anggaran'] . ']',
+			'nama_page' => 'Pemantauan Rencana Aksi | Tahun Anggaran ' . $tahun_anggaran,
+			'content' => '[perjanjian_kinerja_publik_baru tahun_anggaran=' . $tahun_anggaran . ']',
 			'show_header' => 1,
 			'post_status' => 'publish'
 		));

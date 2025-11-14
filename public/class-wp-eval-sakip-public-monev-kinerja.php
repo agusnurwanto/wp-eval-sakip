@@ -11516,6 +11516,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$predikat_capaian = '-';
 				if ($capaian != false) {
 					$predikat_capaian = $this->get_predikat_capaian($capaian);
+					$class_bg_predikat_capaian = $this->get_class_background_by_persentase_capaian($capaian);
 				}
 
 				// jika capaian 0 tampilkan kosong.
@@ -11539,9 +11540,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					<td class='kiri kanan atas bawah text_tengah'>{$all_realisasi_display['realisasi_4']}</td>
 					<td class='kiri kanan atas bawah text_tengah'>{$sum_realisasi}</td>
 					<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td>
-					<td class='kiri kanan atas bawah text_tengah'>{$predikat_capaian}</td>"
-					. $tbody_2
-					.'<td rowspan="'.$sasaran_rowspan.'" colspan="19" style="padding:0;">
+					<td class='kiri kanan atas bawah text_tengah text_blok {$class_bg_predikat_capaian}'>{$predikat_capaian}</td>"
+					. '<td rowspan="'.$sasaran_rowspan.'" colspan="19" style="padding:0;">
 						<table style="margin: 0;">
 							<tbody>
 					';
@@ -11558,7 +11558,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						</table>';
 
 				if ($is_first_row_for_skpd) {
-					$tbody .= $tbody_catatan;
+					$tbody .= $tbody_catatan . $tbody_2;
 					$is_first_row_for_skpd = false;
 				}
 				$tbody .= '
