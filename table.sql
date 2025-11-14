@@ -2554,3 +2554,23 @@ CREATE TABLE `esakip_rpjmd_misi_detail` (
   KEY `id_misi` (`id_misi`),
   KEY `id_jadwal` (`id_jadwal`)
 );
+
+CREATE TABLE `esakip_data_rhk_individu` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_rhk` int(11) DEFAULT NULL,
+  `id_indikator_rhk` int(11) DEFAULT NULL,
+  `label_rhk` text DEFAULT NULL,
+  `label_indikator_rhk` text DEFAULT NULL,
+  `nama` text DEFAULT NULL,
+  `nip` varchar(255) DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `tahun_anggaran` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY key (id),
+  KEY `id_rhk` (`id_rhk`),
+  KEY `id_indikator_rhk` (`id_indikator_rhk`),
+  KEY `id_skpd` (`id_skpd`),
+  KEY `tahun_anggaran` (`tahun_anggaran`)
+);

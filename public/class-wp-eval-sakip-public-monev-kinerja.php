@@ -8709,13 +8709,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										if (!empty($v_indikator['kinerja_bulan'])) {
 											foreach ($v_indikator['kinerja_bulan'] as $k_k_bulan => $v_k_bulan) {
 												if (!empty($v_k_bulan['kinerja'])) {
-													$nama_aspek = array('kuantitas', 'kualitas', 'waktu', 'biaya');
-													if (!empty($v_indikator['aspek_rhk'])) {
-														$nama_aspek = $nama_aspek[$v_indikator['aspek_rhk'] - 1];
-													} else {
-														$nama_aspek = $nama_aspek[0];
-													}
-
+													$nama_aspek = 'kuantitas';
 													$volume_api = $rencana_aksi_api = $satuan_bulan_api = $realisasi_api = $keterangan_api = $capaian_api = array();
 													foreach ($v_k_bulan['kinerja'] as $v_kinerja) {
 														$volume_api[] = $v_kinerja['target_' . $nama_aspek];
