@@ -11067,7 +11067,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								<td class="text_tengah kanan bawah text_blok capaian_renja">' . $total_tw . '</td>
 								<td class="text_tengah kanan bawah text_blok capaian_renja">' . $capaian_realisasi_indikator . '</td>
 								<td class="text_tengah kanan bawah text_blok capaian_renja">' . $capaian . '</td>
-								<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '"></td>
+								<td class="kanan bawah text_blok"></td>
 								<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
 								<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
 							</tr>
@@ -11277,7 +11277,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text_tengah kanan bawah capaian_renja">' . $total_tw . '</td>
 									<td class="text_tengah kanan bawah capaian_renja">' . $capaian_realisasi_indikator . '</td>
 									<td class="text_tengah kanan bawah capaian_renja">' . $capaian . '</td>
-									<td class="kanan bawah" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '.' . $kd_sub_giat . '"></td>
+									<td class="kanan bawah"></td>
 									<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
 									<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
 								</tr>
