@@ -3596,24 +3596,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	function submit_pengaturan_rencana_aksi()
-    {
-        global $wpdb;
-        try {
-            if (!empty($_POST)) {
-                if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-                    if (empty($_POST['tahun_anggaran'])) {
-                        throw new Exception("Ada data yang kosong!", 1);
-                    }
+	{
+		global $wpdb;
+		try {
+			if (!empty($_POST)) {
+				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+					if (empty($_POST['tahun_anggaran'])) {
+						throw new Exception("Ada data yang kosong!", 1);
+					}
 
-                    $tahun_anggaran = $_POST['tahun_anggaran'];
-                    $id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
-                    $id_jadwal_rpjmd_rhk = !empty($_POST['id_jadwal_rpjmd_rhk']) ? $_POST['id_jadwal_rpjmd_rhk'] : null;
-                    $input_renaksi = $_POST['input_renaksi'];
-                    $set_pagu_renaksi = $_POST['set_pagu_renaksi'];
+					$tahun_anggaran = $_POST['tahun_anggaran'];
+					$id_jadwal_renstra_wpsipd = $_POST['id_jadwal_renstra_wpsipd'];
+					$id_jadwal_rpjmd_rhk = !empty($_POST['id_jadwal_rpjmd_rhk']) ? $_POST['id_jadwal_rpjmd_rhk'] : null;
+					$input_renaksi = $_POST['input_renaksi'];
+					$set_pagu_renaksi = $_POST['set_pagu_renaksi'];
 
-                    // Pengaturan rencana aksi
-                    $cek_data_pengaturan = $wpdb->get_var(
-                        $wpdb->prepare("
+					// Pengaturan rencana aksi
+					$cek_data_pengaturan = $wpdb->get_var(
+						$wpdb->prepare("
                         SELECT 
                             id
                         FROM 
@@ -3621,47 +3621,47 @@ class Wp_Eval_Sakip_Monev_Kinerja
                         WHERE tahun_anggaran=%d
                         AND active=1
                     ", $tahun_anggaran)
-                    );
+					);
 
-                    $data = array(
-                        'id_jadwal_wp_sipd' => $id_jadwal_renstra_wpsipd,
-                        'id_jadwal_rpjmd_rhk' => $id_jadwal_rpjmd_rhk,
-                        'tahun_anggaran' => $tahun_anggaran,
-                        'active' => 1,
-                        'update_at' => current_time('mysql')
-                    );
+					$data = array(
+						'id_jadwal_wp_sipd' => $id_jadwal_renstra_wpsipd,
+						'id_jadwal_rpjmd_rhk' => $id_jadwal_rpjmd_rhk,
+						'tahun_anggaran' => $tahun_anggaran,
+						'active' => 1,
+						'update_at' => current_time('mysql')
+					);
 
-                    if (empty($cek_data_pengaturan)) {
-                        $data['created_at'] = current_time('mysql');
-                        $wpdb->insert('esakip_pengaturan_upload_dokumen', $data);
-                        $message = "Sukses tambah data";
-                    } else {
-                        $wpdb->update('esakip_pengaturan_upload_dokumen', $data, array('id' => $cek_data_pengaturan));
-                        $message = "Sukses edit data";
-                    }
+					if (empty($cek_data_pengaturan)) {
+						$data['created_at'] = current_time('mysql');
+						$wpdb->insert('esakip_pengaturan_upload_dokumen', $data);
+						$message = "Sukses tambah data";
+					} else {
+						$wpdb->update('esakip_pengaturan_upload_dokumen', $data, array('id' => $cek_data_pengaturan));
+						$message = "Sukses edit data";
+					}
 
-                    update_option('_crb_input_renaksi', $input_renaksi);
-                    update_option('_crb_set_pagu_renaksi', $set_pagu_renaksi);
+					update_option('_crb_input_renaksi', $input_renaksi);
+					update_option('_crb_set_pagu_renaksi', $set_pagu_renaksi);
 
-                    echo json_encode([
-                        'status' => 'success',
-                        'message' => $message,
-                    ]);
-                    exit();
-                } else {
-                    throw new Exception("API tidak ditemukan!", 1);
-                }
-            } else {
-                throw new Exception("Format tidak sesuai!", 1);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
-            exit();
-        }
-    }
+					echo json_encode([
+						'status' => 'success',
+						'message' => $message,
+					]);
+					exit();
+				} else {
+					throw new Exception("API tidak ditemukan!", 1);
+				}
+			} else {
+				throw new Exception("Format tidak sesuai!", 1);
+			}
+		} catch (Exception $e) {
+			echo json_encode([
+				'status' => 'error',
+				'message' => $e->getMessage()
+			]);
+			exit();
+		}
+	}
 
 	function copy_data_rencana_aksi()
 	{
@@ -10848,7 +10848,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$penghambat_html = implode('<br>', $penghambat_html);
 					$body_monev[$kd_program_asli] = '
 						<tr class="tr-program program" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '" data-bidang-urusan="' . $program['kode_urusan_bidang'] . '">
-							<td class="kanan bawah text_blok" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '" data-bidang-urusan="' . $program['kode_urusan_bidang'] . '" style="width: 100px;">' . $kd_program_asli . '</td>
+							<td class="kanan bawah text_blok" data-kode="' . $kd_urusan . '.' . $kd_bidang . '.' . $kd_program . '" data-bidang-urusan="' . $program['kode_urusan_bidang'] . '" style="width: 125px;">' . $kd_program_asli . '</td>
 							<td class="kanan bawah text_blok nama" style="width: 300px;">' . $program['nama'] . '</td>
 							<td class="kanan bawah text_blok indikator" style="width: 200px;">' . $capaian_prog . '</td>
 							<td class="text_tengah kanan bawah text_blok total_renja target_indikator" style="width: 150px;">' . $target_capaian_prog . '</td>
@@ -10861,9 +10861,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							<td class="text_tengah kanan bawah text_blok triwulan_3" style="width: 150px;">' . $capaian_anggaran_tw3 . '</td>
 							<td class="text_tengah kanan bawah text_blok triwulan_4" style="width: 150px;">' . $realisasi_indikator_tw4 . '</td>
 							<td class="text_tengah kanan bawah text_blok triwulan_4" style="width: 150px;">' . $capaian_anggaran_tw4 . '</td>
-							<td class="text_kanan kanan bawah text_blok capaian_renja" style="width: 100px;">' . $total_tw . '</td>
+							<td class="text_tengah kanan bawah text_blok capaian_renja" style="width: 100px;">' . $total_tw . '</td>
 							<td class="text_tengah kanan bawah text_blok capaian_renja" style="width: 100px;">' . $capaian_realisasi_indikator . '</td>
-							<td class="text_kanan kanan bawah text_blok capaian_renja" style="width: 100px;">' . $capaian . '</td>
+							<td class="text_tengah kanan bawah text_blok capaian_renja" style="width: 100px;">' . $capaian . '</td>
 							<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '" style="width: 200px;"></td>
 							<td class="kanan bawah text_blok" style="width: 200px;">' . $pendorong_html . '</td>
 							<td class="kanan bawah text_blok" style="width: 200px;">' . $penghambat_html . '</td>
@@ -11066,7 +11066,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								<td class="text_tengah kanan bawah text_blok triwulan_4">' . $capaian_anggaran_tw4 . '</td>
 								<td class="text_tengah kanan bawah text_blok capaian_renja">' . $total_tw . '</td>
 								<td class="text_tengah kanan bawah text_blok capaian_renja">' . $capaian_realisasi_indikator . '</td>
-								<td class="text_kanan kanan bawah text_blok capaian_renja">' . $capaian . '</td>
+								<td class="text_tengah kanan bawah text_blok capaian_renja">' . $capaian . '</td>
 								<td class="kanan bawah text_blok" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '"></td>
 								<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
 								<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
@@ -11276,7 +11276,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									<td class="text_tengah kanan bawah triwulan_4">' . $capaian_anggaran_tw4 . '</td>
 									<td class="text_tengah kanan bawah capaian_renja">' . $total_tw . '</td>
 									<td class="text_tengah kanan bawah capaian_renja">' . $capaian_realisasi_indikator . '</td>
-									<td class="text_kanan kanan bawah capaian_renja">' . $capaian . '</td>
+									<td class="text_tengah kanan bawah capaian_renja">' . $capaian . '</td>
 									<td class="kanan bawah" data-kode-progkeg="' . $kd_bidang . '.' . $kd_program . '.' . $kd_giat . '.' . $kd_sub_giat . '"></td>
 									<td class="kanan bawah text_blok">' . $pendorong_html . '</td>
 									<td class="kanan bawah text_blok">' . $penghambat_html . '</td>
@@ -11336,20 +11336,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		$skpd_total_rowspan = 0;
 		foreach ($all_sasaran as $sasaran) {
 			$indikators = $this->get_renaksi_indikator_by_id_renaksi($sasaran['id']);
-			$data_renaksi_level_2 = $this->get_renaksi_level_2_data($sasaran['id']);
+			$data_renaksi_prog_keg = $this->get_renaksi_parent_to_child_by_parent_id($sasaran['id']);
 
 			$sasaran_rowspan = count($indikators) > 0 ? count($indikators) : 1;
 
 			$processed_sasarans[] = [
 				'sasaran_data' => $sasaran,
-				'program_data' => $data_renaksi_level_2,
 				'indikators'   => $indikators,
+				'program_data' => $data_renaksi_prog_keg,
 				'rowspan'      => $sasaran_rowspan,
 			];
 			$skpd_total_rowspan += $sasaran_rowspan;
 		}
 		// echo '<pre>';
-		// var_dump($processed_sasarans);
+		// print_r($processed_sasarans);
 		// echo '</pre>';
 		// die();
 
@@ -11469,12 +11469,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$tbody .= "<td class='kiri kanan atas bawah text_tengah' rowspan='{$sasaran_rowspan}'>" . $no++ . "</td>";
 					$tbody .= "<td class='kiri kanan atas bawah text_kiri' rowspan='{$sasaran_rowspan}'>{$sasaran_data['label']}</td>";
 
-					$program_rows = [];
-					foreach ($program_data as $program) {
-						$program_rows[$program['kode_cascading_program']] = $html_renja['data'][$program['kode_cascading_program']];
-					}
-					// die(var_dump($program_rows));
-					$tbody_program = $program_rows;
+					$program_rows = $this->flatten_program_tree($program_data, $html_renja);
+					// echo "<pre>";
+					// print_r($program_data);
+					// echo "</pre>";
+					// die(json_encode($program_data));
+					$tbody_program = $program_rows['data'];
 				}
 
 				$target_tahunan = (float) str_replace(',', '.', $indikator['target_akhir'] ?? 0);
@@ -11535,7 +11535,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					<td class='kiri kanan atas bawah text_tengah'>{$sum_realisasi}</td>
 					<td class='kiri kanan atas bawah text_tengah' data-toggle='tooltip' data-placement='top' title='{$title_rumus}'>{$anti_zero_capaian}</td>
 					<td class='kiri kanan atas bawah text_tengah text_blok {$class_bg_predikat_capaian}'>{$predikat_capaian}</td>"
-					. '<td rowspan="'.$sasaran_rowspan.'" colspan="19" style="padding:0;">
+					. '<td rowspan="' . $sasaran_rowspan . '" colspan="19" style="padding:0;">
 						<table style="margin: 0;">
 							<tbody>
 					';
@@ -11587,6 +11587,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		// die(var_dump($tbody));
 		return $tbody;
+	}
+
+	function flatten_program_tree($node, &$rows = []) {
+		if (isset($node['data'])) {
+			$rows[] = $node['data'];
+		}
+
+		// jika child ada
+		if (isset($node['child']) && !empty($node['child'])) {
+			foreach ($node['child'] as $child) {
+				$this->flatten_program_tree($child, $rows);
+			}
+		}
+
+		return $rows;
 	}
 
 	function get_predikat_capaian(float $value)

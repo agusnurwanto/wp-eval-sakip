@@ -238,7 +238,7 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
 </style>
 <div id="action-section" class="text-center m-4"></div>
 <h1 class="text-center">Pemantauan Rencana Aksi<br><?php echo $data_skpd['nama_skpd']; ?><br> Tahun Anggaran <?php echo $input['tahun_anggaran']; ?></h1>
-<div id="cetak" title="Laporan Perjanjian Kinerja" style="padding: 5px; overflow: auto; max-height: 80vh;">
+<div id="cetak" title="Laporan Rencana Aksi" style="padding: 5px; overflow: auto; max-height: 80vh;">
     <table id="tabel-monev-renja" cellpadding="2" cellspacing="0" contenteditable="false">
         <thead>
             <tr>
@@ -253,7 +253,7 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
                 <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Capaian Terhadap Target Tahun<br><small>%</small></th>
                 <th rowspan="3" style="width: 200px;" class="atas kiri kanan bawah text_tengah text_blok">Predikat Capaian</th>
 
-                <th rowspan="3" style="width: 100px;" class="atas kanan bawah text_tengah text_blok">Kode</th>
+                <th rowspan="3" style="width: 125px;" class="atas kanan bawah text_tengah text_blok">Kode</th>
                 <th rowspan="3" style="width: 300px;" class="atas kanan bawah text_tengah text_blok">Program, Kegiatan, Sub Kegiatan</th>
                 <th rowspan="3" style="width: 200px;" class="atas kanan bawah text_tengah text_blok">Indikator Program / Kegiatan / Sub Kegiatan</th>
                 <th rowspan="2" colspan="2" style="width: 300px;" class="atas kanan bawah text_tengah text_blok">
@@ -305,7 +305,17 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
 
             <tr>
                 <?php for ($i = 0; $i <= 38; $i++): ?>
-                    <th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?></th>
+                    <?php if ($i == 13) : ?>
+                        <th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?> = (9+10+11+12)</th>
+                    <?php elseif ($i == 14) : ?>
+                        <th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?> = (13/4)*100</th>
+                    <?php elseif ($i == 29) : ?>
+                        <th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?> = (21+23+25+27)</th>
+                    <?php elseif ($i == 30) : ?>
+                        <th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?> = (29/19)*100</th>
+                    <?php else : ?>
+                        <th class="kiri atas kanan bawah text_tengah text_blok"><?= $i ?></th>
+                    <?php endif; ?>
                 <?php endfor; ?>
             </tr>
         </thead>
