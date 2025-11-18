@@ -2564,6 +2564,7 @@ CREATE TABLE `esakip_data_rhk_individu` (
   `nama` text DEFAULT NULL,
   `nip` varchar(255) DEFAULT NULL,
   `id_skpd` int(11) DEFAULT NULL,
+  `json` text DEFAULT NULL,
   `tahun_anggaran` int(11) DEFAULT NULL,
   `active` tinyint(4) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp(),

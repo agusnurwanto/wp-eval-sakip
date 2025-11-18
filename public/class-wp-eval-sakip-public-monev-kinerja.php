@@ -8643,10 +8643,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			if (!empty($_POST['debug'])) {
 				$startTimeOp1 = microtime(true);
 			}
-
 			if ($data_ekin['status']) {
 				if (!empty($data_ekin['data'])) {
 					foreach ($data_ekin['data'] as $k_ekin => $v_ekin) {
+						$nama_pegawai = !empty($v_ekin['nama']) ? $v_ekin['nama'] : '';
+						$nip_pegawai = !empty($v_ekin['nip']) ? $v_ekin['nip'] : '';
 						if (!empty($v_ekin['rencana_hasil_kerja'])) {
 							foreach ($v_ekin['rencana_hasil_kerja'] as $k_rhk => $v_rhk) {
 
@@ -8656,6 +8657,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										continue;
 									}
 								}
+
+								$cek_id_rhk = $wpdb->get_var(
+									$wpdb->prepare("
+									SELECT id 
+									FROM esakip_data_rencana_aksi_opd
+									WHERE id = %d 
+										AND tahun_anggaran = %d 
+										AND id_skpd = %d 
+										AND active = 1
+									", $v_rhk['rhk_id'], $tahun, $id_skpd)
+								);
 
 								if (!empty($v_rhk['indikator'])) {
 									foreach ($v_rhk['indikator'] as $k_indikator => $v_indikator) {
@@ -8679,6 +8691,56 @@ class Wp_Eval_Sakip_Monev_Kinerja
 												AND active=1
 											", $v_indikator['indikator_rhk_id'], $v_rhk['rhk_id'], $tahun, $id_skpd)
 										);
+
+										if (empty($cek_id_rhk) || empty($cek_id_indikator)) {
+										    $existing_data = $wpdb->get_row($wpdb->prepare("
+										    	SELECT id 
+										    	FROM esakip_data_rhk_individu 
+										        	WHERE id_rhk = %d 
+										        	AND id_indikator_rhk = %d 
+										        	AND nip = %s 
+										        	AND tahun_anggaran = %d 
+										        	AND active = 1", $v_rhk['rhk_id'], $v_indikator['indikator_rhk_id'], $nip_pegawai, $tahun
+										    ));
+										    
+										    if (empty($existing_data)) {
+										        $json_data = array(
+										            'satuan' => !empty($v_indikator['satuan']) ? $v_indikator['satuan'] : null,
+										            'aspek_rhk' => !empty($v_indikator['aspek_rhk']) ? $v_indikator['aspek_rhk'] : null,
+										            'aspek_rhk_teks' => !empty($v_indikator['aspek_rhk_teks']) ? $v_indikator['aspek_rhk_teks'] : null,
+										            'kinerja_bulan' => !empty($v_indikator['kinerja_bulan']) ? $v_indikator['kinerja_bulan'] : array(),
+										            'kinerja_triwulan' => !empty($v_indikator['kinerja_triwulan']) ? $v_indikator['kinerja_triwulan'] : array(),
+										            'kinerja_tahunan' => !empty($v_indikator['kinerja_tahunan']) ? $v_indikator['kinerja_tahunan'] : array()
+										        );
+										        
+										        $data_rhk_individu = array(
+										            'id_rhk' => $v_rhk['rhk_id'],
+										            'id_indikator_rhk' => $v_indikator['indikator_rhk_id'],
+										            'label_rhk' => !empty($v_rhk['rencana_hasil_kerja']) ? $v_rhk['rencana_hasil_kerja'] : null,
+										            'label_indikator_rhk' => !empty($v_indikator['indikator']) ? $v_indikator['indikator'] : null,
+										            'nama' => $nama_pegawai,
+										            'nip' => $nip_pegawai,
+										            'id_skpd' => $id_skpd,
+										            'json' => json_encode($json_data),
+										            'tahun_anggaran' => $tahun,
+										            'active' => 1,
+										            'created_at' => current_time('mysql')
+										        );
+										        
+										        $wpdb->insert('esakip_data_rhk_individu', $data_rhk_individu);
+										    }
+										} else {
+										    $wpdb->update(
+										        'esakip_data_rhk_individu',
+										        array('active' => 0),
+										        array(
+										            'id_rhk' => $v_rhk['rhk_id'],
+										            'id_indikator_rhk' => $v_indikator['indikator_rhk_id'],
+										            'nip' => $nip_pegawai,
+										            'tahun_anggaran' => $tahun
+										        )
+										    );
+										}
 
 										if (!empty($v_indikator['kinerja_triwulan'])) {
 											$data_triwulan = array();
@@ -12364,5 +12426,68 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			]);
 			exit();
 		}
+	}
+
+	function get_table_rhk_individu()
+	{
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data iku!',
+			'data'  => ''
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID OPD tidak boleh kosong!';
+				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+				}
+				if ($ret['status'] != 'error') {
+					$get_data = $wpdb->get_results($wpdb->prepare("
+						SELECT
+							*
+						FROM esakip_data_rhk_individu
+						WHERE id_skpd=%d
+							AND tahun_anggaran=%d
+							AND active=1
+					", $_POST['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
+					$html = '';
+					$no = 0;
+					if (!empty($get_data)) {
+						foreach ($get_data as $v) {
+							$no++;
+
+							$html .= '
+							<tr>
+								<td class="atas kanan bawah kiri">' . $no . '</td>
+								<td class="text-left atas kanan bawah kiri">' . $v['label_rhk'] . '</td>
+								<td class="text-left atas kanan bawah kiri">' . $v['label_indikator_rhk'] . '</td>
+								<td class="text-left atas kanan bawah kiri">' . $v['nip'] . '</td>
+								<td class="text-left atas kanan bawah kiri">' . $v['nama'] . '</td>
+							';
+							$html .= '</tr>';
+						}
+					}
+					if (empty($html)) {
+						$html = '<tr><td class="text-center" colspan="3">Data masih kosong!</td></tr>';
+					}
+					$ret['data'] = $html;
+				}
+			} else {
+				$ret = array(
+					'status' => 'error',
+					'message'   => 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$ret = array(
+				'status' => 'error',
+				'message'   => 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
 	}
 }

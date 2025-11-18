@@ -616,7 +616,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_help_rhk', $plugin_public, 'help_rhk');
 		$this->loader->add_action('wp_ajax_copy_data_rencana_aksi', $plugin_public, 'copy_data_rencana_aksi');
 		$this->loader->add_action('wp_ajax_get_data_target_bulanan_ekinerja', $plugin_public, 'get_data_target_bulanan_ekinerja');	
-
+		$this->loader->add_action('wp_ajax_get_table_rhk_individu', $plugin_public, 'get_table_rhk_individu');
+		
 		$this->loader->add_action('wp_ajax_get_rencana_hasil_kerja', $plugin_public, 'get_rencana_hasil_kerja');
 		$this->loader->add_action('wp_ajax_nopriv_get_rencana_hasil_kerja', $plugin_public, 'get_rencana_hasil_kerja');
 

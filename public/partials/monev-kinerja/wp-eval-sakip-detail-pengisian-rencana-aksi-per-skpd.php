@@ -304,6 +304,14 @@ $rincian_tagging = $this->functions->generatePage(array(
     'post_status' => 'private'
 ));
 $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], '&tahun=' . $tahun_anggaran_sakip . '&id_skpd=' . $id_skpd);
+$data_rhk_individu = $wpdb->get_results($wpdb->prepare("
+    SELECT
+        *
+    FROM esakip_data_rhk_individu
+    WHERE id_skpd=%d
+        AND tahun_anggaran=%d
+        AND active=1
+", $id_skpd, $input['tahun']), ARRAY_A);
 ?>
 <style type="text/css">
     .wrap-table {
@@ -391,6 +399,25 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                     </tbody>
                 </table>
             </div>
+            <?php if (
+                !empty($data_rhk_individu)
+            ): ?>            
+            <h4 class="text-center">Tabel Data Rencana Aksi Individu yang tidak ada di Rencana Aksi OPD</h4>
+            <div style="padding: 5px; overflow: auto; max-height: 80vh; margin-bottom: 20px;">
+                <table class="table table-bordered" id="table-rhk-individu" cellpadding="2" cellspacing="0" contenteditable="false">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 60px;">No</th>
+                            <th class="text-center" style="width: 50%">Rencana Aksi / RHK</th>
+                            <th class="text-center">Indikator</th>
+                            <th class="text-center">NIP</th>
+                            <th class="text-center">Pegawal</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <?php endif; ?>
             <?php if (
                 !$is_admin_panrb 
                 && $hak_akses_user_pegawai != 0
@@ -659,6 +686,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         }
 
         getTablePengisianRencanaAksi();
+        getTableIndividu();
         jQuery("#fileUpload").on('change', function() {
             var id_dokumen = jQuery('#idDokumen').val();
             if (id_dokumen == '') {
@@ -3129,7 +3157,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
         return `
             <div class="form-group ${_class}" style="${display}"> 
                 <label for="pokin-level-${id}">Pilih Pokin Level ${id}</label> 
-                <select class="form-control" multiple name="pokin-level-${id}" id="pokin-level-${id}" onchange="get_data_pokin_2(this.value, ${id+1}, 'pokin-level-${id+1}', true)"> 
+                <select class="form-control" multiple name="pokin-level-${id}" id="pokin-level-${id}" onchange="get_data_pokin_2(this.value, ${id+1}, 'pokin-level-${id+1}', true)" disabled> 
                 </select> 
             </div>
         `;
@@ -3402,7 +3430,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 <input type="hidden" id="id_renaksi" value=""/>
                                 <div class="form-group">
                                     <label for="pokin-level-${level_pokin}">Pilih Pokin Level ${level_pokin}</label>
-                                    <select class="form-control" multiple name="pokin-level-${level_pokin}" id="pokin-level-${level_pokin}" ${trigger_pokin_input_rencana_pagu}>
+                                    <select class="form-control" multiple name="pokin-level-${level_pokin}" id="pokin-level-${level_pokin}" ${trigger_pokin_input_rencana_pagu} disabled>
                                         ${html_pokin}
                                     </select>
                                 </div>
@@ -3413,7 +3441,7 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                                 <div class="form-group" style="${hide_cek_parent_global}">
                                     <label for="${html_cascading_turunan_id}">Pilih ${jenis_cascading} Cascading</label>
                                     <select class="form-control" name="${html_cascading_turunan_id}" id="${html_cascading_turunan_id}" ${html_cascading_turunan}></select>
-                                </div>
+                                </di disabledv>
                                 ${ html_input_sub_keg_cascading }
                                 <div class="form-group" style="${hide_pagu_level1} ${hide_cek_parent_global}">
                                     <div class="row">
@@ -4435,6 +4463,40 @@ $rincian_tagging_url = $this->functions->add_param_get($rincian_tagging['url'], 
                 console.error('Gagal mengambil data:', error);
                 alert('Terjadi kesalahan saat mengambil data target realisasi bulanan!.');
             }
+        });
+    }
+
+    function getTableIndividu() {
+        jQuery('#wrap-loading').show();
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_table_rhk_individu',
+                    api_key: esakip.api_key,
+                    id_skpd: <?php echo $skpd['id_skpd']; ?>,
+                    tahun_anggaran: <?php echo $tahun; ?>
+                },
+                dataType: 'json',
+                success: function(response) {
+                    jQuery('#wrap-loading').hide();
+                    console.log(response);
+
+                    if (response.status === 'success') {
+                        jQuery('#table-rhk-individu tbody').html(response.data);
+                    } else {
+                        alert(response.message);
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#wrap-loading').hide();
+                    console.error(xhr.responseText);
+                    alert('Terjadi kesalahan saat memuat data!');
+                    resolve();
+                }
+            });
         });
     }
 </script>
