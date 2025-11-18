@@ -33006,24 +33006,72 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		return $data;
 	}
 
-	function get_renaksi_level_2_data(int $parent_id) {
+	function get_renaksi_opd_by_id(int $id) {
 		global $wpdb;
 		
-		$data = $wpdb->get_results(
+		$data = $wpdb->get_row(
 			$wpdb->prepare("
-				SELECT 
-					id,
-					kode_cascading_program
+				SELECT *
 				FROM esakip_data_rencana_aksi_opd
-				WHERE parent = %d 
-				  AND level = 2
+				WHERE id = %d
 				  AND active = 1
-				ORDER BY kode_cascading_program ASC
-			", $parent_id),
+			", $id),
 			ARRAY_A
 		);
 
 		return $data;
+	}
+
+	function get_all_renaksi_child_by_parent_id(int $id) {
+		global $wpdb;
+		
+		$data = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT *
+				FROM esakip_data_rencana_aksi_opd
+				WHERE parent = %d
+				  AND active = 1
+				ORDER BY kode_cascading_program, kode_cascading_kegiatan, kode_cascading_sub_kegiatan ASC
+			", $id),
+			ARRAY_A
+		);
+
+		return $data;
+	}
+
+	public function get_renaksi_parent_to_child_by_parent_id(int $id)
+	{
+		$current_renaksi = $this->get_renaksi_opd_by_id($id);
+
+		if (empty($current_renaksi)) {
+			throw new Exception("Parent renaksi dengan ID $id tidak ditemukan!", 400);
+		}
+
+		$data = $this->handle_get_child_renaksi_recursive($current_renaksi);
+
+		return [
+			'data' => $current_renaksi,
+			'child'   => $data
+		];
+	}
+
+	public function handle_get_child_renaksi_recursive(array $current_renaksi_data)
+	{
+		$node_id = $current_renaksi_data['id'];
+
+		$child_nodes_data = $this->get_all_renaksi_child_by_parent_id($node_id);
+
+		$child_subtree = [];
+		if (!empty($child_nodes_data)) {
+			foreach ($child_nodes_data as $child_data) {
+				$child_subtree[] = $this->handle_get_child_renaksi_recursive($child_data);
+			}
+		}
+
+		return [
+			'data'      => $current_renaksi_data,
+			'child'     => $child_subtree
+		];
 	}
 
 	function get_renaksi_indikator_by_id_renaksi(int $id_renaksi) {
@@ -33099,8 +33147,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		$pk_gabungan_page = $this->functions->generatePage(array(
-			'nama_page' => 'Pemantauan Rencana Aksi | Tahun Anggaran ' . $input['tahun_anggaran'],
-			'content' => '[perjanjian_kinerja_publik_baru tahun_anggaran=' . $input['tahun_anggaran'] . ']',
+			'nama_page' => 'Pemantauan Rencana Aksi | Tahun Anggaran ' . $tahun_anggaran,
+			'content' => '[perjanjian_kinerja_publik_baru tahun_anggaran=' . $tahun_anggaran . ']',
 			'show_header' => 1,
 			'post_status' => 'publish'
 		));
