@@ -13,6 +13,7 @@ if (!empty($_GET) && !empty($_GET['id_skpd'])) {
     $id_skpd = $_GET['id_skpd'];
 }
 $tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+$set_tabel_individu = get_option('_crb_set_tabel_individu');
 $renaksi_pemda = array();
 $data_id_jadwal = $wpdb->get_row(
     $wpdb->prepare("
@@ -400,7 +401,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 </table>
             </div>
             <?php if (
-                !empty($data_rhk_individu)
+                !empty($data_rhk_individu) && $set_tabel_individu == 0
             ): ?>            
             <h4 class="text-center">Tabel Data Rencana Aksi Individu yang tidak ada di Rencana Aksi OPD</h4>
             <div style="padding: 5px; overflow: auto; max-height: 80vh; margin-bottom: 20px;">

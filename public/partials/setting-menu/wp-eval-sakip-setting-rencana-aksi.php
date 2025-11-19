@@ -17,6 +17,7 @@ $tahun_anggaran = $input['tahun_anggaran'];
 
 $set_renaksi = get_option('_crb_input_renaksi'); 
 $set_pagu_renaksi = get_option('_crb_set_pagu_renaksi'); 
+$set_tabel_individu = get_option('_crb_set_tabel_individu'); 
 $body = '';
 ?>
 <style>
@@ -71,6 +72,14 @@ $body = '';
                             <input type="radio" id="set-pagu-renaksi-1" name="crb_set_pagu_renaksi" value="1" <?php echo ($set_pagu_renaksi == 1) ? 'checked' : ''; ?>>
                             <label for="set-pagu-renaksi-1">Tidak</label>
                             <small class="form-text text-muted">Pilih apakah Rencana Pagu Rencana Hasil Kerja ditampilkan atau disembunyikan.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="set-tabel-individu">Menampilkan Tabel Rencana Aksi Individu yang tidak ada di Rencana Aksi OPD</label><br>
+                            <input type="radio" id="set-tabel-individu-0" name="crb_set_tabel_individu" value="0" <?php echo ($set_tabel_individu == 0) ? 'checked' : ''; ?>>
+                            <label for="set-tabel-individu-0">Iya</label><br>
+                            <input type="radio" id="set-tabel-individu-1" name="crb_set_tabel_individu" value="1" <?php echo ($set_tabel_individu == 1) ? 'checked' : ''; ?>>
+                            <label for="set-tabel-individu-1">Tidak</label>
+                            <small class="form-text text-muted">Pilih apakah tabel Rencana Aksi Individu yang tidak ada di Rencana Aksi OPD ditampilkan atau disembunyikan.</small>
                         </div>
                         <div class="form-group d-flex">
                             <button onclick="submit_pengaturan_menu(); return false;" class="btn btn-primary ml-auto">Simpan</button>
@@ -183,6 +192,7 @@ $body = '';
         let id_jadwal_renstra_wpsipd = jQuery("#jadwal-renstra-wpsipd").val();
         let input_renaksi = jQuery('input[name="crb_input_renaksi"]:checked').val();
         let set_pagu_renaksi = jQuery('input[name="crb_set_pagu_renaksi"]:checked').val();
+        let set_tabel_individu = jQuery('input[name="crb_set_tabel_individu"]:checked').val();
         
         let id_jadwal_rpjmd_rhk = null;
         let tampilkan_ganti = jQuery('#tampilkan-ganti-jadwal').is(':checked');
@@ -211,7 +221,8 @@ $body = '';
                     'id_jadwal_renstra_wpsipd': id_jadwal_renstra_wpsipd,
                     'tahun_anggaran': tahun_anggaran,
                     'input_renaksi': input_renaksi, 
-                    'set_pagu_renaksi': set_pagu_renaksi 
+                    'set_pagu_renaksi': set_pagu_renaksi, 
+                    'set_tabel_individu': set_tabel_individu 
                 },
                 success: function(response) {
                     console.log(response);
@@ -233,6 +244,14 @@ $body = '';
                         } else {
                             jQuery('#set-pagu-renaksi-0').prop('checked', true);
                             jQuery('#set-pagu-renaksi-1').prop('checked', false);
+                        }
+
+                        if (set_tabel_individu == '1') {
+                            jQuery('#set-tabel-individu-0').prop('checked', false);
+                            jQuery('#set-tabel-individu-1').prop('checked', true);
+                        } else {
+                            jQuery('#set-tabel-individu-0').prop('checked', true);
+                            jQuery('#set-tabel-individu-1').prop('checked', false);
                         }
 
                         get_data_pengaturan_rencana_aksi();

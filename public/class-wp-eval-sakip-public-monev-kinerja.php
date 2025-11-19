@@ -3610,6 +3610,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$id_jadwal_rpjmd_rhk = !empty($_POST['id_jadwal_rpjmd_rhk']) ? $_POST['id_jadwal_rpjmd_rhk'] : null;
 					$input_renaksi = $_POST['input_renaksi'];
 					$set_pagu_renaksi = $_POST['set_pagu_renaksi'];
+					$set_tabel_individu = $_POST['set_tabel_individu'];
 
 					// Pengaturan rencana aksi
 					$cek_data_pengaturan = $wpdb->get_var(
@@ -3642,6 +3643,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					update_option('_crb_input_renaksi', $input_renaksi);
 					update_option('_crb_set_pagu_renaksi', $set_pagu_renaksi);
+					update_option('_crb_set_tabel_individu', $set_tabel_individu);
 
 					echo json_encode([
 						'status' => 'success',
