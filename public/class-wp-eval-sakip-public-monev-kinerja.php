@@ -8745,6 +8745,20 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											
 											// Skip jika indikator sudah ada di ID RHK lain
 											if ($skip_indikator) {
+												foreach ($get_id_rhk_ekin as $id_rhk_nonaktif) {
+													$id_rhk_nonaktif = trim($id_rhk_nonaktif);
+													
+													$wpdb->update(
+														'esakip_data_rhk_individu',
+														array('active' => 0),
+														array(
+															'id_rhk' => $id_rhk_nonaktif,
+															'id_indikator_rhk' => $v_indikator['indikator_rhk_id'],
+															'nip' => $nip_pegawai,
+															'tahun_anggaran' => $tahun
+														)
+													);
+												}
 												continue;
 											}
 										}
