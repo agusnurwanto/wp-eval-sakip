@@ -8651,24 +8651,42 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						if (!empty($v_ekin['rencana_hasil_kerja'])) {
 							foreach ($v_ekin['rencana_hasil_kerja'] as $k_rhk => $v_rhk) {
 
+								$get_id_rhk_ekin = explode('|', $v_rhk['rhk_id']);
+								
+								$id_rhk_valid = null;
+								foreach ($get_id_rhk_ekin as $id_for_rhk) {
+									$id_for_rhk = trim($id_for_rhk);
+									
+									$cek_id_rhk = $wpdb->get_var(
+										$wpdb->prepare("
+										SELECT 
+											id 
+										FROM esakip_data_rencana_aksi_opd
+										WHERE id = %d 
+											AND tahun_anggaran = %d 
+											AND id_skpd = %d 
+											AND active = 1
+										", $id_for_rhk, $tahun, $id_skpd)
+									);
+									
+									if (!empty($cek_id_rhk)) {
+										$id_rhk_valid = $id_for_rhk;
+										break;
+									}
+								}
+								
+								// Skip jika tidak ada ID RHK yang ada
+								if (empty($id_rhk_valid)) {
+									continue;
+								}
+								
 								if ($opsi_param['tipe'] == 'indikator') {
 									$list_rhk = is_array($id_rhk) ? $id_rhk : array($id_rhk);
-									if (!in_array($v_rhk['rhk_id'], $list_rhk)) {
+									if (!in_array($id_rhk_valid, $list_rhk)) {
 										continue;
 									}
 								}
-
-								$cek_id_rhk = $wpdb->get_var(
-									$wpdb->prepare("
-									SELECT id 
-									FROM esakip_data_rencana_aksi_opd
-									WHERE id = %d 
-										AND tahun_anggaran = %d 
-										AND id_skpd = %d 
-										AND active = 1
-									", $v_rhk['rhk_id'], $tahun, $id_skpd)
-								);
-
+								
 								if (!empty($v_rhk['indikator'])) {
 									foreach ($v_rhk['indikator'] as $k_indikator => $v_indikator) {
 
@@ -8679,6 +8697,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 											}
 										}
 
+										// Cek apakah indikator ada di ID RHK yang ada
 										$cek_id_indikator = $wpdb->get_var(
 											$wpdb->prepare("
 											SELECT 
@@ -8689,18 +8708,55 @@ class Wp_Eval_Sakip_Monev_Kinerja
 												AND tahun_anggaran=%d 
 												AND id_skpd=%d 
 												AND active=1
-											", $v_indikator['indikator_rhk_id'], $v_rhk['rhk_id'], $tahun, $id_skpd)
+											", $v_indikator['indikator_rhk_id'], $id_rhk_valid, $tahun, $id_skpd)
 										);
+										
+										// Jika indikator tidak ada di ID RHK yang ada, cek di ID RHK lainnya
+										if (empty($cek_id_indikator)) {
+											$skip_indikator = false;
+											foreach ($get_id_rhk_ekin as $id_for_ind) {
+												$id_for_ind = trim($id_for_ind);
+												if ($id_for_ind == $id_rhk_valid) {
+													continue;
+												}
+												
+												// Cek apakah indikator ada di ID RHK lain
+												$cek_indikator_lain = $wpdb->get_var(
+													$wpdb->prepare("
+													SELECT 
+														id 
+													FROM esakip_data_rencana_aksi_indikator_opd
+													WHERE id=%d 
+														AND id_renaksi=%d 
+														AND tahun_anggaran=%d 
+														AND id_skpd=%d 
+														AND active=1
+													", $v_indikator['indikator_rhk_id'], $id_for_ind, $tahun, $id_skpd)
+												);
+												
+												// Jika ditemukan di ID RHK lain, skip indikator ini
+												if (!empty($cek_indikator_lain)) {
+													$skip_indikator = true;
+													break;
+												}
+											}
+											
+											// Skip jika indikator sudah ada di ID RHK lain
+											if ($skip_indikator) {
+												continue;
+											}
+										}
 
-										if (empty($cek_id_rhk) || empty($cek_id_indikator)) {
+										if (empty($cek_id_indikator)) {
 										    $existing_data = $wpdb->get_row($wpdb->prepare("
-										    	SELECT id 
+										    	SELECT 
+										    		id 
 										    	FROM esakip_data_rhk_individu 
 										        	WHERE id_rhk = %d 
 										        	AND id_indikator_rhk = %d 
 										        	AND nip = %s 
 										        	AND tahun_anggaran = %d 
-										        	AND active = 1", $v_rhk['rhk_id'], $v_indikator['indikator_rhk_id'], $nip_pegawai, $tahun
+										        	AND active = 1", $id_rhk_valid, $v_indikator['indikator_rhk_id'], $nip_pegawai, $tahun
 										    ));
 										    
 										    if (empty($existing_data)) {
@@ -8714,7 +8770,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										        );
 										        
 										        $data_rhk_individu = array(
-										            'id_rhk' => $v_rhk['rhk_id'],
+										            'id_rhk' => $id_rhk_valid,
 										            'id_indikator_rhk' => $v_indikator['indikator_rhk_id'],
 										            'label_rhk' => !empty($v_rhk['rencana_hasil_kerja']) ? $v_rhk['rencana_hasil_kerja'] : null,
 										            'label_indikator_rhk' => !empty($v_indikator['indikator']) ? $v_indikator['indikator'] : null,
@@ -8734,7 +8790,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										        'esakip_data_rhk_individu',
 										        array('active' => 0),
 										        array(
-										            'id_rhk' => $v_rhk['rhk_id'],
+										            'id_rhk' => $id_rhk_valid,
 										            'id_indikator_rhk' => $v_indikator['indikator_rhk_id'],
 										            'nip' => $nip_pegawai,
 										            'tahun_anggaran' => $tahun
@@ -12445,64 +12501,75 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_table_rhk_individu()
 	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get data iku!',
-			'data'  => ''
-		);
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID OPD tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				}
-				if ($ret['status'] != 'error') {
-					$get_data = $wpdb->get_results($wpdb->prepare("
-						SELECT
-							*
-						FROM esakip_data_rhk_individu
-						WHERE id_skpd=%d
-							AND tahun_anggaran=%d
-							AND active=1
-					", $_POST['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
-					$html = '';
-					$no = 0;
-					if (!empty($get_data)) {
-						foreach ($get_data as $v) {
-							$no++;
-
-							$html .= '
-							<tr>
-								<td class="atas kanan bawah kiri">' . $no . '</td>
-								<td class="text-left atas kanan bawah kiri">' . $v['label_rhk'] . '</td>
-								<td class="text-left atas kanan bawah kiri">' . $v['label_indikator_rhk'] . '</td>
-								<td class="text-left atas kanan bawah kiri">' . $v['nip'] . '</td>
-								<td class="text-left atas kanan bawah kiri">' . $v['nama'] . '</td>
-							';
-							$html .= '</tr>';
-						}
-					}
-					if (empty($html)) {
-						$html = '<tr><td class="text-center" colspan="3">Data masih kosong!</td></tr>';
-					}
-					$ret['data'] = $html;
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data iku!',
+	        'data'  => ''
+	    );
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if ($ret['status'] != 'error' && empty($_POST['id_skpd'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'ID OPD tidak boleh kosong!';
+	            } else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+	            }
+	            if ($ret['status'] != 'error') {
+	                $get_data = $wpdb->get_results($wpdb->prepare("
+	                    SELECT
+	                        *
+	                    FROM esakip_data_rhk_individu
+	                    WHERE id_skpd=%d
+	                        AND tahun_anggaran=%d
+	                        AND active=1
+	                    ORDER BY label_rhk, label_indikator_rhk, nip
+	                ", $_POST['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
+	                
+	                $html = '';
+	                $no = 0;
+	                
+	                if (!empty($get_data)) {
+	                    $grouped_data = array();
+	                    foreach ($get_data as $v) {
+	                        $key = $v['label_rhk'] . '||' . $v['label_indikator_rhk'] . '||' . $v['nip'] . '||' . $v['nama'] . '||' . $v['id_skpd'] . '||' . $v['tahun_anggaran'];
+	                        
+	                        if (!isset($grouped_data[$key])) {
+	                            $grouped_data[$key] = $v;
+	                        }
+	                    }
+	                    
+	                    foreach ($grouped_data as $v) {
+	                        $no++;
+	                        $html .= '
+	                        <tr>
+	                            <td class="atas kanan bawah kiri">' . $no . '</td>
+	                            <td class="text-left atas kanan bawah kiri">' . $v['label_rhk'] . '</td>
+	                            <td class="text-left atas kanan bawah kiri">' . $v['label_indikator_rhk'] . '</td>
+	                            <td class="text-left atas kanan bawah kiri">' . $v['nip'] . '</td>
+	                            <td class="text-left atas kanan bawah kiri">' . $v['nama'] . '</td>
+	                        </tr>';
+	                    }
+	                }
+	                
+	                if (empty($html)) {
+	                    $html = '<tr><td class="text-center" colspan="5">Data masih kosong!</td></tr>';
+	                }
+	                $ret['data'] = $html;
+	            }
+	        } else {
+	            $ret = array(
+	                'status' => 'error',
+	                'message'   => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    } else {
+	        $ret = array(
+	            'status' => 'error',
+	            'message'   => 'Format tidak sesuai!'
+	        );
+	    }
+	    die(json_encode($ret));
 	}
 }
