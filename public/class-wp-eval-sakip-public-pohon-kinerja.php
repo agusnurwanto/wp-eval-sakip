@@ -6089,6 +6089,9 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						|| $jenis == 'program_renstra'
 						|| $jenis == 'kegiatan_renstra'
 						|| $jenis == 'sub_giat_renstra'
+						|| $jenis == 'program'
+						|| $jenis == 'kegiatan'
+						|| $jenis == 'sub_kegiatan'
 					) {
 						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
 					}

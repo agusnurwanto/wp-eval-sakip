@@ -547,20 +547,23 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				if ($ret['status'] != 'error' && empty($_POST['level'])) {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tipe tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['id_pokin_1'])) {
-					$ret['status'] = 'error';
-					if ($_POST['id_pokin_1'] && ($_POST['level'] == 1)) {
-						$ret['message'] = 'Level 1 POKIN tidak boleh kosong!';
-					} else if ($_POST['id_pokin_1'] && ($_POST['level'] == 2)) {
-						$ret['message'] = 'Level 3 POKIN tidak boleh kosong!';
-					} else if ($_POST['id_pokin_1'] && ($_POST['level'] == 3)) {
-						$ret['message'] = 'Level 4 POKIN tidak boleh kosong!';
-					} else if ($_POST['id_pokin_1'] && ($_POST['level'] == 4)) {
-						$ret['message'] = 'Level 5 POKIN tidak boleh kosong!';
-					} else if ($_POST['id_pokin_2']) {
-						$ret['message'] = 'Level 2 POKIN tidak boleh kosong!';
-					}
-				} else if ($ret['status'] != 'error' && empty($_POST['label_renaksi'])) {
+				}
+
+				// else if ($ret['status'] != 'error' && empty($_POST['id_pokin_1'])) {
+				// 	$ret['status'] = 'error';
+				// 	if ($_POST['id_pokin_1'] && ($_POST['level'] == 1)) {
+				// 		$ret['message'] = 'Level 1 POKIN tidak boleh kosong!';
+				// 	} else if ($_POST['id_pokin_1'] && ($_POST['level'] == 2)) {
+				// 		$ret['message'] = 'Level 3 POKIN tidak boleh kosong!';
+				// 	} else if ($_POST['id_pokin_1'] && ($_POST['level'] == 3)) {
+				// 		$ret['message'] = 'Level 4 POKIN tidak boleh kosong!';
+				// 	} else if ($_POST['id_pokin_1'] && ($_POST['level'] == 4)) {
+				// 		$ret['message'] = 'Level 5 POKIN tidak boleh kosong!';
+				// 	} else if ($_POST['id_pokin_2']) {
+				// 		$ret['message'] = 'Level 2 POKIN tidak boleh kosong!';
+				// 	}
+				// } else 
+				if ($ret['status'] != 'error' && empty($_POST['label_renaksi'])) {
 					$ret['status'] = 'error';
 					if ($_POST['level'] == 1) {
 						$ret['message'] = 'Kegiatan Utama | RHK LEVEL 1 tidak boleh kosong!';
@@ -639,14 +642,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$label_cascading_renstra_sub_kegiatan = implode(' ', $label);
 				}
 
-				if (
-					$_POST['level'] == 1
-					&& $ret['status'] != 'error'
-					&& empty($_POST['id_pokin_2'])
-				) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Level 2 POKIN tidak boleh kosong!';
-				}
+				// if (
+				// 	$_POST['level'] == 1
+				// 	&& $ret['status'] != 'error'
+				// 	&& empty($_POST['id_pokin_2'])
+				// ) {
+				// 	$ret['status'] = 'error';
+				// 	$ret['message'] = 'Level 2 POKIN tidak boleh kosong!';
+				// }
 
 				if (
 					(
