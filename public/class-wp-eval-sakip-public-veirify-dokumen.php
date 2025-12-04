@@ -2736,7 +2736,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             $tbody .= "<td class='text-left'>" . $alamat_kantor . "</td>";
 
                             $btn = '';
-                            if (in_array('administrator', $user_meta->roles)) {
+                            if (in_array('administrator', $user_meta->roles) || in_array('admin_ortala', $user_meta->roles) || in_array('admin_bappeda', $user_meta->roles)) {
                                 $btn .= '
                                     <button class="btn btn-sm btn-warning" onclick="edit_setting_laporan_pk(\'' . $vv['id_skpd'] . '\'); return false;" title="Edit Setting laporan PK">
                                         <span class="dashicons dashicons-edit"></span>
@@ -2755,7 +2755,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 
                             $id_kepala = !empty($id_by_nip['user_id']) ? $id_by_nip['user_id'] : '';
 
-                            if (!empty($id_kepala) && in_array('admin_panrb', $user_meta->roles) || in_array('administrator', $user_meta->roles)) {
+                            if (!empty($id_kepala) && in_array('admin_panrb', $user_meta->roles) || in_array('administrator', $user_meta->roles) || in_array('admin_panrb', $user_meta->roles) || in_array('admin_ortala', $user_meta->roles) || in_array('admin_bappeda', $user_meta->roles)) {
                                 $btn .= '
                                     <button class="btn btn-sm btn-secondary" onclick="login_to_profile(\'' . $id_kepala . '\', \'' . $tahun_anggaran . '\', \'' . $nip_kepala . '\'); return false;" title="Login ke User"><span class="dashicons dashicons-controls-forward"></span>
                                     </button>
@@ -2859,7 +2859,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
         global $wpdb;
         $ret = array(
             'status' => 'success',
-            'message' => 'Berhasil Edit laporan PK Setting!'
+            'message' => 'Berhasil perbarui profile perangkat daerah!'
         );
 
         if (!empty($_POST)) {

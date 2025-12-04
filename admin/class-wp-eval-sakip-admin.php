@@ -4675,43 +4675,7 @@ class Wp_Eval_Sakip_Admin
                 } else {
                     if (!empty($_POST['id'])) {
                         $user = wp_get_current_user();
-                        if (in_array('administrator', $user->roles)) {
-                            $user_target = get_user_by('id', $_POST['user_id']);
-    
-						    if ($user_target) {
-						        $is_view_profile = false;
-						        $tahun = '';
-						        
-						        if (!empty($_POST['url'])) {
-						            $url_parts = explode('|', $_POST['url']);
-						            if ($url_parts[0] == 'view_profile') {
-						                $is_view_profile = true;
-						                if (count($url_parts) > 2) {
-						                    $tahun = sanitize_text_field($url_parts[2]);
-						                }
-						            }
-						        }
-						        
-						        if ($is_view_profile) {
-						            $redirect_url = um_user_profile_url($_POST['user_id']);
-						            
-						            if (!empty($tahun)) {
-						                $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
-						            }
-						            
-						            $ret['url_login'] = $redirect_url;
-						        } else {
-						            $ret['url_login'] = $this->functions->login_to_other_site(array(
-						                'user' => $user_target,
-						                'id_login' => $_POST['id'],
-						                'url_asli' => $_POST['url']
-						            ));
-						        }
-						    } else {
-						        $ret['status'] = 'error';
-						        $ret['message'] = 'User tidak ditemukan!';
-						    }
-                        } elseif (in_array('admin_panrb', $user->roles)) {
+                        if (in_array('administrator', $user->roles)) {                            
                             if ($user->ID == $_POST['user_id']) {
                                 $is_view_profile = false;
                                 $tahun = '';
@@ -4788,11 +4752,191 @@ class Wp_Eval_Sakip_Admin
                                         
                                         $ret['url_login'] = $redirect_url;
                                     } else {
-                                        $ret['url_login'] = $this->functions->login_to_other_site(array(
-                                            'user' => $user_target,
-                                            'id_login' => $_POST['id'],
-                                            'url_asli' => $_POST['url']
+                                        if (in_array('administrator', $user_target->roles)) {
+                                            $target_user = $this->check_target_user(array(
+                                                'username' => $user_target->user_login,
+                                                'id_login' => $_POST['id']
+                                            ));
+
+                                            if ($target_user) {
+                                                // User ada di target, lakukan login SSO
+                                                $ret['url_login'] = $this->functions->login_to_other_site(array(
+                                                    'user' => $user_target,
+                                                    'id_login' => $_POST['id'],
+                                                    'url_asli' => $_POST['url']
+                                                ));
+                                            } else {
+                                                // User tidak ada di target, arahkan ke laporan PK
+                                                $list_skpd_page = get_page_by_path('laporan-pk-setting');
+                                                
+                                                $tahun = '';
+                                                if (!empty($_POST['url'])) {
+                                                    $url_parts = explode('|', $_POST['url']);
+                                                    if (count($url_parts) > 1) {
+                                                        $tahun = sanitize_text_field($url_parts[1]);
+                                                    }
+                                                }
+                                                
+                                                if (!$list_skpd_page) {
+                                                    $list_skpd_laporan_pk_setting = $this->functions->generatePage(array(
+                                                        'nama_page'   => 'Laporan PK Setting',
+                                                        'content'     => '[halaman_laporan_pk_setting]',
+                                                        'show_header' => 1,
+                                                        'post_status' => 'private'
+                                                    ));
+                                                    $redirect_url = get_permalink($list_skpd_laporan_pk_setting);
+                                                } else {
+                                                    $redirect_url = get_permalink($list_skpd_page->ID);
+                                                }
+                                                
+                                                if (!empty($tahun)) {
+                                                    $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                                }
+                                                
+                                                $ret['url_login'] = $redirect_url;
+                                                $ret['message'] = 'Pengguna tidak ditemukan di target. Dialihkan ke halaman PK Setting.';
+                                            }
+                                        } else {
+                                            $ret['url_login'] = $this->functions->login_to_other_site(array(
+                                                'user' => $user_target,
+                                                'id_login' => $_POST['id'],
+                                                'url_asli' => $_POST['url']
+                                            ));
+                                        }
+                                    }
+                                } else {
+                                    $ret['status'] = 'error';
+                                    $ret['message'] = 'User tidak ditemukan!';
+                                }
+                            }
+                        } elseif (in_array('admin_panrb', $user->roles) || in_array('admin_bappeda', $user->roles) || in_array('admin_ortala', $user->roles)) {                            
+                            if ($user->ID == $_POST['user_id']) {
+                                $is_view_profile = false;
+                                $tahun = '';
+                                
+                                if (!empty($_POST['url'])) {
+                                    $url_parts = explode('|', $_POST['url']);
+                                    if ($url_parts[0] == 'view_profile') {
+                                        $is_view_profile = true;
+                                        if (count($url_parts) > 2) {
+                                            $tahun = sanitize_text_field($url_parts[2]);
+                                        }
+                                    }
+                                }
+                                
+                                if ($is_view_profile) {
+                                    $redirect_url = um_user_profile_url($_POST['user_id']);
+                                    
+                                    if (!empty($tahun)) {
+                                        $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                    }
+                                    
+                                    $ret['url_login'] = $redirect_url;
+                                } else {
+                                    $list_skpd_page = get_page_by_path('laporan-pk-setting');
+                                    
+                                    $tahun = '';
+                                    if (!empty($_POST['url'])) {
+                                        $url_parts = explode('|', $_POST['url']);
+                                        if (count($url_parts) > 1) {
+                                            $tahun = sanitize_text_field($url_parts[1]);
+                                        }
+                                    }
+                                    
+                                    if (!$list_skpd_page) {
+                                        $list_skpd_laporan_pk_setting = $this->functions->generatePage(array(
+                                            'nama_page'   => 'Laporan PK Setting',
+                                            'content'     => '[halaman_laporan_pk_setting]',
+                                            'show_header' => 1,
+                                            'post_status' => 'private'
                                         ));
+                                        $redirect_url = get_permalink($list_skpd_laporan_pk_setting);
+                                    } else {
+                                        $redirect_url = get_permalink($list_skpd_page->ID);
+                                    }
+                                    
+                                    if (!empty($tahun)) {
+                                        $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                    }
+                                    
+                                    $ret['url_login'] = $redirect_url;
+                                }
+                            } else {
+                                $user_target = get_user_by('id', $_POST['user_id']);
+                                if ($user_target) {
+                                    $is_view_profile = false;
+                                    $tahun = '';
+                                    
+                                    if (!empty($_POST['url'])) {
+                                        $url_parts = explode('|', $_POST['url']);
+                                        if ($url_parts[0] == 'view_profile') {
+                                            $is_view_profile = true;
+                                            if (count($url_parts) > 2) {
+                                                $tahun = sanitize_text_field($url_parts[2]);
+                                            }
+                                        }
+                                    }
+                                    
+                                    if ($is_view_profile) {
+                                        $redirect_url = um_user_profile_url($_POST['user_id']);
+                                        
+                                        if (!empty($tahun)) {
+                                            $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                        }
+                                        
+                                        $ret['url_login'] = $redirect_url;
+                                    } else {
+                                        if (in_array('administrator', $user_target->roles)) {
+                                            $target_user = $this->check_target_user(array(
+                                                'username' => $user_target->user_login,
+                                                'id_login' => $_POST['id']
+                                            ));
+
+                                            if ($target_user) {
+                                                // User ada di target, lakukan login SSO
+                                                $ret['url_login'] = $this->functions->login_to_other_site(array(
+                                                    'user' => $user_target,
+                                                    'id_login' => $_POST['id'],
+                                                    'url_asli' => $_POST['url']
+                                                ));
+                                            } else {
+                                                // User tidak ada di target, arahkan ke laporan PK
+                                                $list_skpd_page = get_page_by_path('laporan-pk-setting');
+                                                
+                                                $tahun = '';
+                                                if (!empty($_POST['url'])) {
+                                                    $url_parts = explode('|', $_POST['url']);
+                                                    if (count($url_parts) > 1) {
+                                                        $tahun = sanitize_text_field($url_parts[1]);
+                                                    }
+                                                }
+                                                
+                                                if (!$list_skpd_page) {
+                                                    $list_skpd_laporan_pk_setting = $this->functions->generatePage(array(
+                                                        'nama_page'   => 'Laporan PK Setting',
+                                                        'content'     => '[halaman_laporan_pk_setting]',
+                                                        'show_header' => 1,
+                                                        'post_status' => 'private'
+                                                    ));
+                                                    $redirect_url = get_permalink($list_skpd_laporan_pk_setting);
+                                                } else {
+                                                    $redirect_url = get_permalink($list_skpd_page->ID);
+                                                }
+                                                
+                                                if (!empty($tahun)) {
+                                                    $redirect_url = add_query_arg('tahun', $tahun, $redirect_url);
+                                                }
+                                                
+                                                $ret['url_login'] = $redirect_url;
+                                                $ret['message'] = 'Pengguna tidak ditemukan di target. Dialihkan ke halaman PK Setting.';
+                                            }
+                                        } else {
+                                            $ret['url_login'] = $this->functions->login_to_other_site(array(
+                                                'user' => $user_target,
+                                                'id_login' => $_POST['id'],
+                                                'url_asli' => $_POST['url']
+                                            ));
+                                        }
                                     }
                                 } else {
                                     $ret['status'] = 'error';
@@ -4832,6 +4976,64 @@ class Wp_Eval_Sakip_Admin
             $ret['message'] = 'Format Salah!';
         }
         die(json_encode($ret));
+    }
+
+    function check_target_user($opsi = array())
+    {
+        try {
+            $data = $this->functions->get_option_complex('_crb_auto_login');
+            
+            if (empty($data) || !is_array($data)) {
+                return false;
+            }
+            
+            foreach ($data as $v) {
+                if (
+                    !empty($v['app_url'])
+                    && !empty($v['api_key'])
+                    && $v['id_login'] == $opsi['id_login']
+                ) {
+                    // Buat URL untuk cek user
+                    $check_url = rtrim($v['app_url'], '/') . '/wp-json/custom/v1/check-user';
+                    
+                    // Kirim request ke target
+                    $response = wp_remote_post($check_url, array(
+                        'timeout' => 10,
+                        'sslverify' => false,
+                        'body' => array(
+                            'username' => $opsi['username'],
+                            'api_key' => $v['api_key']
+                        )
+                    ));
+                    
+                    if (is_wp_error($response)) {
+                        // Jika error koneksi, anggap user tidak ada
+                        error_log('SSO Check User Error: ' . $response->get_error_message());
+                        return false;
+                    }
+                    
+                    $response_code = wp_remote_retrieve_response_code($response);
+                    if ($response_code !== 200) {
+                        error_log('SSO Check User HTTP Code: ' . $response_code);
+                        return false;
+                    }
+                    
+                    $body = wp_remote_retrieve_body($response);
+                    $result = json_decode($body, true);
+                    
+                    if (isset($result['exists']) && $result['exists'] === true) {
+                        return true;
+                    }
+                    
+                    return false;
+                }
+            }
+            
+            return false;
+        } catch (Exception $e) {
+            error_log('SSO Check User Exception: ' . $e->getMessage());
+            return false;
+        }
     }
 
 	function handle_sso_login()
