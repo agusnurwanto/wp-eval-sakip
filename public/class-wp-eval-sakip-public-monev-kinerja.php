@@ -596,7 +596,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
 				}
 
-				$id_uraian_cascading = !empty($_POST['id_uraian_cascading']) ? intval($_POST['id_uraian_cascading']) : NULL;
+				$id_uraian_cascading = !empty($_POST['id_uraian_cascading']) ? $_POST['id_uraian_cascading'] : NULL;
 				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) || $_POST['kode_cascading_renstra'] != NULL ? $_POST['kode_cascading_renstra'] : NULL;
 				$label_cascading_renstra = !empty($_POST['label_cascading_renstra']) || $_POST['label_cascading_renstra'] != NULL ? $_POST['label_cascading_renstra'] : NULL;
 

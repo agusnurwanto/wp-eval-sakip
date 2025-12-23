@@ -2329,7 +2329,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
     }
 
     function setting_indikator_satuan(rhk, indikator, isEdit = false) {
-        
+    
         var get_rhk;
         if (Array.isArray(rhk) && rhk.length > 0) {
             get_rhk = rhk[0];
@@ -2353,7 +2353,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             } else {
                 if (tipe == 1) {
                     jenis_cascading = 'sasaran';
-                    kode_cascading = get_rhk.kode_cascading_sasaran;
+                    // Untuk sasaran, gunakan id_unik sebagai kode_cascading
+                    kode_cascading = get_rhk.id_cascading || get_rhk.kode_cascading_sasaran;
                 } else if (tipe == 2) {
                     jenis_cascading = 'program';
                     kode_cascading = get_rhk.kode_cascading_program;
@@ -2406,7 +2407,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     }
                     
                     if (!data_cascading || !data_cascading.data) {
-                        console.log('Data cascading tidak ditemukan untuk');
+                        console.log('Data cascading tidak ditemukan untuk key:', key);
                         resolve({ indikator: [], satuan: {} });
                         return;
                     }
@@ -2418,7 +2419,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         
                         switch (jenis_cascading) {
                             case 'sasaran':
-                                is_match = value.kode_bidang_urusan === kode_cascading;
+                                is_match = value.id_unik === kode_cascading;
                                 break;
                             case 'program':
                                 is_match = (value.kode_program + '_' + value.id_sub_skpd) === (kode_cascading + '_' + id_sub_skpd_cascading);
@@ -2447,32 +2448,56 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         satuan: {}
                     };
                     
-                    if (matched_data.get_transformasi_cascading && Array.isArray(matched_data.get_transformasi_cascading)) {
-                        matched_data.get_transformasi_cascading.forEach(function(trans) {
-                            if (trans.induk && trans.induk.indikator && Array.isArray(trans.induk.indikator)) {
-                                trans.induk.indikator.forEach(function(ind) {
-                                    if (!result.indikator.find(i => i.id === ind.id)) {
-                                        result.indikator.push({
-                                            id: ind.id,
-                                            text: ind.indikator,
-                                            id_uraian: trans.id_uraian_cascading
-                                        });
-                                    }
+                    if (jenis_cascading == 'sasaran') {
+                        if (matched_data.indikator && Array.isArray(matched_data.indikator)) {
+                            matched_data.indikator.forEach(function(ind) {
+                                if (ind.indikator_teks) {
+                                    result.indikator.push({
+                                        id: ind.id,
+                                        text: ind.indikator_teks,
+                                        id_unik: ind.id_unik_indikator
+                                    });
                                     
-                                    if (ind.satuan && Array.isArray(ind.satuan)) {
-                                        result.satuan[ind.id] = ind.satuan.map(function(sat) {
-                                            return {
-                                                id: sat.id,
-                                                text: sat.satuan
-                                            };
-                                        });
+                                    if (ind.satuan) {
+                                        result.satuan[ind.id] = [{
+                                            id: ind.id,
+                                            text: ind.satuan
+                                        }];
                                     }
-                                });
-                            }
-                        });
+                                }
+                            });
+                        }
+                    } 
+                    else {
+                        if (matched_data.get_transformasi_cascading && Array.isArray(matched_data.get_transformasi_cascading)) {
+                            matched_data.get_transformasi_cascading.forEach(function(trans) {
+                                if (trans.induk && trans.induk.indikator && Array.isArray(trans.induk.indikator)) {
+                                    trans.induk.indikator.forEach(function(ind) {
+                                        if (!result.indikator.find(i => i.id === ind.id)) {
+                                            result.indikator.push({
+                                                id: ind.id,
+                                                text: ind.indikator,
+                                                id_uraian: trans.id_uraian_cascading
+                                            });
+                                        }
+                                        
+                                        if (ind.satuan && Array.isArray(ind.satuan)) {
+                                            result.satuan[ind.id] = ind.satuan.map(function(sat) {
+                                                return {
+                                                    id: sat.id,
+                                                    text: sat.satuan
+                                                };
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                     
                     console.log('Hasil setting indikator satuan:', result);
+                    console.log('Jenis cascading:', jenis_cascading);
+                    console.log('Kode cascading:', kode_cascading);
                     resolve(result);
                 })
                 .catch(function(error) {
@@ -2500,7 +2525,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     response.rencana_pagu = 0;
                 }
                 
-                setting_indikator_satuan(response.data_rhk, response.data_indikator).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(id, tipe, +response.rencana_pagu, set_input_rencana_pagu, kode_sbl, indikator_satuan_data
+                setting_indikator_satuan(response.data_rhk, response.data_indikator).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(id, tipe, +response.rencana_pagu, set_input_rencana_pagu, kode_sbl, '', indikator_satuan_data
                     );
                 });
             },
@@ -5197,7 +5222,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             case 1:
                 kode_cascading_renstra = jQuery('#cascading-renstra').val();
                 label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
-                id_cascading = jQuery('#cascading-renstra option:selected').data('id-sasaran');
+                id_cascading = jQuery('#cascading-renstra option:selected').data('id-unik');
                 break;
             case 2:
                 kode_cascading_renstra = jQuery('#cascading-renstra-program').val();
