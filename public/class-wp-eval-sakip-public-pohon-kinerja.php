@@ -6072,6 +6072,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						throw new Exception("Id Jadwal WpSipd Kosong!", 1);
 					} else {
 						$id_jadwal_wpsipd = $_POST['id_jadwal_wpsipd'];
+						$id_jadwal_rpjmd_rhk = $_POST['id_jadwal_rpjmd_rhk'];
 					}
 
 					$api_params = array(
@@ -6094,6 +6095,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 						|| $jenis == 'sub_kegiatan'
 					) {
 						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
+						$api_params['id_jadwal_rhk'] = $id_jadwal_rpjmd_rhk;
 					}
 
 					$response_asli = wp_remote_post(
@@ -6108,6 +6110,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 					$response = wp_remote_retrieve_body($response_asli);
 					$response = json_decode($response);
 					$data = $response->data;
+					$data_transformasi_cascading = $response->data_transformasi_cascading;
 
 					$return = array(
 						'status' => 'success',

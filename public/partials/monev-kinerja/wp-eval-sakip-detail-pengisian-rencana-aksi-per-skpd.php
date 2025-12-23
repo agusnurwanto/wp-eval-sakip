@@ -19,7 +19,8 @@ $data_id_jadwal = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
         id_jadwal_rpjmd as id_jadwal,
-        id_jadwal_wp_sipd
+        id_jadwal_wp_sipd,
+        id_jadwal_rpjmd_rhk
     FROM esakip_pengaturan_upload_dokumen
     WHERE tahun_anggaran =%d
     AND active=1
@@ -31,6 +32,12 @@ if (empty($data_id_jadwal['id_jadwal'])) {
     $id_jadwal = 0;
 } else {
     $id_jadwal = $data_id_jadwal['id_jadwal'];
+}
+
+if (empty($data_id_jadwal['id_jadwal_rpjmd_rhk'])) {
+    $id_jadwal_rpjmd_rhk = 0;
+} else {
+    $id_jadwal_rpjmd_rhk = $data_id_jadwal['id_jadwal_rpjmd_rhk'];
 }
 
 if (empty($data_id_jadwal['id_jadwal_wp_sipd'])) {
@@ -679,6 +686,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
 
         window.id_jadwal = <?php echo $id_jadwal; ?>;
         window.id_jadwal_wpsipd = <?php echo $id_jadwal_wpsipd; ?>;
+        window.id_jadwal_rpjmd_rhk = <?php echo $id_jadwal_rpjmd_rhk; ?>;
         if (id_jadwal == 0) {
             alert("Jadwal RPJMD/RPD untuk data Pokin belum disetting.\nSetting di admin dashboard di menu E-SAKIP Options -> Laporan Monitor Upload Dokumen Tahun <?php echo $input['tahun']; ?>")
         }
@@ -872,14 +880,17 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         var id = jQuery('#id_label_indikator').val();
         var rencana_pagu = jQuery('#rencana_pagu').val();
         var id_label = jQuery('#id_label').val();
-        var indikator = jQuery('#indikator').val();
-        if (indikator == '') {
+        var indikator = jQuery('#indikator option:selected').text();
+        if (id_indikator_cascading == '') {
             return alert('Indikator tidak boleh kosong!')
         }
-        var satuan = jQuery('#satuan_indikator').val();
-        if (satuan == '') {
+        var satuan = jQuery('#satuan_indikator option:selected').text();
+        if (id_satuan_cascading == '') {
             return alert('Satuan tidak boleh kosong!')
         }
+        var id_indikator_cascading = jQuery('#indikator').val();
+        var id_satuan_cascading = jQuery('#satuan_indikator').val();
+
         var target_awal = jQuery('#target_awal').val();
         if (target_awal == '') {
             return alert('Target awal tidak boleh kosong!')
@@ -955,6 +966,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 "id_label": id_label,
                 "indikator": indikator,
                 "satuan": satuan,
+                "id_indikator_cascading": id_indikator_cascading,
+                "id_satuan_cascading": id_satuan_cascading,
                 "target_awal": target_awal,
                 "target_akhir": target_akhir,
                 "target_tw_1": target_tw_1,
@@ -1043,7 +1056,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             "id_skpd": <?php echo $id_skpd; ?>,
                             "tahun_anggaran": <?php echo $input['tahun']; ?>,
                             "jenis": jenis,
-                            "id_jadwal_wpsipd": id_jadwal_wpsipd
+                            "id_jadwal_wpsipd": id_jadwal_wpsipd,
+                            "id_jadwal_rpjmd_rhk": id_jadwal_rpjmd_rhk
                         },
                         dataType: "json",
                         success: function(response) {
@@ -1071,7 +1085,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             "tahun_anggaran": <?php echo $input['tahun']; ?>,
                             "jenis": jenis,
                             "parent_cascading": parent_cascading,
-                            "id_jadwal_wpsipd": id_jadwal_wpsipd
+                            "id_jadwal_wpsipd": id_jadwal_wpsipd,
+                            "id_jadwal_rpjmd_rhk": id_jadwal_rpjmd_rhk
                         },
                         dataType: "json",
                         success: function(response) {
@@ -1099,7 +1114,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             "tahun_anggaran": <?php echo $input['tahun']; ?>,
                             "jenis": jenis,
                             "parent_cascading": parent_cascading,
-                            "id_jadwal_wpsipd": id_jadwal_wpsipd
+                            "id_jadwal_wpsipd": id_jadwal_wpsipd,
+                            "id_jadwal_rpjmd_rhk": id_jadwal_rpjmd_rhk
                         },
                         dataType: "json",
                         success: function(response) {
@@ -1127,7 +1143,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             "tahun_anggaran": <?php echo $input['tahun']; ?>,
                             "jenis": jenis,
                             "parent_cascading": parent_cascading,
-                            "id_jadwal_wpsipd": id_jadwal_wpsipd
+                            "id_jadwal_wpsipd": id_jadwal_wpsipd,
+                            "id_jadwal_rpjmd_rhk": id_jadwal_rpjmd_rhk
                         },
                         dataType: "json",
                         success: function(response) {
@@ -1148,16 +1165,290 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         });
     }
 
+    function get_cascading_tujuan_from_sasaran(kode_sasaran, id_skpd, id_jadwal_wpsipd) {
+        return new Promise(function(resolve, reject) {
+            if (!kode_sasaran) {
+                resolve(null);
+                return;
+            }
+
+            console.log('Get tujuan untuk sasaran:', kode_sasaran);
+
+            jQuery.ajax({
+                url: esakip.url,
+                type: "post",
+                data: {
+                    "action": 'get_tujuan_sasaran_cascading',
+                    "api_key": esakip.api_key,
+                    "id_skpd": id_skpd,
+                    "tahun_anggaran": <?php echo $input['tahun']; ?>,
+                    "jenis": 'sasaran',
+                    "id_jadwal_wpsipd": id_jadwal_wpsipd,
+                    "id_jadwal_rpjmd_rhk": id_jadwal_rpjmd_rhk
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status && response.data && Array.isArray(response.data)) {
+                        let sasaran = response.data.find(s => s.kode_bidang_urusan === kode_sasaran);
+                        if (sasaran && sasaran.tujuan_teks) {
+                            console.log('Tujuan ditemukan:', sasaran.tujuan_teks);
+                            resolve(sasaran.tujuan_teks);
+                        } else {
+                            console.log('Sasaran tidak ditemukan atau tidak punya tujuan');
+                            resolve(null);
+                        }
+                    } else {
+                        console.log('Response API tidak valid');
+                        resolve(null);
+                    }
+                },
+                error: function() {
+                    console.log('Error get tujuan');
+                    resolve(null);
+                }
+            });
+        });
+    }
+
+    function get_tujuan_from_sasaran(kode_sasaran, return_sync = false) {
+        if (!kode_sasaran) {
+            return return_sync ? null : Promise.resolve(null);
+        }
+
+        let tujuan_teks = null;
+        
+        if (typeof data_sasaran_cascading !== 'undefined') {
+            for (let key in data_sasaran_cascading) {
+                if (data_sasaran_cascading.hasOwnProperty(key) && key.startsWith('sasaran-')) {
+                    let data = data_sasaran_cascading[key];
+                    if (data && data.data && Array.isArray(data.data)) {
+                        let sasaran = data.data.find(s => s.kode_bidang_urusan === kode_sasaran);
+                        if (sasaran && sasaran.tujuan_teks) {
+                            tujuan_teks = sasaran.tujuan_teks;
+                            console.log('Tujuan ditemukan dari data_sasaran_cascading:', tujuan_teks);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!tujuan_teks) {
+            jQuery('#cascading-renstra option').each(function() {
+                if (jQuery(this).val() === kode_sasaran) {
+                    tujuan_teks = jQuery(this).data('tujuan-teks');
+                    if (tujuan_teks) {
+                        console.log('Tujuan ditemukan:', tujuan_teks);
+                    }
+                    return false;
+                }
+            });
+        }
+        
+        console.log('Hasil pencarian tujuan untuk kode', kode_sasaran, ':', tujuan_teks);
+        
+        if (return_sync) {
+            return tujuan_teks;
+        }
+        
+        return Promise.resolve(tujuan_teks);
+    }
+
+    function get_label_renaksi_from_cascading(jenis, cascading_id) {
+        return new Promise(function(resolve, reject) {
+            let data_cascading = null;
+            let key = '';
+            
+            if (!cascading_id) {
+                resolve();
+                return;
+            }
+            
+            switch (jenis) {
+                case 'sasaran':
+                    let selectedOption = jQuery('#cascading-renstra option:selected');
+                    let sasaranText = selectedOption.text();
+                    
+                    if (sasaranText && cascading_id) {
+                        jQuery('#label_renaksi').empty();
+                        let newOption = new Option(sasaranText, sasaranText, true, true);
+                        jQuery('#label_renaksi').append(newOption).trigger('change');
+                        
+                        // Untuk sasaran, disable karena auto-fill
+                        jQuery('#label_renaksi').prop('disabled', true);
+                    }
+                    resolve();
+                    return;
+                    
+                case 'program':
+                    let id_sub_skpd_prog = jQuery('#cascading-renstra-program option:selected').data('id-sub-skpd-cascading');
+                    let kode_program = cascading_id ? cascading_id.split('_')[0] : '';
+                    
+                    data_cascading = null;
+                    if (typeof data_program_cascading !== 'undefined' && kode_program) {
+                        for (let key in data_program_cascading) {
+                            if (data_program_cascading.hasOwnProperty(key) && key.startsWith('program-')) {
+                                let temp_data = data_program_cascading[key];
+                                if (temp_data && temp_data.data && Array.isArray(temp_data.data)) {
+                                    let found = temp_data.data.find(p => {
+                                        let program_key = p.kode_program + '_' + p.id_sub_skpd;
+                                        return program_key === cascading_id;
+                                    });
+                                    if (found) {
+                                        data_cascading = temp_data;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                    
+                case 'kegiatan':
+                    let id_sub_skpd_keg = jQuery('#cascading-renstra-kegiatan option:selected').data('id-sub-skpd-cascading');
+                    let parent_program = jQuery('#cascading-renstra-program').val();
+                    
+                    if (!parent_program) {
+                        let parent_cascading_program = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
+                        if (parent_cascading_program) {
+                            parent_program = parent_cascading_program;
+                        }
+                    }
+                    
+                    if (parent_program) {
+                        parent_program = parent_program.split('_')[0];
+                        key = 'kegiatan-' + parent_program;
+                        
+                        if (!id_sub_skpd_keg || id_sub_skpd_keg == 0) {
+                            let id_sub_skpd_program = jQuery('#cascading-renstra-program option:selected').data('id-sub-skpd-cascading');
+                            if (id_sub_skpd_program) {
+                                id_sub_skpd_keg = id_sub_skpd_program;
+                            } else {
+                                let parent_sub_skpd = jQuery('#tabel_uraian_rencana_aksi').attr('parent_sub_skpd');
+                                if (parent_sub_skpd && parent_sub_skpd != 0) {
+                                    id_sub_skpd_keg = parent_sub_skpd;
+                                }
+                            }
+                        }                            
+                        
+                        if (id_sub_skpd_keg) {
+                            key += '-' + id_sub_skpd_keg;
+                        }
+                        
+                        data_cascading = typeof data_kegiatan_cascading !== 'undefined' ? data_kegiatan_cascading[key] : null;
+                    }
+                    break;
+                                    
+                case 'sub_kegiatan':
+                    let id_sub_skpd_sub = jQuery('#cascading-renstra-sub-kegiatan option:selected').data('id-sub-skpd-cascading');
+                    let parent_kegiatan = jQuery('#cascading-renstra-kegiatan').val();
+                    
+                    if (!parent_kegiatan) {
+                        let parent_cascading_kegiatan = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
+                        if (parent_cascading_kegiatan) {
+                            parent_kegiatan = parent_cascading_kegiatan;
+                        }
+                    }
+                    
+                    if (parent_kegiatan) {
+                        key = 'sub_kegiatan-' + parent_kegiatan;
+                        
+                        if (!id_sub_skpd_sub || id_sub_skpd_sub == 0) {
+                            let id_sub_skpd_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').data('id-sub-skpd-cascading');
+                            if (id_sub_skpd_kegiatan) {
+                                id_sub_skpd_sub = id_sub_skpd_kegiatan;
+                            } else {
+                                let parent_sub_skpd = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_sub_skpd');
+                                if (parent_sub_skpd && parent_sub_skpd != 0) {
+                                    id_sub_skpd_sub = parent_sub_skpd;
+                                }
+                            }
+                        }
+                                                    
+                        if (id_sub_skpd_sub) {
+                            key += '-' + id_sub_skpd_sub;
+                        }
+                        
+                        data_cascading = typeof data_sub_kegiatan_cascading !== 'undefined' ? data_sub_kegiatan_cascading[key] : null;
+                    }
+                    break;
+            }
+            
+            if (!data_cascading) {
+                jQuery('#label_renaksi').empty().prop('disabled', false).trigger('change');
+                resolve();
+                return;
+            }
+            
+            let options = get_transformasi_cascading_options(jenis, cascading_id, data_cascading);
+            
+            jQuery('#label_renaksi').empty();
+            
+            if (options.length > 0) {
+                options.forEach(opt => {
+                    let newOption = new Option(opt.text, opt.id, false, false);
+                    jQuery(newOption).attr('data-id-unik', opt.id_unik);
+                    jQuery('#label_renaksi').append(newOption);
+                });
+                
+                jQuery('#label_renaksi').prop('disabled', false).trigger('change');
+            } else {
+                jQuery('#label_renaksi').prop('disabled', false).trigger('change');
+            }
+            
+            resolve();
+        });
+    }
+
+    function get_transformasi_cascading_options(jenis, selectedValue, data_cascading) {
+        let options = [];
+        
+        if (!data_cascading || !Array.isArray(data_cascading.data)) {
+            return options;
+        }
+        
+        data_cascading.data.forEach(value => {
+            let isMatch = false;
+            
+            switch (jenis) {
+                case 'program':
+                    isMatch = (value.kode_program + '_' + value.id_sub_skpd) === selectedValue;
+                    break;
+                case 'kegiatan':
+                    isMatch = value.kode_giat === selectedValue;
+                    break;
+                case 'sub_kegiatan':
+                    isMatch = value.kode_sub_giat === selectedValue;
+                    break;
+            }
+            
+            if (isMatch && value.get_transformasi_cascading && Array.isArray(value.get_transformasi_cascading)) {
+                value.get_transformasi_cascading.forEach(trans => {
+                    if (trans.induk && trans.induk.uraian_cascading) {
+                        const exists = options.find(opt => opt.id === trans.id_uraian_cascading);
+                        if (!exists) {
+                            options.push({
+                                id: trans.id_uraian_cascading,
+                                text: trans.induk.uraian_cascading,
+                                id_unik: trans.id_unik
+                            });
+                        }
+                    }
+                });
+            }
+        });
+        
+        return options;
+    }
+
     function setting_cascading(rhk, isEdit=false){
         var tipe = rhk.level;
 
-        /** menghapus attr onchange sementara agar tidak bentrok dengan fungsi onchange-nya dibawah ini */
         jQuery('#cascading-renstra').removeAttr('onchange');
         jQuery('#cascading-renstra-program').removeAttr('onchange');
         jQuery('#cascading-renstra-kegiatan').removeAttr('onchange');
         jQuery('#cascading-renstra-sub-kegiatan').removeAttr('onchange');
 
-        // jika cek_parent input pagu terchecklist maka harus diuncheck
         open_input_rencana_pagu(false);
         if(
             rhk.input_rencana_pagu_level == 1
@@ -1181,271 +1472,376 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
 
         var kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_skpd;
         
-        new Promise(function(resolve, reject){
-            jQuery('#cascading-renstra option').each(function(){
-                var opt_val = jQuery(this).val();
-                var opt_text = jQuery(this).text();
-                
-                if(opt_val == rhk.kode_cascading_sasaran && opt_text == rhk.label_cascading_sasaran) {
-                    jQuery(this).prop('selected', true);
-                    jQuery('#cascading-renstra').trigger('change');
-                    return false;
-                }
-            });
+        let editParent = Promise.resolve([]);
+        if (tipe > 1 && rhk.parent && rhk.parent != 0) {
+            editParent = get_all_parent_cascading(rhk.parent, tipe - 1);
+        }
+        
+        editParent.then(function(parentData) {
             
-            if(
-                rhk.input_rencana_pagu_level == 1
-                && tipe < 2
-            ){
-                console.log('kosongkan cascading-renstra-program');
-                jQuery("#cascading-renstra-program").empty();
-                get_cascading_input_rencana_pagu('program').then(function() {
-                    resolve();
-                });
-            }else{
-                resolve();
-            }
-        }).then(function(){
-            return new Promise(function(resolve, reject){
-                jQuery('#cascading-renstra-program option').each(function(){
+            new Promise(function(resolve, reject){
+                jQuery('#cascading-renstra option').each(function(){
                     var opt_val = jQuery(this).val();
                     var opt_text = jQuery(this).text();
-                    var clean_text = opt_text.split('(')[0].trim();
                     
-                    if(opt_val == kode_cascading_renstra_program && clean_text == (rhk.kode_cascading_program + ' ' + rhk.label_cascading_program)) {
+                    if(opt_val == rhk.kode_cascading_sasaran && opt_text == rhk.label_cascading_sasaran) {
                         jQuery(this).prop('selected', true);
-                        jQuery('#cascading-renstra-program').trigger('change');
+                        if (!jQuery(this).data('id-sasaran') && rhk.id_sasaran_renstra) {
+                            jQuery(this).attr('data-id-sasaran', rhk.id_sasaran_renstra);
+                        }
+                        jQuery('#cascading-renstra').trigger('change');
+                        
+                        if (tipe == 1) {
+                            setTimeout(function() {
+                                if (rhk.input_rencana_pagu_level == 1) {
+                                    // Jika input pagu dicentang, label akan diisi dari sub kegiatan
+                                    // Jadi kosongkan dulu
+                                    jQuery('#label_renaksi').empty().prop('disabled', false).trigger('change');
+                                } else {
+                                    // Jika input pagu tidak dicentang, isi dari sasaran
+                                    if (rhk.label === rhk.label_cascading_sasaran) {
+                                        jQuery('#label_renaksi').empty();
+                                        let newOption = new Option(rhk.label, rhk.label, true, true);
+                                        jQuery('#label_renaksi').append(newOption).trigger('change');
+                                        jQuery('#label_renaksi').prop('disabled', true);
+                                    } else {
+                                        jQuery('#label_renaksi').empty().prop('disabled', false).trigger('change');
+                                    }
+                                }
+                            }, 500);
+                        }
+                        
                         return false;
                     }
                 });
                 
+                if (tipe > 1 && parentData.length > 0) {
+                    parent_label_cascading(parentData, tipe);
+                }
+                
+                if (rhk.kode_cascading_sasaran) {
+                    get_tujuan_from_sasaran(rhk.kode_cascading_sasaran).then(function(tujuan_teks) {
+                        if (tujuan_teks) {
+                            jQuery('#parent-cascading-tujuan').val(tujuan_teks);
+                        }
+                    });
+                }
+                
                 if(
-                    (
-                        rhk.input_rencana_pagu_level == 1
-                        || cek_parent_global.input_pagu == 1
-                    )
-                    && tipe < 3
+                    rhk.input_rencana_pagu_level == 1
+                    && tipe < 2
                 ){
-                    if (rhk.id_sub_skpd_cascading) {
-                        kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_sub_skpd_cascading;
-                    }
-                    console.log('kosongkan cascading-renstra-kegiatan');
-                    jQuery("#cascading-renstra-kegiatan").empty();
-                    get_cascading_input_rencana_pagu('kegiatan').then(function() {
+                    console.log('kosongkan cascading-renstra-program');
+                    jQuery("#cascading-renstra-program").empty();
+                    get_cascading_input_rencana_pagu('program').then(function() {
                         resolve();
                     });
                 }else{
                     resolve();
                 }
-            });
-        }).then(function(){
-            return new Promise(function(resolve, reject){
-                jQuery('#cascading-renstra-kegiatan option').each(function(){
+            }).then(function(){
+                return new Promise(function(resolve, reject){
+                    jQuery('#cascading-renstra-program option').each(function(){
+                        var opt_val = jQuery(this).val();
+                        var opt_text = jQuery(this).text();
+                        var clean_text = opt_text.split('(')[0].trim();
+                        
+                        if(opt_val == kode_cascading_renstra_program && clean_text == (rhk.kode_cascading_program + ' ' + rhk.label_cascading_program)) {
+                            jQuery(this).prop('selected', true);
+                            jQuery('#cascading-renstra-program').trigger('change');
+                            
+                            // Cek apakah input pagu dicentang
+                            if (tipe == 2) {
+                                setTimeout(function() {
+                                    if (rhk.input_rencana_pagu_level == 1) {
+                                        // Jika input pagu dicentang, label akan diisi dari sub kegiatan
+                                        jQuery('#label_renaksi').empty().prop('disabled', false).trigger('change');
+                                    } else {
+                                        // Jika input pagu tidak dicentang, isi dari program
+                                        get_label_renaksi_from_cascading('program', kode_cascading_renstra_program).then(function() {
+                                            if (rhk.label_renaksi_ids) {
+                                                let savedIds = rhk.label_renaksi_ids.split(',');
+                                                jQuery('#label_renaksi').val(savedIds).trigger('change');
+                                            }
+                                        });
+                                    }
+                                }, 500);
+                            }
+                            
+                            return false;
+                        }
+                    });
+                    
+                    if(
+                        (
+                            rhk.input_rencana_pagu_level == 1
+                            || cek_parent_global.input_pagu == 1
+                        )
+                        && tipe < 3
+                    ){
+                        if (rhk.id_sub_skpd_cascading) {
+                            kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_sub_skpd_cascading;
+                        }
+                        console.log('kosongkan cascading-renstra-kegiatan');
+                        jQuery("#cascading-renstra-kegiatan").empty();
+                        get_cascading_input_rencana_pagu('kegiatan').then(function() {
+                            resolve();
+                        });
+                    }else{
+                        resolve();
+                    }
+                });
+            }).then(function(){
+                return new Promise(function(resolve, reject){
+                    jQuery('#cascading-renstra-kegiatan option').each(function(){
+                        var opt_val = jQuery(this).val();
+                        var opt_text = jQuery(this).text();
+                        var clean_text = opt_text.split('(')[0].trim();
+                        
+                        if(opt_val == rhk.kode_cascading_kegiatan && clean_text == (rhk.kode_cascading_kegiatan + ' ' + rhk.label_cascading_kegiatan)) {
+                            jQuery(this).prop('selected', true);
+                            jQuery('#cascading-renstra-kegiatan').trigger('change');
+                            
+                            // Cek apakah input pagu dicentang
+                            if (tipe == 3) {
+                                setTimeout(function() {
+                                    if (rhk.input_rencana_pagu_level == 1) {
+                                        // Jika input pagu dicentang, label akan diisi dari sub kegiatan
+                                        jQuery('#label_renaksi').empty().prop('disabled', false).trigger('change');
+                                    } else {
+                                        // Jika input pagu tidak dicentang, isi dari kegiatan
+                                        get_label_renaksi_from_cascading('kegiatan', rhk.kode_cascading_kegiatan).then(function() {
+                                            if (rhk.label_renaksi_ids) {
+                                                let savedIds = rhk.label_renaksi_ids.split(',');
+                                                jQuery('#label_renaksi').val(savedIds).trigger('change');
+                                            }
+                                        });
+                                    }
+                                }, 500);
+                            }
+                            
+                            return false;
+                        }
+                    });
+                    
+                    if(
+                        (
+                            rhk.input_rencana_pagu_level == 1
+                            || cek_parent_global.input_pagu == 1
+                        )
+                        && tipe < 4
+                    ){
+                        console.log('kosongkan cascading-renstra-sub-kegiatan');
+                        jQuery("#cascading-renstra-sub-kegiatan").empty();
+                        get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
+                            resolve();
+                        });
+                    }else{
+                        resolve();
+                    }
+                });
+            }).then(function(){
+                jQuery('#cascading-renstra-sub-kegiatan option').each(function(){
                     var opt_val = jQuery(this).val();
                     var opt_text = jQuery(this).text();
-                    
                     var clean_text = opt_text.split('(')[0].trim();
                     
-                    if(opt_val == rhk.kode_cascading_kegiatan && clean_text == (rhk.kode_cascading_kegiatan + ' ' + rhk.label_cascading_kegiatan)) {
+                    if(opt_val == rhk.kode_cascading_sub_kegiatan && clean_text.includes(rhk.label_cascading_sub_kegiatan)) {
                         jQuery(this).prop('selected', true);
-                        jQuery('#cascading-renstra-kegiatan').trigger('change');
+                        jQuery('#cascading-renstra-sub-kegiatan').trigger('change');
+                        
+                        // Load label dari sub kegiatan jika input pagu dicentang
+                        if (tipe == 4 || rhk.input_rencana_pagu_level == 1) {
+                            setTimeout(function() {
+                                get_label_renaksi_from_cascading('sub_kegiatan', rhk.kode_cascading_sub_kegiatan).then(function() {
+                                    if (rhk.label_renaksi_ids) {
+                                        let savedIds = rhk.label_renaksi_ids.split(',');
+                                        jQuery('#label_renaksi').val(savedIds).trigger('change');
+                                    }
+                                });
+                            }, 500);
+                        }
+                        
                         return false;
                     }
                 });
                 
-                if(
-                    (
-                        rhk.input_rencana_pagu_level == 1
-                        || cek_parent_global.input_pagu == 1
-                    )
-                    && tipe < 4
-                ){
-                    console.log('kosongkan cascading-renstra-sub-kegiatan');
-                    jQuery("#cascading-renstra-sub-kegiatan").empty();
-                    get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
-                        resolve();
-                    });
-                }else{
-                    resolve();
-                }
-            });
-        }).then(function(){
-            console.log(
-                'rhk.id='+rhk.id,
-                'cek_parent_global.input_pagu='+cek_parent_global.input_pagu,
-                'rhk.input_rencana_pagu_level='+rhk.input_rencana_pagu_level,
-                'rhk.kode_cascading_sasaran='+rhk.kode_cascading_sasaran, 
-                'rhk.label_cascading_sasaran='+rhk.label_cascading_sasaran,
-                'kode_cascading_renstra_program='+kode_cascading_renstra_program,
-                'rhk.kode_cascading_kegiatan='+rhk.kode_cascading_kegiatan,
-                'rhk.kode_cascading_sub_kegiatan='+rhk.kode_cascading_sub_kegiatan
-            );
-            
-            jQuery('#cascading-renstra-sub-kegiatan option').each(function(){
-                var opt_val = jQuery(this).val();
-                var opt_text = jQuery(this).text();
-                
-                var clean_text = opt_text.split('(')[0].trim();
-                
-                if(opt_val == rhk.kode_cascading_sub_kegiatan && clean_text.includes(rhk.label_cascading_sub_kegiatan)) {
-                    jQuery(this).prop('selected', true);
-                    jQuery('#cascading-renstra-sub-kegiatan').trigger('change');
-                    return false;
-                }
-            });
-            
-            setTimeout(function() {
-                
-                let pokin_displayed = false;
-                
-                if(rhk.kode_cascading_sasaran){
-                    var id_unik_sasaran = get_id_unik_from_cascading('sasaran', rhk.kode_cascading_sasaran, rhk.label_cascading_sasaran);
-                    if(id_unik_sasaran) {
-                        console.log('Menampilkan pokin sasaran');
-                        let result = tampilkan_pokin_dari_cascading(id_unik_sasaran, 'sasaran');
-                        if(result) pokin_displayed = true;
+                // Kembalikan attr onchange dengan logic baru
+                jQuery('#cascading-renstra').attr('onchange', `
+                    var selectedOption = jQuery(this).find('option:selected');
+                    var id_unik = selectedOption.data('id-unik');
+                    var tujuan_teks = selectedOption.data('tujuan-teks');
+                    var cascading_id = selectedOption.val();
+                    
+                    if(tujuan_teks) {
+                        jQuery('#parent-cascading-tujuan').val(tujuan_teks);
+                    } else {
+                        jQuery('#parent-cascading-tujuan').val('');
                     }
-                }
-                
-                if(rhk.kode_cascading_program){
-                    setTimeout(function() {
-                        var id_sub_skpd = rhk.id_sub_skpd_cascading || rhk.id_skpd;
-                        var id_unik_program = get_id_unik_from_cascading('program', rhk.kode_cascading_program, rhk.label_cascading_program, id_sub_skpd);
-                        if(id_unik_program) {
-                            console.log('Menampilkan pokin program');
-                            let result = tampilkan_pokin_dari_cascading(id_unik_program, 'program');
-                            if(result) pokin_displayed = true;
-                            else {
-                                reset_pokin_cascading(3);
-                            }
-                        }
-                    }, 200);
-                }
-                
-                if(rhk.kode_cascading_kegiatan){
-                    setTimeout(function() {
-                        var id_unik_kegiatan = get_id_unik_from_cascading('kegiatan', rhk.kode_cascading_kegiatan, rhk.label_cascading_kegiatan, rhk.id_sub_skpd_cascading);
-                        if(id_unik_kegiatan) {
-                            console.log('Menampilkan pokin kegiatan');
-                            let result = tampilkan_pokin_dari_cascading(id_unik_kegiatan, 'kegiatan');
-                            if(result) pokin_displayed = true;
-                            else {
-                                reset_pokin_cascading(4);
-                            }
-                        }
-                    }, 400);
-                }
-                
-                if(rhk.kode_cascading_sub_kegiatan){
-                    setTimeout(function() {
-                        var id_unik_sub = get_id_unik_from_cascading('sub_kegiatan', rhk.kode_cascading_sub_kegiatan, rhk.label_cascading_sub_kegiatan, rhk.id_sub_skpd_cascading);
-                        if(id_unik_sub) {
-                            console.log('Menampilkan pokin sub kegiatan');
-                            let result = tampilkan_pokin_dari_cascading(id_unik_sub, 'sub_kegiatan');
-                            if(result) pokin_displayed = true;
-                            else {
-                                reset_pokin_cascading(5);
-                            }
-                        }
-                    }, 600);
-                }
-            }, 500);
-            
-            /** kembalikan attr onchange */
-            jQuery('#cascading-renstra').attr('onchange', `
-                var selectedOption = jQuery(this).find('option:selected');
-                var id_unik = selectedOption.data('id-unik');
-                
-                jQuery('#cascading-renstra-program').html('<option value="">Pilih Program Cascading</option>').trigger('change');
-                jQuery('#cascading-renstra-kegiatan').html('<option value="">Pilih Kegiatan Cascading</option>').trigger('change');
-                jQuery('#cascading-renstra-sub-kegiatan').html('<option value="">Pilih Sub Kegiatan Cascading</option>').trigger('change');
-                
-                for(let i = 1; i <= 5; i++) {
-                    jQuery('#pokin-level-' + i).html('').trigger('change');
-                }
-                
-                if(id_unik) {
-                    setTimeout(function() {
-                        let result = tampilkan_pokin_dari_cascading(id_unik, 'sasaran');
-                        if(!result) {
-                            console.log('Sasaran tidak mempunyai pokin');
-                        }
-                    }, 100);
-                }
-                get_cascading_input_rencana_pagu('program');
-            `);
+                    
+                    jQuery('#cascading-renstra-program').html('<option value="">Pilih Program Cascading</option>').trigger('change');
+                    jQuery('#cascading-renstra-kegiatan').html('<option value="">Pilih Kegiatan Cascading</option>').trigger('change');
+                    jQuery('#cascading-renstra-sub-kegiatan').html('<option value="">Pilih Sub Kegiatan Cascading</option>').trigger('change');
+                    
+                    jQuery('#label_renaksi').empty();
+                    if(cascading_id) {
+                        get_label_renaksi_from_cascading('sasaran', cascading_id);
+                    }
+                    
+                    for(let i = 1; i <= 5; i++) {
+                        jQuery('#pokin-level-' + i).html('').trigger('change');
+                    }
+                    
+                    if(id_unik) {
+                        setTimeout(function() {
+                            tampilkan_pokin_dari_cascading(id_unik, 'sasaran');
+                        }, 100);
+                    }
+                    get_cascading_input_rencana_pagu('program');
+                `);
 
-            jQuery('#cascading-renstra-program').attr('onchange', `
-                var selectedOption = jQuery(this).find('option:selected');
-                var id_unik = selectedOption.data('id-unik');
-                
-                jQuery('#cascading-renstra-kegiatan').html('<option value="">Pilih Kegiatan Cascading</option>').trigger('change');
-                jQuery('#cascading-renstra-sub-kegiatan').html('<option value="">Pilih Sub Kegiatan Cascading</option>').trigger('change');
-                
-                jQuery('#pokin-level-3').html('').trigger('change');
-                jQuery('#pokin-level-4').html('').trigger('change');
-                jQuery('#pokin-level-5').html('').trigger('change');
-                
-                if(id_unik && id_unik.toString().trim() !== '') {
-                    setTimeout(function() {
-                        let result = tampilkan_pokin_dari_cascading(id_unik, 'program');
-                        if(!result) {
-                            console.log('Program tidak mempunyai pokin');
+                jQuery('#cascading-renstra-program').attr('onchange', `
+                    var selectedOption = jQuery(this).find('option:selected');
+                    var id_unik = selectedOption.data('id-unik');
+                    var cascading_id = selectedOption.val();
+                    
+                    jQuery('#cascading-renstra-kegiatan').html('<option value="">Pilih Kegiatan Cascading</option>').trigger('change');
+                    jQuery('#cascading-renstra-sub-kegiatan').html('<option value="">Pilih Sub Kegiatan Cascading</option>').trigger('change');
+                    
+                    jQuery('#pokin-level-3').html('').trigger('change');
+                    jQuery('#pokin-level-4').html('').trigger('change');
+                    jQuery('#pokin-level-5').html('').trigger('change');
+                    
+                    jQuery('#label_renaksi').empty();
+                    
+                    if(cascading_id) {
+                        var currentLevel = jQuery('.modal-footer .btn-success').attr('onclick').split('(')[1].split(')')[0];
+                        if(currentLevel == 2) {
+                            setTimeout(function() {
+                                get_label_renaksi_from_cascading('program', cascading_id);
+                            }, 50);
+                        } else if(currentLevel == 1 && jQuery('#set_input_rencana_pagu').is(':checked')) {
+                            setTimeout(function() {
+                                get_label_renaksi_from_cascading('program', cascading_id);
+                            }, 50);
                         }
-                    }, 100);
-                }
-                get_cascading_input_rencana_pagu('kegiatan');
-            `);
+                    }
+                    
+                    if(id_unik && id_unik.toString().trim() !== '') {
+                        setTimeout(function() {
+                            tampilkan_pokin_dari_cascading(id_unik, 'program');
+                        }, 100);
+                    }
+                    get_cascading_input_rencana_pagu('kegiatan');
+                `);
 
-            jQuery('#cascading-renstra-kegiatan').attr('onchange', `
-                var selectedOption = jQuery(this).find('option:selected');
-                var id_unik = selectedOption.data('id-unik');
-                
-                jQuery('#cascading-renstra-sub-kegiatan').html('<option value="">Pilih Sub Kegiatan Cascading</option>').trigger('change');
-                
-                jQuery('#pokin-level-4').html('').trigger('change');
-                jQuery('#pokin-level-5').html('').trigger('change');
-                
-                if(id_unik && id_unik.toString().trim() !== '') {
-                    setTimeout(function() {
-                        let result = tampilkan_pokin_dari_cascading(id_unik, 'kegiatan');
-                        if(!result) {
-                            console.log('Kegiatan tidak mempunyai pokin');
+                jQuery('#cascading-renstra-kegiatan').attr('onchange', `
+                    var selectedOption = jQuery(this).find('option:selected');
+                    var id_unik = selectedOption.data('id-unik');
+                    var cascading_id = selectedOption.val();
+                    
+                    jQuery('#cascading-renstra-sub-kegiatan').html('<option value="">Pilih Sub Kegiatan Cascading</option>').trigger('change');
+                    
+                    jQuery('#pokin-level-4').html('').trigger('change');
+                    jQuery('#pokin-level-5').html('').trigger('change');
+                    
+                    jQuery('#label_renaksi').empty();
+                    
+                    if(cascading_id) {
+                        var currentLevel = jQuery('.modal-footer .btn-success').attr('onclick').split('(')[1].split(')')[0];
+                        if(currentLevel == 3) {
+                            setTimeout(function() {
+                                get_label_renaksi_from_cascading('kegiatan', cascading_id);
+                            }, 50);
+                        } else if((currentLevel == 1 || currentLevel == 2) && jQuery('#set_input_rencana_pagu').is(':checked')) {
+                            setTimeout(function() {
+                                get_label_renaksi_from_cascading('kegiatan', cascading_id);
+                            }, 50);
                         }
-                    }, 100);
-                }
-                get_cascading_input_rencana_pagu('sub_kegiatan');
-            `);
+                    }
+                    
+                    if(id_unik && id_unik.toString().trim() !== '') {
+                        setTimeout(function() {
+                            tampilkan_pokin_dari_cascading(id_unik, 'kegiatan');
+                        }, 100);
+                    }
+                    get_cascading_input_rencana_pagu('sub_kegiatan');
+                `);
 
-            jQuery('#cascading-renstra-sub-kegiatan').attr('onchange', `
-                var selectedOption = jQuery(this).find('option:selected');
-                var id_unik = selectedOption.data('id-unik');
-                
-                jQuery('#pokin-level-5').html('').trigger('change');
-                
-                if(id_unik && id_unik.toString().trim() !== '') {
-                    setTimeout(function() {
-                        let result = tampilkan_pokin_dari_cascading(id_unik, 'sub_kegiatan');
-                        if(!result) {
-                            console.log('Sub Kegiatan tidak punya pokin');
+                jQuery('#cascading-renstra-sub-kegiatan').attr('onchange', `
+                    var selectedOption = jQuery(this).find('option:selected');
+                    var id_unik = selectedOption.data('id-unik');
+                    var cascading_id = selectedOption.val();
+                    
+                    jQuery('#pokin-level-5').html('').trigger('change');
+                    
+                    jQuery('#label_renaksi').empty();
+                    
+                    if(cascading_id) {
+                        var currentLevel = jQuery('.modal-footer .btn-success').attr('onclick').split('(')[1].split(')')[0];
+                        if(currentLevel == 4) {
+                            setTimeout(function() {
+                                get_label_renaksi_from_cascading('sub_kegiatan', cascading_id);
+                            }, 50);
+                        } else if(jQuery('#set_input_rencana_pagu').is(':checked')) {
+                            setTimeout(function() {
+                                get_label_renaksi_from_cascading('sub_kegiatan', cascading_id);
+                            }, 50);
                         }
-                    }, 100);
-                }
-                get_cascading_input_rencana_pagu();
-            `);
+                    }
+                    
+                    if(id_unik && id_unik.toString().trim() !== '') {
+                        setTimeout(function() {
+                            tampilkan_pokin_dari_cascading(id_unik, 'sub_kegiatan');
+                        }, 100);
+                    }
+                    get_cascading_input_rencana_pagu();
+                `);
 
-            // setting OPD dan pagu cascading setelah selesai setting cascading
-            if(
-                rhk.input_rencana_pagu_level == 1
-                || cek_parent_global.input_pagu == 1
-                || tipe == 4
-            ){
-                get_cascading_input_rencana_pagu();
-            }else if(tipe == 2){
-                set_view_cascading('cascading-renstra-program');
-            }else if(tipe == 3){
-                set_view_cascading('cascading-renstra-kegiatan');
-            }
+                jQuery('#set_input_rencana_pagu').off('change').on('change', function() {
+                    let isChecked = jQuery(this).is(':checked');
+                    
+                    if (isChecked) {
+                        let currentLevel = jQuery('.modal-footer .btn-success').attr('onclick').split('(')[1].split(')')[0];
+                        
+                        jQuery('#label_renaksi').empty().prop('disabled', true).trigger('change');
+                        
+                        if (jQuery('#cascading-renstra-sub-kegiatan').val()) {
+                            get_label_renaksi_from_cascading('sub_kegiatan', jQuery('#cascading-renstra-sub-kegiatan').val());
+                        } else if (jQuery('#cascading-renstra-kegiatan').val()) {
+                            get_label_renaksi_from_cascading('kegiatan', jQuery('#cascading-renstra-kegiatan').val());
+                        } else if (jQuery('#cascading-renstra-program').val()) {
+                            get_label_renaksi_from_cascading('program', jQuery('#cascading-renstra-program').val());
+                        } else if (jQuery('#cascading-renstra').val()) {
+                            get_label_renaksi_from_cascading('sasaran', jQuery('#cascading-renstra').val());
+                        }
+                    } else {
+                        let currentLevel = jQuery('.modal-footer .btn-success').attr('onclick').split('(')[1].split(')')[0];
+                        
+                        if (currentLevel == 1 && jQuery('#cascading-renstra').val()) {
+                            get_label_renaksi_from_cascading('sasaran', jQuery('#cascading-renstra').val());
+                        } else if (currentLevel == 2 && jQuery('#cascading-renstra-program').val()) {
+                            get_label_renaksi_from_cascading('program', jQuery('#cascading-renstra-program').val());
+                        } else if (currentLevel == 3 && jQuery('#cascading-renstra-kegiatan').val()) {
+                            get_label_renaksi_from_cascading('kegiatan', jQuery('#cascading-renstra-kegiatan').val());
+                        } else if (currentLevel == 4 && jQuery('#cascading-renstra-sub-kegiatan').val()) {
+                            get_label_renaksi_from_cascading('sub_kegiatan', jQuery('#cascading-renstra-sub-kegiatan').val());
+                        }
+                    }
+                });
+
+                if(
+                    rhk.input_rencana_pagu_level == 1
+                    || cek_parent_global.input_pagu == 1
+                    || tipe == 4
+                ){
+                    get_cascading_input_rencana_pagu();
+                }else if(tipe == 2){
+                    set_view_cascading('cascading-renstra-program');
+                }else if(tipe == 3){
+                    set_view_cascading('cascading-renstra-kegiatan');
+                }
+            });
         });
     }
 
@@ -1932,6 +2328,160 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         });
     }
 
+    function setting_indikator_satuan(rhk, indikator, isEdit = false) {
+        
+        var get_rhk;
+        if (Array.isArray(rhk) && rhk.length > 0) {
+            get_rhk = rhk[0];
+        } else if (typeof rhk === 'object' && rhk !== null) {
+            get_rhk = rhk;
+        } else {
+            return Promise.resolve({ indikator: [], satuan: {} });
+        }
+        
+        return new Promise(function(resolve, reject) {
+            var tipe = get_rhk.level;
+            
+            var jenis_cascading = '';
+            var kode_cascading = '';
+            var id_sub_skpd_cascading = 0;
+            
+            if (get_rhk.input_rencana_pagu_level == 1) {
+                jenis_cascading = 'sub_kegiatan';
+                kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
+                id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+            } else {
+                if (tipe == 1) {
+                    jenis_cascading = 'sasaran';
+                    kode_cascading = get_rhk.kode_cascading_sasaran;
+                } else if (tipe == 2) {
+                    jenis_cascading = 'program';
+                    kode_cascading = get_rhk.kode_cascading_program;
+                    id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || get_rhk.id_skpd;
+                } else if (tipe == 3) {
+                    jenis_cascading = 'kegiatan';
+                    kode_cascading = get_rhk.kode_cascading_kegiatan;
+                    id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                } else if (tipe == 4) {
+                    jenis_cascading = 'sub_kegiatan';
+                    kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
+                    id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                }
+            }
+            
+            if (!kode_cascading) {
+                console.log('Tidak ada kode cascading untuk level:', tipe);
+                resolve({ indikator: [], satuan: {} });
+                return;
+            }
+                        
+            var parent_cascading = kode_cascading;
+            if (jenis_cascading == 'program' && id_sub_skpd_cascading) {
+                parent_cascading = kode_cascading.split('_')[0];
+            } else if (jenis_cascading == 'kegiatan' || jenis_cascading == 'sub_kegiatan') {
+                if (jenis_cascading == 'kegiatan') {
+                    parent_cascading = get_rhk.kode_cascading_program ? get_rhk.kode_cascading_program.split('_')[0] : '';
+                } else {
+                    parent_cascading = get_rhk.kode_cascading_kegiatan || '';
+                }
+            }
+            
+            return get_tujuan_sasaran_cascading(jenis_cascading, parent_cascading, id_sub_skpd_cascading)
+                .then(function() {
+                    var key = jenis_cascading + '-' + parent_cascading;
+                    if (id_sub_skpd_cascading != 0) {
+                        key = jenis_cascading + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
+                    }
+                    
+                    var data_cascading = null;
+                    
+                    if (jenis_cascading == 'sasaran') {
+                        data_cascading = data_sasaran_cascading[key];
+                    } else if (jenis_cascading == 'program') {
+                        data_cascading = data_program_cascading[key];
+                    } else if (jenis_cascading == 'kegiatan') {
+                        data_cascading = data_kegiatan_cascading[key];
+                    } else if (jenis_cascading == 'sub_kegiatan') {
+                        data_cascading = data_sub_kegiatan_cascading[key];
+                    }
+                    
+                    if (!data_cascading || !data_cascading.data) {
+                        console.log('Data cascading tidak ditemukan untuk');
+                        resolve({ indikator: [], satuan: {} });
+                        return;
+                    }
+                    
+                    var matched_data = null;
+                    
+                    data_cascading.data.forEach(function(value) {
+                        var is_match = false;
+                        
+                        switch (jenis_cascading) {
+                            case 'sasaran':
+                                is_match = value.kode_bidang_urusan === kode_cascading;
+                                break;
+                            case 'program':
+                                is_match = (value.kode_program + '_' + value.id_sub_skpd) === (kode_cascading + '_' + id_sub_skpd_cascading);
+                                break;
+                            case 'kegiatan':
+                                is_match = value.kode_giat === kode_cascading;
+                                break;
+                            case 'sub_kegiatan':
+                                is_match = value.kode_sub_giat === kode_cascading;
+                                break;
+                        }
+                        
+                        if (is_match) {
+                            matched_data = value;
+                        }
+                    });
+                    
+                    if (!matched_data) {
+                        console.log('Data cascading tidak cocok untuk kode:', kode_cascading);
+                        resolve({ indikator: [], satuan: {} });
+                        return;
+                    }
+                    
+                    var result = {
+                        indikator: [],
+                        satuan: {}
+                    };
+                    
+                    if (matched_data.get_transformasi_cascading && Array.isArray(matched_data.get_transformasi_cascading)) {
+                        matched_data.get_transformasi_cascading.forEach(function(trans) {
+                            if (trans.induk && trans.induk.indikator && Array.isArray(trans.induk.indikator)) {
+                                trans.induk.indikator.forEach(function(ind) {
+                                    if (!result.indikator.find(i => i.id === ind.id)) {
+                                        result.indikator.push({
+                                            id: ind.id,
+                                            text: ind.indikator,
+                                            id_uraian: trans.id_uraian_cascading
+                                        });
+                                    }
+                                    
+                                    if (ind.satuan && Array.isArray(ind.satuan)) {
+                                        result.satuan[ind.id] = ind.satuan.map(function(sat) {
+                                            return {
+                                                id: sat.id,
+                                                text: sat.satuan
+                                            };
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
+                    console.log('Hasil setting indikator satuan:', result);
+                    resolve(result);
+                })
+                .catch(function(error) {
+                    console.error('Error setting indikator satuan:', error);
+                    resolve({ indikator: [], satuan: {} });
+                });
+        });
+    }
+
     function tambah_indikator_rencana_aksi_baru(id, tipe, total_pagu, set_input_rencana_pagu, kode_sbl = false, sumber_dana = false) {
         jQuery('#wrap-loading').show();
         jQuery.ajax({
@@ -1940,44 +2490,49 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             data: {
                 "action": 'cek_validasi_input_rencana_pagu',
                 "api_key": esakip.api_key,
+                "tahun_anggaran": <?php echo $input['tahun']; ?>,
                 "id": id
             },
             dataType: "json",
             success: function(response) {
                 jQuery('#wrap-loading').hide();
-                if(!response.rencana_pagu){
+                if (!response.rencana_pagu) {
                     response.rencana_pagu = 0;
                 }
-                tambah_indikator_rencana_aksi(id, tipe, +response.rencana_pagu, set_input_rencana_pagu, kode_sbl);
+                
+                setting_indikator_satuan(response.data_rhk, response.data_indikator).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(id, tipe, +response.rencana_pagu, set_input_rencana_pagu, kode_sbl, indikator_satuan_data
+                    );
+                });
             },
             error: function() {
+                jQuery('#wrap-loading').hide();
                 alert('Gagal melihat data.');
             }
         });
     }
 
-    function tambah_indikator_rencana_aksi(id, tipe, total_pagu, set_input_rencana_pagu, kode_sbl = false, sumber_dana = false) {
-        return new Promise(function(resolve, reject){
-            cek_input_pagu_parent(tipe)
-            .then(function(){
+    function tambah_indikator_rencana_aksi(id, tipe, total_pagu, set_input_rencana_pagu, kode_sbl = false, sumber_dana = false, indikator_satuan = null) {
+        return new Promise(function(resolve, reject) {
+            console.log('Parameter Data Indikator Satuan:');
+            console.log('Data Indikator Satuan:', indikator_satuan);
+            
+            cek_input_pagu_parent(tipe).then(function() {
                 var title = '';
                 let input_pagu = '';
                 let input_sumber_dana = '';
+                
                 if (tipe == 1) {
                     title = 'Indikator Kegiatan Utama | RHK Level 1';
                 } else if (tipe == 2) {
                     title = 'Indikator Rencana Hasil Kerja | RHK Level 2';
                 } else if (tipe == 3) {
                     title = 'Indikator Uraian Kegiatan Rencana Hasil Kerja | RHK Level 3';
-                }else if (tipe == 4){
+                } else if (tipe == 4) {
                     title = 'Indikator Uraian Teknis Kegiatan | RHK Level 4';
                     set_input_rencana_pagu = 1;
                 }
 
-                if(
-                    set_input_rencana_pagu == 1
-                    && cek_parent_global.input_pagu != 1
-                ) {
+                if (set_input_rencana_pagu == 1 && cek_parent_global.input_pagu != 1) {
                     input_pagu = '' +
                         `<div class="form-group row">` +
                             '<div class="col-md-2">' +
@@ -2009,20 +2564,20 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         `</div>`;
 
                     if (kode_sbl) {
-                        get_sub_keg_rka_wpsipd(kode_sbl, sumber_dana)
+                        get_sub_keg_rka_wpsipd(kode_sbl, sumber_dana);
                     }
-                }else{
+                } else {
                     var pagu_level = 4;
-                    if(cek_parent_global.input_pagu == 1){
+                    if (cek_parent_global.input_pagu == 1) {
                         pagu_level = cek_parent_global.level;
                         input_pagu = '' +
                             `<div class="form-group row">` +
                                 '<div class="col-md-12">' +
                                     `<h4 class="text-center">Input Pagu di RHK Level ${pagu_level}</h4>` +
                                     `<input type="hidden" disabled class="form-control text-right" id="rencana_pagu" value="0" />` +
-                                '</div>'+
+                                '</div>' +
                             '</div>';
-                    }else{
+                    } else {
                         input_pagu = '' +
                             `<div class="form-group row">` +
                                 '<div class="col-md-2">' +
@@ -2030,7 +2585,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                 '</div>' +
                                 '<div class="col-md-10">' +
                                     `<div class="input-group">` +
-                                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="` + total_pagu + `"/>` +
+                                        `<input type="number" disabled class="form-control text-right" id="rencana_pagu_tk" value="${total_pagu}"/>` +
                                     `</div>` +
                                 '</div>' +
                             '</div>' +
@@ -2041,25 +2596,26 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                 '<div class="col-md-2">' +
                                     `<div class="input-group">` +
                                         `<input type="number" class="form-control" id="total_rincian" max="100" value="100"/>` +
-                                    `<span class="input-group-text">%</span>` +
+                                        `<span class="input-group-text">%</span>` +
                                     `</div>` +
                                 '</div>' +
-                                '<div class="col-md-1">' +
-                                '</div>' +
+                                '<div class="col-md-1"></div>' +
                                 '<div class="col-md-2">' +
                                     `<label for="total_rincian">Rencana Pagu</label>` +
                                 '</div>' +
                                 '<div class="col-md-5">' +
                                     `<div class="input-group">` +
-                                        `<input type="number" class="form-control text-right" id="rencana_pagu" value="` + total_pagu + `" />` +
+                                        `<input type="number" class="form-control text-right" id="rencana_pagu" value="${total_pagu}" />` +
                                     `</div>` +
                                 '</div>' +
                             '</div>';
                     }
                 }
+                
                 var tr = jQuery('#kegiatan_utama_' + id);
                 var label_pokin = tr.find('.label_pokin').text();
                 var label_renaksi = tr.find('.label_renaksi').text();
+                
                 jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
                 jQuery("#modal-crud").find('.modal-body').html('' +
                     `<form id="form-renaksi">` +
@@ -2088,7 +2644,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     `</div>` +
                     `<div class="form-group row">` +
                         '<div class="col-md-2">' +
-                            `<label for="kegiatan_utama_indikator">` + title.replace("Indikator", "") + `</label>` +
+                            `<label for="kegiatan_utama_indikator">${title.replace("Indikator", "")}</label>` +
                         '</div>' +
                         '<div class="col-md-10">' +
                             '<input type="text" disabled class="form-control" id="kegiatan_utama_indikator" value="' + label_renaksi + '"/>' +
@@ -2096,10 +2652,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     `</div>` +
                     `<div class="form-group row">` +
                         '<div class="col-md-2">' +
-                            '<label for="indikator">Indikator</label>' +
+                            '<label for="indikator">Indikator Cascading</label>' +
                         '</div>' +
                         '<div class="col-md-10">' +
-                            `<textarea class="form-control" name="label" id="indikator" placeholder="Tuliskan Indikator..."></textarea>` +
+                            `<select class="form-control" id="indikator">` +
+                                `<option value="">Pilih Indikator</option>` +
+                            `</select>` +
                         '</div>' +
                     `</div>` +
                     `<div class="form-group row">` +
@@ -2132,10 +2690,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     `</div>` +
                     `<div class="form-group row">` +
                         '<div class="col-md-2">' +
-                            `<label for="satuan_indikator">Satuan</label>` +
+                            '<label for="satuan_indikator">Satuan Cascading</label>' +
                         '</div>' +
                         '<div class="col-md-10">' +
-                            `<input type="text" class="form-control" id="satuan_indikator"/>` +
+                            `<select class="form-control" id="satuan_indikator">` +
+                                `<option value="">Pilih Satuan</option>` +
+                            `</select>` +
                         '</div>' +
                     `</div>` +
                     `${input_sumber_dana}` +
@@ -2237,11 +2797,13 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         '</div>' +
                     `</div>` +
                     `</form>`);
+                
                 jQuery("#modal-crud").find('.modal-footer').html('' +
                     '<button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>' +
                     '<button type="button" class="btn btn-success" onclick="simpan_indikator_renaksi(' + tipe + ')" data-view="kegiatanUtama">Simpan</button>');
                 jQuery("#modal-crud").find('.modal-dialog').css('maxWidth', '1000px');
                 jQuery("#modal-crud").find('.modal-dialog').css('width', '');
+                
                 jQuery("#modal-crud").modal('show');
 
                 jQuery("#total_rincian").on('input', function() {
@@ -2261,17 +2823,48 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     var get_total_pagu = (persen_rencana_pagu * persen) / 100;
                     jQuery("#rencana_pagu").val(setToFixed(get_total_pagu));
                 });
-                jQuery("#rencana_pagu").on('input', function(){
+                
+                jQuery("#rencana_pagu").on('input', function() {
                     var total_pagu = parseFloat(jQuery("#rencana_pagu_tk").val());
                     var rencana_pagu = jQuery(this).val();
-                    if(total_pagu == 0){
+                    if (total_pagu == 0) {
                         jQuery("#total_rincian").val(100).trigger('input');
-                    }else if(rencana_pagu == 0){
+                    } else if (rencana_pagu == 0) {
                         jQuery("#total_rincian").val(0).trigger('input');
-                    }else{
-                        jQuery("#total_rincian").val((rencana_pagu/total_pagu)*100).trigger('input');
+                    } else {
+                        jQuery("#total_rincian").val((rencana_pagu / total_pagu) * 100).trigger('input');
                     }
                 });
+                
+                if (indikator_satuan && indikator_satuan.indikator && indikator_satuan.indikator.length > 0) {
+                    var html_indikator = '<option value="">Pilih Indikator</option>';
+                    indikator_satuan.indikator.forEach(function(ind) {
+                        html_indikator += '<option value="' + ind.id + '" data-text="' + ind.text + '">' + ind.text + '</option>';
+                    });
+                    jQuery('#indikator').html(html_indikator);
+                    
+                    jQuery('#indikator').off('change').on('change', function() {
+                        var selected_id = jQuery(this).val();
+                        jQuery('#satuan_indikator').html('<option value="">Pilih Satuan</option>');
+                        
+                        if (selected_id && indikator_satuan.satuan[selected_id]) {
+                            var html_satuan = '<option value="">Pilih Satuan</option>';
+                            indikator_satuan.satuan[selected_id].forEach(function(sat) {
+                                html_satuan += '<option value="' + sat.id + '">' + sat.text + '</option>';
+                            });
+                            jQuery('#satuan_indikator').html(html_satuan);
+                        }
+                    });
+                }
+                
+                jQuery('#cek-target-teks').off('change').on('change', function() {
+                    if (jQuery(this).is(':checked')) {
+                        jQuery('.target-teks').show();
+                    } else {
+                        jQuery('.target-teks').hide();
+                    }
+                });
+                
                 resolve();
             });
         });
@@ -2377,50 +2970,103 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         setting_input_rencana_pagu = response.data.data_rhk_khusus.input_rencana_pagu_level;
                     }
 
-                    tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana).then(function(){
-                        jQuery("#modal-crud").find('.modal-title').text(jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit'));
-                        jQuery('#id_label_indikator').val(id);
-                        jQuery('#indikator').val(response.data.indikator);
-                        jQuery('#satuan_indikator').val(response.data.satuan);
-                        jQuery('#target_awal').val(response.data.target_awal);
-                        jQuery('#target_akhir').val(response.data.target_akhir);
-                        jQuery('#target_tw_1').val(response.data.target_1);
-                        jQuery('#target_tw_2').val(response.data.target_2);
-                        jQuery('#target_tw_3').val(response.data.target_3);
-                        jQuery('#target_tw_4').val(response.data.target_4);
-                        jQuery('#aspek_rhk').val(response.data.aspek_rhk);
-                        jQuery('#target_teks_awal').val(response.data.target_teks_awal);
-                        jQuery('#target_teks_akhir').val(response.data.target_teks_akhir);
-                        jQuery('#target_teks_tw_1').val(response.data.target_teks_1);
-                        jQuery('#target_teks_tw_2').val(response.data.target_teks_2);
-                        jQuery('#target_teks_tw_3').val(response.data.target_teks_3);
-                        jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
-                        jQuery('#rumus_capaian_kinerja').val(response.data.rumus_capaian_kinerja);
+                    jQuery.ajax({
+                        url: esakip.url,
+                        type: 'POST',
+                        data: {
+                            action: 'get_rencana_aksi',
+                            api_key: esakip.api_key,
+                            id: response.data.id_renaksi,
+                            tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                        },
+                        dataType: 'json',
+                        success: function(rhk_response) {
+                            if (rhk_response.status == 'success' && rhk_response.data != null) {
+                                var rhk_data = rhk_response.data;
+                                
+                                setting_indikator_satuan(rhk_data).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana, indikator_satuan_data
+                                    ).then(function(){
+                                        jQuery("#modal-crud").find('.modal-title').text(
+                                            jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit')
+                                        );
+                                        
+                                        jQuery('#id_label_indikator').val(id);
+                                        
+                                        if (indikator_satuan_data && indikator_satuan_data.indikator && indikator_satuan_data.indikator.length > 0) {
+                                            var html_indikator = '<option value="">Pilih Indikator</option>';
+                                            indikator_satuan_data.indikator.forEach(function(ind) {
+                                                var selected = (ind.id == response.data.id_indikator_cascading) ? 'selected' : '';
+                                                html_indikator += '<option value="' + ind.id + '" data-text="' + ind.text + '" ' + selected + '>' + ind.text + '</option>';
+                                            });
+                                            jQuery('#indikator').html(html_indikator);
+                                            
+                                            if (response.data.id_indikator_cascading) {
+                                                jQuery('#indikator').val(response.data.id_indikator_cascading).trigger('change');
+                                                
+                                                setTimeout(function() {
+                                                    if (response.data.id_satuan_cascading) {
+                                                        jQuery('#satuan_indikator').val(response.data.id_satuan_cascading);
+                                                    }
+                                                }, 100);
+                                            }
+                                        }
+                                        
+                                        jQuery('#target_awal').val(response.data.target_awal);
+                                        jQuery('#target_akhir').val(response.data.target_akhir);
+                                        jQuery('#target_tw_1').val(response.data.target_1);
+                                        jQuery('#target_tw_2').val(response.data.target_2);
+                                        jQuery('#target_tw_3').val(response.data.target_3);
+                                        jQuery('#target_tw_4').val(response.data.target_4);
+                                        jQuery('#aspek_rhk').val(response.data.aspek_rhk);
+                                        jQuery('#target_teks_awal').val(response.data.target_teks_awal);
+                                        jQuery('#target_teks_akhir').val(response.data.target_teks_akhir);
+                                        jQuery('#target_teks_tw_1').val(response.data.target_teks_1);
+                                        jQuery('#target_teks_tw_2').val(response.data.target_teks_2);
+                                        jQuery('#target_teks_tw_3').val(response.data.target_teks_3);
+                                        jQuery('#target_teks_tw_4').val(response.data.target_teks_4);
+                                        jQuery('#rumus_capaian_kinerja').val(response.data.rumus_capaian_kinerja);
 
-                        if(persen < 0){
-                            persen = 100;
-                        }
-                        jQuery('#total_rincian').val(persen).trigger('input');
-                        jQuery('#rencana_pagu_tk').val(total_pagu);
-                        if (response.data.rumus_indikator) {
-                            jQuery('#rumus-indikator').val(response.data.rumus_indikator);
-                        } else {
-                            jQuery('#rumus-indikator').val('(Realisasi Indikator / Target Indikator) * 100 = Capaian');
-                        }
+                                        if(persen < 0){
+                                            persen = 100;
+                                        }
+                                        jQuery('#total_rincian').val(persen).trigger('input');
+                                        jQuery('#rencana_pagu_tk').val(total_pagu);
+                                        
+                                        if (response.data.rumus_indikator) {
+                                            jQuery('#rumus-indikator').val(response.data.rumus_indikator);
+                                        } else {
+                                            jQuery('#rumus-indikator').val('(Realisasi Indikator / Target Indikator) * 100 = Capaian');
+                                        }
 
-                        if (response.data.set_target_teks == 1) {
-                            jQuery('#cek-target-teks').prop('checked', true);
-                            jQuery(".target-teks").show();
-                        } else {
-                            jQuery('#cek-target-teks').prop('checked', false);
-                            jQuery(".target-teks").hide();
+                                        if (response.data.set_target_teks == 1) {
+                                            jQuery('#cek-target-teks').prop('checked', true);
+                                            jQuery(".target-teks").show();
+                                        } else {
+                                            jQuery('#cek-target-teks').prop('checked', false);
+                                            jQuery(".target-teks").hide();
+                                        }
+                                        
+                                        jQuery('#wrap-loading').hide();
+                                    });
+                                });
+                            } else {
+                                jQuery('#wrap-loading').hide();
+                                alert('Gagal mengambil data RHK');
+                            }
+                        },
+                        error: function() {
+                            jQuery('#wrap-loading').hide();
+                            alert('Gagal mengambil data RHK');
                         }
-                        jQuery('#wrap-loading').hide();
                     });
                 } else if (response.status == 'error') {
                     alert(response.message);
                     jQuery('#wrap-loading').hide();
                 }
+            },
+            error: function() {
+                jQuery('#wrap-loading').hide();
+                alert('Gagal mengambil data indikator');
             }
         });
     }
@@ -3610,7 +4256,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
 
     function tampil_pokin(id, tampil=false){
         var display = 'display: none;';
-        var _class = 'in_setting_input_rencana_pagu';
+        var _class = '';
+        // var _class = 'in_setting_input_rencana_pagu';
         if(tampil){
             display = '';
             _class = '';
@@ -3620,6 +4267,190 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 <label for="pokin-level-${id}">Pokin Level ${id}</label> 
                 <select class="form-control" multiple name="pokin-level-${id}" id="pokin-level-${id}" disabled> 
                 </select> 
+            </div>
+        `;
+    }
+
+    function parent_label_cascading(parentData, currentLevel) {
+        if (!parentData || parentData.length === 0) return;
+        
+        if (parentData.length >= 1) {
+            let level1Data = parentData[0];
+            
+            if (level1Data.label_cascading_sasaran) {
+                jQuery('#parent-cascading-sasaran').val(level1Data.label_cascading_sasaran);
+            }
+            
+            if (level1Data.kode_cascading_sasaran) {
+                console.log('Mencari tujuan untuk kode sasaran:', level1Data.kode_cascading_sasaran);
+                
+                let tujuan_teks = get_tujuan_from_sasaran(level1Data.kode_cascading_sasaran, true);
+                
+                if (tujuan_teks) {
+                    console.log('Tujuan ditemukan:', tujuan_teks);
+                    jQuery('#parent-cascading-tujuan').val(tujuan_teks);
+                } else {
+                    console.log('Tujuan tidak ditemukan');
+                    get_cascading_tujuan_from_sasaran(
+                        level1Data.kode_cascading_sasaran, 
+                        level1Data.id_skpd || <?php echo $id_skpd; ?>,
+                        id_jadwal_wpsipd
+                    ).then(function(tujuan) {
+                        if (tujuan) {
+                            console.log('Tujuan:', tujuan);
+                            jQuery('#parent-cascading-tujuan').val(tujuan);
+                        }
+                    });
+                }
+            }
+            
+            if (level1Data.input_rencana_pagu_level == 1) {
+                
+                if (level1Data.label_cascading_program && level1Data.kode_cascading_program) {
+                    let programLabel = level1Data.kode_cascading_program + ' ' + level1Data.label_cascading_program;
+                    jQuery('#parent-cascading-program').val(programLabel);
+                }
+                
+                if (level1Data.label_cascading_kegiatan && level1Data.kode_cascading_kegiatan) {
+                    let kegiatanLabel = level1Data.kode_cascading_kegiatan + ' ' + level1Data.label_cascading_kegiatan;
+                    jQuery('#parent-cascading-kegiatan').val(kegiatanLabel);
+                }
+                
+                if (level1Data.label_cascading_sub_kegiatan && level1Data.kode_cascading_sub_kegiatan) {
+                    let subKegiatanLabel = level1Data.kode_cascading_sub_kegiatan + ' ' + level1Data.label_cascading_sub_kegiatan;
+                    jQuery('#parent-cascading-sub-kegiatan').val(subKegiatanLabel);
+                }
+            }
+        }
+        
+        if (currentLevel >= 3 && parentData.length >= 2) {
+            let level2Data = parentData[1];
+            
+            if (level2Data.label_cascading_program) {
+                let programLabel = level2Data.kode_cascading_program + ' ' + level2Data.label_cascading_program;
+                jQuery('#parent-cascading-program').val(programLabel);
+            }
+            
+            if (level2Data.input_rencana_pagu_level == 1) {
+                
+                if (level2Data.label_cascading_kegiatan && level2Data.kode_cascading_kegiatan) {
+                    let kegiatanLabel = level2Data.kode_cascading_kegiatan + ' ' + level2Data.label_cascading_kegiatan;
+                    jQuery('#parent-cascading-kegiatan').val(kegiatanLabel);
+                }
+                
+                if (level2Data.label_cascading_sub_kegiatan && level2Data.kode_cascading_sub_kegiatan) {
+                    let subKegiatanLabel = level2Data.kode_cascading_sub_kegiatan + ' ' + level2Data.label_cascading_sub_kegiatan;
+                    jQuery('#parent-cascading-sub-kegiatan').val(subKegiatanLabel);
+                }
+            }
+        }
+        
+        if (currentLevel == 4 && parentData.length >= 3) {
+            let level3Data = parentData[2];
+            
+            if (level3Data.label_cascading_kegiatan) {
+                let kegiatanLabel = level3Data.kode_cascading_kegiatan + ' ' + level3Data.label_cascading_kegiatan;
+                jQuery('#parent-cascading-kegiatan').val(kegiatanLabel);
+            }
+            
+            if (level3Data.input_rencana_pagu_level == 1) {
+                
+                if (level3Data.label_cascading_sub_kegiatan && level3Data.kode_cascading_sub_kegiatan) {
+                    let subKegiatanLabel = level3Data.kode_cascading_sub_kegiatan + ' ' + level3Data.label_cascading_sub_kegiatan;
+                    jQuery('#parent-cascading-sub-kegiatan').val(subKegiatanLabel);
+                }
+            }
+        }
+    }
+
+    function get_parent_cascading_data(parent_id) {
+        return new Promise(function(resolve, reject) {
+            if (!parent_id || parent_id == 0) {
+                resolve(null);
+                return;
+            }
+            
+            jQuery.ajax({
+                url: esakip.url,
+                type: 'POST',
+                data: {
+                    action: 'get_rencana_aksi',
+                    api_key: esakip.api_key,
+                    id: parent_id,
+                    tahun_anggaran: '<?php echo $input['tahun'] ?>'
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status == 'success' && response.data != null) {
+                        if (!response.data.id_parent && response.data.parent) {
+                            response.data.id_parent = response.data.parent;
+                        }
+                        resolve(response.data);
+                    } else {
+                        resolve(null);
+                    }
+                },
+                error: function() {
+                    resolve(null);
+                }
+            });
+        });
+    }
+
+    function get_all_parent_cascading(parent_id, level) {
+        return new Promise(function(resolve, reject) {
+            let parents = [];
+            
+            function fetchParent(id, currentLevel) {
+                if (!id || id == 0 || currentLevel < 1) {
+                    resolve(parents);
+                    return;
+                }
+                
+                get_parent_cascading_data(id).then(function(data) {
+                    if (data) {
+                        parents.unshift(data);
+                        let nextParentId = data.id_parent || data.parent || 0;
+                        fetchParent(nextParentId, currentLevel - 1);
+                    } else {
+                        resolve(parents);
+                    }
+                });
+            }
+            
+            fetchParent(parent_id, level);
+        });
+    }
+
+    function tampil_parent_cascading(id, tampil=false){
+        var display = 'display: none;';
+        if(tampil){
+            display = '';
+        }
+        var label = '';
+        var id_html = '';
+        
+        if(id == 'tujuan'){
+            id_html = 'parent-cascading-tujuan';
+            label = 'Tujuan';
+        }else if(id == 'sasaran'){
+            id_html = 'parent-cascading-sasaran';
+            label = 'Sasaran';
+        }else if(id == 'program'){
+            id_html = 'parent-cascading-program';
+            label = 'Program';  
+        }else if(id == 'kegiatan'){
+            id_html = 'parent-cascading-kegiatan';
+            label = 'Kegiatan';
+        }else if(id == 'sub-kegiatan'){
+            id_html = 'parent-cascading-sub-kegiatan';
+            label = 'Sub Kegiatan';            
+        }
+        
+        return `
+            <div class="form-group" style="${display}"> 
+                <label for="${id_html}">Cascading ${label}</label> 
+                <input type="text" class="form-control" name="${id_html}" id="${id_html}" disabled> 
             </div>
         `;
     }
@@ -3704,21 +4535,18 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 jenis = "sasaran";
                 jenis_cascading = "Sasaran";
                 break;
-
             case 2:
                 jenis = "program";
                 jenis_cascading = "Program";
                 parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
                 id_sub_skpd_cascading = jQuery('#tabel_rencana_aksi').attr('parent_sub_skpd');
                 break;
-
             case 3:
                 jenis = "kegiatan";
                 jenis_cascading = "Kegiatan";
                 parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
                 id_sub_skpd_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_sub_skpd');
                 break;
-
             case 4:
                 jenis = "sub_kegiatan";
                 jenis_cascading = "Sub Kegiatan";
@@ -3727,318 +4555,473 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 break;
         }
 
-        return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
-        .then(function() {
-            return new Promise(function(resolve, reject) {
-                var parent_pokin = '';
-                var parent_renaksi = '';
-                var level_pokin = 0;
-                var title = '';
-                var key = jenis + '-' + parent_cascading;
-                if (id_sub_skpd_cascading != 0) {
-                    key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
-                }
-                let data_cascading = [];
+        // Ambil data parent untuk level 2-4
+        let parent_renaksi_id = 0;
+        if (tipe == 2) {
+            parent_renaksi_id = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+        } else if (tipe == 3) {
+            parent_renaksi_id = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+        } else if (tipe == 4) {
+            parent_renaksi_id = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+        }
 
-                let get_renaksi_pemda = <?php echo json_encode($get_data_pemda); ?>;
-                let checklist_renaksi_pemda = '';
-                let html_input_sub_keg_cascading = '';
-                let html_pokin_input_rencana_pagu = '';
-                let html_cascading_turunan = '';
-                let html_cascading_turunan_id = '';
-                var hide_pagu_level1 = '';
-                var hide_cek_parent_global = '';
+        let parentDataRenaksi = Promise.resolve([]);
+        if (tipe > 1 && parent_renaksi_id) {
+            parentDataRenaksi = get_all_parent_cascading(parent_renaksi_id, tipe - 1);
+        }
 
-                if(tipe == 1) {
-                    hide_pagu_level1 = 'display: none;';
-                    title = 'Kegiatan Utama | RHK Level 1';
-                    data_cascading = data_sasaran_cascading[key];
-                    level_pokin = 1;
-                    html_cascading_turunan_id = 'cascading-renstra';
-                    html_cascading_turunan = `onchange="
-                        var selectedOption = jQuery(this).find('option:selected');
-                        var id_unik = selectedOption.data('id-unik');
-                        if(id_unik) {
-                            tampilkan_pokin_dari_cascading(id_unik, 'sasaran');
+        return parentDataRenaksi.then(function(parentData) {
+            
+            return get_tujuan_sasaran_cascading(jenis, parent_cascading, id_sub_skpd_cascading)
+            .then(function() {
+                return new Promise(function(resolve, reject) {
+                    var parent_pokin = '';
+                    var parent_renaksi = '';
+                    var level_pokin = 0;
+                    var title = '';
+                    var key = jenis + '-' + parent_cascading;
+                    if (id_sub_skpd_cascading != 0) {
+                        key = jenis + '-' + parent_cascading + '-' + id_sub_skpd_cascading;
+                    }
+                    let data_cascading = [];
+
+                    let get_renaksi_pemda = <?php echo json_encode($get_data_pemda); ?>;
+                    let checklist_renaksi_pemda = '';
+                    let html_input_sub_keg_cascading = '';
+                    let html_pokin_input_rencana_pagu = '';
+                    let html_parent_cascading = '';
+                    let html_cascading_turunan = '';
+                    let html_cascading_turunan_id = '';
+                    var hide_pagu_level1 = '';
+                    var hide_cek_parent_global = '';
+
+                    var disabled_label_renaksi = '';
+
+                    let parent_has_input_pagu = false;
+                    if (parentData && parentData.length > 0) {
+                        parentData.forEach(function(parent) {
+                            if (parent && parent.input_rencana_pagu_level == 1) {
+                                parent_has_input_pagu = true;
+                            }
+                        });
+                    }
+
+                    if(tipe == 1) {
+                        hide_pagu_level1 = 'display: none;';
+                        title = 'Kegiatan Utama | RHK Level 1';
+                        data_cascading = data_sasaran_cascading[key];
+                        level_pokin = 1;
+                        html_cascading_turunan_id = 'cascading-renstra';
+                        html_cascading_turunan = `onchange="
+                            var selectedOption = jQuery(this).find('option:selected');
+                            var id_unik = selectedOption.data('id-unik');
+                            var tujuan_teks = selectedOption.data('tujuan-teks');
+                            
+                            if(tujuan_teks) {
+                                jQuery('#parent-cascading-tujuan').val(tujuan_teks);
+                            } else {
+                                jQuery('#parent-cascading-tujuan').val('');
+                            }
+                            
+                            if(id_unik) {
+                                tampilkan_pokin_dari_cascading(id_unik, 'sasaran');
+                            }
+                            get_cascading_input_rencana_pagu('program');
+                            
+                            var selectedText = selectedOption.text();
+                            var selectedValue = selectedOption.val();
+                            if(selectedValue && selectedText) {
+                                jQuery('#label_renaksi').empty();
+                                var newOption = new Option(selectedText, selectedText, true, true);
+                                jQuery('#label_renaksi').append(newOption).trigger('change');
+                            } else {
+                                jQuery('#label_renaksi').empty().trigger('change');
+                            }
+                        "`;
+                        
+                        html_pokin_input_rencana_pagu += tampil_pokin(1, false);
+                        html_pokin_input_rencana_pagu += tampil_pokin(2, false);
+                        html_pokin_input_rencana_pagu += tampil_pokin(3, false);
+                        html_pokin_input_rencana_pagu += tampil_pokin(4, false);
+                        html_pokin_input_rencana_pagu += tampil_pokin(5, false);
+
+                        html_parent_cascading += tampil_parent_cascading('tujuan', true);
+                        html_input_sub_keg_cascading += tampil_cascading('program', false);
+                        html_input_sub_keg_cascading += tampil_cascading('kegiatan', false);
+                        html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
+                        
+                        disabled_label_renaksi = 'disabled';
+                        
+                    }else if(tipe == 2) {
+                        title = 'Rencana Hasil Kerja | RHK Level 2';
+                        data_cascading = data_program_cascading[key];
+                        parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
+                        parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
+                        level_pokin = 3;
+                        html_pokin_input_rencana_pagu += tampil_pokin(3, false);
+                        html_pokin_input_rencana_pagu += tampil_pokin(4, false);
+                        html_pokin_input_rencana_pagu += tampil_pokin(5, false);
+
+                        html_parent_cascading += tampil_parent_cascading('tujuan', true);
+                        html_parent_cascading += tampil_parent_cascading('sasaran', true);
+                        
+                        if (parent_has_input_pagu) {
+                            html_parent_cascading += tampil_parent_cascading('program', true);
+                            html_parent_cascading += tampil_parent_cascading('kegiatan', true);
+                            html_parent_cascading += tampil_parent_cascading('sub-kegiatan', true);
                         }
-                        get_cascading_input_rencana_pagu('program');
-                    "`;
-                    
-                    html_pokin_input_rencana_pagu += tampil_pokin(1, true);
-                    html_pokin_input_rencana_pagu += tampil_pokin(2, true);
-                    html_pokin_input_rencana_pagu += tampil_pokin(3, false);
-                    html_pokin_input_rencana_pagu += tampil_pokin(4, false);
-                    html_pokin_input_rencana_pagu += tampil_pokin(5, false);
+                        
+                        html_input_sub_keg_cascading += tampil_cascading('kegiatan', false);
+                        html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
 
-                    html_input_sub_keg_cascading += tampil_cascading('program', false);
-                    html_input_sub_keg_cascading += tampil_cascading('kegiatan', false);
-                    html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
-                }else if(tipe == 2) {
-                    title = 'Rencana Hasil Kerja | RHK Level 2';
-                    data_cascading = data_program_cascading[key];
-                    parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
-                    parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
-                    level_pokin = 3;
-                    html_pokin_input_rencana_pagu += tampil_pokin(3, true);
-                    html_pokin_input_rencana_pagu += tampil_pokin(4, false);
-                    html_pokin_input_rencana_pagu += tampil_pokin(5, false);
+                        html_cascading_turunan_id = 'cascading-renstra-program';
+                        html_cascading_turunan = `onchange="
+                            var selectedOption = jQuery(this).find('option:selected');
+                            var id_unik = selectedOption.data('id-unik');
+                            if(id_unik) {
+                                tampilkan_pokin_dari_cascading(id_unik, 'program');
+                            }
+                            get_cascading_input_rencana_pagu('kegiatan')
+                        "`;
+                        
+                        disabled_label_renaksi = '';
+                        
+                    }else if(tipe == 3) {
+                        level_pokin = 4;
+                        title = 'Uraian Rencana Hasil Kerja | RHK Level 3';
+                        parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
+                        parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
+                        data_cascading = data_kegiatan_cascading[key];
+                        
+                        html_pokin_input_rencana_pagu += tampil_pokin(4, false);
+                        html_pokin_input_rencana_pagu += tampil_pokin(5, false);
 
-                    html_input_sub_keg_cascading += tampil_cascading('kegiatan', false);
-                    html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
-
-                    html_cascading_turunan_id = 'cascading-renstra-program';
-                    html_cascading_turunan = `onchange="
-                        var selectedOption = jQuery(this).find('option:selected');
-                        var id_unik = selectedOption.data('id-unik');
-                        if(id_unik) {
-                            tampilkan_pokin_dari_cascading(id_unik, 'program');
+                        html_parent_cascading += tampil_parent_cascading('tujuan', true);
+                        html_parent_cascading += tampil_parent_cascading('sasaran', true);
+                        html_parent_cascading += tampil_parent_cascading('program', true);
+                        
+                        if (parent_has_input_pagu) {
+                            html_parent_cascading += tampil_parent_cascading('kegiatan', true);
+                            html_parent_cascading += tampil_parent_cascading('sub-kegiatan', true);
                         }
-                        get_cascading_input_rencana_pagu('kegiatan')
-                    "`;
-                }else if(tipe == 3) {
-                    level_pokin = 4;
-                    title = 'Uraian Rencana Hasil Kerja | RHK Level 3';
-                    parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
-                    parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
-                    data_cascading = data_kegiatan_cascading[key];
-                    
-                    html_pokin_input_rencana_pagu += tampil_pokin(4, true);
-                    html_pokin_input_rencana_pagu += tampil_pokin(5, false);
+                        
+                        html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
 
-                    html_input_sub_keg_cascading += tampil_cascading('sub-kegiatan', false);
+                        html_cascading_turunan_id = 'cascading-renstra-kegiatan';
+                        html_cascading_turunan = `onchange="
+                            var selectedOption = jQuery(this).find('option:selected');
+                            var id_unik = selectedOption.data('id-unik');
+                            if(id_unik) {
+                                tampilkan_pokin_dari_cascading(id_unik, 'kegiatan');
+                            }
+                            get_cascading_input_rencana_pagu('sub_kegiatan')
+                        "`;
+                        
+                        disabled_label_renaksi = '';
+                        
+                    } else if(tipe == 4) {
+                        level_pokin = 5;
+                        title = 'Uraian Teknis Kegiatan | RHK Level 4';
+                        parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
+                        parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
+                        data_cascading = data_sub_kegiatan_cascading[key];
+                        html_pokin_input_rencana_pagu += tampil_pokin(5, false);
 
-                    html_cascading_turunan_id = 'cascading-renstra-kegiatan';
-                    html_cascading_turunan = `onchange="
-                        var selectedOption = jQuery(this).find('option:selected');
-                        var id_unik = selectedOption.data('id-unik');
-                        if(id_unik) {
-                            tampilkan_pokin_dari_cascading(id_unik, 'kegiatan');
+                        html_parent_cascading += tampil_parent_cascading('tujuan', true);
+                        html_parent_cascading += tampil_parent_cascading('sasaran', true);
+                        html_parent_cascading += tampil_parent_cascading('program', true);
+                        html_parent_cascading += tampil_parent_cascading('kegiatan', true);
+                        
+                        if (parent_has_input_pagu) {
+                            html_parent_cascading += tampil_parent_cascading('sub-kegiatan', true);
                         }
-                        get_cascading_input_rencana_pagu('sub_kegiatan')
-                    "`;
-                    
-                } else if(tipe == 4) {
-                    level_pokin = 5;
-                    title = 'Uraian Teknis Kegiatan | RHK Level 4';
-                    parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
-                    parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
-                    data_cascading = data_sub_kegiatan_cascading[key];
-                    html_pokin_input_rencana_pagu += tampil_pokin(5, true);
-                    html_input_sub_keg_cascading = '';
-                    html_cascading_turunan_id = 'cascading-renstra-sub-kegiatan';
-                    html_cascading_turunan = `onchange="
-                        var selectedOption = jQuery(this).find('option:selected');
-                        var id_unik = selectedOption.data('id-unik');
-                        if(id_unik) {
-                            tampilkan_pokin_dari_cascading(id_unik, 'sub_kegiatan');
-                        }
-                        get_cascading_input_rencana_pagu()
-                    "`;
-                }
 
-                // menampilkan rhk pemda hanya di level 2 rhk opd
-                if (!isEdit && tipe === 2) {
-                    checklist_renaksi_pemda += `
-                        <label>Rencana Hasil Kerja Pemerintah Daerah</label>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"><input type="checkbox" id="select_all"></th>
-                                    <th>Sasaran Strategis</th>
-                                    <th>Indikator Kinerja</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-                    get_renaksi_pemda.forEach(function(item, index) {
-                        let label_sasaran = (item.id_iku && item.ik_label_sasaran) 
-                            ? item.ik_label_sasaran 
-                            : (item.label_sasaran || '');
+                        html_input_sub_keg_cascading = '';
+                        html_cascading_turunan_id = 'cascading-renstra-sub-kegiatan';
+                        html_cascading_turunan = `onchange="
+                            var selectedOption = jQuery(this).find('option:selected');
+                            var id_unik = selectedOption.data('id-unik');
+                            if(id_unik) {
+                                tampilkan_pokin_dari_cascading(id_unik, 'sub_kegiatan');
+                            }
+                            get_cascading_input_rencana_pagu()
+                        "`;
+                        
+                        disabled_label_renaksi = '';
+                    }
 
-                        let label_indikator = (item.id_iku && item.ik_label_indikator) 
-                            ? item.ik_label_indikator 
-                            : (item.label_indikator || '');
+                    // menampilkan rhk pemda hanya di level 2 rhk opd
+                    if (!isEdit && tipe === 2) {
                         checklist_renaksi_pemda += `
-                            <tr>
-                                <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}" name="checklist_renaksi_pemda[]" value="${label_sasaran}" id_label_renaksi_pemda="${item.id_detail}">
-                                    </td>
-                                <td>${label_sasaran}</td>
-                                <td>${label_indikator}</td>
-                            </tr>
+                            <label>Rencana Hasil Kerja Pemerintah Daerah</label>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center"><input type="checkbox" id="select_all"></th>
+                                        <th>Sasaran Strategis</th>
+                                        <th>Indikator Kinerja</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                         `;
+                        get_renaksi_pemda.forEach(function(item, index) {
+                            let label_sasaran = (item.id_iku && item.ik_label_sasaran) 
+                                ? item.ik_label_sasaran 
+                                : (item.label_sasaran || '');
+
+                            let label_indikator = (item.id_iku && item.ik_label_indikator) 
+                                ? item.ik_label_indikator 
+                                : (item.label_indikator || '');
+                            checklist_renaksi_pemda += `
+                                <tr>
+                                    <td><input class="text-right" type="checkbox" class="form-check-input" id="label_renaksi_pemda${index}" name="checklist_renaksi_pemda[]" value="${label_sasaran}" id_label_renaksi_pemda="${item.id_detail}">
+                                        </td>
+                                    <td>${label_sasaran}</td>
+                                    <td>${label_indikator}</td>
+                                </tr>
+                            `;
+                        });
+
+                        checklist_renaksi_pemda += '</tbody></table>';
+                    }
+
+                    if(typeof cek_parent_global == 'undefined'){
+                        window.cek_parent_global = {
+                            input_pagu: 0
+                        };
+                    }
+
+                    let html_setting_input_rencana_pagu = '';
+                    if(tipe != 4){
+                        var hide = 'style="display:none"';
+                        if(cek_parent_global.input_pagu == 0){
+                            hide = '';
+                        }
+                        html_setting_input_rencana_pagu = `
+                            <div class="form-group form-check" ${hide}>
+                                <label class="form-check-label" for="set_input_rencana_pagu">
+                                    <input class="form-check-input" type="checkbox" id="set_input_rencana_pagu" name="set_input_rencana_pagu">
+                                    Pengaturan Input Rencana Pagu
+                                </label>
+                                <small class="form-text text-muted">
+                                    Pengaturan Input Rencana Pagu Menjadikan Level Ini Menjadi Level RHK Terakhir.
+                                </small>
+                            </div>`;
+                    }
+
+                    if(cek_parent_global.input_pagu == 1){
+                        hide_cek_parent_global = 'display: none;'
+                    }
+
+                    jQuery('#wrap-loading').show();
+                    var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
+                    jQuery('#wrap-loading').hide();
+                    jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
+
+                    jQuery("#modal-crud").find('.modal-body').html(`
+                        <form>
+                            <input type="hidden" id="id_renaksi" value=""/>
+                            ${html_parent_cascading}
+                            ${html_pokin_input_rencana_pagu}
+                            <div class="form-group">
+                                <label for="satker_id">Pilih RHK / Uraian Cascading</label> 
+                                <select class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..." ${disabled_label_renaksi}></select>
+                            </div>
+                            <div class="form-group" style="${hide_cek_parent_global}">
+                                <label for="${html_cascading_turunan_id}">Pilih ${jenis_cascading} Cascading</label>
+                                <select class="form-control" name="${html_cascading_turunan_id}" id="${html_cascading_turunan_id}" ${html_cascading_turunan}></select>
+                            </div>
+                            ${ html_input_sub_keg_cascading }
+                            <div class="form-group" style="${hide_pagu_level1} ${hide_cek_parent_global}">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label for="sub-skpd-cascading">OPD Cascading</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <input class="form-control" type="text" id="sub-skpd-cascading" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="${hide_pagu_level1} ${hide_cek_parent_global}">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label for="pagu-cascading">Pagu Cascading</label>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <input class="form-control" type="text" id="pagu-cascading" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group"> 
+                                <label for="satker_id">Pilih Satuan Kerja</label> 
+                                    <select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?> 
+                                    </select> 
+                            </div> 
+                            <div class="form-group"> 
+                                <label for="pegawai">Pilih Pegawai Pelaksana</label> 
+                                    <select class="form-control select2" id="pegawai" name="pegawai"> ${get_pegawai}
+                                    </select> 
+                            </div> 
+                            ${html_setting_input_rencana_pagu}
+                            <?php if (!empty($get_data_pemda)): ?>
+                                ${checklist_renaksi_pemda}  
+                            <?php endif; ?>
+                        </form>
+                    `);
+                    set_dasar_pelaksanaan();
+
+                    jQuery("#modal-crud").find('.modal-footer').html(`
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-success" onclick="simpan_data_renaksi(${tipe})">Simpan</button>
+                    `);
+
+                    jQuery('#select_all').on('click', function() {
+                        var isChecked = this.checked;
+                        jQuery('input[name="checklist_renaksi_pemda[]"]').prop('checked', isChecked);
                     });
 
-                    checklist_renaksi_pemda += '</tbody></table>';
-                }
+                    jQuery('input[name="checklist_renaksi_pemda[]"]').on('change', function() {
+                        var allChecked = jQuery('input[name="checklist_renaksi_pemda[]"]').length === jQuery('input[name="checklist_renaksi_pemda[]"]:checked').length;
+                        jQuery('#select_all').prop('checked', allChecked);
+                    });
+                    jQuery("#modal-crud").modal('show');
 
-                // ketika tipe 1, masih undefined
-                if(typeof cek_parent_global == 'undefined'){
-                    window.cek_parent_global = {
-                        input_pagu: 0
-                    };
-                }
-
-                let html_setting_input_rencana_pagu = '';
-                if(tipe != 4){
-                    var hide = 'style="display:none"';
-
-                    // jika parent rhk tidak ada yang input pagu maka checklist input pagu ditampilkan
-                    if(cek_parent_global.input_pagu == 0){
-                        hide = '';
-                    }
-                    html_setting_input_rencana_pagu = `
-                        <div class="form-group form-check" ${hide}>
-                            <label class="form-check-label" for="set_input_rencana_pagu">
-                                <input class="form-check-input" type="checkbox" id="set_input_rencana_pagu" name="set_input_rencana_pagu">
-                                Pengaturan Input Rencana Pagu
-                            </label>
-                            <small class="form-text text-muted">
-                                Pengaturan Input Rencana Pagu Menjadikan Level Ini Menjadi Level RHK Terakhir.
-                            </small>
-                        </div>`;
-                }
-
-                // sembunyikan pilihan cascading jika parent sudah diset input pagu
-                if(cek_parent_global.input_pagu == 1){
-                    hide_cek_parent_global = 'display: none;'
-                }
-
-                jQuery('#wrap-loading').show();
-                
-                var get_pegawai = <?php echo json_encode($select_pegawai); ?>;
-                jQuery('#wrap-loading').hide();
-                jQuery("#modal-crud").find('.modal-title').html('Tambah ' + title);
-
-                jQuery("#modal-crud").find('.modal-body').html(`
-                    <form>
-                        <input type="hidden" id="id_renaksi" value=""/>
-                        ${html_pokin_input_rencana_pagu}
-                        <div class="form-group">
-                            <textarea class="form-control" name="label" id="label_renaksi" placeholder="Tuliskan ${title}..."></textarea>
-                        </div>
-                        <div class="form-group" style="${hide_cek_parent_global}">
-                            <label for="${html_cascading_turunan_id}">Pilih ${jenis_cascading} Cascading</label>
-                            <select class="form-control" name="${html_cascading_turunan_id}" id="${html_cascading_turunan_id}" ${html_cascading_turunan}></select>
-                        </div>
-                        ${ html_input_sub_keg_cascading }
-                        <div class="form-group" style="${hide_pagu_level1} ${hide_cek_parent_global}">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label for="sub-skpd-cascading">OPD Cascading</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input class="form-control" type="text" id="sub-skpd-cascading" disabled>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group" style="${hide_pagu_level1} ${hide_cek_parent_global}">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label for="pagu-cascading">Pagu Cascading</label>
-                                </div>
-                                <div class="col-md-9">
-                                    <input class="form-control" type="text" id="pagu-cascading" disabled>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group"> 
-                            <label for="satker_id">Pilih Satuan Kerja</label> 
-                                <select class="form-control select2" id="satker_id" name="satker_id"><?php echo $select_satker; ?> 
-                                </select> 
-                        </div> 
-                        <div class="form-group"> 
-                            <label for="pegawai">Pilih Pegawai Pelaksana</label> 
-                                <select class="form-control select2" id="pegawai" name="pegawai"> ${get_pegawai}
-                                </select> 
-                        </div> 
-                        ${html_setting_input_rencana_pagu}
-                        <?php if (!empty($get_data_pemda)): ?>
-                            ${checklist_renaksi_pemda}  
-                        <?php endif; ?>
-                    </form>
-                `);
-                set_dasar_pelaksanaan();
-
-                jQuery("#modal-crud").find('.modal-footer').html(`
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-success" onclick="simpan_data_renaksi(${tipe})">Simpan</button>
-                `);
-
-                jQuery('#select_all').on('click', function() {
-                    var isChecked = this.checked;
-                    jQuery('input[name="checklist_renaksi_pemda[]"]').prop('checked', isChecked);
-                });
-
-                jQuery('input[name="checklist_renaksi_pemda[]"]').on('change', function() {
-                    var allChecked = jQuery('input[name="checklist_renaksi_pemda[]"]').length === jQuery('input[name="checklist_renaksi_pemda[]"]:checked').length;
-                    jQuery('#select_all').prop('checked', allChecked);
-                });
-                jQuery("#modal-crud").modal('show');
-
-                jQuery('#pokin-level-1').select2({
-                    width: '100%'
-                });
-                jQuery('#pokin-level-2').select2({
-                    width: '100%'
-                });
-                jQuery('#pokin-level-3').select2({
-                    width: '100%'
-                });
-                jQuery('#pokin-level-4').select2({
-                    width: '100%'
-                });
-                jQuery('#pokin-level-5').select2({
-                    width: '100%'
-                });
-                jQuery('#satker_id').select2({
-                    width: '100%'
-                });
-                jQuery('#pegawai').select2({
-                    width: '100%'
-                });
-                
-                if (data_cascading && Array.isArray(data_cascading.data)) {
-                    let html_cascading = '<option value="">Pilih ' + jenis_cascading + ' Cascading</option>';
-                    data_cascading.data.map(value => {
-                        if (value.id_unik_indikator == null) {
-                            switch (tipe) {
-                                case 1:
-                                    html_cascading += '<option value="' + value.kode_bidang_urusan + '" data-id-unik="' + value.id_unik + '">' + value.sasaran_teks + '</option>';
-                                    break;
-                                case 2:
-                                    let id_unik_program = '';
-                                    if (value.get_pokin_renstra && value.get_pokin_renstra.length > 0) {
-                                        id_unik_program = value.get_pokin_renstra.map(p => p.id_unik).join(',');
-                                    }
-                                    html_cascading += `<option value="${value.kode_program}_${value.id_sub_skpd}" data-id-unik="${id_unik_program}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_program} ${value.nama_program} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
-                                    break;
-                                case 3:
-                                    let id_unik_kegiatan = '';
-                                    if (value.get_pokin_renstra && value.get_pokin_renstra.length > 0) {
-                                        id_unik_kegiatan = value.get_pokin_renstra.map(p => p.id_unik).join(',');
-                                    }
-                                    html_cascading += `<option value="${value.kode_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-id-unik="${id_unik_kegiatan}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_giat} ${value.nama_giat} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
-                                    break;
-                                case 4:
-                                    let id_unik_sub_kegiatan = '';
-                                    if (value.get_pokin_renstra && value.get_pokin_renstra.length > 0) {
-                                        id_unik_sub_kegiatan = value.get_pokin_renstra.map(p => p.id_unik).join(',');
-                                    }
-                                    let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
-                                    html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-unik="${id_unik_sub_kegiatan}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
-                                    break;
+                    jQuery('#pokin-level-1').select2({ width: '100%' });
+                    jQuery('#pokin-level-2').select2({ width: '100%' });
+                    jQuery('#pokin-level-3').select2({ width: '100%' });
+                    jQuery('#pokin-level-4').select2({ width: '100%' });
+                    jQuery('#pokin-level-5').select2({ width: '100%' });
+                    jQuery('#satker_id').select2({ width: '100%' });
+                    jQuery('#pegawai').select2({ width: '100%' });
+                    jQuery('#label_renaksi').select2({ width: '100%' });
+                    jQuery('#cascading-renstra').off('change').on('change', function() {
+                        let cascading_id = jQuery(this).val();
+                        
+                        // Di level 1, selalu update label dari sasaran
+                        if (tipe == 1 && cascading_id) {
+                            get_label_renaksi_from_cascading('sasaran', cascading_id);
+                        }
+                    });
+                    
+                    jQuery('#cascading-renstra-program').off('change').on('change', function() {
+                        let cascading_id = jQuery(this).val();
+                        
+                        if (!cascading_id) {
+                            return;
+                        }
+                        
+                        // Update label program jika:
+                        // 1. Di level 2 (tanpa perlu cek Input Pagu)
+                        // 2. Di level 1 HANYA jika Input Pagu dicentang
+                        if (tipe == 2) {
+                            get_label_renaksi_from_cascading('program', cascading_id);
+                        } else if (tipe == 1 && jQuery('#set_input_rencana_pagu').is(':checked')) {
+                            get_label_renaksi_from_cascading('program', cascading_id);
+                        }
+                    });
+                    
+                    jQuery('#cascading-renstra-kegiatan').off('change').on('change', function() {
+                        let cascading_id = jQuery(this).val();
+                        
+                        if (!cascading_id) {
+                            return;
+                        }
+                        
+                        // Update label kegiatan jika:
+                        // 1. Di level 3 (tanpa perlu cek Input Pagu)
+                        // 2. Di level 1-2 HANYA jika Input Pagu dicentang
+                        if (tipe == 3) {
+                            get_label_renaksi_from_cascading('kegiatan', cascading_id);
+                        } else if ((tipe == 1 || tipe == 2) && jQuery('#set_input_rencana_pagu').is(':checked')) {
+                            get_label_renaksi_from_cascading('kegiatan', cascading_id);
+                        }
+                    });
+                    
+                    jQuery('#cascading-renstra-sub-kegiatan').off('change').on('change', function() {
+                        let cascading_id = jQuery(this).val();
+                        
+                        if (!cascading_id) {
+                            return;
+                        }
+                        
+                        // Update label sub kegiatan jika:
+                        // 1. Di level 4 (tanpa perlu cek Input Pagu)
+                        // 2. Di level 1-3 HANYA jika Input Pagu dicentang
+                        if (tipe == 4) {
+                            get_label_renaksi_from_cascading('sub_kegiatan', cascading_id);
+                        } else if ((tipe == 1 || tipe == 2 || tipe == 3) && jQuery('#set_input_rencana_pagu').is(':checked')) {
+                            get_label_renaksi_from_cascading('sub_kegiatan', cascading_id);
+                        }
+                    });
+                    
+                    // Setup checkbox Input Rencana Pagu
+                    jQuery('#set_input_rencana_pagu').off('change').on('change', function() {
+                        let isChecked = jQuery(this).is(':checked');
+                        
+                        // Label hanya berubah saat onChange cascading                        
+                        if (!isChecked) {
+                            // Ketika tidak dicentang, kembalikan ke mode normal sesuai level
+                            // Update label sesuai cascading level saat ini (hanya jika sudah dipilih)
+                            if (tipe == 1 && jQuery('#cascading-renstra').val()) {
+                                get_label_renaksi_from_cascading('sasaran', jQuery('#cascading-renstra').val());
+                            } else if (tipe == 2 && jQuery('#cascading-renstra-program').val()) {
+                                get_label_renaksi_from_cascading('program', jQuery('#cascading-renstra-program').val());
+                            } else if (tipe == 3 && jQuery('#cascading-renstra-kegiatan').val()) {
+                                get_label_renaksi_from_cascading('kegiatan', jQuery('#cascading-renstra-kegiatan').val());
+                            } else if (tipe == 4 && jQuery('#cascading-renstra-sub-kegiatan').val()) {
+                                get_label_renaksi_from_cascading('sub_kegiatan', jQuery('#cascading-renstra-sub-kegiatan').val());
                             }
                         }
                     });
-                    jQuery("#"+html_cascading_turunan_id).html(html_cascading);
-                    jQuery('#'+html_cascading_turunan_id).select2({
-                        width: '100%'
-                    });
-                } else {
-                    alert("Data Cascading Kosong!");
-                }
+                    if (data_cascading && Array.isArray(data_cascading.data)) {
+                        let html_cascading = '<option value="">Pilih ' + jenis_cascading + ' Cascading</option>';
+                        data_cascading.data.map(value => {
+                            if (value.id_unik_indikator == null) {
+                                switch (tipe) {
+                                    case 1:
+                                        html_cascading += '<option value="' + value.kode_bidang_urusan + '" data-id-unik="' + value.id_unik + '"data-id-sasaran="' + value.id + '" data-tujuan-teks="' + (value.tujuan_teks || '') + '">' + value.sasaran_teks + '</option>';
+                                        break;
+                                    case 2:
+                                        let id_unik_program = '';
+                                        if (value.get_pokin_renstra && value.get_pokin_renstra.length > 0) {
+                                            id_unik_program = value.get_pokin_renstra.map(p => p.id_unik).join(',');
+                                        }
+                                        html_cascading += `<option value="${value.kode_program}_${value.id_sub_skpd}" data-id-unik="${id_unik_program}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_program} ${value.nama_program} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
+                                        break;
+                                    case 3:
+                                        let id_unik_kegiatan = '';
+                                        if (value.get_pokin_renstra && value.get_pokin_renstra.length > 0) {
+                                            id_unik_kegiatan = value.get_pokin_renstra.map(p => p.id_unik).join(',');
+                                        }
+                                        html_cascading += `<option value="${value.kode_giat}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-id-unik="${id_unik_kegiatan}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${value.kode_giat} ${value.nama_giat} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )</option>`;
+                                        break;
+                                    case 4:
+                                        let id_unik_sub_kegiatan = '';
+                                        if (value.get_pokin_renstra && value.get_pokin_renstra.length > 0) {
+                                            id_unik_sub_kegiatan = value.get_pokin_renstra.map(p => p.id_unik).join(',');
+                                        }
+                                        let nama_sub_giat = `${value.kode_sub_giat} ${value.nama_sub_giat.replace(value.kode_sub_giat, '')} ( ${value.kode_sub_skpd} ${value.nama_sub_skpd} | Rp. ${formatRupiah(value.pagu)} )`;
+                                        html_cascading += `<option data-kodesbl="${value.kode_sbl}" value="${value.kode_sub_giat}" data-id-unik="${id_unik_sub_kegiatan}" data-id-sub-skpd-cascading="${value.id_sub_skpd}" data-nama-sub-skpd="${value.kode_sub_skpd} ${value.nama_sub_skpd}" data-pagu-cascading="${value.pagu}">${nama_sub_giat}</option>`;
+                                        break;
+                                }
+                            }
+                        });
+                        jQuery("#"+html_cascading_turunan_id).html(html_cascading);
+                        jQuery('#'+html_cascading_turunan_id).select2({ width: '100%' });
+                    } else {
+                        alert("Data Cascading Kosong!");
+                    }
 
-                resolve();
+                    if (tipe > 1 && parentData.length > 0) {
+                        parent_label_cascading(parentData, tipe);
+                    }
+
+                    if(tipe >= 2) {
+                        jQuery('#label_renaksi').empty().trigger('change');
+                    }
+
+                    resolve();
+                });
             });
         });
     }
@@ -4209,10 +5192,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         var parent_sub_skpd = 0;
         var kode_cascading_renstra = '';
         var label_cascading_renstra = '';
+        var id_cascading = '';
         switch (tipe) {
             case 1:
                 kode_cascading_renstra = jQuery('#cascading-renstra').val();
                 label_cascading_renstra = jQuery('#cascading-renstra option:selected').text();
+                id_cascading = jQuery('#cascading-renstra option:selected').data('id-sasaran');
                 break;
             case 2:
                 kode_cascading_renstra = jQuery('#cascading-renstra-program').val();
@@ -4227,6 +5212,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     }
                 }
 
+                id_cascading = jQuery('#label_renaksi').val() || 0;
                 parent_pokin = jQuery('#tabel_rencana_aksi').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_rencana_aksi').attr('parent_renaksi');
                 parent_cascading = jQuery('#tabel_rencana_aksi').attr('parent_cascading');
@@ -4244,6 +5230,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     }
                 }
 
+                id_cascading = jQuery('#label_renaksi').val() || 0;
                 parent_pokin = jQuery('#tabel_uraian_rencana_aksi').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_rencana_aksi').attr('parent_renaksi');
                 parent_cascading = jQuery('#tabel_uraian_rencana_aksi').attr('parent_cascading');
@@ -4262,6 +5249,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     }
                 }
 
+                id_cascading = jQuery('#label_renaksi').val() || 0;
                 parent_pokin = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_pokin');
                 parent_renaksi = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_renaksi');
                 parent_cascading = jQuery('#tabel_uraian_teknis_kegiatan').attr('parent_cascading');
@@ -4275,6 +5263,49 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         var label_pokin_2 = jQuery('#pokin-level-2 option:selected').text();
         var label_renaksi = jQuery('#label_renaksi').val();
         var setting_input_rencana_pagu = jQuery('#set_input_rencana_pagu').is(':checked') ? 1 : 0;
+        if (setting_input_rencana_pagu == 1) {
+            var kode_sub_kegiatan_check = jQuery('#cascading-renstra-sub-kegiatan').val();
+            if (!kode_sub_kegiatan_check || kode_sub_kegiatan_check == '') {
+                return alert('Jika Pengaturan Input Rencana Pagu dicentang, Sub Kegiatan Cascading wajib diisi!');
+            }
+        }
+        var label_renaksi = jQuery('#label_renaksi option:selected').text();
+        if (tipe >= 2) {
+            if (setting_input_rencana_pagu == 1) {
+                // Jika input pagu dicentang, harus pilih dari dropdown uraian cascading
+                if (!label_renaksi || label_renaksi == '') {
+                    return alert('Silakan pilih Uraian Cascading dari Sub Kegiatan terlebih dahulu!');
+                }
+            } else {
+                // Jika input pagu tidak dicentang, validasi sesuai level
+                if (!label_renaksi || label_renaksi == '') {
+                    var pesan = '';
+                    if (tipe == 2) pesan = 'Uraian Cascading Program';
+                    else if (tipe == 3) pesan = 'Uraian Cascading Kegiatan';
+                    else if (tipe == 4) pesan = 'Uraian Cascading Sub Kegiatan';
+                    
+                    return alert('Silakan pilih ' + pesan + ' terlebih dahulu!');
+                }
+            }
+        }
+        
+        if (tipe == 1) {
+            if (label_renaksi == '') {
+                return alert('Kegiatan Utama tidak boleh kosong!');
+            }
+        } else if (tipe == 2) {
+            if (label_renaksi == '') {
+                return alert('Rencana Hasil Kerja tidak boleh kosong!');
+            }
+        } else if (tipe == 3) {
+            if (label_renaksi == '') {
+                return alert('Uraian Kegiatan tidak boleh kosong!');
+            }
+        } else if (tipe == 4) {
+            if (label_renaksi == '') {
+                return alert('Uraian Teknis Kegiatan tidak boleh kosong!');
+            }
+        }
         
         var id_sub_skpd_cascading = 0;
         var pagu_cascading = 0;
@@ -4440,6 +5471,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 "label_pokin_4": label_pokin_4,
                 "id_pokin_5": id_pokin_5,
                 "label_pokin_5": label_pokin_5,
+                "id_uraian_cascading": id_cascading
             },
             dataType: "json",
             success: function(res) {
@@ -4823,9 +5855,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         jQuery('#detail_uraian_kegiatan').hide();
                         jQuery('label[for="detail_uraian_tk"]').hide();
                         jQuery('#detail_uraian_tk').hide();
-                        jQuery('label[for="detail_pokin_2"]').show();
+                        jQuery('label[for="detail_pokin_1"]').show();
                         var pokin_1 = response.get_pokin_2.map(pokin => pokin.pokin_label).join(" - ");
-                        jQuery('#detail_pokin_2').val(pokin_1).show();
+                        jQuery('#detail_pokin_1').val(pokin_1).show();
                         jQuery('label[for="detail_pokin_2"]').show();
                         var pokin_2 = response.get_pokin_2.map(pokin => pokin.pokin_label).join(" - ");
                         jQuery('#detail_pokin_2').val(pokin_2).show();

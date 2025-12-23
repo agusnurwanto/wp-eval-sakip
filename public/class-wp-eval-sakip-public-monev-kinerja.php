@@ -412,70 +412,81 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	function cek_validasi_input_rencana_pagu($return)
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil cek rencana pagu RHK!',
-			'rencana_pagu'  => 0,
-			'ids' => array(),
-			'ids_indikator' => array()
-		);
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil cek rencana pagu RHK!',
+            'rencana_pagu'  => 0,
+            'ids' => array(),
+            'ids_indikator' => array(),
+            'data_rhk'  => 0
+        );
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				$cek_rhk_level_turunan = $this->get_rhk_child(array(
-					'id' => $_POST['id'],
-					'tahun' => $_POST['tahun_anggaran'],
-					'check_input_pagu' => true
-				));
-				$ret['cek_rhk_level_turunan'] = $cek_rhk_level_turunan;
-				$rencana_pagu = 0;
-				foreach ($cek_rhk_level_turunan as $level => $rhk_all) {
-					foreach ($rhk_all as $rhk) {
-						$pagu_all = $wpdb->get_results($wpdb->prepare("
-							SELECT
-								i.id as id_indikator,
-								s.id,
-								s.rencana_pagu
-							FROM esakip_data_rencana_aksi_indikator_opd as i
-							INNER JOIN esakip_sumber_dana_indikator as s on i.id=s.id_indikator
-								AND s.active=i.active
-								AND s.tahun_anggaran=i.tahun_anggaran
-							WHERE i.id_renaksi=%d
-								AND i.active=1
-								AND i.tahun_anggaran=%d
-						", $rhk['id'], $rhk['tahun_anggaran']), ARRAY_A);
-						foreach ($pagu_all as $pagu) {
-							$ret['rencana_pagu'] += $pagu['rencana_pagu'];
-							$ret['ids'][] = $pagu['id'];
-							$ret['ids_indikator'][$pagu['id_indikator']] = $pagu['id_indikator'];
-						}
-					}
-				}
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                $cek_rhk_level_turunan = $this->get_rhk_child(array(
+                    'id' => $_POST['id'],
+                    'tahun' => $_POST['tahun_anggaran'],
+                    'check_input_pagu' => true
+                ));
+                $ret['cek_rhk_level_turunan'] = $cek_rhk_level_turunan;
+                $rencana_pagu = 0;
+                foreach ($cek_rhk_level_turunan as $level => $rhk_all) {
+                    foreach ($rhk_all as $rhk) {
+                        $pagu_all = $wpdb->get_results($wpdb->prepare("
+                            SELECT
+                                i.id as id_indikator,
+                                s.id,
+                                s.rencana_pagu
+                            FROM esakip_data_rencana_aksi_indikator_opd as i
+                            INNER JOIN esakip_sumber_dana_indikator as s on i.id=s.id_indikator
+                                AND s.active=i.active
+                                AND s.tahun_anggaran=i.tahun_anggaran
+                            WHERE i.id_renaksi=%d
+                                AND i.active=1
+                                AND i.tahun_anggaran=%d
+                        ", $rhk['id'], $rhk['tahun_anggaran']), ARRAY_A);
+                        foreach ($pagu_all as $pagu) {
+                            $ret['rencana_pagu'] += $pagu['rencana_pagu'];
+                            $ret['ids'][] = $pagu['id'];
+                            $ret['ids_indikator'][$pagu['id_indikator']] = $pagu['id_indikator'];
+                        }
+                    }
+                }
+                $data_rhk = $wpdb->get_results($wpdb->prepare("
+                    SELECT
+                        *
+                    FROM esakip_data_rencana_aksi_opd
+                    WHERE id=%d
+                        AND active=1
+                ", $_POST['id']), ARRAY_A);
+                if (!empty($data_rhk)) {
+                    $ret['data_rhk'] = $data_rhk;
+                }
 
-				if (!empty($ret['rencana_pagu'])) {
-					// Untuk validasi agar setting input rencana pagu tetap di level RHK paling akhir
-					$ret['status'] = 'error';
-					$ret['message'] = "Rencana pagu RHK sebesar Rp " . number_format($ret['rencana_pagu'], 0, ",", ".") . " sudah diinput di level bawahnya. Nilai pagu RHK level dibawah RHK ini akan di 0 kan atau dipindah ke RHK yang saat ini. Untuk rincian belanja perlu dipindahkan manual. Apakah kamu yakin untuk melanjutkan proses ini?";
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		if (!empty($return)) {
-			return $ret;
-		}
-		die(json_encode($ret));
-	}
+                if (!empty($ret['rencana_pagu'])) {
+                    // Untuk validasi agar setting input rencana pagu tetap di level RHK paling akhir
+                    $ret['status'] = 'error';
+                    $ret['message'] = "Rencana pagu RHK sebesar Rp " . number_format($ret['rencana_pagu'], 0, ",", ".") . " sudah diinput di level bawahnya. Nilai pagu RHK level dibawah RHK ini akan di 0 kan atau dipindah ke RHK yang saat ini. Untuk rincian belanja perlu dipindahkan manual. Apakah kamu yakin untuk melanjutkan proses ini?";
+                }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message'   => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message'   => 'Format tidak sesuai!'
+            );
+        }
+        if (!empty($return)) {
+            return $ret;
+        }
+        die(json_encode($ret));
+    }
 
 	function cek_input_pagu_parent($return)
 	{
@@ -585,6 +596,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
 				}
 
+				$id_uraian_cascading = !empty($_POST['id_uraian_cascading']) ? intval($_POST['id_uraian_cascading']) : NULL;
 				$kode_cascading_renstra = !empty($_POST['kode_cascading_renstra']) || $_POST['kode_cascading_renstra'] != NULL ? $_POST['kode_cascading_renstra'] : NULL;
 				$label_cascading_renstra = !empty($_POST['label_cascading_renstra']) || $_POST['label_cascading_renstra'] != NULL ? $_POST['label_cascading_renstra'] : NULL;
 
@@ -612,6 +624,56 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} else {
 					$setting_input_rencana_pagu = !empty($_POST['setting_input_rencana_pagu']) ? 1 : 0;
 				}
+
+				if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 1 && $_POST['level'] != 4) {
+	                $kode_sub_kegiatan = isset($_POST['kode_cascading_renstra_sub_kegiatan']) ? trim($_POST['kode_cascading_renstra_sub_kegiatan']) : '';
+	                
+	                if (empty($kode_sub_kegiatan)) {
+	                    $ret['status'] = 'error';
+	                    $ret['message'] = 'Jika Pengaturan Input Rencana Pagu dicentang, Sub Kegiatan Cascading wajib diisi!';
+	                }
+	            }
+	            
+	            if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 1) {
+	                $label_renaksi = isset($_POST['label_renaksi']) ? trim($_POST['label_renaksi']) : '';
+	                $id_uraian_cascading = isset($_POST['id_uraian_cascading']) ? intval($_POST['id_uraian_cascading']) : 0;
+	                
+	                if (empty($label_renaksi) || 
+	                    $label_renaksi == '' || 
+	                    $id_uraian_cascading == 0) {
+	                    $ret['status'] = 'error';
+	                    $ret['message'] = 'Jika Pengaturan Input Rencana Pagu dicentang, wajib memilih Uraian Cascading dari Sub Kegiatan!';
+	                }
+	            }
+	            
+	            if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 0) {
+	                if ($_POST['level'] == 1) {
+	                    if (empty($_POST['kode_cascading_renstra'])) {
+	                        $ret['status'] = 'error';
+	                        $ret['message'] = 'Sasaran Cascading tidak boleh kosong!';
+	                    }
+	                } else if ($_POST['level'] == 2) {
+	                    if (empty($_POST['kode_cascading_renstra'])) {
+	                        $ret['status'] = 'error';
+	                        $ret['message'] = 'Program Cascading tidak boleh kosong!';
+	                    }
+	                    $id_uraian_cascading = isset($_POST['id_uraian_cascading']) ? intval($_POST['id_uraian_cascading']) : 0;
+	                    if ($id_uraian_cascading == 0) {
+	                        $ret['status'] = 'error';
+	                        $ret['message'] = 'Uraian Cascading Program wajib dipilih!';
+	                    }
+	                } else if ($_POST['level'] == 3) {
+	                    if (empty($_POST['kode_cascading_renstra'])) {
+	                        $ret['status'] = 'error';
+	                        $ret['message'] = 'Kegiatan Cascading tidak boleh kosong!';
+	                    }
+	                    $id_uraian_cascading = isset($_POST['id_uraian_cascading']) ? intval($_POST['id_uraian_cascading']) : 0;
+	                    if ($id_uraian_cascading == 0) {
+	                        $ret['status'] = 'error';
+	                        $ret['message'] = 'Uraian Cascading Kegiatan wajib dipilih!';
+	                    }
+	                }
+	            }
 
 
 				$get_dasar_pelaksanaan = $_POST['get_dasar_pelaksanaan'];
@@ -682,7 +744,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'pokir' => isset($get_dasar_pelaksanaan['pokir']) ? $get_dasar_pelaksanaan['pokir'] : 0,
 						'id_sub_skpd_cascading' => $id_sub_skpd_cascading,
 						'pagu_cascading' => $pagu_cascading,
-						'input_rencana_pagu_level' => $setting_input_rencana_pagu
+						'input_rencana_pagu_level' => $setting_input_rencana_pagu,
+						'id_cascading' => $id_uraian_cascading
 					);
 					if ($_POST['level'] == 1) {
 						$data['kode_cascading_sasaran'] = $kode_cascading_renstra;
@@ -1335,98 +1398,105 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	function get_indikator_rencana_aksi()
-	{
-		global $wpdb;
-		$ret = array(
-			'status' => 'success',
-			'message' => 'Berhasil get indikator rencana aksi!',
-			'data'  => array()
-		);
+    {
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get indikator rencana aksi!',
+            'data'  => array()
+        );
 
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-				if ($ret['status'] != 'error' && empty($_POST['id'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID indikator tidak boleh kosong!';
-				} else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tahun anggaran tidak boleh kosong!';
-				}
-				if ($ret['status'] != 'error') {
-					$ret['data'] = $wpdb->get_row(
-						$wpdb->prepare('
-							SELECT
-								*
-							FROM esakip_data_rencana_aksi_indikator_opd
-							WHERE id=%d
-							  AND tahun_anggaran=%d
-						', $_POST['id'], $_POST['tahun_anggaran']),
-						ARRAY_A
-					);
-					$ret['data']['sumber_dana'] = $wpdb->get_results(
-						$wpdb->prepare('
-							SELECT
-								*
-							FROM esakip_sumber_dana_indikator
-							WHERE id_indikator = %d
-							  AND active = 1
-						', $_POST['id']),
-						ARRAY_A
-					);
+        if (!empty($_POST)) {
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+                if ($ret['status'] != 'error' && empty($_POST['id'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'ID indikator tidak boleh kosong!';
+                } else if ($ret['status'] != 'error' && empty($_POST['tahun_anggaran'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Tahun anggaran tidak boleh kosong!';
+                }
+                if ($ret['status'] != 'error') {
+                    $ret['data'] = $wpdb->get_row(
+                        $wpdb->prepare('
+                            SELECT
+                                *
+                            FROM esakip_data_rencana_aksi_indikator_opd
+                            WHERE id=%d
+                              AND tahun_anggaran=%d
+                        ', $_POST['id'], $_POST['tahun_anggaran']),
+                        ARRAY_A
+                    );
+                    
+                    // PERBAIKAN: Pastikan id_indikator_cascading dan id_satuan_cascading ter-return
+                    if ($ret['data']) {
+                        $ret['data']['id_indikator_cascading'] = $ret['data']['id_indikator_cascading'] ?? null;
+                        $ret['data']['id_satuan_cascading'] = $ret['data']['id_satuan_cascading'] ?? null;
+                    }
+                    
+                    $ret['data']['sumber_dana'] = $wpdb->get_results(
+                        $wpdb->prepare('
+                            SELECT
+                                *
+                            FROM esakip_sumber_dana_indikator
+                            WHERE id_indikator = %d
+                              AND active = 1
+                        ', $_POST['id']),
+                        ARRAY_A
+                    );
 
-					$cek_input_pagu = false;
-					if (!empty($ret['data'])) {
-						$ret['data']['data_rhk_khusus'] = $wpdb->get_row(
-							$wpdb->prepare('
-								SELECT
-									id,
-									input_rencana_pagu_level
-								FROM esakip_data_rencana_aksi_opd
-								WHERE id=%d
-								  AND tahun_anggaran=%d
-							', $ret['data']['id_renaksi'], $_POST['tahun_anggaran']),
-							ARRAY_A
-						);
-						if ($ret['data']['data_rhk_khusus']['input_rencana_pagu_level']) {
-							$cek_input_pagu = $wpdb->get_var($wpdb->prepare("
-								SELECT
-									sum(s.rencana_pagu)
-								FROM esakip_data_rencana_aksi_indikator_opd i
-								INNER JOIN esakip_sumber_dana_indikator s ON i.id=s.id_indikator
-									AND s.active=i.active
-									AND s.tahun_anggaran=i.tahun_anggaran
-								WHERE i.id_renaksi=%d
-									AND i.active=1
-									AND i.tahun_anggaran=%d
-							", $ret['data']['id_renaksi'], $_POST['tahun_anggaran']));
-						}
-					}
+                    $cek_input_pagu = false;
+                    if (!empty($ret['data'])) {
+                        $ret['data']['data_rhk_khusus'] = $wpdb->get_row(
+                            $wpdb->prepare('
+                                SELECT
+                                    id,
+                                    input_rencana_pagu_level
+                                FROM esakip_data_rencana_aksi_opd
+                                WHERE id=%d
+                                  AND tahun_anggaran=%d
+                            ', $ret['data']['id_renaksi'], $_POST['tahun_anggaran']),
+                            ARRAY_A
+                        );
+                        if ($ret['data']['data_rhk_khusus']['input_rencana_pagu_level']) {
+                            $cek_input_pagu = $wpdb->get_var($wpdb->prepare("
+                                SELECT
+                                    sum(s.rencana_pagu)
+                                FROM esakip_data_rencana_aksi_indikator_opd i
+                                INNER JOIN esakip_sumber_dana_indikator s ON i.id=s.id_indikator
+                                    AND s.active=i.active
+                                    AND s.tahun_anggaran=i.tahun_anggaran
+                                WHERE i.id_renaksi=%d
+                                    AND i.active=1
+                                    AND i.tahun_anggaran=%d
+                            ", $ret['data']['id_renaksi'], $_POST['tahun_anggaran']));
+                        }
+                    }
 
-					// get total pagu rhk
-					if (!empty($cek_input_pagu)) {
-						$ret['data']['total_pagu'] = $cek_input_pagu;
-						$ret['data']['cek_pagu'] = array('message' => 'RHK input pagu');
-					} else {
-						$_POST['id'] = $ret['data']['id_renaksi'];
-						$cek_pagu_child = $this->cek_validasi_input_rencana_pagu(1);
-						$ret['data']['total_pagu'] = $cek_pagu_child['rencana_pagu'];
-						$ret['data']['cek_pagu'] = $cek_pagu_child;
-					}
-				}
-			} else {
-				$ret = array(
-					'status' => 'error',
-					'message'   => 'Api Key tidak sesuai!'
-				);
-			}
-		} else {
-			$ret = array(
-				'status' => 'error',
-				'message'   => 'Format tidak sesuai!'
-			);
-		}
-		die(json_encode($ret));
-	}
+                    // get total pagu rhk
+                    if (!empty($cek_input_pagu)) {
+                        $ret['data']['total_pagu'] = $cek_input_pagu;
+                        $ret['data']['cek_pagu'] = array('message' => 'RHK input pagu');
+                    } else {
+                        $_POST['id'] = $ret['data']['id_renaksi'];
+                        $cek_pagu_child = $this->cek_validasi_input_rencana_pagu(1);
+                        $ret['data']['total_pagu'] = $cek_pagu_child['rencana_pagu'];
+                        $ret['data']['cek_pagu'] = $cek_pagu_child;
+                    }
+                }
+            } else {
+                $ret = array(
+                    'status' => 'error',
+                    'message'   => 'Api Key tidak sesuai!'
+                );
+            }
+        } else {
+            $ret = array(
+                'status' => 'error',
+                'message'   => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($ret));
+    }
 
 	function hapus_indikator_rencana_aksi()
 	{
@@ -1765,6 +1835,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 					$data = array(
 						'id_renaksi' => $_POST['id_label'],
+						'id_indikator_cascading' => $_POST['id_indikator_cascading'],
+						'id_satuan_cascading' => $_POST['id_satuan_cascading'],
 						'indikator' => $_POST['indikator'],
 						'satuan' => $_POST['satuan'],
 						'rencana_pagu' => $_POST['rencana_pagu'],
