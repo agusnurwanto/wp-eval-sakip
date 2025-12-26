@@ -220,7 +220,7 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields($this->generate_fields_dokumen_pedoman_teknis_evaluasi_internal_pemda());
 
-		Container::make('theme_options', __('Rencana Aksi'))
+		Container::make('theme_options', __('Rencana Hasil Kerja'))
 			->set_page_parent($dokumen_pemda_menu)
 			->add_fields($this->generate_fields_dokumen_renaksi_pemda());
 
@@ -285,7 +285,7 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($dokumen_menu)
 			->add_fields($this->generate_fields_dokumen_laporan_monev_renaksi_opd());
 
-		Container::make('theme_options', __('Rencana Aksi'))
+		Container::make('theme_options', __('Rencana Hasil Kerja'))
 			->set_page_parent($dokumen_menu)
 			->add_fields($this->generate_fields_dokumen_renaksi_opd());
 
@@ -330,19 +330,19 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($pengisian_pokin_menu)
 			->add_fields($this->generate_fields_cascading_opd());
 
-		$monev_renaksi_menu = Container::make('theme_options', __('Rencana Aksi'))
+		$monev_renaksi_menu = Container::make('theme_options', __('Rencana Hasil Kerja'))
 			->set_page_menu_position(3.5)
 			->set_icon('dashicons-analytics');
 
-		Container::make('theme_options', __('Rencana Aksi Pemerintah Daerah'))
+		Container::make('theme_options', __('Rencana Hasil Kerja Pemerintah Daerah'))
 			->set_page_parent($monev_renaksi_menu)
 			->add_fields($this->generate_fields_renaksi_pemda());
 
-		Container::make('theme_options', __('Rencana Aksi Perangkat Daerah'))
+		Container::make('theme_options', __('Rencana Hasil Kerja Perangkat Daerah'))
 			->set_page_parent($monev_renaksi_menu)
 			->add_fields($this->generate_fields_renaksi_opd());
 
-		Container::make('theme_options', __('Rencana Aksi Setting'))
+		Container::make('theme_options', __('Rencana Hasil Kerja Setting'))
 			->set_page_parent($monev_renaksi_menu)
 			->add_fields($this->generate_fields_renaksi_settings());
 

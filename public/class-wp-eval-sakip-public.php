@@ -21399,7 +21399,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
-		$title_pengisian_rencana_aksi = 'Rencana Aksi';
+		$title_pengisian_rencana_aksi = 'Rencana Hasil Kerja';
 		$pengisian_rencana_aksi = '<li><a target="_blank" href="' . $list_skpd_pengisian_rencana_aksi['url'] . '" class="btn btn-primary">' .  $title_pengisian_rencana_aksi . '</a></li>';
 
 		$list_setting_jadwal = '';
@@ -22548,7 +22548,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'show_header' => 1,
 						'post_status' => 'private'
 					));
-					$title_pengisian_rencana_aksi_skpd = 'Rencana Aksi';
+					$title_pengisian_rencana_aksi_skpd = 'Rencana Hasil Kerja';
 					$pengisian_rencana_aksi_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
 					$pengisian_rencana_aksi_per_skpd_page = '<li><a href="' . $pengisian_rencana_aksi_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengisian_rencana_aksi_skpd . '</a></li>';
 	
