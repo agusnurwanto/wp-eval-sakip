@@ -420,7 +420,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
             'rencana_pagu'  => 0,
             'ids' => array(),
             'ids_indikator' => array(),
-            'data_rhk'  => 0
+            'data_rhk'  => 0,
+            'data_rhk_parent'  => 0
         );
 
         if (!empty($_POST)) {
@@ -463,6 +464,16 @@ class Wp_Eval_Sakip_Monev_Kinerja
                 ", $_POST['id']), ARRAY_A);
                 if (!empty($data_rhk)) {
                     $ret['data_rhk'] = $data_rhk;
+                }
+                $data_rhk_parent = $wpdb->get_results($wpdb->prepare("
+                    SELECT
+                        *
+                    FROM esakip_data_rencana_aksi_opd
+                    WHERE id=%d
+                        AND active=1
+                ", $_POST['id_parent']), ARRAY_A);
+                if (!empty($data_rhk_parent)) {
+                    $ret['data_rhk_parent'] = $data_rhk_parent;
                 }
 
                 if (!empty($ret['rencana_pagu'])) {
@@ -619,13 +630,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$id_indikator = isset($_POST['id_indikator']) ? $_POST['id_indikator'] : [];
 				$id_sub_skpd_cascading = !empty($_POST['id_sub_skpd_cascading']) ? $_POST['id_sub_skpd_cascading'] : null;
 				$pagu_cascading = !empty($_POST['pagu_cascading']) ? $_POST['pagu_cascading'] : null;
+				$status_input_rencana_pagu = isset($_POST['status_input_rencana_pagu']) ? intval($_POST['status_input_rencana_pagu']) : 0;
 				if ($_POST['level'] == 4) {
 					$setting_input_rencana_pagu = 1;
 				} else {
 					$setting_input_rencana_pagu = !empty($_POST['setting_input_rencana_pagu']) ? 1 : 0;
 				}
 
-				if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 1 && $_POST['level'] != 4) {
+				if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 1 && $_POST['level'] != 4 && $status_input_rencana_pagu == 0) {
 	                $kode_sub_kegiatan = isset($_POST['kode_cascading_renstra_sub_kegiatan']) ? trim($_POST['kode_cascading_renstra_sub_kegiatan']) : '';
 	                
 	                if (empty($kode_sub_kegiatan)) {
@@ -634,7 +646,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                }
 	            }
 	            
-	            if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 1) {
+	            if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 1 && $status_input_rencana_pagu == 0) {
 	                $label_renaksi = isset($_POST['label_renaksi']) ? trim($_POST['label_renaksi']) : '';
 	                $id_uraian_cascading = isset($_POST['id_uraian_cascading']) ? intval($_POST['id_uraian_cascading']) : 0;
 	                
@@ -646,8 +658,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	                }
 	            }
 	            
-	            if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 0) {
-	                if ($_POST['level'] == 1) {
+	            if ($ret['status'] != 'error' && $setting_input_rencana_pagu == 0 && $status_input_rencana_pagu == 0) {
+	                if ($_POST['level'] == 1 && $_POST['level'] == 1) {
 	                    if (empty($_POST['kode_cascading_renstra'])) {
 	                        $ret['status'] = 'error';
 	                        $ret['message'] = 'Sasaran Cascading tidak boleh kosong!';
@@ -745,7 +757,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'id_sub_skpd_cascading' => $id_sub_skpd_cascading,
 						'pagu_cascading' => $pagu_cascading,
 						'input_rencana_pagu_level' => $setting_input_rencana_pagu,
-						'id_cascading' => $id_uraian_cascading
+						'id_cascading' => $id_uraian_cascading,
+						'status_input_rencana_pagu' => $status_input_rencana_pagu,
+						'cascading_pk' => $_POST['cascading_pk'],
 					);
 					if ($_POST['level'] == 1) {
 						$data['kode_cascading_sasaran'] = $kode_cascading_renstra;
@@ -982,7 +996,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$data,
 								array('id' => $cek_id_pokin)
 							);
-							$ret['message'] = "Berhasil update data.";
+							$ret['message'] = "Berhasil menyimpan data.";
 						} else {
 							$data['created_at'] = current_time('mysql');
 							$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
@@ -1021,7 +1035,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$data,
 									array('id' => $cek_id_pokin)
 								);
-								$ret['message'] = "Berhasil update data.";
+								$ret['message'] = "Berhasil menyimpan data.";
 							} else {
 								$data['created_at'] = current_time('mysql');
 								$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
@@ -1061,7 +1075,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$data,
 									array('id' => $cek_id_pokin)
 								);
-								$ret['message'] = "Berhasil update data.";
+								$ret['message'] = "Berhasil menyimpan data.";
 							} else {
 								$data['created_at'] = current_time('mysql');
 								$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
@@ -1102,7 +1116,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$data,
 									array('id' => $cek_id_pokin)
 								);
-								$ret['message'] = "Berhasil update data.";
+								$ret['message'] = "Berhasil menyimpan data.";
 							} else {
 								$data['created_at'] = current_time('mysql');
 								$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
@@ -1143,7 +1157,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$data,
 									array('id' => $cek_id_pokin)
 								);
-								$ret['message'] = "Berhasil update data.";
+								$ret['message'] = "Berhasil menyimpan data.";
 							} else {
 								$data['created_at'] = current_time('mysql');
 								$wpdb->insert('esakip_data_pokin_rhk_opd', $data);
