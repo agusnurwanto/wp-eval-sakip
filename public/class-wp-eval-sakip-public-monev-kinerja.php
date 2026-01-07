@@ -7372,9 +7372,15 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				// die(print_r($data_rhk_child));
 
 				$index_level = $jenis_level[$v_rhk_child['level']];
-				if ($v_rhk_child['input_rencana_pagu_level'] == 1) {
+				if ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 3) {
 					$index = $v_rhk_child['kode_cascading_sub_kegiatan'];
 					$index_level = 'sub_kegiatan';
+				} elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 2) {
+					$index = $v_rhk_child['kode_cascading_kegiatan'];
+					$index_level = 'kegiatan';
+				}  elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 1) {
+					$index = $v_rhk_child['kode_cascading_program'];
+					$index_level = 'program';
 				} elseif ($v_rhk_child['level'] == 2) {
 					$index = $v_rhk_child['kode_cascading_program'];
 				} elseif ($v_rhk_child['level'] == 3) {

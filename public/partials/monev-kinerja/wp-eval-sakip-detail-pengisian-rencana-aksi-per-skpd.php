@@ -3594,66 +3594,73 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             }
                         }
 
+                        var bg_input_pagu = '';
+                        var bg_program = '';
+                        var bg_kegiatan = '';
+                        var bg_sub_kegiatan = '';
+                        if (value['cascading_pk'] == 1) {
+                            bg_program = 'style="background:#33bc0b;" title="Nomenklatur yang ditampilkan di PK"';
+                        } else if (value['cascading_pk'] == 2) {
+                            bg_kegiatan = 'style="background:#33bc0b;" title="Nomenklatur yang ditampilkan di PK"';
+                        } else if (value['cascading_pk'] == 3) {
+                            bg_sub_kegiatan = 'style="background:#33bc0b;" title="Nomenklatur yang ditampilkan di PK"';
+                        }
+
                         if (tipe == 1) {
                             id_parent_cascading = value['kode_cascading_sasaran'];
                             label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
-                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ` + (tipe + 1) + `, ` + JSON.stringify(id_pokin) + `, '` + id_parent_cascading + `')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${tipe + 1}, ${JSON.stringify(id_pokin)}, '${id_parent_cascading}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 2) {
                             id_parent_cascading = value['kode_cascading_program'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
-
                             if (value['label_cascading_program']) {
                                 let nama_prog = value['label_cascading_program'];
                                 var pagu = ' | Rp. ' + formatRupiah(value['pagu_cascading']);
                                 if(set_input_rencana_pagu == 1){
                                     pagu = '';
                                 }
-                                label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
+                                label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ' + bg_program + '>' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
                             }
-
-                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${ id_parent_sub_skpd_cascading })" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${tipe + 1}, ${JSON.stringify(id_pokin)}, '${id_parent_cascading}', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 3) {
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
-
                             if (value['label_cascading_kegiatan']) {
                                 let nama_keg = value['label_cascading_kegiatan'];
                                 var pagu = ' | Rp. ' + formatRupiah(value['pagu_cascading']);
                                 if(set_input_rencana_pagu == 1){
                                     pagu = '';
                                 }
-                                label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
+                                label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ' + bg_kegiatan + '>' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
                             }
-
-                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${ (tipe + 1) }, ${ JSON.stringify(id_pokin) }, '${ id_parent_cascading }', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
+                            tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${tipe + 1}, ${JSON.stringify(id_pokin)}, '${id_parent_cascading}', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
                         } else if (tipe == 4) {
                             id_pokin = value['id_pokin_5'];
-
                             if (value['label_cascading_sub_kegiatan']) {
                                 let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
-                                label_cascading = value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                label_cascading = value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ' + bg_sub_kegiatan + '>' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
                             }
                         }
 
                         // jika input pagu maka ditampilkan sampai sub kegiatan
-                        var bg_input_pagu = '';
+
                         if(set_input_rencana_pagu == 1 && value['status_input_rencana_pagu'] == 0){
                             if(tipe <= 1) {
                                 if (value['label_cascading_program']) {
                                     let nama_prog = value['label_cascading_program'];
-                                    label_cascading += '</br>'+value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + '</span>';
+                                    label_cascading += `</br>${value['kode_cascading_program']} ${nama_prog}</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ${bg_program}>${value['kode_sub_skpd']} ${value['nama_sub_skpd']}</span>`;
                                 }
                             }
                             if(tipe <= 2) {
                                 if (value['label_cascading_kegiatan']) {
                                     let nama_keg = value['label_cascading_kegiatan'];
-                                    label_cascading += '</br>'+value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + '</span>';
+                                    label_cascading += `</br>${value['kode_cascading_kegiatan']} ${nama_keg}</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ${bg_kegiatan}>${value['kode_sub_skpd']} ${value['nama_sub_skpd']}</span>`;
                                 }
                             }
                             if(tipe <= 3) {
                                 if (value['label_cascading_sub_kegiatan']) {
                                     let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
-                                    label_cascading += '</br>'+value['kode_cascading_sub_kegiatan'] + ' ' + nama_subkeg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap">' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + ' | Rp. ' + formatRupiah(value['pagu_cascading']) + '</span>';
+                                    label_cascading += `</br>${value['kode_cascading_sub_kegiatan']} ${nama_subkeg}</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ${bg_sub_kegiatan}>${value['kode_sub_skpd']} ${value['nama_sub_skpd']} | Rp. ${formatRupiah(value['pagu_cascading'])}</span>`;
                                 }
                             }
                             bg_input_pagu = 'style="background: #a1fe86;" title="Checklist Input Pagu RHK"';
@@ -3707,7 +3714,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                                 `<th class="text-center" style="width:50px;">Target Awal</th>` +
                                                 `<th class="text-center" style="width:50px;">Target Akhir</th>` +
                                                 `${header_pagu}` +
-                                                `<th class="text-center" style="width:125px">Aksi</th>` +
+                                                `<th class="text-center" style="width:150px">Aksi</th>` +
                                             `</tr>` +
                                         `</thead>` +
                                     `<tbody>`;
