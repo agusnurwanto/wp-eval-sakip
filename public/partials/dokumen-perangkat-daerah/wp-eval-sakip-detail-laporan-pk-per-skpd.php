@@ -56,9 +56,9 @@ $pihak_pertama = array(
     'status_jabatan'  => ''
 );
 if (!empty($_GET['inactive']) && $_GET['inactive'] == 1) {
-    $data_pegawai_1 = $this->get_data_pegawai_simpeg_inactive_by_id($id_pegawai);
+    $data_pegawai_1 = $this->get_data_pegawai_simpeg_inactive_by_id($id_pegawai, $input['tahun']);
 } else {
-    $data_pegawai_1 = $this->get_data_pegawai_simpeg_by_id($id_pegawai);
+    $data_pegawai_1 = $this->get_data_pegawai_simpeg_by_id($id_pegawai, $input['tahun']);
 }
 if (!empty($data_pegawai_1)) {
     $pihak_pertama['nama_pegawai']    = $data_pegawai_1->nama_pegawai;
@@ -84,9 +84,9 @@ if (!empty($data_pegawai_1)) {
         $pihak_pertama['jabatan_pegawai'] = $data_pegawai_1->plt_plh_teks . ' ' . $pihak_pertama['jabatan_pegawai'];
     }
 
-    $data_atasan = $this->_get_atasan_definitif($data_pegawai_1);
+    $data_atasan = $this->_get_atasan_definitif($data_pegawai_1, $input['tahun']);
     if (empty($data_atasan) && !empty($data_pegawai_1->id_atasan)) {
-        $data_atasan = $this->get_data_pegawai_simpeg_by_id($data_pegawai_1->id_atasan);
+        $data_atasan = $this->get_data_pegawai_simpeg_by_id($data_pegawai_1->id_atasan, $input['tahun']);
     }
 
     $options = array(
@@ -120,7 +120,7 @@ if (!empty($data_atasan) && $data_atasan->id != 0) {
     $pihak_kedua['gelar_belakang']  = ', ' . $data_atasan->gelar_belakang;
     $pihak_kedua['status_jabatan']  = $data_atasan->jabatan;
 
-    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan->nip_baru, $data_atasan->satker_id, $data_atasan->jabatan);
+    $simpeg_pihak_kedua = $this->get_pegawai_simpeg('asn', $data_atasan->nip_baru, $data_atasan->satker_id, $data_atasan->jabatan, $input['tahun']);
     $response_2 = json_decode($simpeg_pihak_kedua, true);
     if (!isset($response_2['status']) || $response_2['status'] === false) {
         array_push($error_message, 'Pihak Kedua : ' . $response_2['message']);

@@ -34428,7 +34428,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $updated;
     }
 
-    public function get_data_pegawai_simpeg_by_id($id)
+    public function get_data_pegawai_simpeg_by_id($id, $tahun)
     {
         global $wpdb;
 
@@ -34440,18 +34440,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			FROM {$this->table_data_pegawai_simpeg} p
 			JOIN {$this->table_data_satker_simpeg} s
 			  ON p.satker_id = s.satker_id
+			  AND s.tahun_anggaran = %d
 			WHERE p.id = %d 
 			  AND p.active = 1
-			", $id
+			", $tahun, $id
         );
-
         // The second parameter, OBJECT, ensures the result is an object.
         $pegawai = $wpdb->get_row($sql, OBJECT);
 
         return $pegawai;
     }
 
-    public function get_data_pegawai_simpeg_inactive_by_id($id)
+    public function get_data_pegawai_simpeg_inactive_by_id($id, $tahun)
     {
         global $wpdb;
 
@@ -34463,9 +34463,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			FROM {$this->table_data_pegawai_simpeg} p
 			JOIN {$this->table_data_satker_simpeg} s
 			  ON p.satker_id = s.satker_id
+			  AND s.tahun_anggaran = %d
 			WHERE p.id = %d 
 			  AND p.active = 0
-			", $id
+			", $tahun, $id
         );
 
         // The second parameter, OBJECT, ensures the result is an object.
@@ -34488,7 +34489,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-    public function get_data_pegawai_simpeg_atasan_by_satker_id($satker_id)
+    public function get_data_pegawai_simpeg_atasan_by_satker_id($satker_id, $tahun_anggaran)
 	{
 		global $wpdb;
 
@@ -34518,7 +34519,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 
 		if (!empty($id_pegawai_atasan)) {
-			$data_atasan = $this->get_data_pegawai_simpeg_by_id($id_pegawai_atasan);
+			$data_atasan = $this->get_data_pegawai_simpeg_by_id($id_pegawai_atasan, $tahun_anggaran);
 			return $data_atasan;
 		}
 
@@ -34539,7 +34540,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
 			}
 			$pegawai_id = intval($_POST['id']);
-			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id);
+			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($pegawai_id, $_POST['tahun_anggaran']);
 
 			if (!$data_pegawai) {
 				throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
@@ -34582,12 +34583,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 			// Jika $satker_id_atasan ada, cari atasannya di database.
 			if ($satker_id_atasan) {
-				$data_pegawai->atasan = $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan);
+				$data_pegawai->atasan = $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan, $_POST['tahun_anggaran']);
 			}
 
 			// Jika data atasan tidak ketemu dan punya riwayat custom atasan
 			if (empty($data_pegawai->atasan) && !empty($data_pegawai->id_atasan)) {
-				$data_pegawai->atasan_custom = $this->get_data_pegawai_simpeg_by_id($data_pegawai->id_atasan);
+				$data_pegawai->atasan_custom = $this->get_data_pegawai_simpeg_by_id($data_pegawai->id_atasan, $_POST['tahun_anggaran']);
 			} else {
 				$data_pegawai->atasan_custom = null;
 			}
@@ -34655,7 +34656,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	 * @param object $pegawai The employee data object.
 	 * @return object|null The atasan's data object, a virtual object for Kepala Daerah, or null if no definitive atasan is found.
 	 */
-	public function _get_atasan_definitif($pegawai)
+	public function _get_atasan_definitif($pegawai, $tahun)
 	{
 		global $wpdb;
 
@@ -34694,7 +34695,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		// Jika satker_id_atasan telah ditentukan
 		if ($satker_id_atasan) {
-			return $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan);
+			return $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan, $tahun);
 		}
 
 		// Jika tidak ada kasus yang cocok return null

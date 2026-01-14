@@ -322,7 +322,8 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
             data: {
                 action: 'get_data_pegawai_simpeg_by_id_ajax',
                 api_key: esakip.api_key,
-                id: idPegawai
+                id: idPegawai,
+                tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>
             },
             dataType: 'json',
             success: function(response) {
