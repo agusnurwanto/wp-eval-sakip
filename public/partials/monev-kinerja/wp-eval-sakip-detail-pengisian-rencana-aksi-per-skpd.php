@@ -2638,7 +2638,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 } else {
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
-                    parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
+                    parent_cascading = get_rhk.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
                 }
             } else {
