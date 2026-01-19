@@ -436,9 +436,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 </table>
             </div>
             <?php endif; ?>
-            <h4 id="notifikasi-title-rhk-cascading" style="text-align: center; margin-top: 50px; font-weight: bold;margin-bottom: .5em;">Tabel Data RHK atau Indikator RHK yang tidak ada di Uraian Cascading RENSTRA</h4>
+            <h4 class = "text-center" id="notifikasi-title-rhk-cascading" style="font-weight: bold; margin-top: 50px;">Tabel Data RHK atau Indikator RHK yang tidak ada di Uraian Cascading RENSTRA</h4>
             <div style="padding: 5px;">
-                <table class="table table-bordered table_rhk_cascading"cellpadding="2" cellspacing="0" contenteditable="false">
+                <table class="table table-bordered table_rhk_cascading" cellpadding="2" cellspacing="0" contenteditable="false">
                     <thead>
                         <tr>
                             <th>Keterangan</th>
@@ -2480,30 +2480,19 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         jQuery('.table_rhk_cascading').show();
                         jQuery('.table_rhk_cascading tbody').html(response.data_rhk_cascading);
 
-                        if (jQuery.fn.DataTable.isDataTable('.table_rhk_cascading')) {
-                            jQuery('.table_rhk_cascading').DataTable().clear().destroy();
-                        }
-
-                        jQuery('.table_rhk_cascading').DataTable({
-                            paging: true,
-                            searching: true,
-                            ordering: true,
-                            info: true,
-                            fixedHeader: true,
-                            scrollX: true, // Enables horizontal scrolling
-                            scrollY: '600px',
-                            scrollCollapse: true,
+                        jQuery('.table_dokumen_skpd tbody').html(response.data);
+                        jQuery('.table_rhk_cascading').dataTable({
                             pageLength: 10, // Default number of rows per page
-                            lengthMenu: [10, 25, 50, 100, 200] // Options for rows per page
+                            aLengthMenu: [
+                                [5, 10, 25, 100, -1],
+                                [5, 10, 25, 100, "All"]
+                            ],
+                            iDisplayLength: -1
                         });
                         
                     } else {
                         jQuery('#notifikasi-title-rhk-individu').hide();
                         jQuery('.table_rhk_cascading').hide();
-
-                        if (jQuery.fn.DataTable.isDataTable('.table_rhk_cascading')) {
-                            jQuery('.table_rhk_cascading').DataTable().clear().destroy();
-                        }
                     }
                     jQuery('#show_anggaran_column').trigger('change');
                 } else {
@@ -4348,7 +4337,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         });
     }
 
-    function setting_rhk_from_input_pagu(rhk, isEdit = false) {        
+    function setting_rhk_from_input_pagu(rhk, isEdit = false) {
         var get_rhk;
         
         if (rhk && rhk.status === "success" && rhk.data) {
