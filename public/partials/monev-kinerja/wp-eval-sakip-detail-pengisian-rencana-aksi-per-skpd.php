@@ -2490,9 +2490,6 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             iDisplayLength: -1
                         });
                         
-                    } else {
-                        jQuery('#notifikasi-title-rhk-individu').hide();
-                        jQuery('.table_rhk_cascading').hide();
                     }
                     jQuery('#show_anggaran_column').trigger('change');
                 } else {
