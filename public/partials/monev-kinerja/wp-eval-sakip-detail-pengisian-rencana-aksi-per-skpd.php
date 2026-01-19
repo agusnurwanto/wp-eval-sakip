@@ -386,6 +386,11 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         /* Default disembunyikan */
     }
 
+    #notifikasi-title-rhk-cascading {
+        display: none;
+        /* Default disembunyikan */
+    }
+
     .table_rhk_cascading {
         display: none;
         /* Default disembunyikan */
