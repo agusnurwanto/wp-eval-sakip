@@ -1382,6 +1382,16 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						if (!empty($data_skpd_cascading)) {
 							$ret['data']['nama_skpd_cascading'] = $data_skpd_cascading['nama_skpd'];
 						}
+						$data_rhk_parent = $wpdb->get_results($wpdb->prepare("
+		                    SELECT
+		                        *
+		                    FROM esakip_data_rencana_aksi_opd
+		                    WHERE id=%d
+		                        AND active=1
+		                ", $ret['data']['parent']), ARRAY_A);
+		                if (!empty($data_rhk_parent)) {
+		                    $ret['data']['data_rhk_parent'] = $data_rhk_parent;
+		                }
 					} else {
 						$ret['data']['renaksi_pemda'] = array();
 						$ret['data']['jabatan'] = array();
@@ -1391,6 +1401,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$ret['data']['pokin_3'] = array();
 						$ret['data']['pokin_4'] = array();
 						$ret['data']['pokin_5'] = array();
+						$ret['data']['data_rhk_parent'] = array();
 					}
 
 					if (empty($ret['data'])) {

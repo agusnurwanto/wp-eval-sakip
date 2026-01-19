@@ -2609,10 +2609,15 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     kode_cascading = get_rhk_parent.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk_parent.id_sub_skpd_cascading || 0;
-                } else {
+                } else if (status == 0 && tipe != 4){
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk.kode_cascading_kegiatan;
+                    id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                } else if (status == 0 && tipe == 4){
+                    jenis_cascading = 'sub_kegiatan';
+                    kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
+                    parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
                 }
             } else {
@@ -2650,7 +2655,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 tipe: tipe,
                 jenis_cascading: jenis_cascading,
                 kode_cascading: kode_cascading,
-                is_tujuan: get_rhk.is_tujuan
+                is_tujuan: get_rhk.is_tujuan,
+                parent_cascading: parent_cascading,
             });
             
             if (!kode_cascading) {
@@ -2671,7 +2677,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     }
                 }                
             }
-            
+            console.log('parent_cascading', parent_cascading);
             return get_tujuan_sasaran_cascading(jenis_cascading, parent_cascading, id_sub_skpd_cascading)
                 .then(function() {
                     var key = jenis_cascading + '-' + parent_cascading;
@@ -3361,7 +3367,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             if (rhk_response.status == 'success' && rhk_response.data != null) {
                                 var rhk_data = rhk_response.data;
                                 
-                                setting_indikator_satuan(rhk_data).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana, indikator_satuan_data
+                                setting_indikator_satuan(rhk_data, 0, rhk_data.data_rhk_parent).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana, indikator_satuan_data
                                     ).then(function(){
                                         jQuery("#modal-crud").find('.modal-title').text(
                                             jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit')
