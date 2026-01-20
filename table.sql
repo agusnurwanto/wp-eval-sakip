@@ -1461,7 +1461,7 @@ CREATE TABLE `esakip_data_lembaga_lainnya` (
 
 CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `id` int(11) NOT NULL auto_increment,
-  `label` varchar(255) NOT NULL,
+  `label` TEXT NOT NULL,
   `id_skpd` int(11) DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
   `level` int(11) NOT null COMMENT '1 = kegiatan utama, 2 = rencana hasil kerja, 3 = uraian kegiatan rhk, 4 = uraian teknis kegiatan' ,
