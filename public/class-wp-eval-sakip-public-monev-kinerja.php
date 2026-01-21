@@ -842,8 +842,16 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						", $_POST['kegiatan_utama'], $_POST['tahun_anggaran'], $_POST['id_skpd'], $_POST['level'], $id_sub_skpd_cascading));
 					}
 					if (empty($cek_id)) {
-						$wpdb->insert('esakip_data_rencana_aksi_opd', $data);
+						$insert = $wpdb->insert('esakip_data_rencana_aksi_opd', $data);
+						if ($insert === false) {
+							$ret = array(
+								'status' => 'error',
+								'message'   => 'Gagal menyimpan data rencana aksi!'
+							);
+							die(json_encode($ret));
+						}
 						$cek_id = $wpdb->insert_id;
+
 					} else {
 						$status_update = false;
 						if (

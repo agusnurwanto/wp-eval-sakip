@@ -472,7 +472,8 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                 jabatan_custom: namaJabatanCustom,
                 terapkan_all_satker: terapkanAllSatker,
                 format_halaman_kedua: format_halaman_kedua,
-                plt_plh_teks: plt_plh_teks
+                plt_plh_teks: plt_plh_teks,
+                tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>
             },
             dataType: 'json',
             success: function(response) {

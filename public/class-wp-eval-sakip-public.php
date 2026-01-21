@@ -34713,7 +34713,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$this->functions->validate($_POST, [
 				'api_key'    			=> 'required|string',
 				'format_halaman_kedua'  => 'required|in:gabungan,program,kegiatan,subkegiatan',
-				'id_pegawai' 			=> 'required|numeric'
+				'id_pegawai' 			=> 'required|numeric',
+				'tahun_anggaran' 		=> 'required|numeric',
 			]);
 
 			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
@@ -34727,7 +34728,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$terapkan_all_satker = isset($_POST['terapkan_all_satker']) && $_POST['terapkan_all_satker'] == 1;
 
 			// Ambil data pegawai yang akan diedit
-			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($id_pegawai);
+			$data_pegawai = $this->get_data_pegawai_simpeg_by_id($id_pegawai, $_POST['tahun_anggaran']);
 			if (!$data_pegawai) {
 				throw new Exception("Pegawai dengan ID {$id_pegawai} tidak ditemukan.", 404);
 			}
