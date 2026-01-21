@@ -1497,6 +1497,7 @@ CREATE TABLE `esakip_data_rencana_aksi_opd` (
   `status_input_rencana_pagu` tinyint(4) NULL COMMENT '0 = pagu sebelumnya tidak dicentang, 1 pagu sebelumnya dicentang',
   `status_renaksi` tinyint(4) NULL COMMENT '1 = Cascading tidak ditemukan di target api',
   `cascading_pk` tinyint(4) NULL COMMENT '1 = program, 2 kegiatan, 3 sub kegiatan',
+  `no_urut` int(11) DEFAULT NULL,
   PRIMARY key (id),
   KEY `parent` (`parent`),
   KEY `level` (`level`),

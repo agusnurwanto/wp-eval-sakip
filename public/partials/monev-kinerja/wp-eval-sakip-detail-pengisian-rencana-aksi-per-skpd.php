@@ -376,6 +376,11 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         line-height: 1.3;
     }
 
+    #notifikasi-title {
+        display: none;
+        /* Default disembunyikan */
+    }
+
     .table_notifikasi_pemda {
         display: none;
         /* Default disembunyikan */
@@ -2206,7 +2211,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         if (response.status == 'error') {
                             alert(response.message);
                         } else if (response.data != null) {
-                            jQuery('#id_renaksi').val(response.data.id);                            
+                            jQuery('#id_renaksi').val(response.data.id);    
+                            if (tipe == 1 && response.data.no_urut) {
+                                setTimeout(function() {
+                                    jQuery('#no_urut').val(response.data.no_urut);
+                                }, 500);
+                            }                        
                             if(parentCheck.input_pagu == 1) {
                                 setting_rhk_from_input_pagu(parentCheck, true).then(function(rhk_data) {
                                     setting_cascading(response.data, rhk_data, parentCheck);
@@ -2495,6 +2505,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             iDisplayLength: -1
                         });
                         
+                    } else {
+                        jQuery('#notifikasi-title-rhk-cascading').hide();
+                        jQuery('.table_rhk_cascading').hide();
                     }
                     jQuery('#show_anggaran_column').trigger('change');
                 } else {
@@ -5393,8 +5406,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         if(cek_parent_global.input_pagu == 0){
                             hide = '';
                         }
-                         if (tipe == 1) {
+                        if (tipe == 1) {
                             html_setting_input_rencana_pagu += `
+                                <div class="form-group">
+                                    <label for="no_urut">No Urut</label>
+                                    <input type="number" class="form-control" id="no_urut" name="no_urut" value="1" min="1">
+                                </div>
                                 <div class="form-group form-check" id="wrapper-is-tujuan">
                                     <label class="form-check-label" for="is_tujuan">
                                         <input class="form-check-input" type="checkbox" id="is_tujuan" name="is_tujuan">
@@ -5406,7 +5423,6 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                 </div>
                             `;
                         }
-
                         html_setting_input_rencana_pagu += `
                             <div class="form-group form-check" ${hide}>
                                 <label class="form-check-label" for="set_input_rencana_pagu">
@@ -6202,6 +6218,10 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             musrembang: jQuery('#musrembang').is(':checked') ? 1 : 0,
             pokir: jQuery('#pokir').is(':checked') ? 1 : 0
         };
+        var no_urut = 1;
+        if (tipe == 1) {
+            no_urut = jQuery('#no_urut').val() || 1;
+        }
         // if (Object.values(get_dasar_pelaksanaan).every(value => value === 0) && tipe === 4) {
         //     return alert('Pilih salah satu dasar pelaksanaan!');
         // }
@@ -6262,6 +6282,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 "id_uraian_cascading": id_cascading,
                 "status_input_rencana_pagu": status_input_rencana_pagu,
                 "cascading_pk": cascading_pk,
+                "no_urut": no_urut
             },
             dataType: "json",
             success: function(res) {
