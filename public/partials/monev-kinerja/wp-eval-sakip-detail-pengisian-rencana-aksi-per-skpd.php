@@ -2613,6 +2613,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             var parent_cascading = '';
             var kode_cascading = '';
             var id_sub_skpd_cascading = 0;
+            var id_cascading_filter = null;
             
             // Untuk input rencana pagu
             if (get_rhk.input_rencana_pagu_level == 1) {
@@ -2621,16 +2622,19 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     kode_cascading = get_rhk_parent.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk_parent.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (status == 0 && tipe != 4){
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (status == 0 && tipe == 4){
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 }
             } else {
                 if (tipe == 1) {
@@ -2638,11 +2642,11 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     
                     if (get_rhk.is_tujuan && get_rhk.is_tujuan != '0') {
                         kode_cascading = get_rhk.kode_cascading_sasaran;
-                        
+                        id_cascading_filter = get_rhk.id_cascading || get_rhk.kode_cascading_sasaran;
                         console.log('Ambil indikator dari TUJUAN dengan kode:', kode_cascading);
                     } else {
                         kode_cascading = get_rhk.id_cascading || get_rhk.kode_cascading_sasaran;
-                        
+                        id_cascading_filter = kode_cascading;
                         console.log('Ambil indikator dari SASARAN dengan kode:', kode_cascading);
                     }
                 } else if (tipe == 2) {
@@ -2650,16 +2654,19 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     kode_cascading = get_rhk.kode_cascading_program;
                     parent_cascading = get_rhk.kode_cascading_program;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || get_rhk.id_skpd;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (tipe == 3) {
                     jenis_cascading = 'kegiatan';
                     kode_cascading = get_rhk.kode_cascading_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_program;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (tipe == 4) {
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 }
             }
             
@@ -2667,6 +2674,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 tipe: tipe,
                 jenis_cascading: jenis_cascading,
                 kode_cascading: kode_cascading,
+                id_cascading_filter: id_cascading_filter,
                 is_tujuan: get_rhk.is_tujuan,
                 parent_cascading: parent_cascading,
             });
@@ -2816,6 +2824,10 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         if (status == 1) {
                             if (matched_data.get_transformasi_cascading_pelaksana && Array.isArray(matched_data.get_transformasi_cascading_pelaksana)) {
                                 matched_data.get_transformasi_cascading_pelaksana.forEach(function(trans) {
+                                    if (id_cascading_filter && trans.id_uraian_cascading != id_cascading_filter) {
+                                        return;
+                                    }
+                                    
                                     if (trans.induk && trans.induk.indikator && Array.isArray(trans.induk.indikator)) {
                                         trans.induk.indikator.forEach(function(ind) {
                                             if (!result.indikator.find(i => i.id === ind.id)) {
@@ -2841,6 +2853,10 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         } else {
                             if (matched_data.get_transformasi_cascading && Array.isArray(matched_data.get_transformasi_cascading)) {
                                 matched_data.get_transformasi_cascading.forEach(function(trans) {
+                                    if (id_cascading_filter && trans.id_uraian_cascading != id_cascading_filter) {
+                                        return;
+                                    }
+                                    
                                     if (trans.induk && trans.induk.indikator && Array.isArray(trans.induk.indikator)) {
                                         trans.induk.indikator.forEach(function(ind) {
                                             if (!result.indikator.find(i => i.id === ind.id)) {
@@ -2866,7 +2882,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         }
                     }
                     
-                    console.log('Result indikator satuan:', result);
+                    console.log('Data indikator satuan:', result);
                     resolve(result);
                 })
                 .catch(function(error) {
