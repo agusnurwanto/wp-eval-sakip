@@ -34738,7 +34738,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			// update atasan custom
 			if ($id_atasan !== null) {
 				// Validasi Atasan Definitif
-				$atasan_definitif = $this->_get_atasan_definitif($data_pegawai);
+				$atasan_definitif = $this->_get_atasan_definitif($data_pegawai, $_POST['tahun_anggaran']);
 				if ($atasan_definitif) {
 					throw new Exception(
 						"Gagal: Pegawai ini sudah memiliki atasan definitif ({$atasan_definitif->nama_pegawai} - {$atasan_definitif->jabatan}). Atasan kustom tidak dapat diterapkan.",
@@ -34757,7 +34757,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 					$pegawai_diupdate_count = 0;
 					foreach ($pegawai_satu_satker as $v) {
-						$atasan_definitif = $this->_get_atasan_definitif($v);
+						$atasan_definitif = $this->_get_atasan_definitif($v, $_POST['tahun_anggaran']);
 						
 						// HANYA UPDATE jika pegawai tersebut TIDAK punya atasan definitif
 						if (!$atasan_definitif) {
