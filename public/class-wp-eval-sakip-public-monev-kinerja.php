@@ -74,33 +74,46 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					}
 
 					if ($_POST['tipe_pokin'] == '') {
-						$data_renaksi = array();
+					    $data_renaksi = array();
 					} else if ($_POST['tipe_pokin'] == 'opd') {
-						$data_renaksi = $wpdb->get_results($wpdb->prepare(
-							"
-							SELECT 
-								a.*
-							FROM esakip_data_rencana_aksi_opd a
-							WHERE 
-								a.parent=%d AND 
-								a.level=%d AND 
-								a.active=%d AND 
-								a.id_skpd=%d AND
-								a.active=1 AND
-								a.tahun_anggaran=%d
-							ORDER BY kode_cascading_sasaran, 
-								id_sub_skpd_cascading,
-								kode_cascading_program, 
-								kode_cascading_kegiatan, 
-								kode_cascading_sub_kegiatan,
-								id
-						",
-							$_POST['parent'],
-							$_POST['level'],
-							1,
-							$id_skpd,
-							$tahun_anggaran
-						), ARRAY_A);
+					    $order_by = '';
+					    if ($_POST['level'] == 1) {
+					        $order_by = 'ORDER BY a.no_urut ASC, 
+					            a.kode_cascading_sasaran, 
+					            a.id_sub_skpd_cascading,
+					            a.kode_cascading_program, 
+					            a.kode_cascading_kegiatan, 
+					            a.kode_cascading_sub_kegiatan,
+					            a.id';
+					    } else {
+					        $order_by = 'ORDER BY a.kode_cascading_sasaran, 
+					            a.id_sub_skpd_cascading,
+					            a.kode_cascading_program, 
+					            a.kode_cascading_kegiatan, 
+					            a.kode_cascading_sub_kegiatan,
+					            a.id';
+					    }
+					    
+					    $data_renaksi = $wpdb->get_results($wpdb->prepare(
+					        "
+					        SELECT 
+					            a.*
+					        FROM esakip_data_rencana_aksi_opd a
+					        WHERE 
+					            a.parent=%d AND 
+					            a.level=%d AND 
+					            a.active=%d AND 
+					            a.id_skpd=%d AND
+					            a.active=1 AND
+					            a.tahun_anggaran=%d
+					        " . $order_by . "
+					    ",
+					        $_POST['parent'],
+					        $_POST['level'],
+					        1,
+					        $id_skpd,
+					        $tahun_anggaran
+					    ), ARRAY_A);
 					}
 
 					foreach ($data_renaksi as $key => $val) {
@@ -633,6 +646,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$id_sub_skpd_cascading = !empty($_POST['id_sub_skpd_cascading']) ? $_POST['id_sub_skpd_cascading'] : null;
 				$pagu_cascading = !empty($_POST['pagu_cascading']) ? $_POST['pagu_cascading'] : null;
 				$status_input_rencana_pagu = isset($_POST['status_input_rencana_pagu']) ? intval($_POST['status_input_rencana_pagu']) : 0;
+				$no_urut = 1;
+	            if ($_POST['level'] == 1 && !empty($_POST['no_urut'])) {
+	                $no_urut = intval($_POST['no_urut']);
+	                if ($no_urut < 1) {
+	                    $no_urut = 1;
+	                }
+	            }
 				if ($_POST['level'] == 4) {
 					$setting_input_rencana_pagu = 1;
 				} else {
@@ -763,6 +783,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'status_input_rencana_pagu' => $status_input_rencana_pagu,
 						'cascading_pk' => $_POST['cascading_pk'],
 						'is_tujuan' => $is_tujuan,
+						'no_urut' => $no_urut,
 					);
 					if ($_POST['level'] == 1) {
 						$data['kode_cascading_sasaran'] = $kode_cascading_renstra;
@@ -2094,6 +2115,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							AND tahun_anggaran=%d
 							AND active=1
 							AND level=1
+						ORDER BY no_urut ASC
 					", $_POST['id_skpd'], $_POST['tahun_anggaran']), ARRAY_A);
 					$html = '';
 					$data_all = array(
@@ -3990,10 +4012,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					            <td class="text-center atas kanan bawah kiri">' . $nip . ' ' . $nama_pegawai . '</td>
 					        </tr>';
 					    }
-					}
-
-					if (empty($html_rhk_cascading)) {
-					    $html_rhk_cascading = '<tr><td class="text-center" colspan="5">Data masih kosong!</td></tr>';
 					}
 
 					$ret['data_rhk_cascading'] = $html_rhk_cascading;
@@ -8452,21 +8470,33 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 		// hasil ploting di halaman RHK
 		$data_ploting_rhk = $wpdb->get_results(
-			$wpdb->prepare("
-				SELECT 
-					id,
-					label,
-					level,
-					satker_id
-				FROM esakip_data_rencana_aksi_opd
-				WHERE id_skpd = %d 
-				  AND tahun_anggaran = %d 
-				  AND nip = %d 
-				  AND id_jabatan = %s 
-				  AND active = 1
-				ORDER BY kode_cascading_sasaran, kode_cascading_program, id_sub_skpd_cascading, kode_cascading_kegiatan, kode_cascading_sub_kegiatan, level, id ASC
-			", $id_skpd, $options['tahun'], $options['nip_baru'], $options['satker_id']),
-			ARRAY_A
+		    $wpdb->prepare("
+		        SELECT 
+		            id,
+		            label,
+		            level,
+		            satker_id,
+		            no_urut
+		        FROM esakip_data_rencana_aksi_opd
+		        WHERE id_skpd = %d 
+		          AND tahun_anggaran = %d 
+		          AND nip = %d 
+		          AND id_jabatan = %s 
+		          AND active = 1
+		        ORDER BY 
+		            CASE 
+		                WHEN level = 1 THEN no_urut 
+		                ELSE 1 
+		            END ASC,
+		            kode_cascading_sasaran, 
+		            kode_cascading_program, 
+		            id_sub_skpd_cascading, 
+		            kode_cascading_kegiatan, 
+		            kode_cascading_sub_kegiatan, 
+		            level, 
+		            id ASC
+		    ", $id_skpd, $options['tahun'], $options['nip_baru'], $options['satker_id']),
+		    ARRAY_A
 		);
 
 		$data_anggaran = array(
