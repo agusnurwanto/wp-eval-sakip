@@ -8542,6 +8542,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						} else {
 							$satuan_indikator = '';							
 						}
+
+						$target_teks_akhir = $v_indikator['target_teks_akhir'] ?? '';
+
 						$html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '" id-indikator="' . $v_indikator['id'] . '">';
 
 						if ($index === 0) {
@@ -8551,7 +8554,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 
 						$html_indikator .= '<td class="text-left">' . $v_indikator['indikator'] . '</td>';
-						$html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $satuan_indikator . '</td>';
+						$html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $target_teks_akhir . ' ' . $satuan_indikator . '</td>';
 						$html_indikator .= '</tr>';
 					}
 				} else {
