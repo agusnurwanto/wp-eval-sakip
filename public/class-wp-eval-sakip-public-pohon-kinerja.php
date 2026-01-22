@@ -912,7 +912,6 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 							$id_skpd
 						), ARRAY_A);
 					}
-print_r($dataPokin); die($wpdb->last_query);
 					$data = [
 						'data' => [],
 						'parent' => []
