@@ -1000,6 +1000,13 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             }
         });
 
+        var is_satuan = 0;
+        if (jQuery("#is_satuan").is(":checked")) {
+            is_satuan = 1;
+        } else {
+            is_satuan = 0;
+        }
+
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -1035,7 +1042,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 "target_teks_tw_4": target_teks_tw_4,
                 "set_target_teks": set_target_teks,
                 "rumus_indikator": rumus_indikator,
-                "sumber_danas": sumberDanas
+                "sumber_danas": sumberDanas,
+                "is_satuan": is_satuan,
             },
             dataType: "json",
             success: function(res) {
@@ -3084,6 +3092,17 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                 `<option value="">Pilih Satuan</option>` +
                             `</select>` +
                         '</div>' +
+                    `</div>` +                    
+                    `<div class="form-group row">` +
+                        '<div class="col-md-2">' +
+                            `<label for="is_satuan">Tampil Satuan di PK</label>` +
+                        '</div>' +
+                        '<div class="col-md-10">' +
+                            `<div class="form-check" style="margin-top: 5px;">` +
+                                `<input class="form-check-input" type="checkbox" id="is_satuan" name="is_satuan" checked>` +
+                                `<label class="form-check-label" for="is_satuan">Tampilkan satuan di Perjanjian Kinerja</label>` +
+                            `</div>` +
+                        '</div>' +
                     `</div>` +
                     `${input_sumber_dana}` +
                     `${input_pagu}` +
@@ -3432,7 +3451,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                             jQuery('#cek-target-teks').prop('checked', false);
                                             jQuery(".target-teks").hide();
                                         }
-                                        
+
+                                        if (response.data.is_satuan == 1) {
+                                            jQuery('#is_satuan').prop('checked', true);
+                                        } else {
+                                            jQuery('#is_satuan').prop('checked', false);
+                                        }
                                         jQuery('#wrap-loading').hide();
                                     });
                                 });

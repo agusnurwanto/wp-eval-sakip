@@ -1818,6 +1818,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'rumus capaian kinerja tidak boleh kosong!';
 				}
+				$is_satuan = isset($_POST['is_satuan']) ? sanitize_text_field($_POST['is_satuan']) : '0';
 				if ($ret['status'] != 'error') {
 					$_POST['id'] = $_POST['id_label'];
 
@@ -1911,7 +1912,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
 						'aspek_rhk' => $_POST['aspek_rhk'],
-						'rumus_indikator' => $_POST['rumus_indikator']
+						'rumus_indikator' => $_POST['rumus_indikator'],
+						'is_satuan' => $is_satuan,
 					);
 
 					if ($_POST['set_target_teks'] == 1) {
@@ -7986,16 +7988,17 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		);
 		if (!empty($data_rhk_child)) {
 			foreach ($data_rhk_child as $v_rhk_child) {
-				// die(print_r($data_rhk_child));
+				$child_level_before = $v_rhk_child['level'] - 1;
 
 				$index_level = $jenis_level[$v_rhk_child['level']];
-				if ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 3) {
+				// die(print_r($index_level));
+				if ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 3 && $data_rhk_existing['input_rencana_pagu_level'] == 1) {
 					$index = $v_rhk_child['kode_cascading_sub_kegiatan'];
 					$index_level = 'sub_kegiatan';
-				} elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 2) {
+				} elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 2 && $data_rhk_existing['input_rencana_pagu_level'] == 1) {
 					$index = $v_rhk_child['kode_cascading_kegiatan'];
 					$index_level = 'kegiatan';
-				}  elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 1) {
+				}  elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 1 && $data_rhk_existing['input_rencana_pagu_level'] == 1) {
 					$index = $v_rhk_child['kode_cascading_program'];
 					$index_level = 'program';
 				} elseif ($v_rhk_child['level'] == 2) {
@@ -8005,7 +8008,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				} elseif ($v_rhk_child['level'] == 4) {
 					$index = $v_rhk_child['kode_cascading_sub_kegiatan'];
 				}
-
+				
 				if (empty($index)) {
 					continue;
 				}
@@ -8531,6 +8534,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				if (!empty($data_indikator_ploting_rhk)) {
 					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+						if ($v_indikator['is_satuan'] == 1) {
+							$satuan_indikator = $v_indikator['satuan'];
+						} else {
+							$satuan_indikator = '';							
+						}
 						$html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '" id-indikator="' . $v_indikator['id'] . '">';
 
 						if ($index === 0) {
@@ -8540,7 +8548,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 
 						$html_indikator .= '<td class="text-left">' . $v_indikator['indikator'] . '</td>';
-						$html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $v_indikator['satuan'] . '</td>';
+						$html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $satuan_indikator . '</td>';
 						$html_indikator .= '</tr>';
 					}
 				} else {

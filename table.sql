@@ -1554,6 +1554,7 @@ CREATE TABLE `esakip_data_rencana_aksi_indikator_opd` (
   `id_satuan_cascading` int(11) DEFAULT NULL,
   `status_indikator_cascading` int(11) DEFAULT NULL,
   `status_satuan_cascading` int(11) DEFAULT NULL,
+  `is_satuan` int(11) DEFAULT 1,
   PRIMARY key (id),
   KEY `id_renaksi` (`id_renaksi`),
   KEY `tahun_anggaran` (`tahun_anggaran`),
