@@ -34712,7 +34712,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		try {
 			$this->functions->validate($_POST, [
 				'api_key'    			=> 'required|string',
-				'format_halaman_kedua'  => 'required|in:gabungan,program,kegiatan,subkegiatan',
+				'format_halaman_kedua'  => 'required|in:gabungan,program,kegiatan,sub_kegiatan',
 				'id_pegawai' 			=> 'required|numeric',
 				'tahun_anggaran' 		=> 'required|numeric',
 			]);
