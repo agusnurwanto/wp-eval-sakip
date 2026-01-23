@@ -1818,6 +1818,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$ret['status'] = 'error';
 					$ret['message'] = 'rumus capaian kinerja tidak boleh kosong!';
 				}
+				$is_satuan = isset($_POST['is_satuan']) ? sanitize_text_field($_POST['is_satuan']) : '0';
 				if ($ret['status'] != 'error') {
 					$_POST['id'] = $_POST['id_label'];
 
@@ -1911,7 +1912,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						'tahun_anggaran' => $_POST['tahun_anggaran'],
 						'created_at' => current_time('mysql'),
 						'aspek_rhk' => $_POST['aspek_rhk'],
-						'rumus_indikator' => $_POST['rumus_indikator']
+						'rumus_indikator' => $_POST['rumus_indikator'],
+						'is_satuan' => $is_satuan,
 					);
 
 					if ($_POST['set_target_teks'] == 1) {
@@ -7934,81 +7936,85 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 	function get_rencana_pagu_rhk($opsi)
 	{
-		global $wpdb;
-		$opsi['data_ind'] = array();
-		$opsi['total'] = 0;
+	    global $wpdb;
+	    $opsi['data_ind'] = array();
+	    $opsi['total'] = 0;
 
-		// jika level rhk adalah yang terkahir maka tidak perlu cek rhk child
-		if ($opsi['level'] == 4) {
-			return $opsi;
-		}
+	    // jika level rhk adalah yang terakhir maka tidak perlu cek rhk child
+	    if ($opsi['level'] == 4) {
+	        return $opsi;
+	    }
 
-		$ids = implode(',', $opsi['ids']);
-		$data_rhk_existing = $wpdb->get_row(
-			$wpdb->prepare("
-				SELECT *
-				FROM esakip_data_rencana_aksi_opd 
-				WHERE id IN ($ids) 
-				  AND level = %d 
-				  AND id_skpd = %d
-				  AND active = 1
-				ORDER BY kode_cascading_program, 
-					kode_cascading_kegiatan, 
-					kode_cascading_sub_kegiatan
-			", $opsi['level'], $opsi['id_skpd']),
-			ARRAY_A
-		);
+	    $ids = implode(',', $opsi['ids']);
+	    
+	    $data_rhk_existing = $wpdb->get_results(
+	        $wpdb->prepare("
+	            SELECT *
+	            FROM esakip_data_rencana_aksi_opd 
+	            WHERE id IN ($ids) 
+	              AND level = %d 
+	              AND id_skpd = %d
+	              AND active = 1
+	            ORDER BY kode_cascading_program, 
+	                kode_cascading_kegiatan, 
+	                kode_cascading_sub_kegiatan
+	        ", $opsi['level'], $opsi['id_skpd']),
+	        ARRAY_A
+	    );
+	    
+	    $data_rhk_first = !empty($data_rhk_existing) ? $data_rhk_existing[0] : null;
 
-		if ($data_rhk_existing['input_rencana_pagu_level'] == 1) {
-			$data_rhk_child = array($data_rhk_existing);
-		} else {
-			$data_rhk_child = $wpdb->get_results(
-				$wpdb->prepare("
-					SELECT *
-					FROM esakip_data_rencana_aksi_opd 
-					WHERE parent IN ($ids) 
-					  AND level = %d 
-					  AND id_skpd = %d
-					  AND active = 1
-					ORDER BY kode_cascading_program, 
-						kode_cascading_kegiatan, 
-						kode_cascading_sub_kegiatan
-				", $opsi['level'] + 1, $opsi['id_skpd']),
-				ARRAY_A
-			);
-		}
+	    if (!empty($data_rhk_first) && $data_rhk_first['input_rencana_pagu_level'] == 1) {
+	        $data_rhk_child = $data_rhk_existing;
+	    } else {
+	        $data_rhk_child = $wpdb->get_results(
+	            $wpdb->prepare("
+	                SELECT *
+	                FROM esakip_data_rencana_aksi_opd 
+	                WHERE parent IN ($ids) 
+	                  AND level = %d 
+	                  AND id_skpd = %d
+	                  AND active = 1
+	                ORDER BY kode_cascading_program, 
+	                    kode_cascading_kegiatan, 
+	                    kode_cascading_sub_kegiatan
+	            ", $opsi['level'] + 1, $opsi['id_skpd']),
+	            ARRAY_A
+	        );
+	    }
+	    
+	    $jenis_level = array(
+	        '1' => 'sasaran',
+	        '2' => 'program',
+	        '3' => 'kegiatan',
+	        '4' => 'sub_kegiatan'
+	    );
+	    
+	    if (!empty($data_rhk_child)) {
+	        foreach ($data_rhk_child as $v_rhk_child) {
 
-		$jenis_level = array(
-			'1' => 'sasaran',
-			'2' => 'program',
-			'3' => 'kegiatan',
-			'4' => 'sub_kegiatan'
-		);
-		if (!empty($data_rhk_child)) {
-			foreach ($data_rhk_child as $v_rhk_child) {
-				// die(print_r($data_rhk_child));
+	            $index_level = $jenis_level[$v_rhk_child['level']];	            
+	            if ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 3 && !empty($data_rhk_first) && $data_rhk_first['input_rencana_pagu_level'] == 1) {
+	                $index = $v_rhk_child['kode_cascading_sub_kegiatan'];
+	                $index_level = 'sub_kegiatan';
+	            } elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 2 && !empty($data_rhk_first) && $data_rhk_first['input_rencana_pagu_level'] == 1) {
+	                $index = $v_rhk_child['kode_cascading_kegiatan'];
+	                $index_level = 'kegiatan';
+	            } elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 1 && !empty($data_rhk_first) && $data_rhk_first['input_rencana_pagu_level'] == 1) {
+	                $index = $v_rhk_child['kode_cascading_program'];
+	                $index_level = 'program';
+	            } elseif ($v_rhk_child['level'] == 2) {
+	                $index = $v_rhk_child['kode_cascading_program'];
+	            } elseif ($v_rhk_child['level'] == 3) {
+	                $index = $v_rhk_child['kode_cascading_kegiatan'];
+	            } elseif ($v_rhk_child['level'] == 4) {
+	                $index = $v_rhk_child['kode_cascading_sub_kegiatan'];
+	            }
 
-				$index_level = $jenis_level[$v_rhk_child['level']];
-				if ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 3) {
-					$index = $v_rhk_child['kode_cascading_sub_kegiatan'];
-					$index_level = 'sub_kegiatan';
-				} elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 2) {
-					$index = $v_rhk_child['kode_cascading_kegiatan'];
-					$index_level = 'kegiatan';
-				}  elseif ($v_rhk_child['input_rencana_pagu_level'] == 1 && $v_rhk_child['cascading_pk'] == 1) {
-					$index = $v_rhk_child['kode_cascading_program'];
-					$index_level = 'program';
-				} elseif ($v_rhk_child['level'] == 2) {
-					$index = $v_rhk_child['kode_cascading_program'];
-				} elseif ($v_rhk_child['level'] == 3) {
-					$index = $v_rhk_child['kode_cascading_kegiatan'];
-				} elseif ($v_rhk_child['level'] == 4) {
-					$index = $v_rhk_child['kode_cascading_sub_kegiatan'];
-				}
+	            if (empty($index)) {
+	                continue;
+	            }
 
-				if (empty($index)) {
-					continue;
-				}
 
 				$opsi['data_ind'][$v_rhk_child['id']] = array();
 				if (empty($opsi['data_anggaran'][$index_level][$index])) {
@@ -8531,6 +8537,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 				if (!empty($data_indikator_ploting_rhk)) {
 					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+						if ($v_indikator['is_satuan'] == 1) {
+							$satuan_indikator = $v_indikator['satuan'];
+						} else {
+							$satuan_indikator = '';							
+						}
+
+						$target_teks_akhir = $v_indikator['target_teks_akhir'] ?? '';
+
 						$html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '" id-indikator="' . $v_indikator['id'] . '">';
 
 						if ($index === 0) {
@@ -8540,7 +8554,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 
 						$html_indikator .= '<td class="text-left">' . $v_indikator['indikator'] . '</td>';
-						$html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $v_indikator['satuan'] . '</td>';
+						$html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $target_teks_akhir . ' ' . $satuan_indikator . '</td>';
 						$html_indikator .= '</tr>';
 					}
 				} else {

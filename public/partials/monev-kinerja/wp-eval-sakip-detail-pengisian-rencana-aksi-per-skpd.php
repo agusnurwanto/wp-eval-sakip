@@ -1000,6 +1000,13 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             }
         });
 
+        var is_satuan = 0;
+        if (jQuery("#is_satuan").is(":checked")) {
+            is_satuan = 1;
+        } else {
+            is_satuan = 0;
+        }
+
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -1035,7 +1042,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 "target_teks_tw_4": target_teks_tw_4,
                 "set_target_teks": set_target_teks,
                 "rumus_indikator": rumus_indikator,
-                "sumber_danas": sumberDanas
+                "sumber_danas": sumberDanas,
+                "is_satuan": is_satuan,
             },
             dataType: "json",
             success: function(res) {
@@ -2605,6 +2613,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             var parent_cascading = '';
             var kode_cascading = '';
             var id_sub_skpd_cascading = 0;
+            var id_cascading_filter = null;
             
             // Untuk input rencana pagu
             if (get_rhk.input_rencana_pagu_level == 1) {
@@ -2613,16 +2622,19 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     kode_cascading = get_rhk_parent.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk_parent.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (status == 0 && tipe != 4){
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (status == 0 && tipe == 4){
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 }
             } else {
                 if (tipe == 1) {
@@ -2630,11 +2642,11 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     
                     if (get_rhk.is_tujuan && get_rhk.is_tujuan != '0') {
                         kode_cascading = get_rhk.kode_cascading_sasaran;
-                        
+                        id_cascading_filter = get_rhk.id_cascading || get_rhk.kode_cascading_sasaran;
                         console.log('Ambil indikator dari TUJUAN dengan kode:', kode_cascading);
                     } else {
                         kode_cascading = get_rhk.id_cascading || get_rhk.kode_cascading_sasaran;
-                        
+                        id_cascading_filter = kode_cascading;
                         console.log('Ambil indikator dari SASARAN dengan kode:', kode_cascading);
                     }
                 } else if (tipe == 2) {
@@ -2642,16 +2654,19 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     kode_cascading = get_rhk.kode_cascading_program;
                     parent_cascading = get_rhk.kode_cascading_program;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || get_rhk.id_skpd;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (tipe == 3) {
                     jenis_cascading = 'kegiatan';
                     kode_cascading = get_rhk.kode_cascading_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_program;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 } else if (tipe == 4) {
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
                     id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
                 }
             }
             
@@ -2659,6 +2674,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 tipe: tipe,
                 jenis_cascading: jenis_cascading,
                 kode_cascading: kode_cascading,
+                id_cascading_filter: id_cascading_filter,
                 is_tujuan: get_rhk.is_tujuan,
                 parent_cascading: parent_cascading,
             });
@@ -2808,6 +2824,10 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         if (status == 1) {
                             if (matched_data.get_transformasi_cascading_pelaksana && Array.isArray(matched_data.get_transformasi_cascading_pelaksana)) {
                                 matched_data.get_transformasi_cascading_pelaksana.forEach(function(trans) {
+                                    if (id_cascading_filter && trans.id_uraian_cascading != id_cascading_filter) {
+                                        return;
+                                    }
+                                    
                                     if (trans.induk && trans.induk.indikator && Array.isArray(trans.induk.indikator)) {
                                         trans.induk.indikator.forEach(function(ind) {
                                             if (!result.indikator.find(i => i.id === ind.id)) {
@@ -2833,6 +2853,10 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         } else {
                             if (matched_data.get_transformasi_cascading && Array.isArray(matched_data.get_transformasi_cascading)) {
                                 matched_data.get_transformasi_cascading.forEach(function(trans) {
+                                    if (id_cascading_filter && trans.id_uraian_cascading != id_cascading_filter) {
+                                        return;
+                                    }
+                                    
                                     if (trans.induk && trans.induk.indikator && Array.isArray(trans.induk.indikator)) {
                                         trans.induk.indikator.forEach(function(ind) {
                                             if (!result.indikator.find(i => i.id === ind.id)) {
@@ -2858,7 +2882,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         }
                     }
                     
-                    console.log('Result indikator satuan:', result);
+                    console.log('Data indikator satuan:', result);
                     resolve(result);
                 })
                 .catch(function(error) {
@@ -3083,6 +3107,17 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             `<select class="form-control" id="satuan_indikator">` +
                                 `<option value="">Pilih Satuan</option>` +
                             `</select>` +
+                        '</div>' +
+                    `</div>` +                    
+                    `<div class="form-group row">` +
+                        '<div class="col-md-2">' +
+                            `<label for="is_satuan">Tampil Satuan di PK</label>` +
+                        '</div>' +
+                        '<div class="col-md-10">' +
+                            `<div class="form-check" style="margin-top: 5px;">` +
+                                `<input class="form-check-input" type="checkbox" id="is_satuan" name="is_satuan" checked>` +
+                                `<label class="form-check-label" for="is_satuan">Tampilkan satuan di Perjanjian Kinerja</label>` +
+                            `</div>` +
                         '</div>' +
                     `</div>` +
                     `${input_sumber_dana}` +
@@ -3432,7 +3467,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                             jQuery('#cek-target-teks').prop('checked', false);
                                             jQuery(".target-teks").hide();
                                         }
-                                        
+
+                                        if (response.data.is_satuan == 1) {
+                                            jQuery('#is_satuan').prop('checked', true);
+                                        } else {
+                                            jQuery('#is_satuan').prop('checked', false);
+                                        }
                                         jQuery('#wrap-loading').hide();
                                     });
                                 });
