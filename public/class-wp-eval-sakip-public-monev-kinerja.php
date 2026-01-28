@@ -2613,7 +2613,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$label_cascading = '';
 						if ($v['detail']['input_rencana_pagu_level'] == 1) {
 							if ($v['detail']['label_cascading_sasaran']) {
-								$label_cascading .= $v['detail']['kode_cascading_sasaran'] . ' ' . $v['detail']['label_cascading_sasaran'];
+								$label_cascading .= $v['detail']['label_cascading_sasaran'];
 							}
 							if ($v['detail']['label_cascading_program']) {
 								$label_cascading .= '<br>' . $v['detail']['kode_cascading_program'] . ' ' . $v['detail']['label_cascading_program'];
@@ -2628,7 +2628,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							}
 						} else {
 							if ($v['detail']['label_cascading_sasaran']) {
-								$label_cascading = $v['detail']['kode_cascading_sasaran'] . ' ' . $v['detail']['label_cascading_sasaran'];
+								$label_cascading = $v['detail']['label_cascading_sasaran'];
 							}
 						}
 						$html .= '
