@@ -34475,15 +34475,23 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         return $pegawai;
     }
 
-    public function get_data_pegawai_simpeg_by_satker_id($satker_id)
+    public function get_data_pegawai_simpeg_by_satker_id($satker_id, $tahun_anggaran)
     {
         global $wpdb; 
 
-		$sql = $wpdb->prepare(
-			"SELECT * FROM {$this->table_data_pegawai_simpeg} WHERE satker_id = %s AND active = 1",
-			$satker_id
-		);
-        
+		$sql = $wpdb->prepare("
+			SELECT 
+				p.*,
+				s.nama AS nama_bidang 
+			FROM {$this->table_data_pegawai_simpeg} p 
+			JOIN {$this->table_data_satker_simpeg} s
+			  ON p.satker_id = s.satker_id
+			  AND s.tahun_anggaran = %d
+			WHERE p.active = 1
+			  AND p.satker_id = %s
+			", $tahun_anggaran, $satker_id
+        );
+
         $pegawai = $wpdb->get_results($sql, OBJECT);
 
         return $pegawai;
@@ -34618,15 +34626,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
         try {
             $this->functions->validate($_POST, [
                 'api_key'   => 'required|string',
-                'satker_id' => 'required|numeric'
+                'satker_id' => 'required|numeric',
+                'tahun_anggaran' => 'required|numeric'
             ]);
 
             if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
                  throw new Exception("API key tidak valid atau tidak ditemukan!", 401);
             }
 
-            $satker_id = intval($_POST['satker_id']);
-            $data_pegawai = $this->get_data_pegawai_simpeg_by_satker_id($satker_id);
+            $satker_id = $_POST['satker_id'];
+            $data_pegawai = $this->get_data_pegawai_simpeg_by_satker_id($satker_id, $_POST['tahun_anggaran']);
 
             if ($data_pegawai) {
                 echo json_encode([
@@ -34753,7 +34762,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 				// Jika terapkan ke seluruh satker
 				if ($terapkan_all_satker) {
-					$pegawai_satu_satker = $this->get_data_pegawai_simpeg_by_satker_id($data_pegawai->satker_id);
+					$pegawai_satu_satker = $this->get_data_pegawai_simpeg_by_satker_id($data_pegawai->satker_id, $_POST['tahun_anggaran']);
 
 					$pegawai_diupdate_count = 0;
 					foreach ($pegawai_satu_satker as $v) {
