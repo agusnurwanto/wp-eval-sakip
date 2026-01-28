@@ -346,7 +346,9 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                     jQuery('#nama-pegawai-atasan-teks-container').show();
 
                     jQuery('#nama-pegawai-atasan').val('').trigger('change');
-                    jQuery('#nama-pegawai-atasan-teks').val(`${data.atasan.nama_pegawai} (${data.atasan.nip_baru}) | ${data.atasan.jabatan}`);
+                    const opt = formatPegawaiOption(data.atasan);
+
+                    jQuery('#nama-pegawai-atasan-teks').val(`${opt.label}`);
 
                     // Jika tidak ada atasan definitif, izinkan pemilihan manual
                 } else {
@@ -378,10 +380,14 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                         .done(function(pegawaiResponse) {
                             if (pegawaiResponse.status && pegawaiResponse.data.length > 0) {
                                 pegawaiResponse.data.forEach(function(pegawai) {
-                                    // Hindari menampilkan diri sendiri di list atasan
-                                    if (pegawai.id != data.id) {
-                                        pegawaiOptions += `<option value="${pegawai.id}">${pegawai.nama_pegawai} (${pegawai.nip_baru}) | ${pegawai.jabatan}</option>`;
-                                    }
+                                    const opt = formatPegawaiOption(pegawai, data.id);
+                                    if (!opt) return;
+
+                                    pegawaiOptions += `
+                                        <option value="${opt.value}">
+                                            ${opt.label}
+                                        </option>
+                                    `;
                                 });
                             }
                             jQuery('#nama-pegawai-atasan').html(pegawaiOptions).select2({
@@ -407,7 +413,9 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
 
                 jQuery('#id-pegawai').val(data.id);
                 jQuery('#nama-pegawai').val(data.nama_pegawai);
-                jQuery('#nama-jabatan-pegawai-custom').val(data.custom_jabatan || data.jabatan + ' ' + namaSatuanKerja);
+                jQuery('#nama-jabatan-pegawai-custom').val(
+                    data.custom_jabatan || (data.jabatan?.trim() + ' ' + namaSatuanKerja?.trim())
+                );
                 jQuery('#nama-satker').val(namaSatuanKerja);
                 jQuery('#nama-satker-info').text(namaSatuanKerja);
                 jQuery('#info-atasan-pegawai').text(message);
@@ -434,6 +442,43 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
         });
     }
 
+    function formatPegawaiOption(pegawai, currentUserId = null) {
+        // Hindari menampilkan diri sendiri
+        if (currentUserId && pegawai.id == currentUserId) {
+            return null;
+        }
+
+        // ===== JABATAN =====
+        let jabatan = '-';
+
+        if (pegawai.custom_jabatan && pegawai.custom_jabatan.trim() !== '') {
+            jabatan = pegawai.custom_jabatan.trim();
+        } else {
+            const jab = (pegawai.jabatan || '').trim();
+            const bidang = (pegawai.nama_bidang || '').trim();
+            jabatan = `${jab} ${bidang}`.trim();
+        }
+
+        if (pegawai.plt_plh === "1" && pegawai.plt_plh_teks) {
+            jabatan = `${pegawai.plt_plh_teks.trim()} ${jabatan}`;
+        }
+
+        // ===== NAMA =====
+        const namaLengkap = [
+            (pegawai.gelar_depan || '').trim(),
+            (pegawai.nama_pegawai || '').trim(),
+            (pegawai.gelar_belakang || '').trim()
+        ].filter(Boolean).join(' ');
+
+        const nip = (pegawai.nip_baru || '').trim();
+
+        return {
+            value: pegawai.id,
+            label: `${namaLengkap} (${nip}) | ${jabatan}`
+        };
+    }
+
+
     function getPegawaiBySatkerId(satkerId) {
         return jQuery.ajax({
             url: esakip.url,
@@ -441,7 +486,8 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
             data: {
                 action: 'get_data_pegawai_simpeg_by_satker_id_ajax',
                 api_key: esakip.api_key,
-                satker_id: satkerId
+                satker_id: satkerId,
+                tahun_anggaran: <?php echo $input['tahun_anggaran']; ?>
             },
             dataType: 'json'
         });
