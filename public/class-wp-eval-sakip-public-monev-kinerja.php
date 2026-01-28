@@ -2826,31 +2826,32 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							}
 
 							// rhk level 2 cascading program
-							if ($v['detail']['input_rencana_pagu_level'] == 1) {
-							    // jika parent sudah input sub keg, maka hapus cascading di rhk child nya
-							    if (
-							        !empty($renaksi['detail']['kode_cascading_sasaran'])
-							        || !empty($renaksi['detail']['kode_cascading_program'])
-							        || !empty($renaksi['detail']['kode_cascading_kegiatan'])
-							        || !empty($renaksi['detail']['kode_cascading_sub_kegiatan'])
-							        || !empty($renaksi['detail']['pagu_cascading'])
-							    ) {
-							        $wpdb->update('esakip_data_rencana_aksi_opd', array(
-							            'kode_cascading_sasaran' => '',
-							            'kode_cascading_program' => '',
-							            'kode_cascading_kegiatan' => '',
-							            'kode_cascading_sub_kegiatan' => '',
-							            'label_cascading_sasaran' => '',
-							            'label_cascading_program' => '',
-							            'label_cascading_kegiatan' => '',
-							            'label_cascading_sub_kegiatan' => '',
-							            'pagu_cascading' => '0'
-							        ), array(
-							            'id' => $renaksi['detail']['id']
-							        ));
-							        $renaksi['detail']['label_cascading_program'] = '';
-							    }
-							} else {
+							// if ($v['detail']['input_rencana_pagu_level'] == 1) {
+							//     // jika parent sudah input sub keg, maka hapus cascading di rhk child nya
+							//     if (
+							//         !empty($renaksi['detail']['kode_cascading_sasaran'])
+							//         || !empty($renaksi['detail']['kode_cascading_program'])
+							//         || !empty($renaksi['detail']['kode_cascading_kegiatan'])
+							//         || !empty($renaksi['detail']['kode_cascading_sub_kegiatan'])
+							//         || !empty($renaksi['detail']['pagu_cascading'])
+							//     ) {
+							//         $wpdb->update('esakip_data_rencana_aksi_opd', array(
+							//             'kode_cascading_sasaran' => '',
+							//             'kode_cascading_program' => '',
+							//             'kode_cascading_kegiatan' => '',
+							//             'kode_cascading_sub_kegiatan' => '',
+							//             'label_cascading_sasaran' => '',
+							//             'label_cascading_program' => '',
+							//             'label_cascading_kegiatan' => '',
+							//             'label_cascading_sub_kegiatan' => '',
+							//             'pagu_cascading' => '0'
+							//         ), array(
+							//             'id' => $renaksi['detail']['id']
+							//         ));
+							//         $renaksi['detail']['label_cascading_program'] = '';
+							//     }
+							// } else {
+							if ($v['detail']['input_rencana_pagu_level'] != 1) {
 							    if ($renaksi['detail']['input_rencana_pagu_level'] == 1) {
 							        if (empty($renaksi['detail']['kode_cascading_sub_kegiatan'])) {
 							            $keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
@@ -3306,34 +3307,38 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								}
 
 								// rhk level 3 cascading kegiatan
+								// if (
+								//     $v['detail']['input_rencana_pagu_level'] == 1
+								//     || $renaksi['detail']['input_rencana_pagu_level'] == 1
+								// ) {
+								//     // jika parent sudah input sub keg, maka hapus cascading di rhk child nya
+								//     if (
+								//         !empty($uraian_renaksi['detail']['kode_cascading_sasaran'])
+								//         || !empty($uraian_renaksi['detail']['kode_cascading_program'])
+								//         || !empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])
+								//         || !empty($uraian_renaksi['detail']['kode_cascading_sub_kegiatan'])
+								//         || !empty($uraian_renaksi['detail']['pagu_cascading'])
+								//     ) {
+								//         $wpdb->update('esakip_data_rencana_aksi_opd', array(
+								//             'kode_cascading_sasaran' => '',
+								//             'kode_cascading_program' => '',
+								//             'kode_cascading_kegiatan' => '',
+								//             'kode_cascading_sub_kegiatan' => '',
+								//             'label_cascading_sasaran' => '',
+								//             'label_cascading_program' => '',
+								//             'label_cascading_kegiatan' => '',
+								//             'label_cascading_sub_kegiatan' => '',
+								//             'pagu_cascading' => '0'
+								//         ), array(
+								//             'id' => $uraian_renaksi['detail']['id']
+								//         ));
+								//         $uraian_renaksi['detail']['label_cascading_kegiatan'] = '';
+								//     }
+								// } else {
 								if (
-								    $v['detail']['input_rencana_pagu_level'] == 1
-								    || $renaksi['detail']['input_rencana_pagu_level'] == 1
+								    $v['detail']['input_rencana_pagu_level'] != 1
+								    || $renaksi['detail']['input_rencana_pagu_level'] != 1
 								) {
-								    // jika parent sudah input sub keg, maka hapus cascading di rhk child nya
-								    if (
-								        !empty($uraian_renaksi['detail']['kode_cascading_sasaran'])
-								        || !empty($uraian_renaksi['detail']['kode_cascading_program'])
-								        || !empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])
-								        || !empty($uraian_renaksi['detail']['kode_cascading_sub_kegiatan'])
-								        || !empty($uraian_renaksi['detail']['pagu_cascading'])
-								    ) {
-								        $wpdb->update('esakip_data_rencana_aksi_opd', array(
-								            'kode_cascading_sasaran' => '',
-								            'kode_cascading_program' => '',
-								            'kode_cascading_kegiatan' => '',
-								            'kode_cascading_sub_kegiatan' => '',
-								            'label_cascading_sasaran' => '',
-								            'label_cascading_program' => '',
-								            'label_cascading_kegiatan' => '',
-								            'label_cascading_sub_kegiatan' => '',
-								            'pagu_cascading' => '0'
-								        ), array(
-								            'id' => $uraian_renaksi['detail']['id']
-								        ));
-								        $uraian_renaksi['detail']['label_cascading_kegiatan'] = '';
-								    }
-								} else {
 								    if ($uraian_renaksi['detail']['input_rencana_pagu_level'] == 1) {
 								        if (empty($uraian_renaksi['detail']['kode_cascading_sub_kegiatan'])) {
 								            $keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
@@ -3689,35 +3694,40 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									}
 
 									// rhk level 4 cascading sub kegiatan
+									// if (
+									//     $v['detail']['input_rencana_pagu_level'] == 1
+									//     || $renaksi['detail']['input_rencana_pagu_level'] == 1
+									//     || $uraian_renaksi['detail']['input_rencana_pagu_level'] == 1
+									// ) {
+									//     // jika parent sudah input sub keg, maka hapus cascading di rhk child nya
+									//     if (
+									//         !empty($uraian_teknis_kegiatan['detail']['kode_cascading_sasaran'])
+									//         || !empty($uraian_teknis_kegiatan['detail']['kode_cascading_program'])
+									//         || !empty($uraian_teknis_kegiatan['detail']['kode_cascading_kegiatan'])
+									//         || !empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])
+									//         || !empty($uraian_teknis_kegiatan['detail']['pagu_cascading'])
+									//     ) {
+									//         $wpdb->update('esakip_data_rencana_aksi_opd', array(
+									//             'kode_cascading_sasaran' => '',
+									//             'kode_cascading_program' => '',
+									//             'kode_cascading_kegiatan' => '',
+									//             'kode_cascading_sub_kegiatan' => '',
+									//             'label_cascading_sasaran' => '',
+									//             'label_cascading_program' => '',
+									//             'label_cascading_kegiatan' => '',
+									//             'label_cascading_sub_kegiatan' => '',
+									//             'pagu_cascading' => '0'
+									//         ), array(
+									//             'id' => $uraian_teknis_kegiatan['detail']['id']
+									//         ));
+									//         $uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan'] = '';
+									//     }
+									// } else {
 									if (
-									    $v['detail']['input_rencana_pagu_level'] == 1
-									    || $renaksi['detail']['input_rencana_pagu_level'] == 1
-									    || $uraian_renaksi['detail']['input_rencana_pagu_level'] == 1
+									    $v['detail']['input_rencana_pagu_level'] != 1
+									    || $renaksi['detail']['input_rencana_pagu_level'] != 1
+									    || $uraian_renaksi['detail']['input_rencana_pagu_level'] != 1
 									) {
-									    // jika parent sudah input sub keg, maka hapus cascading di rhk child nya
-									    if (
-									        !empty($uraian_teknis_kegiatan['detail']['kode_cascading_sasaran'])
-									        || !empty($uraian_teknis_kegiatan['detail']['kode_cascading_program'])
-									        || !empty($uraian_teknis_kegiatan['detail']['kode_cascading_kegiatan'])
-									        || !empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])
-									        || !empty($uraian_teknis_kegiatan['detail']['pagu_cascading'])
-									    ) {
-									        $wpdb->update('esakip_data_rencana_aksi_opd', array(
-									            'kode_cascading_sasaran' => '',
-									            'kode_cascading_program' => '',
-									            'kode_cascading_kegiatan' => '',
-									            'kode_cascading_sub_kegiatan' => '',
-									            'label_cascading_sasaran' => '',
-									            'label_cascading_program' => '',
-									            'label_cascading_kegiatan' => '',
-									            'label_cascading_sub_kegiatan' => '',
-									            'pagu_cascading' => '0'
-									        ), array(
-									            'id' => $uraian_teknis_kegiatan['detail']['id']
-									        ));
-									        $uraian_teknis_kegiatan['detail']['label_cascading_sub_kegiatan'] = '';
-									    }
-									} else {
 									    if (empty($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'])) {
 									        $keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
 									    } else {
