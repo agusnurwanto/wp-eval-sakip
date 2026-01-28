@@ -2613,7 +2613,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$label_cascading = '';
 						if ($v['detail']['input_rencana_pagu_level'] == 1) {
 							if ($v['detail']['label_cascading_sasaran']) {
-								$label_cascading .= $v['detail']['kode_cascading_sasaran'] . ' ' . $v['detail']['label_cascading_sasaran'];
+								$label_cascading .= $v['detail']['label_cascading_sasaran'];
 							}
 							if ($v['detail']['label_cascading_program']) {
 								$label_cascading .= '<br>' . $v['detail']['kode_cascading_program'] . ' ' . $v['detail']['label_cascading_program'];
@@ -2628,7 +2628,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							}
 						} else {
 							if ($v['detail']['label_cascading_sasaran']) {
-								$label_cascading = $v['detail']['kode_cascading_sasaran'] . ' ' . $v['detail']['label_cascading_sasaran'];
+								$label_cascading = $v['detail']['label_cascading_sasaran'];
 							}
 						}
 						$html .= '
@@ -2855,7 +2855,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							        if (empty($renaksi['detail']['kode_cascading_sub_kegiatan'])) {
 							            $keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
 							        } else {
-							            // Buat key yang konsisten dengan frontend
 							            $parent_kode_cascading = $renaksi['detail']['kode_cascading_kegiatan'];
 							            $id_sub_skpd = $renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
 							            $key_cascading = 'sub_kegiatan-' . $parent_kode_cascading;
@@ -2866,7 +2865,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							            if (empty($data_all_wpsipd[$key_cascading])) {
 							                $_POST['jenis'] = 'sub_kegiatan';
 							                $_POST['parent_cascading'] = $parent_kode_cascading;
-							                $_POST['id_skpd'] = $_POST['id_skpd']; // Pastikan id_skpd dikirim
+							                $_POST['id_skpd'] = $_POST['id_skpd'];
 							                $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
 							                $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
 							                $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
@@ -2874,46 +2873,53 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							            
 							            // Update pagu dan validasi uraian cascading
 							            if (!empty($data_all_wpsipd[$key_cascading]['data'])) {
-							                foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
-							                    if ($renaksi['detail']['kode_cascading_sub_kegiatan'] == $val->kode_sub_giat) {
-							                        // Update pagu jika berbeda
-							                        if ($renaksi['detail']['pagu_cascading'] != $val->pagu) {
-							                            $wpdb->update('esakip_data_rencana_aksi_opd', array(
-							                                'pagu_cascading' => $val->pagu
-							                            ), array(
-							                                'id' => $renaksi['detail']['id']
-							                            ));
-							                        }
-							                        
-							                        // Validasi uraian cascading
-							                        $this->cek_uraian_cascading_rhk(
-							                            $renaksi['detail']['id'],
-							                            $val,
-							                            $renaksi['detail']['id_cascading'],
-							                            $renaksi['detail']['label'],
-							                            $renaksi['detail']['status_input_rencana_pagu']
-							                        );
+								            $kode_sub = $renaksi['detail']['kode_cascading_sub_kegiatan'];
+											$id_sub_skpd = $renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
 
-							                        foreach ($renaksi['indikator'] as $ind) {
-									                    $this->cek_indikator_satuan_cascading(
-									                        $ind['id'],
-									                        $val,
-									                        $ind['id_indikator_cascading'],
-									                        $ind['id_satuan_cascading'],
-									                        $ind['indikator'],
-									                        $ind['satuan']
-									                    );
-									                }
-									                break;
-							                    }
-							                }
-							            }
+											foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
+											    if (
+											        $val->kode_sub_giat !== $kode_sub
+											        || (int) ($val->id_sub_skpd ?? 0) !== (int) $id_sub_skpd
+											    ) {
+											        continue;
+											    }
+
+											    if ((float) $renaksi['detail']['pagu_cascading'] !== (float) $val->pagu) {
+											        $wpdb->update(
+											            'esakip_data_rencana_aksi_opd',
+											            ['pagu_cascading' => $val->pagu],
+											            ['id' => $renaksi['detail']['id']]
+											        );
+											    }
+
+											    $this->cek_uraian_cascading_rhk(
+											        $renaksi['detail']['id'],
+											        $val,
+											        $renaksi['detail']['id_cascading'],
+											        $renaksi['detail']['label'], 
+											        $renaksi['detail']['status_input_rencana_pagu'] 
+											    );
+
+											    foreach ($renaksi['indikator'] as $ind) {
+											        $this->cek_indikator_satuan_cascading(
+											            $ind['id'],
+											            $val,
+											            $ind['id_indikator_cascading'],
+											            $ind['id_satuan_cascading'],
+											            $ind['indikator'],
+											            $ind['satuan']
+											        );
+											    }
+
+											    break;
+											}
+
+								        }
 							        }
 							    } else {
 							        if (empty($renaksi['detail']['kode_cascading_program'])) {
 							            $keterangan .= '<li>Cascading Program Belum dipilih</li>';
 							        } else {
-							            // Buat key yang konsisten dengan frontend
 							            $parent_kode_cascading = $v['detail']['kode_cascading_sasaran'];
 							            $key_cascading = 'program-' . $parent_kode_cascading;
 							            
@@ -2929,37 +2935,45 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							            // Update pagu dan validasi uraian cascading
 							            if (!empty($data_all_wpsipd[$key_cascading]['data'])) {
 							                $kode_program_clean = explode('_', $renaksi['detail']['kode_cascading_program'])[0];
-							                foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
-							                    if ($kode_program_clean == $val->kode_program) {
-							                        if ($renaksi['detail']['pagu_cascading'] != $val->pagu) {
-							                            $wpdb->update('esakip_data_rencana_aksi_opd', array(
-							                                'pagu_cascading' => $val->pagu
-							                            ), array(
-							                                'id' => $renaksi['detail']['id']
-							                            ));
-							                        }
-							                        
-							                        // Validasi uraian cascading
-							                        $this->cek_uraian_cascading_rhk(
-							                            $renaksi['detail']['id'],
-							                            $val,
-							                            $renaksi['detail']['id_cascading'],
-							                            $renaksi['detail']['label'],
-							                            $renaksi['detail']['status_input_rencana_pagu']
-							                        );
+											$id_sub_skpd_prog   = $renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
 
-							                        foreach ($renaksi['indikator'] as $ind) {
-									                    $this->cek_indikator_satuan_cascading(
-									                        $ind['id'],
-									                        $val,
-									                        $ind['id_indikator_cascading'],
-									                        $ind['id_satuan_cascading'],
-									                        $ind['indikator'],
-									                        $ind['satuan']
-									                    );
-									                }
-									                break;
-							                    }
+											foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
+
+											    if (
+											        $val->kode_program !== $kode_program_clean
+											        || (int) ($val->id_sub_skpd ?? 0) !== (int) $id_sub_skpd_prog
+											    ) {
+											        continue;
+											    }
+
+											    if ((float) $renaksi['detail']['pagu_cascading'] !== (float) $val->pagu) {
+											        $wpdb->update(
+											            'esakip_data_rencana_aksi_opd',
+											            ['pagu_cascading' => $val->pagu],
+											            ['id' => $renaksi['detail']['id']]
+											        );
+											    }
+							                        
+						                        // Validasi uraian cascading
+						                        $this->cek_uraian_cascading_rhk(
+						                            $renaksi['detail']['id'],
+						                            $val,
+						                            $renaksi['detail']['id_cascading'],
+						                            $renaksi['detail']['label'],
+						                            $renaksi['detail']['status_input_rencana_pagu']
+						                        );
+
+						                        foreach ($renaksi['indikator'] as $ind) {
+								                    $this->cek_indikator_satuan_cascading(
+								                        $ind['id'],
+								                        $val,
+								                        $ind['id_indikator_cascading'],
+								                        $ind['id_satuan_cascading'],
+								                        $ind['indikator'],
+								                        $ind['satuan']
+								                    );
+								                }
+								                break;
 							                }
 							            }
 							            
@@ -3341,39 +3355,48 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								            }
 								            
 								            if (!empty($data_all_wpsipd[$key_cascading]['data'])) {
-								                foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
-								                    if ($uraian_renaksi['detail']['kode_cascading_sub_kegiatan'] == $val->kode_sub_giat) {
-								                        if ($uraian_renaksi['detail']['pagu_cascading'] != $val->pagu) {
-								                            $wpdb->update('esakip_data_rencana_aksi_opd', array(
-								                                'pagu_cascading' => $val->pagu
-								                            ), array(
-								                                'id' => $uraian_renaksi['detail']['id']
-								                            ));
-								                        }
-								                        
-								                        // Validasi uraian cascading
-								                        $this->cek_uraian_cascading_rhk(
-								                            $uraian_renaksi['detail']['id'],
-								                            $val,
-								                            $uraian_renaksi['detail']['id_cascading'],
-								                            $uraian_renaksi['detail']['label'],
-								                            $uraian_renaksi['detail']['status_input_rencana_pagu']
-								                        );
+									            $kode_sub = $uraian_renaksi['detail']['kode_cascading_sub_kegiatan'];
+												$id_sub_skpd = $uraian_renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
 
-								                        foreach ($uraian_renaksi['indikator'] as $ind) {
-										                    $this->cek_indikator_satuan_cascading(
-										                        $ind['id'],
-										                        $val,
-										                        $ind['id_indikator_cascading'],
-										                        $ind['id_satuan_cascading'],
-										                        $ind['indikator'],
-										                        $ind['satuan']
-										                    );
-										                }
-										                break;
-								                    }
-								                }
-								            }
+												foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
+												    if (
+												        $val->kode_sub_giat !== $kode_sub
+												        || (int) ($val->id_sub_skpd ?? 0) !== (int) $id_sub_skpd
+												    ) {
+												        continue;
+												    }
+
+												    if ((float) $uraian_renaksi['detail']['pagu_cascading'] !== (float) $val->pagu) {
+												        $wpdb->update(
+												            'esakip_data_rencana_aksi_opd',
+												            ['pagu_cascading' => $val->pagu],
+												            ['id' => $uraian_renaksi['detail']['id']]
+												        );
+												    }
+
+												    $this->cek_uraian_cascading_rhk(
+												        $uraian_renaksi['detail']['id'],
+												        $val,
+												        $uraian_renaksi['detail']['id_cascading'],
+												        $uraian_renaksi['detail']['label'], 
+												        $uraian_renaksi['detail']['status_input_rencana_pagu'] 
+												    );
+
+												    foreach ($renaksi['indikator'] as $ind) {
+												        $this->cek_indikator_satuan_cascading(
+												            $ind['id'],
+												            $val,
+												            $ind['id_indikator_cascading'],
+												            $ind['id_satuan_cascading'],
+												            $ind['indikator'],
+												            $ind['satuan']
+												        );
+												    }
+
+												    break;
+												}
+
+									        }
 								        }
 								    } else {
 								        if (empty($uraian_renaksi['detail']['kode_cascading_kegiatan'])) {
@@ -3396,38 +3419,46 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								            }
 								            
 								            if (!empty($data_all_wpsipd[$key_cascading]['data'])) {
-								                foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
-								                    if ($uraian_renaksi['detail']['kode_cascading_kegiatan'] == $val->kode_giat) {
-								                        if ($uraian_renaksi['detail']['pagu_cascading'] != $val->pagu) {
-								                            $wpdb->update('esakip_data_rencana_aksi_opd', array(
-								                                'pagu_cascading' => $val->pagu
-								                            ), array(
-								                                'id' => $uraian_renaksi['detail']['id']
-								                            ));
-								                        }
-								                        
-								                        // Validasi uraian cascading
-								                        $this->cek_uraian_cascading_rhk(
-								                            $uraian_renaksi['detail']['id'],
-								                            $val,
-								                            $uraian_renaksi['detail']['id_cascading'],
-								                            $uraian_renaksi['detail']['label'],
-								                            $uraian_renaksi['detail']['status_input_rencana_pagu']
-								                        );
+								                $kode_kegiatan = $uraian_renaksi['detail']['kode_cascading_kegiatan'];
+												$id_sub_skpd   = $uraian_renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
 
-								                        foreach ($uraian_renaksi['indikator'] as $ind) {
-										                    $this->cek_indikator_satuan_cascading(
-										                        $ind['id'],
-										                        $val,
-										                        $ind['id_indikator_cascading'],
-										                        $ind['id_satuan_cascading'],
-										                        $ind['indikator'],
-										                        $ind['satuan']
-										                    );
-										                }
-										                break;
-								                    }
-								                }
+												foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
+												    if (
+												        $val->kode_giat !== $kode_kegiatan
+												        || (int) ($val->id_sub_skpd ?? 0) !== (int) $id_sub_skpd
+												    ) {
+												        continue;
+												    }
+
+												    if ((float) $uraian_renaksi['detail']['pagu_cascading'] !== (float) $val->pagu) {
+												        $wpdb->update(
+												            'esakip_data_rencana_aksi_opd',
+												            ['pagu_cascading' => $val->pagu],
+												            ['id' => $uraian_renaksi['detail']['id']]
+												        );
+												    }
+
+												    $this->cek_uraian_cascading_rhk(
+												        $uraian_renaksi['detail']['id'],
+												        $val,
+												        $uraian_renaksi['detail']['id_cascading'],
+												        $uraian_renaksi['detail']['label'],
+												        $uraian_renaksi['detail']['status_input_rencana_pagu']
+												    );
+
+												    foreach ($uraian_renaksi['indikator'] as $ind) {
+												        $this->cek_indikator_satuan_cascading(
+												            $ind['id'],
+												            $val,
+												            $ind['id_indikator_cascading'],
+												            $ind['id_satuan_cascading'],
+												            $ind['indikator'],
+												            $ind['satuan']
+												        );
+												    }
+
+												    break;
+												}
 								            }
 								            
 								            // Prepare untuk sub_kegiatan
@@ -3707,38 +3738,47 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									        }
 									        
 									        if (!empty($data_all_wpsipd[$key_cascading]['data'])) {
-									            foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
-									                if ($uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'] == $val->kode_sub_giat) {
-									                    if ($uraian_teknis_kegiatan['detail']['pagu_cascading'] != $val->pagu) {
-									                        $wpdb->update('esakip_data_rencana_aksi_opd', array(
-									                            'pagu_cascading' => $val->pagu
-									                        ), array(
-									                            'id' => $uraian_teknis_kegiatan['detail']['id']
-									                        ));
-									                    }
-									                    
-									                    // Validasi uraian cascading
-									                    $this->cek_uraian_cascading_rhk(
-									                        $uraian_teknis_kegiatan['detail']['id'],
-									                        $val,
-									                        $uraian_teknis_kegiatan['detail']['id_cascading'],
-									                        $uraian_teknis_kegiatan['detail']['label'], 
-									                        $uraian_teknis_kegiatan['detail']['status_input_rencana_pagu'] 
-									                    );
+									            $kode_sub = $uraian_teknis_kegiatan['detail']['kode_cascading_sub_kegiatan'];
+												$id_sub_skpd = $uraian_teknis_kegiatan['detail']['id_sub_skpd_cascading'] ?? 0;
 
-									                    foreach ($uraian_teknis_kegiatan['indikator'] as $ind) {
-											                $this->cek_indikator_satuan_cascading(
-											                    $ind['id'],
-											                    $val,
-											                    $ind['id_indikator_cascading'],
-											                    $ind['id_satuan_cascading'],
-											                    $ind['indikator'],
-											                    $ind['satuan']
-											                );
-											            }
-											            break;
-									                }
-									            }
+												foreach ($data_all_wpsipd[$key_cascading]['data'] as $val) {
+												    if (
+												        $val->kode_sub_giat !== $kode_sub
+												        || (int) ($val->id_sub_skpd ?? 0) !== (int) $id_sub_skpd
+												    ) {
+												        continue;
+												    }
+
+												    if ((float) $uraian_teknis_kegiatan['detail']['pagu_cascading'] !== (float) $val->pagu) {
+												        $wpdb->update(
+												            'esakip_data_rencana_aksi_opd',
+												            ['pagu_cascading' => $val->pagu],
+												            ['id' => $uraian_teknis_kegiatan['detail']['id']]
+												        );
+												    }
+
+												    $this->cek_uraian_cascading_rhk(
+												        $uraian_teknis_kegiatan['detail']['id'],
+												        $val,
+												        $uraian_teknis_kegiatan['detail']['id_cascading'],
+												        $uraian_teknis_kegiatan['detail']['label'], 
+												        $uraian_teknis_kegiatan['detail']['status_input_rencana_pagu'] 
+												    );
+
+												    foreach ($uraian_teknis_kegiatan['indikator'] as $ind) {
+												        $this->cek_indikator_satuan_cascading(
+												            $ind['id'],
+												            $val,
+												            $ind['id_indikator_cascading'],
+												            $ind['id_satuan_cascading'],
+												            $ind['indikator'],
+												            $ind['satuan']
+												        );
+												    }
+
+												    break;
+												}
+
 									        }
 									    }
 									}
@@ -8543,7 +8583,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 							$satuan_indikator = '';							
 						}
 
-						$target_teks_akhir = $v_indikator['target_teks_akhir'] ?? '';
+						if ($v_indikator['target_teks_akhir'] == NULL) {
+							$target_akhir = $v_indikator['target_akhir'];
+						} else {
+							$target_akhir = $v_indikator['target_teks_akhir'];							
+						}
 
 						$html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '" id-indikator="' . $v_indikator['id'] . '">';
 
@@ -8554,7 +8598,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						}
 
 						$html_indikator .= '<td class="text-left">' . $v_indikator['indikator'] . '</td>';
-						$html_indikator .= '<td class="text-left">' . $v_indikator['target_akhir'] . ' ' . $target_teks_akhir . ' ' . $satuan_indikator . '</td>';
+						$html_indikator .= '<td class="text-left">' . $target_akhir . ' ' . $satuan_indikator . '</td>';
 						$html_indikator .= '</tr>';
 					}
 				} else {
