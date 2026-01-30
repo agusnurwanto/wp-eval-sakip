@@ -3490,17 +3490,29 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
     }
 
     function set_anggaran(that) {
-        let that_id = jQuery(that).attr('id');
         var tbody = jQuery('.input_sumber_dana > tbody');
         var tr = tbody.find('>tr');
         let total = 0;
-        tr.map(function(i, b) {
+
+        tr.each(function(i, b) {
             let id = i + 1;
-            let dana = jQuery("#pagu_sumber_dana_" + id).val()
-            if (dana) {
-                total = total + parseInt(dana);
+            // Ambil nilai mentah dari input
+            let val = jQuery("#pagu_sumber_dana_" + id).val();
+
+            if (val) {
+                // Konversi ke Float (desimal). 
+                // Input type="number" selalu menggunakan titik untuk desimal secara internal.
+                let dana = parseFloat(val);
+                
+                if (!isNaN(dana)) {
+                    total += dana;
+                }
             }
         });
+
+        // Menampilkan hasil ke #rencana_pagu
+        // Gunakan toFixed(2) jika ingin membatasi 2 angka di belakang koma
+        // Atau biarkan total saja jika ingin fleksibel
         jQuery("#rencana_pagu").val(total);
     }
 
@@ -4151,7 +4163,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                         `<td class="text-center">${b.satuan}</td>` +
                                         `<td class="text-center">${b.target_awal} ${target_teks_awal}</td>` +
                                         `<td class="text-center">${b.target_akhir} ${target_teks_akhir}</td>` +
-                                        `<td class="text-right">${formatRupiah(b.rencana_pagu) || 0}</td>` +
+                                        `<td class="text-right">${formatRupiah(parseFloat(b.rencana_pagu) || 0)}</td>` +
                                         `<td class="text-center">` +
                                             `<input type="checkbox" title="Lihat Rencana Hasil Kerja Per Bulan" class="lihat_bulanan" data-id="${b.id}" onclick="lihat_bulanan(this);" style="margin: 0 6px 0 0;">`;
                                 if (

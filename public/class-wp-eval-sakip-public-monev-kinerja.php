@@ -2062,14 +2062,21 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	function update_pagu_existing($opsi)
 	{
 		global $wpdb;
+		
+		// Pastikan key ada untuk menghindari undefined index
+		$pagu_rhk = isset($opsi['rencana_pagu_rhk']) ? (float)$opsi['rencana_pagu_rhk'] : 0;
+		$pagu_lama = isset($opsi['rencana_pagu']) ? (float)$opsi['rencana_pagu'] : 0;
+
 		if (
 			$opsi['input_rencana_pagu_level'] != 1
-			&& $opsi['rencana_pagu_rhk'] != $opsi['total_rhk_existing']
+			&& $pagu_rhk != $opsi['total_rhk_existing']
 		) {
-			if (!empty($opsi['rencana_pagu_rhk'])) {
-				$persen = ($opsi['rencana_pagu'] / $opsi['rencana_pagu_rhk']) * 100;
+			// PERBAIKAN: Cek spesifik apakah pembagi > 0
+			if ($pagu_rhk > 0) {
+				$persen = ($pagu_lama / $pagu_rhk) * 100;
 				$opsi['rencana_pagu'] = ($persen / 100) * $opsi['total_rhk_existing'];
-			} else if ($opsi['total_rhk_existing'] == 0) {
+			} else {
+				// Jika pagu_rhk adalah 0, set ke 0 untuk menghindari division by zero
 				$opsi['rencana_pagu'] = 0;
 			}
 
@@ -2077,10 +2084,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				'rencana_pagu' => $opsi['rencana_pagu'],
 				'rencana_pagu_rhk' => $opsi['total_rhk_existing']
 			), array('id' => $opsi['id']));
-
-			// print_r($opsi); die($wpdb->last_query);
 		}
-		return number_format((float)$opsi['rencana_pagu'], 0, ",", ".");
+		
+		return number_format((float)$opsi['rencana_pagu'], 2, ",", ".");
 	}
 
 	function format_rupiah_tanpa_rp($angka)
@@ -3571,7 +3577,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 										$target_4_html[$key] = $ind['target_4'];
 										$rencana_pagu_html[$key] = 0;
 										if (!empty($ind['rencana_pagu'])) {
-											$rencana_pagu_html[$key] = number_format((float)$ind['rencana_pagu'], 0, ",", ".");
+											$rencana_pagu_html[$key] = number_format((float)$ind['rencana_pagu'], 2, ",", ".");
 										}
 										$realisasi_pagu_html[$key] = !empty($ind['realisasi_pagu']) ? $ind['realisasi_pagu'] : 0;
 										$realisasi_1_html[$key] = !empty($ind['realisasi_tw_1']) ? $ind['realisasi_tw_1'] : 0;
@@ -5600,7 +5606,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$target_3_html = implode('<br>', $target_3_html);
 								$target_4_html = implode('<br>', $target_4_html);
 								$rencana_pagu = !empty($rencana_pagu_html) ? implode('<br>', array_map(function ($item) {
-									return number_format((float)$item, 0, ",", ".");
+									return number_format((float)$item, 2, ",", ".");
 								}, $rencana_pagu_html)) : 0;
 								$mitra_bidang_html = implode('<br>', $mitra_bidang_html);
 								$nama_skpd_html = implode('<br>', $nama_skpd_html);

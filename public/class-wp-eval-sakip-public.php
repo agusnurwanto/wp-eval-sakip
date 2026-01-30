@@ -34637,6 +34637,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
             $satker_id = $_POST['satker_id'];
             $data_pegawai = $this->get_data_pegawai_simpeg_by_satker_id($satker_id, $_POST['tahun_anggaran']);
 
+			if (strlen($satker_id) >= 4) {
+				$satker_induk = substr($satker_id, 0, -2);
+				$data_pegawai_induk = $this->get_data_pegawai_simpeg_by_satker_id($satker_induk, $_POST['tahun_anggaran']);
+				$data_pegawai = array_merge($data_pegawai, $data_pegawai_induk);
+			}
+
             if ($data_pegawai) {
                 echo json_encode([
                     'status'  => true,
