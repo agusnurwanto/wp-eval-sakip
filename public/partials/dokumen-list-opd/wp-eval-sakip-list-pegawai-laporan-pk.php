@@ -380,7 +380,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                         .done(function(pegawaiResponse) {
                             if (pegawaiResponse.status && pegawaiResponse.data.length > 0) {
                                 pegawaiResponse.data.forEach(function(pegawai) {
-                                    const opt = formatPegawaiOption(pegawai, data.id);
+                                    const opt = formatPegawaiOption(pegawai, data.nip_baru);
                                     if (!opt) return;
 
                                     pegawaiOptions += `
@@ -444,7 +444,7 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
 
     function formatPegawaiOption(pegawai, currentUserId = null) {
         // Hindari menampilkan diri sendiri
-        if (currentUserId && pegawai.id == currentUserId) {
+        if (currentUserId && pegawai.nip_baru == currentUserId) {
             return null;
         }
 
