@@ -290,19 +290,19 @@ $tahun = $input['tahun'];
 $show_alert_bulanan = 0;
 $get_bulanan_message = "-";
 if(!empty($tahun) && !empty($satker_id_pegawai_indikator) && !empty($id_skpd)){
-	$opsi_param = array(
-		'tahun' => $tahun,
+    $opsi_param = array(
+        'tahun' => $tahun,
         'satker_id' => $satker_id_pegawai_indikator,
-		'id_skpd' => $id_skpd,
-		'tipe' => 'satker'
-	);
+        'id_skpd' => $id_skpd,
+        'tipe' => 'satker'
+    );
 
-	$data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
-	$data_ekin_terbaru = json_decode($data_ekin, true);
-	$get_bulanan_message = $data_ekin_terbaru['message'];
-	if(!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']){
-		$show_alert_bulanan = 1;
-	}
+    $data_ekin = $this->get_data_perbulan_ekinerja($opsi_param);
+    $data_ekin_terbaru = json_decode($data_ekin, true);
+    $get_bulanan_message = $data_ekin_terbaru['message'];
+    if(!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']){
+        $show_alert_bulanan = 1;
+    }
 }
 
 $rincian_tagging = $this->functions->generatePage(array(
@@ -703,7 +703,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         window.hak_akses_pegawai = <?php echo $hak_akses_user_pegawai; ?>;
         window.nip_pegawai = <?php echo $nip_user_pegawai; ?>;
         window.get_data_bulanan_message = '<?php echo $get_bulanan_message; ?>';
-		window.show_alert_bulanan = '<?php echo $show_alert_bulanan; ?>';
+        window.show_alert_bulanan = '<?php echo $show_alert_bulanan; ?>';
         
         window.tahunAnggaran = <?php echo $input['tahun']; ?>;
         window.today = new Date();
@@ -745,9 +745,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         });
 
         if(get_data_bulanan_message != '-' && show_alert_bulanan == 1){
-			alert(get_data_bulanan_message);
-		}
-		console.log(get_data_bulanan_message)
+            alert(get_data_bulanan_message);
+        }
+        console.log(get_data_bulanan_message)
 
 
         jQuery('#show_anggaran_column').on('change', function() {
@@ -2707,7 +2707,6 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         } else if(typeof rhk_parent === 'object' && rhk_parent !== null) {
             get_rhk_parent = rhk_parent;
         }
-        
         return new Promise(function(resolve, reject) {
             var tipe = get_rhk.level;
             var status = get_rhk.status_input_rencana_pagu;
@@ -2717,21 +2716,63 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             var id_sub_skpd_cascading = 0;
             var id_cascading_filter = null;
             
-            // Untuk input rencana pagu
             if (get_rhk.input_rencana_pagu_level == 1) {
+                var cascading_pk = get_rhk.cascading_pk || 3;
+                
                 if (status == 1) {
-                    jenis_cascading = 'sub_kegiatan';
-                    kode_cascading = get_rhk_parent.kode_cascading_sub_kegiatan;
-                    parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
-                    id_sub_skpd_cascading = get_rhk_parent.id_sub_skpd_cascading || 0;
+                    // Jika status input pagu aktif, ambil dari parent
+                    if (cascading_pk == 1) { // Program
+                        jenis_cascading = 'program';
+                        kode_cascading = get_rhk_parent.kode_cascading_program;
+                        parent_cascading = get_rhk_parent.kode_cascading_sasaran;
+                        id_sub_skpd_cascading = get_rhk_parent.id_sub_skpd_cascading || 0;
+                    } else if (cascading_pk == 2) { // Kegiatan
+                        jenis_cascading = 'kegiatan';
+                        kode_cascading = get_rhk_parent.kode_cascading_kegiatan;
+                        parent_cascading = get_rhk_parent.kode_cascading_program;
+                        id_sub_skpd_cascading = get_rhk_parent.id_sub_skpd_cascading || 0;
+                    } else { // Sub Kegiatan (default)
+                        jenis_cascading = 'sub_kegiatan';
+                        kode_cascading = get_rhk_parent.kode_cascading_sub_kegiatan;
+                        parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
+                        id_sub_skpd_cascading = get_rhk_parent.id_sub_skpd_cascading || 0;
+                    }
                     id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
-                } else if (status == 0 && tipe != 4){
-                    jenis_cascading = 'sub_kegiatan';
-                    kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
-                    parent_cascading = get_rhk.kode_cascading_kegiatan;
-                    id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    
+                } else if (status == 0 && tipe == 2) {
+                    if (cascading_pk == 1) { // Program
+                        jenis_cascading = 'program';
+                        kode_cascading = get_rhk.kode_cascading_program;
+                        parent_cascading = get_rhk_parent.kode_cascading_sasaran;
+                        id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    } else if (cascading_pk == 2) { // Kegiatan
+                        jenis_cascading = 'kegiatan';
+                        kode_cascading = get_rhk.kode_cascading_kegiatan;
+                        parent_cascading = get_rhk.kode_cascading_program;
+                        id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    } else { // Sub Kegiatan (default)
+                        jenis_cascading = 'sub_kegiatan';
+                        kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
+                        parent_cascading = get_rhk.kode_cascading_kegiatan;
+                        id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    }
                     id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
-                } else if (status == 0 && tipe == 4){
+                    
+                } else if (status == 0 && tipe == 3) {
+                    if (cascading_pk == 2) { // Kegiatan
+                        jenis_cascading = 'kegiatan';
+                        kode_cascading = get_rhk.kode_cascading_kegiatan;
+                        parent_cascading = get_rhk_parent.kode_cascading_program;
+                        id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    } else { // Sub Kegiatan (default)
+                        jenis_cascading = 'sub_kegiatan';
+                        kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
+                        parent_cascading = get_rhk.kode_cascading_kegiatan;
+                        id_sub_skpd_cascading = get_rhk.id_sub_skpd_cascading || 0;
+                    }
+                    id_cascading_filter = get_rhk.id_cascading || get_rhk.id_uraian_cascading;
+                    
+                } else if (status == 0 && tipe == 4) {
                     jenis_cascading = 'sub_kegiatan';
                     kode_cascading = get_rhk.kode_cascading_sub_kegiatan;
                     parent_cascading = get_rhk_parent.kode_cascading_kegiatan;
@@ -2777,6 +2818,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 jenis_cascading: jenis_cascading,
                 kode_cascading: kode_cascading,
                 id_cascading_filter: id_cascading_filter,
+                cascading_pk: get_rhk.cascading_pk,
                 is_tujuan: get_rhk.is_tujuan,
                 parent_cascading: parent_cascading,
             });
@@ -2787,19 +2829,18 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 return;
             }
 
-            if (get_rhk.input_rencana_pagu_level == 1 && status == 0 && tipe != 4) {
-                var parent_cascading = kode_cascading;
-                if (jenis_cascading == 'program' && id_sub_skpd_cascading) {
-                    parent_cascading = kode_cascading.split('_')[0];
-                } else if (jenis_cascading == 'kegiatan' || jenis_cascading == 'sub_kegiatan') {
-                    if (jenis_cascading == 'kegiatan') {
-                        parent_cascading = get_rhk.kode_cascading_program ? get_rhk.kode_cascading_program.split('_')[0] : '';
-                    } else {
-                        parent_cascading = get_rhk.kode_cascading_kegiatan || '';
-                    }
-                }                
-            }
-            console.log('parent_cascading', parent_cascading);
+            // if (get_rhk.input_rencana_pagu_level == 1 && status == 0 && tipe != 4) {
+            //     var parent_cascading_for_query = kode_cascading;
+            //     if (jenis_cascading == 'program' && id_sub_skpd_cascading) {
+            //         parent_cascading_for_query = kode_cascading.split('_')[0];
+            //     } else if (jenis_cascading == 'kegiatan') {
+            //         parent_cascading_for_query = get_rhk.kode_cascading_program ? get_rhk.kode_cascading_program.split('_')[0] : '';
+            //     } else if (jenis_cascading == 'sub_kegiatan') {
+            //         parent_cascading_for_query = get_rhk.kode_cascading_kegiatan || '';
+            //     }
+            //     parent_cascading = parent_cascading_for_query;
+            // }        
+            
             return get_tujuan_sasaran_cascading(jenis_cascading, parent_cascading, id_sub_skpd_cascading)
                 .then(function() {
                     var key = jenis_cascading + '-' + parent_cascading;
@@ -3013,8 +3054,13 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     response.rencana_pagu = 0;
                 }
                 
-                setting_indikator_satuan(response.data_rhk, response.data_indikator, response.data_rhk_parent).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(id, tipe, +response.rencana_pagu, set_input_rencana_pagu, kode_sbl, '', indikator_satuan_data
-                    );
+                if (response.data_rhk && response.data_rhk[0]) {
+                    let rhk = response.data_rhk[0];                    
+                    window.current_cascading_pk = rhk.cascading_pk || null;
+                }
+                
+                setting_indikator_satuan(response.data_rhk, response.data_indikator, response.data_rhk_parent).then(function(indikator_satuan_data) {
+                    tambah_indikator_rencana_aksi(id, tipe, +response.rencana_pagu, set_input_rencana_pagu, kode_sbl, '', indikator_satuan_data);
                 });
             },
             error: function() {
@@ -3493,6 +3539,10 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     if(response.data.data_rhk_khusus.input_rencana_pagu_level != undefined){
                         setting_input_rencana_pagu = response.data.data_rhk_khusus.input_rencana_pagu_level;
                     }
+                    
+                    if (response.data.data_rhk_khusus.cascading_pk) {
+                        window.current_cascading_pk = response.data.data_rhk_khusus.cascading_pk;
+                    }
 
                     jQuery.ajax({
                         url: esakip.url,
@@ -3508,7 +3558,12 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             if (rhk_response.status == 'success' && rhk_response.data != null) {
                                 var rhk_data = rhk_response.data;
                                 
-                                setting_indikator_satuan(rhk_data, 0, rhk_data.data_rhk_parent).then(function(indikator_satuan_data) {tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana, indikator_satuan_data
+                                if (window.current_cascading_pk) {
+                                    rhk_data.cascading_pk = window.current_cascading_pk;
+                                }
+                                
+                                setting_indikator_satuan(rhk_data, 0, rhk_data.data_rhk_parent).then(function(indikator_satuan_data) {
+                                    tambah_indikator_rencana_aksi(response.data.id_renaksi, tipe, total_pagu, setting_input_rencana_pagu, kode_sbl, response.data.sumber_dana, indikator_satuan_data
                                     ).then(function(){
                                         jQuery("#modal-crud").find('.modal-title').text(
                                             jQuery("#modal-crud").find('.modal-title').text().replace('Tambah', 'Edit')
@@ -7025,8 +7080,8 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 api_key: esakip.api_key,
                 tahun: <?php echo $tahun; ?>,
                 satker_id: <?php echo $satker_id_pegawai_indikator_string; ?>,
-		        id_skpd: <?php echo $id_skpd; ?>,
-		        tipe: 'satker'
+                id_skpd: <?php echo $id_skpd; ?>,
+                tipe: 'satker'
             },
             success: function(response) {
                 if (response.status == 'success') {
