@@ -131,6 +131,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						        WHERE o.id_rhk_opd = %d
 						            AND o.level_rhk_opd = %d
 									AND o.active=1
+								ORDER BY level_pokin ASC
 						    ", $val['id'], $val['level']),
 							ARRAY_A
 						);
