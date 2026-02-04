@@ -1709,7 +1709,14 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     jQuery('#cascading-renstra-program option').each(function(){
                         var opt_val = jQuery(this).val();
                         var opt_text = jQuery(this).text();
-                        var clean_text = opt_text.split('(')[0].trim();
+
+                        var new_label = opt_text.split('(');
+                        if (Array.isArray(new_label) && new_label.length > 1) {
+                            new_label.pop();
+                            opt_text = new_label.join('(').trim();
+                        }
+                        var clean_text = opt_text;
+
                         var opt_id_sub_skpd = jQuery(this).data('id-sub-skpd-cascading');
                         
                         if(opt_val == kode_cascading_renstra_program && clean_text == (rhk.kode_cascading_program + ' ' + rhk.label_cascading_program) && opt_id_sub_skpd == rhk.id_sub_skpd_cascading) {
@@ -1780,7 +1787,14 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     jQuery('#cascading-renstra-kegiatan option').each(function(){
                         var opt_val = jQuery(this).val();
                         var opt_text = jQuery(this).text();
-                        var clean_text = opt_text.split('(')[0].trim();
+
+                        var new_label = opt_text.split('(');
+                        if (Array.isArray(new_label) && new_label.length > 1) {
+                            new_label.pop();
+                            opt_text = new_label.join('(').trim();
+                        }
+                        var clean_text = opt_text;
+
                         var opt_id_sub_skpd = jQuery(this).data('id-sub-skpd-cascading');
                         
                         if(opt_val == rhk.kode_cascading_kegiatan && clean_text == (rhk.kode_cascading_kegiatan + ' ' + rhk.label_cascading_kegiatan) && opt_id_sub_skpd == rhk.id_sub_skpd_cascading) {
@@ -1846,7 +1860,14 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 jQuery('#cascading-renstra-sub-kegiatan option').each(function(){
                     var opt_val = jQuery(this).val();
                     var opt_text = jQuery(this).text();
-                    var clean_text = opt_text.split('(')[0].trim();
+
+                    var new_label = opt_text.split('(');
+                    if (Array.isArray(new_label) && new_label.length > 1) {
+                        new_label.pop();
+                        opt_text = new_label.join('(').trim();
+                    }
+                    var clean_text = opt_text;
+
                     var opt_id_sub_skpd = jQuery(this).data('id-sub-skpd-cascading');
                     
                     if(opt_val == rhk.kode_cascading_sub_kegiatan && clean_text.includes(rhk.label_cascading_sub_kegiatan) && opt_id_sub_skpd == rhk.id_sub_skpd_cascading) {
@@ -6352,8 +6373,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
 
                         label_cascading_renstra = jQuery('#cascading-renstra-program option:selected').text();
                         let new_label = label_cascading_renstra.split('(');
-                        if (Array.isArray(new_label)) {
-                            label_cascading_renstra = new_label[0].trim();
+                        if (Array.isArray(new_label) && new_label.length > 1) {
+                            new_label.pop();
+                            label_cascading_renstra = new_label.join('(').trim();
                         }
                     }
                     id_cascading = jQuery('#label_renaksi').val() || 0;
@@ -6377,8 +6399,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         
                         label_cascading_renstra = jQuery('#cascading-renstra-kegiatan option:selected').text();
                         let new_label = label_cascading_renstra.split('(');
-                        if (Array.isArray(new_label)) {
-                            label_cascading_renstra = new_label[0].trim();
+                        if (Array.isArray(new_label) && new_label.length > 1) {
+                            new_label.pop();
+                            label_cascading_renstra = new_label.join('(').trim();
                         }
                     }
                     id_cascading = jQuery('#label_renaksi').val() || 0;
@@ -6403,8 +6426,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         
                         label_cascading_renstra = jQuery('#cascading-renstra-sub-kegiatan option:selected').text();
                         let new_label = label_cascading_renstra.split('(');
-                        if (Array.isArray(new_label)) {
-                            label_cascading_renstra = new_label[0].trim();
+                        if (Array.isArray(new_label) && new_label.length > 1) {
+                            new_label.pop();
+                            label_cascading_renstra = new_label.join('(').trim();
                         }
                     }
                     id_cascading = jQuery('#label_renaksi').val() || 0;
@@ -6545,8 +6569,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 var kode_cascading_renstra_program_1 = kode_cascading_renstra_program.split("_");
                 kode_cascading_renstra_program = kode_cascading_renstra_program_1[0];
                 let new_label = label_cascading_renstra_program.split('(');
-                if (Array.isArray(new_label)) {
-                    label_cascading_renstra_program = new_label[0].trim();
+                if (Array.isArray(new_label) && new_label.length > 1) {
+                    new_label.pop();
+                    label_cascading_renstra_program = new_label.join('(').trim();
                 }
             }
 
@@ -6554,8 +6579,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             label_cascading_renstra_kegiatan = jQuery('#cascading-renstra-kegiatan option:selected').text();
             if (kode_cascading_renstra_kegiatan) {
                 let new_label = label_cascading_renstra_kegiatan.split('(');
-                if (Array.isArray(new_label)) {
-                    label_cascading_renstra_kegiatan = new_label[0].trim();
+                if (Array.isArray(new_label) && new_label.length > 1) {
+                    new_label.pop();
+                    label_cascading_renstra_kegiatan = new_label.join('(').trim();
                 }
             }
 
@@ -6563,8 +6589,9 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             label_cascading_renstra_sub_kegiatan = jQuery('#cascading-renstra-sub-kegiatan option:selected').text();
             if (kode_cascading_renstra_sub_kegiatan) {
                 let new_label = label_cascading_renstra_sub_kegiatan.split('(');
-                if (Array.isArray(new_label)) {
-                    label_cascading_renstra_sub_kegiatan = new_label[0].trim();
+                if (Array.isArray(new_label) && new_label.length > 1) {
+                    new_label.pop();
+                    label_cascading_renstra_sub_kegiatan = new_label.join('(').trim();
                 }
             }
         }
@@ -7018,18 +7045,16 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 if (response.status) {
                     jQuery("#modal-detail-renaksi").modal('show');
 
+                    var cascading_pk = response.data && response.data.cascading_pk ? response.data.cascading_pk : 3;
+                    var input_rencana_pagu = response.data && response.data.input_rencana_pagu_level ? response.data.input_rencana_pagu_level : 0;
                     var satker = response.get_satker && response.get_satker.satker_id && response.get_satker.nama ?
                         response.get_satker.satker_id + ' ' + response.get_satker.nama : '';
                     var pegawai = response.get_pegawai && response.get_pegawai.nip_baru && response.get_pegawai.nama_pegawai ?
                         response.get_pegawai.nip_baru + ' ' + response.get_pegawai.nama_pegawai : '';
-                    var get_cascading_sasaran = response.data && response.data.kode_cascading_sasaran && response.data.label_cascading_sasaran ? response.data.kode_cascading_sasaran + ' ' + response.data.label_cascading_sasaran :
-                        '';
-                    var get_cascading_program = response.data && response.data.kode_cascading_program && response.data.label_cascading_program ? response.data.kode_cascading_program + ' ' + response.data.label_cascading_program :
-                        '';
-                    var get_cascading_kegiatan = response.data && response.data.kode_cascading_kegiatan && response.data.label_cascading_kegiatan ? response.data.kode_cascading_kegiatan + ' ' + response.data.label_cascading_kegiatan :
-                        '';
-                    var get_cascading_sub_kegiatan = response.data && response.data.kode_cascading_sub_kegiatan && response.data.label_cascading_sub_kegiatan ? response.data.kode_cascading_sub_kegiatan + ' ' + response.data.label_cascading_sub_kegiatan :
-                        '';
+                    var get_cascading_sasaran = response.data && response.data.kode_cascading_sasaran && response.data.label_cascading_sasaran ? response.data.kode_cascading_sasaran + ' ' + response.data.label_cascading_sasaran : '';
+                    var get_cascading_program = response.data && response.data.kode_cascading_program && response.data.label_cascading_program ? response.data.kode_cascading_program + ' ' + response.data.label_cascading_program : '';
+                    var get_cascading_kegiatan = response.data && response.data.kode_cascading_kegiatan && response.data.label_cascading_kegiatan ? response.data.kode_cascading_kegiatan + ' ' + response.data.label_cascading_kegiatan : '';
+                    var get_cascading_sub_kegiatan = response.data && response.data.kode_cascading_sub_kegiatan && response.data.label_cascading_sub_kegiatan ? response.data.kode_cascading_sub_kegiatan + ' ' + response.data.label_cascading_sub_kegiatan : '';
 
                     if (tipe === 1) {
                         jQuery('label[for="detail_kegiatan_utama"]').show();
@@ -7040,26 +7065,74 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         jQuery('#detail_uraian_kegiatan').hide();
                         jQuery('label[for="detail_uraian_tk"]').hide();
                         jQuery('#detail_uraian_tk').hide();
-                        jQuery('label[for="detail_pokin_1"]').show();
-                        var pokin_1 = response.get_pokin_2.map(pokin => pokin.pokin_label).join(" - ");
-                        jQuery('#detail_pokin_1').val(pokin_1).show();
-                        jQuery('label[for="detail_pokin_2"]').show();
-                        var pokin_2 = response.get_pokin_2.map(pokin => pokin.pokin_label).join(" - ");
-                        jQuery('#detail_pokin_2').val(pokin_2).show();
-                        jQuery('label[for="detail_pokin_3"]').hide();
-                        jQuery('#detail_pokin_3').hide();
-                        jQuery('label[for="detail_pokin_4"]').hide();
-                        jQuery('#detail_pokin_4').hide();
-                        jQuery('label[for="detail_pokin_5"]').hide();
-                        jQuery('#detail_pokin_5').hide();
-                        jQuery('label[for="detail_cascading_sasaran"]').show();
-                        jQuery('#detail_cascading_sasaran').val(get_cascading_sasaran).show();
-                        jQuery('label[for="detail_cascading_program"]').hide();
-                        jQuery('#detail_cascading_program').hide();
-                        jQuery('label[for="detail_cascading_kegiatan"]').hide();
-                        jQuery('#detail_cascading_kegiatan').hide();
-                        jQuery('label[for="detail_cascading_sub_giat"]').hide();
-                        jQuery('#detail_cascading_sub_giat').hide();
+                        
+                        if (input_rencana_pagu == 1) {
+                            jQuery('label[for="detail_pokin_1"]').hide();
+                            jQuery('#detail_pokin_1').hide();
+                            jQuery('label[for="detail_pokin_2"]').hide();
+                            jQuery('#detail_pokin_2').hide();
+                            jQuery('label[for="detail_pokin_3"]').hide();
+                            jQuery('#detail_pokin_3').hide();
+                            jQuery('label[for="detail_pokin_4"]').hide();
+                            jQuery('#detail_pokin_4').hide();
+                            jQuery('label[for="detail_pokin_5"]').hide();
+                            jQuery('#detail_pokin_5').hide();
+                            
+                            jQuery('label[for="detail_cascading_sasaran"]').hide();
+                            jQuery('#detail_cascading_sasaran').hide();
+                            jQuery('label[for="detail_cascading_program"]').hide();
+                            jQuery('#detail_cascading_program').hide();
+                            jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                            jQuery('#detail_cascading_kegiatan').hide();
+                            jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                            jQuery('#detail_cascading_sub_giat').hide();
+                            
+                            if (cascading_pk == 1) {
+                                jQuery('label[for="detail_pokin_3"]').show();
+                                var pokin_3 = response.get_pokin_3.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_3').val(pokin_3).show();
+                                
+                                jQuery('label[for="detail_cascading_program"]').show();
+                                jQuery('#detail_cascading_program').val(get_cascading_program).show();
+                            } else if (cascading_pk == 2) {
+                                jQuery('label[for="detail_pokin_4"]').show();
+                                var pokin_4 = response.get_pokin_4.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_4').val(pokin_4).show();
+                                
+                                jQuery('label[for="detail_cascading_kegiatan"]').show();
+                                jQuery('#detail_cascading_kegiatan').val(get_cascading_kegiatan).show();
+                            } else if (cascading_pk == 3) {
+                                jQuery('label[for="detail_pokin_5"]').show();
+                                var pokin_5 = response.get_pokin_5.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_5').val(pokin_5).show();
+                                
+                                jQuery('label[for="detail_cascading_sub_giat"]').show();
+                                jQuery('#detail_cascading_sub_giat').val(get_cascading_sub_kegiatan).show();
+                            }
+                        } else {
+                            jQuery('label[for="detail_pokin_1"]').show();
+                            var pokin_1 = response.get_pokin_1.map(pokin => pokin.pokin_label).join(" - ");
+                            jQuery('#detail_pokin_1').val(pokin_1).show();
+                            jQuery('label[for="detail_pokin_2"]').show();
+                            var pokin_2 = response.get_pokin_2.map(pokin => pokin.pokin_label).join(" - ");
+                            jQuery('#detail_pokin_2').val(pokin_2).show();
+                            jQuery('label[for="detail_pokin_3"]').hide();
+                            jQuery('#detail_pokin_3').hide();
+                            jQuery('label[for="detail_pokin_4"]').hide();
+                            jQuery('#detail_pokin_4').hide();
+                            jQuery('label[for="detail_pokin_5"]').hide();
+                            jQuery('#detail_pokin_5').hide();
+                            
+                            jQuery('label[for="detail_cascading_sasaran"]').show();
+                            jQuery('#detail_cascading_sasaran').val(get_cascading_sasaran).show();
+                            jQuery('label[for="detail_cascading_program"]').hide();
+                            jQuery('#detail_cascading_program').hide();
+                            jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                            jQuery('#detail_cascading_kegiatan').hide();
+                            jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                            jQuery('#detail_cascading_sub_giat').hide();
+                        }
+                        
                         jQuery('#detail_satuan_kerja').val(satker).show();
                         jQuery('#detail_pegawai').val(pegawai).show();
                     } else if (tipe === 2) {
@@ -7071,25 +7144,73 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         jQuery('#detail_uraian_kegiatan').hide();
                         jQuery('label[for="detail_uraian_tk"]').hide();
                         jQuery('#detail_uraian_tk').hide();
-                        jQuery('label[for="detail_pokin_1"]').hide();
-                        jQuery('#detail_pokin_1').hide();
-                        jQuery('label[for="detail_pokin_2"]').hide();
-                        jQuery('#detail_pokin_2').hide();
-                        jQuery('label[for="detail_pokin_3"]').show();
-                        var pokin_3 = response.get_pokin_3.map(pokin => pokin.pokin_label).join(" - ");
-                        jQuery('#detail_pokin_3').val(pokin_3).show();
-                        jQuery('label[for="detail_pokin_4"]').hide();
-                        jQuery('#detail_pokin_4').hide();
-                        jQuery('label[for="detail_pokin_5"]').hide();
-                        jQuery('#detail_pokin_5').hide();
-                        jQuery('label[for="detail_cascading_sasaran"]').hide();
-                        jQuery('#detail_cascading_sasaran').hide();
-                        jQuery('label[for="detail_cascading_program"]').show();
-                        jQuery('#detail_cascading_program').val(get_cascading_program).show();
-                        jQuery('label[for="detail_cascading_kegiatan"]').hide();
-                        jQuery('#detail_cascading_kegiatan').hide();
-                        jQuery('label[for="detail_cascading_sub_giat"]').hide();
-                        jQuery('#detail_cascading_sub_giat').hide();
+                        
+                        if (input_rencana_pagu == 1) {
+                            jQuery('label[for="detail_pokin_1"]').hide();
+                            jQuery('#detail_pokin_1').hide();
+                            jQuery('label[for="detail_pokin_2"]').hide();
+                            jQuery('#detail_pokin_2').hide();
+                            jQuery('label[for="detail_pokin_3"]').hide();
+                            jQuery('#detail_pokin_3').hide();
+                            jQuery('label[for="detail_pokin_4"]').hide();
+                            jQuery('#detail_pokin_4').hide();
+                            jQuery('label[for="detail_pokin_5"]').hide();
+                            jQuery('#detail_pokin_5').hide();
+                            
+                            jQuery('label[for="detail_cascading_sasaran"]').hide();
+                            jQuery('#detail_cascading_sasaran').hide();
+                            jQuery('label[for="detail_cascading_program"]').hide();
+                            jQuery('#detail_cascading_program').hide();
+                            jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                            jQuery('#detail_cascading_kegiatan').hide();
+                            jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                            jQuery('#detail_cascading_sub_giat').hide();
+                            
+                            if (cascading_pk == 1) {
+                                jQuery('label[for="detail_pokin_3"]').show();
+                                var pokin_3 = response.get_pokin_3.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_3').val(pokin_3).show();
+                                
+                                jQuery('label[for="detail_cascading_program"]').show();
+                                jQuery('#detail_cascading_program').val(get_cascading_program).show();
+                            } else if (cascading_pk == 2) {
+                                jQuery('label[for="detail_pokin_4"]').show();
+                                var pokin_4 = response.get_pokin_4.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_4').val(pokin_4).show();
+                                
+                                jQuery('label[for="detail_cascading_kegiatan"]').show();
+                                jQuery('#detail_cascading_kegiatan').val(get_cascading_kegiatan).show();
+                            } else if (cascading_pk == 3) {
+                                jQuery('label[for="detail_pokin_5"]').show();
+                                var pokin_5 = response.get_pokin_5.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_5').val(pokin_5).show();
+                                
+                                jQuery('label[for="detail_cascading_sub_giat"]').show();
+                                jQuery('#detail_cascading_sub_giat').val(get_cascading_sub_kegiatan).show();
+                            }
+                        } else {
+                            jQuery('label[for="detail_pokin_1"]').hide();
+                            jQuery('#detail_pokin_1').hide();
+                            jQuery('label[for="detail_pokin_2"]').hide();
+                            jQuery('#detail_pokin_2').hide();
+                            jQuery('label[for="detail_pokin_3"]').show();
+                            var pokin_3 = response.get_pokin_3.map(pokin => pokin.pokin_label).join(" - ");
+                            jQuery('#detail_pokin_3').val(pokin_3).show();
+                            jQuery('label[for="detail_pokin_4"]').hide();
+                            jQuery('#detail_pokin_4').hide();
+                            jQuery('label[for="detail_pokin_5"]').hide();
+                            jQuery('#detail_pokin_5').hide();
+                            
+                            jQuery('label[for="detail_cascading_sasaran"]').hide();
+                            jQuery('#detail_cascading_sasaran').hide();
+                            jQuery('label[for="detail_cascading_program"]').show();
+                            jQuery('#detail_cascading_program').val(get_cascading_program).show();
+                            jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                            jQuery('#detail_cascading_kegiatan').hide();
+                            jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                            jQuery('#detail_cascading_sub_giat').hide();
+                        }
+                        
                         jQuery('#detail_satuan_kerja').val(satker).show();
                         jQuery('#detail_pegawai').val(pegawai).show();
                     } else if (tipe === 3) {
@@ -7101,25 +7222,73 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         jQuery('#detail_uraian_kegiatan').val(response.data.label).show();
                         jQuery('label[for="detail_uraian_tk"]').hide();
                         jQuery('#detail_uraian_tk').hide();
-                        jQuery('label[for="detail_pokin_1"]').hide();
-                        jQuery('#detail_pokin_1').hide();
-                        jQuery('label[for="detail_pokin_2"]').hide();
-                        jQuery('#detail_pokin_2').hide();
-                        jQuery('label[for="detail_pokin_3"]').hide();
-                        jQuery('#detail_pokin_3').hide();
-                        jQuery('label[for="detail_pokin_4"]').show();
-                        var pokin_4 = response.get_pokin_4.map(pokin => pokin.pokin_label).join(" - ");
-                        jQuery('#detail_pokin_4').val(pokin_4).show();
-                        jQuery('label[for="detail_pokin_5"]').hide();
-                        jQuery('#detail_pokin_5').hide();
-                        jQuery('label[for="detail_cascading_sasaran"]').hide();
-                        jQuery('#detail_cascading_sasaran').hide();
-                        jQuery('label[for="detail_cascading_program"]').hide();
-                        jQuery('#detail_cascading_program').hide();
-                        jQuery('label[for="detail_cascading_kegiatan"]').show();
-                        jQuery('#detail_cascading_kegiatan').val(get_cascading_kegiatan).show();
-                        jQuery('label[for="detail_cascading_sub_giat"]').hide();
-                        jQuery('#detail_cascading_sub_giat').hide();
+                        
+                        if (input_rencana_pagu == 1) {
+                            jQuery('label[for="detail_pokin_1"]').hide();
+                            jQuery('#detail_pokin_1').hide();
+                            jQuery('label[for="detail_pokin_2"]').hide();
+                            jQuery('#detail_pokin_2').hide();
+                            jQuery('label[for="detail_pokin_3"]').hide();
+                            jQuery('#detail_pokin_3').hide();
+                            jQuery('label[for="detail_pokin_4"]').hide();
+                            jQuery('#detail_pokin_4').hide();
+                            jQuery('label[for="detail_pokin_5"]').hide();
+                            jQuery('#detail_pokin_5').hide();
+                            
+                            jQuery('label[for="detail_cascading_sasaran"]').hide();
+                            jQuery('#detail_cascading_sasaran').hide();
+                            jQuery('label[for="detail_cascading_program"]').hide();
+                            jQuery('#detail_cascading_program').hide();
+                            jQuery('label[for="detail_cascading_kegiatan"]').hide();
+                            jQuery('#detail_cascading_kegiatan').hide();
+                            jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                            jQuery('#detail_cascading_sub_giat').hide();
+                            
+                            if (cascading_pk == 1) {
+                                jQuery('label[for="detail_pokin_3"]').show();
+                                var pokin_3 = response.get_pokin_3.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_3').val(pokin_3).show();
+                                
+                                jQuery('label[for="detail_cascading_program"]').show();
+                                jQuery('#detail_cascading_program').val(get_cascading_program).show();
+                            } else if (cascading_pk == 2) {
+                                jQuery('label[for="detail_pokin_4"]').show();
+                                var pokin_4 = response.get_pokin_4.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_4').val(pokin_4).show();
+                                
+                                jQuery('label[for="detail_cascading_kegiatan"]').show();
+                                jQuery('#detail_cascading_kegiatan').val(get_cascading_kegiatan).show();
+                            } else if (cascading_pk == 3) {
+                                jQuery('label[for="detail_pokin_5"]').show();
+                                var pokin_5 = response.get_pokin_5.map(pokin => pokin.pokin_label).join(" - ");
+                                jQuery('#detail_pokin_5').val(pokin_5).show();
+                                
+                                jQuery('label[for="detail_cascading_sub_giat"]').show();
+                                jQuery('#detail_cascading_sub_giat').val(get_cascading_sub_kegiatan).show();
+                            }
+                        } else {
+                            jQuery('label[for="detail_pokin_1"]').hide();
+                            jQuery('#detail_pokin_1').hide();
+                            jQuery('label[for="detail_pokin_2"]').hide();
+                            jQuery('#detail_pokin_2').hide();
+                            jQuery('label[for="detail_pokin_3"]').hide();
+                            jQuery('#detail_pokin_3').hide();
+                            jQuery('label[for="detail_pokin_4"]').show();
+                            var pokin_4 = response.get_pokin_4.map(pokin => pokin.pokin_label).join(" - ");
+                            jQuery('#detail_pokin_4').val(pokin_4).show();
+                            jQuery('label[for="detail_pokin_5"]').hide();
+                            jQuery('#detail_pokin_5').hide();
+                            
+                            jQuery('label[for="detail_cascading_sasaran"]').hide();
+                            jQuery('#detail_cascading_sasaran').hide();
+                            jQuery('label[for="detail_cascading_program"]').hide();
+                            jQuery('#detail_cascading_program').hide();
+                            jQuery('label[for="detail_cascading_kegiatan"]').show();
+                            jQuery('#detail_cascading_kegiatan').val(get_cascading_kegiatan).show();
+                            jQuery('label[for="detail_cascading_sub_giat"]').hide();
+                            jQuery('#detail_cascading_sub_giat').hide();
+                        }
+                        
                         jQuery('#detail_satuan_kerja').val(satker).show();
                         jQuery('#detail_pegawai').val(pegawai).show();
                     } else if (tipe === 4) {
@@ -7158,7 +7327,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                 }
             }
         });
-    };
+    }
 
     function get_data_target_realisasi_bulanan() {
         jQuery.ajax({

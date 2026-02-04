@@ -8519,220 +8519,228 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	}
 
 	function get_pk_html($options)
-	{
-		global $wpdb;
+    {
+        global $wpdb;
 
-		$ret = array(
-			'html_sasaran' 		=> '',
-			'html_program' 		=> '',
-			'html_kegiatan' 	=> '',
-			'html_sub_kegiatan' => '',
-			'rhk_unik' 			=> array()
-		);
-		$id_skpd = $options['id_skpd'];
+        $ret = array(
+            'html_sasaran'      => '',
+            'html_program'      => '',
+            'html_kegiatan'     => '',
+            'html_sub_kegiatan' => '',
+            'rhk_unik'          => array()
+        );
+        $id_skpd = $options['id_skpd'];
 
-		// hasil ploting di halaman RHK
-		$data_ploting_rhk = $wpdb->get_results(
-		    $wpdb->prepare("
-		        SELECT 
-		            id,
-		            label,
-		            level,
-		            satker_id,
-		            no_urut
-		        FROM esakip_data_rencana_aksi_opd
-		        WHERE id_skpd = %d 
-		          AND tahun_anggaran = %d 
-		          AND nip = %d 
-		          AND id_jabatan = %s 
-		          AND active = 1
-		        ORDER BY 
-		            CASE 
-		                WHEN level = 1 THEN no_urut 
-		                ELSE 1 
-		            END ASC,
-		            kode_cascading_sasaran, 
-		            kode_cascading_program, 
-		            id_sub_skpd_cascading, 
-		            kode_cascading_kegiatan, 
-		            kode_cascading_sub_kegiatan, 
-		            level, 
-		            id ASC
-		    ", $id_skpd, $options['tahun'], $options['nip_baru'], $options['satker_id']),
-		    ARRAY_A
-		);
+        // hasil ploting di halaman RHK
+        $data_ploting_rhk = $wpdb->get_results(
+            $wpdb->prepare("
+                SELECT 
+                    id,
+                    label,
+                    level,
+                    satker_id,
+                    no_urut
+                FROM esakip_data_rencana_aksi_opd
+                WHERE id_skpd = %d 
+                  AND tahun_anggaran = %d 
+                  AND nip = %d 
+                  AND id_jabatan = %s 
+                  AND active = 1
+                ORDER BY 
+                    CASE 
+                        WHEN level = 1 THEN no_urut 
+                        ELSE 1 
+                    END ASC,
+                    kode_cascading_sasaran, 
+                    kode_cascading_program, 
+                    id_sub_skpd_cascading, 
+                    kode_cascading_kegiatan, 
+                    kode_cascading_sub_kegiatan, 
+                    level, 
+                    id ASC
+            ", $id_skpd, $options['tahun'], $options['nip_baru'], $options['satker_id']),
+            ARRAY_A
+        );
 
-		$data_anggaran = array(
-			'sasaran'       => array(),
-			'program'       => array(),
-			'kegiatan'      => array(),
-			'sub_kegiatan'  => array()
-		);
+        $data_anggaran = array(
+            'sasaran'       => array(),
+            'program'       => array(),
+            'kegiatan'      => array(),
+            'sub_kegiatan'  => array()
+        );
 
-		$data_anggaran_all = array(
-			'program'       => array(),
-			'kegiatan'      => array(),
-			'sub_kegiatan'  => array()
-		);
-		$no_2 = 0;
-		if (!empty($data_ploting_rhk)) {
-			$ret['rhk_unik'] = $this->get_rhk_unik($data_ploting_rhk);
+        $data_anggaran_all = array(
+            'program'       => array(),
+            'kegiatan'      => array(),
+            'sub_kegiatan'  => array()
+        );
+        $no_2 = 0;
+        if (!empty($data_ploting_rhk)) {
+            $ret['rhk_unik'] = $this->get_rhk_unik($data_ploting_rhk);
 
-			foreach ($ret['rhk_unik'] as $v) {
-				$v_rhk = $v['data'][0];
-				$v_rhk['id'] = implode('|', $v['ids']);
-				$data_indikator_ploting_rhk = array();
-				foreach ($v['indikator'] as $vv) {
-					$indikator = $vv['data'][0];
-					$indikator['id'] = implode('|', $vv['ids']);
-					$data_indikator_ploting_rhk[] = $indikator;
-				}
+            foreach ($ret['rhk_unik'] as $v) {
+                $v_rhk = $v['data'][0];
+                $v_rhk['id'] = implode('|', $v['ids']);
+                $data_indikator_ploting_rhk = array();
+                foreach ($v['indikator'] as $vv) {
+                    $indikator = $vv['data'][0];
+                    $indikator['id'] = implode('|', $vv['ids']);
+                    $data_indikator_ploting_rhk[] = $indikator;
+                }
 
-				$html_indikator = '';
-				$p_i = count($data_indikator_ploting_rhk);
-				$no_2++;
+                $html_indikator = '';
+                $p_i = count($data_indikator_ploting_rhk);
+                $no_2++;
 
-				if (!empty($data_indikator_ploting_rhk)) {
-					foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
-						if ($v_indikator['is_satuan'] == 1) {
-							$satuan_indikator = $v_indikator['satuan'];
-						} else {
-							$satuan_indikator = '';							
-						}
+                if (!empty($data_indikator_ploting_rhk)) {
+                    foreach ($data_indikator_ploting_rhk as $index => $v_indikator) {
+                        if ($v_indikator['is_satuan'] == 1) {
+                            $satuan_indikator = $v_indikator['satuan'];
+                        } else {
+                            $satuan_indikator = '';                         
+                        }
 
-						if ($v_indikator['target_teks_akhir'] == NULL) {
-							$target_akhir = $v_indikator['target_akhir'];
-						} else {
-							$target_akhir = $v_indikator['target_teks_akhir'];							
-						}
+                        if ($v_indikator['target_teks_akhir'] == NULL) {
+                            $target_akhir = $v_indikator['target_akhir'];
+                        } else {
+                            $target_akhir = $v_indikator['target_teks_akhir'];                          
+                        }
 
-						$html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '" id-indikator="' . $v_indikator['id'] . '">';
+                        $html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '" id-indikator="' . $v_indikator['id'] . '">';
 
-						if ($index === 0) {
-							$rowspan = $p_i > 1 ? 'rowspan="' . $p_i . '"' : '';
-							$html_indikator .= '<td ' . $rowspan . ' class="text-center">' . $no_2 . '</td>';
-							$html_indikator .= '<td ' . $rowspan . ' class="text-left">' . $v_rhk['label'] . '</td>';
-						}
+                        if ($index === 0) {
+                            $rowspan = $p_i > 1 ? 'rowspan="' . $p_i . '"' : '';
+                            $html_indikator .= '<td ' . $rowspan . ' class="text-center">' . $no_2 . '</td>';
+                            $html_indikator .= '<td ' . $rowspan . ' class="text-left">' . $v_rhk['label'] . '</td>';
+                        }
 
-						$html_indikator .= '<td class="text-left">' . $v_indikator['indikator'] . '</td>';
-						$html_indikator .= '<td class="text-left">' . $target_akhir . ' ' . $satuan_indikator . '</td>';
-						$html_indikator .= '</tr>';
-					}
-				} else {
-					$html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '">
-						<td class="text-center">' . $no_2 . '</td>
-						<td class="text-left">' . $v_rhk['label'] . '</td>
-						<td></td>
-						<td></td>
-					</tr>';
-				}
+                        $html_indikator .= '<td class="text-left">' . $v_indikator['indikator'] . '</td>';
+                        $html_indikator .= '<td class="text-left">' . $target_akhir . ' ' . $satuan_indikator . '</td>';
+                        $html_indikator .= '</tr>';
+                    }
+                } else {
+                    $html_indikator .= '<tr id-rhk="' . $v_rhk['id'] . '">
+                        <td class="text-center">' . $no_2 . '</td>
+                        <td class="text-left">' . $v_rhk['label'] . '</td>
+                        <td></td>
+                        <td></td>
+                    </tr>';
+                }
 
-				$ret['html_sasaran'] .= $html_indikator;
+                $ret['html_sasaran'] .= $html_indikator;
 
-				$anggaran = $this->get_rencana_pagu_rhk(array(
-					'ids' 			=> $v['ids'],
-					'level' 		=> $v_rhk['level'],
-					'id_skpd' 		=> $id_skpd,
-					'data_anggaran' => $data_anggaran,
-					'data_anggaran_all' => $data_anggaran_all,
-					'no_urut_rhk' 	=> $no_2
-				));
-				$data_anggaran = $anggaran['data_anggaran'];
-				$data_anggaran_all = $anggaran['data_anggaran_all'];
-			}
+                $anggaran = $this->get_rencana_pagu_rhk(array(
+                    'ids'           => $v['ids'],
+                    'level'         => $v_rhk['level'],
+                    'id_skpd'       => $id_skpd,
+                    'data_anggaran' => $data_anggaran,
+                    'data_anggaran_all' => $data_anggaran_all,
+                    'no_urut_rhk'   => $no_2
+                ));
+                $data_anggaran = $anggaran['data_anggaran'];
+                $data_anggaran_all = $anggaran['data_anggaran_all'];
+            }
 
-			// die(json_encode($data_anggaran_all));
+            // die(json_encode($data_anggaran_all));
 
-			if (
-				empty($options['format_halaman_kedua'])
-				|| $options['format_halaman_kedua'] == 'gabungan'
-			) {
-				$cek_urut = 0;
-				foreach ($data_anggaran as $jenis => $cascading) {
-					foreach ($cascading as $multi_cascading) {
+            if (
+                empty($options['format_halaman_kedua'])
+                || $options['format_halaman_kedua'] == 'gabungan'
+            ) {
+                $cek_urut = 0;
+                foreach ($data_anggaran as $jenis => $cascading) {
+                    foreach ($cascading as $multi_cascading) {
+                        // Skip jika total adalah 0
+                        if ($multi_cascading['total'] == 0) {
+                            continue;
+                        }
 
-						$v = $multi_cascading['data'][0];
-						if ($cek_urut != $v['urut']) {
-							$cek_urut = $v['urut'];
-							$no_cascading = 0;
-						}
+                        $v = $multi_cascading['data'][0];
+                        if ($cek_urut != $v['urut']) {
+                            $cek_urut = $v['urut'];
+                            $no_cascading = 0;
+                        }
 
-						$no_cascading++;
-						if ($jenis == 'program') {
-							$ret['html_program'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
-								<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
-							</tr>';
-						} else if ($jenis == 'kegiatan') {
-							$ret['html_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
-								<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
-							</tr>';
-						} else if ($jenis == 'sub_kegiatan') {
-							$parts = explode(" ", $v['nama'], 2);
-							$ret['html_sub_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
-								<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
-								<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
-							</tr>';
-						}
-					}
-				}
-			} else {
-				$cek_urut = 0;
-				foreach ($data_anggaran_all as $jenis => $cascading) {
-					foreach ($cascading as $multi_cascading) {
+                        $no_cascading++;
+                        if ($jenis == 'program') {
+                            $ret['html_program'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+                                <td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+                                <td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+                                <td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+                                <td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+                            </tr>';
+                        } else if ($jenis == 'kegiatan') {
+                            $ret['html_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+                                <td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+                                <td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+                                <td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+                                <td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+                            </tr>';
+                        } else if ($jenis == 'sub_kegiatan') {
+                            $parts = explode(" ", $v['nama'], 2);
+                            $ret['html_sub_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+                                <td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+                                <td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
+                                <td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+                                <td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+                            </tr>';
+                        }
+                    }
+                }
+            } else {
+                $cek_urut = 0;
+                foreach ($data_anggaran_all as $jenis => $cascading) {
+                    foreach ($cascading as $multi_cascading) {
+                        // Skip jika total adalah 0
+                        if ($multi_cascading['total'] == 0) {
+                            continue;
+                        }
 
-						$v = $multi_cascading['data'][0];
-						if ($cek_urut != $v['urut']) {
-							$cek_urut = $v['urut'];
-							$no_cascading = 0;
-						}
+                        $v = $multi_cascading['data'][0];
+                        if ($cek_urut != $v['urut']) {
+                            $cek_urut = $v['urut'];
+                            $no_cascading = 0;
+                        }
 
-						$no_cascading++;
-						if (
-							$jenis == 'program'
-							&& $jenis == $options['format_halaman_kedua']
-						) {
-							$ret['html_program'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
-								<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
-							</tr>';
-						} else if (
-							$jenis == 'kegiatan'
-							&& $jenis == $options['format_halaman_kedua']
-						) {
-							$ret['html_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
-								<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
-								<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
-							</tr>';
-						} else if (
-							$jenis == 'sub_kegiatan'
-							&& $jenis == $options['format_halaman_kedua']
-						) {
-							$parts = explode(" ", $v['nama'], 2);
-							$ret['html_sub_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
-								<td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
-								<td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
-								<td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
-								<td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
-							</tr>';
-						}
-					}
-				}
-			}
-		}
-		return $ret;
-	}
+                        $no_cascading++;
+                        if (
+                            $jenis == 'program'
+                            && $jenis == $options['format_halaman_kedua']
+                        ) {
+                            $ret['html_program'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+                                <td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+                                <td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+                                <td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+                                <td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+                            </tr>';
+                        } else if (
+                            $jenis == 'kegiatan'
+                            && $jenis == $options['format_halaman_kedua']
+                        ) {
+                            $ret['html_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+                                <td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+                                <td class="text-left">' . $v['kode'] . ' ' . $v['nama'] . '</td>
+                                <td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+                                <td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+                            </tr>';
+                        } else if (
+                            $jenis == 'sub_kegiatan'
+                            && $jenis == $options['format_halaman_kedua']
+                        ) {
+                            $parts = explode(" ", $v['nama'], 2);
+                            $ret['html_sub_kegiatan'] .= '<tr data-id="' . implode('|', $multi_cascading['ids']) . '">
+                                <td class="text-center">' . $v['urut'] . '.' . $no_cascading . '</td>
+                                <td class="text-left">' . $v['kode'] . ' ' . $parts[1] . '</td>
+                                <td class="text-right">' . number_format($multi_cascading['total'], 0, ",", ".") . '</td>
+                                <td class="text-left">' . implode(', ', $multi_cascading['sumber_dana']) . '</td>
+                            </tr>';
+                        }
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
 
 	function simpan_finalisasi_laporan_pk()
 	{
