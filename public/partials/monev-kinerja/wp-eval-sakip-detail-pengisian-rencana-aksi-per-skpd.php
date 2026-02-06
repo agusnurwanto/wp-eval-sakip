@@ -2623,19 +2623,19 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         jQuery('#table_rhk_individu').hide();
                     }
                     if (response.data_rhk_cascading && response.data_rhk_cascading.trim() !== '') {
-                        jQuery('#notifikasi-title-rhk-cascading').hide();
-                        jQuery('.table_rhk_cascading').hide();
+                        jQuery('#notifikasi-title-rhk-cascading').show();
+                        jQuery('.table_rhk_cascading').show();
                         jQuery('.table_rhk_cascading tbody').html(response.data_rhk_cascading);
 
                         jQuery('.table_dokumen_skpd tbody').html(response.data);
-                        // jQuery('.table_rhk_cascading').dataTable({
-                        //     pageLength: 10, // Default number of rows per page
-                        //     aLengthMenu: [
-                        //         [5, 10, 25, 100, -1],
-                        //         [5, 10, 25, 100, "All"]
-                        //     ],
-                        //     iDisplayLength: -1
-                        // });
+                        jQuery('.table_rhk_cascading').dataTable({
+                            pageLength: 10, // Default number of rows per page
+                            aLengthMenu: [
+                                [5, 10, 25, 100, -1],
+                                [5, 10, 25, 100, "All"]
+                            ],
+                            iDisplayLength: -1
+                        });
                         
                     } else {
                         jQuery('#notifikasi-title-rhk-cascading').hide();
