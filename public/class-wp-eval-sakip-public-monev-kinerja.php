@@ -3167,8 +3167,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                         // Cascading PK = Sub Kegiatan
                                         if (empty($renaksi['detail']['kode_cascading_sub_kegiatan'])) {
                                             $keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
-                                        } else {
-                                            $parent_kode_cascading = $renaksi['detail']['kode_cascading_kegiatan'];
+                                        } else {                                            
+                                            if ($uraian_renaksi['detail']['status_input_rencana_pagu'] == 1) {
+                                            	$parent_kode_cascading = $v['detail']['kode_cascading_kegiatan'];
+                                            } else {                                                	
+                                            	$parent_kode_cascading = $renaksi['detail']['kode_cascading_kegiatan'];
+                                            }
                                             $id_sub_skpd = $renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
                                             $key_cascading = 'sub_kegiatan-' . $parent_kode_cascading;
                                             if ($id_sub_skpd != 0) {
@@ -3702,7 +3706,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                             if (empty($uraian_renaksi['detail']['kode_cascading_sub_kegiatan'])) {
                                                 $keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
                                             } else {
-                                                $parent_kode_cascading = $uraian_renaksi['detail']['kode_cascading_kegiatan'];
+                                                if ($uraian_renaksi['detail']['status_input_rencana_pagu'] == 1) {
+                                                	$parent_kode_cascading = $renaksi['detail']['kode_cascading_kegiatan'];
+                                                } else {                                                	
+                                                	$parent_kode_cascading = $uraian_renaksi['detail']['kode_cascading_kegiatan'];
+                                                }
                                                 $id_sub_skpd = $uraian_renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
                                                 $key_cascading = 'sub_kegiatan-' . $parent_kode_cascading;
                                                 if ($id_sub_skpd != 0) {
