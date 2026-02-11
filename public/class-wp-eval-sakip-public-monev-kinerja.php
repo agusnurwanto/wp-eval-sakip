@@ -2116,6 +2116,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
                     $ret['message'] = 'Tahun anggaran tidak boleh kosong!';
                 }
                 if ($ret['status'] != 'error') {
+                	$p = $_POST;
                     $data = $wpdb->get_results($wpdb->prepare("
                         SELECT
                             *
@@ -2595,11 +2596,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                     }
                                     
                                     if (empty($data_all_wpsipd[$key_program])) {
+                                        $_POST = array();
+                                        $_POST['api_key'] = $p['api_key'];
                                         $_POST['jenis'] = 'program';
                                         $_POST['parent_cascading'] = $v['detail']['kode_cascading_sasaran'];
-                                        $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $_POST['id_skpd'];
-                                        $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                        $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                        $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $p['id_skpd'];
+                                        $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                        $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                        $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                         $data_all_wpsipd[$key_program] = $this->get_tujuan_sasaran_cascading(true);
                                     }
                                     
@@ -2645,11 +2649,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                     }
                                     
                                     if (empty($data_all_wpsipd[$key_kegiatan])) {
+                                        $_POST = array();
+                                        $_POST['api_key'] = $p['api_key'];
                                         $_POST['jenis'] = 'kegiatan';
                                         $_POST['parent_cascading'] = $kode_program_clean;
-                                        $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $_POST['id_skpd'];
-                                        $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                        $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                        $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $p['id_skpd'];
+                                        $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                        $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                        $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                         $data_all_wpsipd[$key_kegiatan] = $this->get_tujuan_sasaran_cascading(true);
                                     }
                                     
@@ -2695,11 +2702,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                     }
                                     
                                     if (empty($data_all_wpsipd[$key_cascading])) {
+                                        $_POST = array();
+                                        $_POST['api_key'] = $p['api_key'];
                                         $_POST['jenis'] = 'sub_kegiatan';
                                         $_POST['parent_cascading'] = $parent_kode_cascading;
-                                        $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $_POST['id_skpd'];
-                                        $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                        $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                        $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $p['id_skpd'];
+                                        $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                        $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                        $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                         $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
                                     }
                                     
@@ -2749,10 +2759,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                 $key_cascading = 'sasaran';
                                 
                                 if (empty($data_all_wpsipd[$key_cascading])) {
+                                    $_POST = array();
+                                    $_POST['api_key'] = $p['api_key'];
                                     $_POST['jenis'] = 'sasaran';
-                                    $_POST['id_skpd'] = $_POST['id_skpd'];
-                                    $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                    $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                    $_POST['id_skpd'] = $p['id_skpd'];
+                                    $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                    $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                    $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                     $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
                                 }
                                 
@@ -2809,11 +2822,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                 }
                                 
                                 if (empty($data_all_wpsipd[$key_program])) {
+                                    $_POST = array();
+                                    $_POST['api_key'] = $p['api_key'];
                                     $_POST['jenis'] = 'program';
                                     $_POST['parent_cascading'] = $kode_sasaran_clean;
-                                    $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                    $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
-                                    $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $_POST['id_skpd'];
+                                    $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                    $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                    $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $p['id_skpd'];
+                                    $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                     $data_all_wpsipd[$key_program] = $this->get_tujuan_sasaran_cascading(true);
                                 }
                             }
@@ -3076,11 +3092,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                             }
                                             
                                             if (empty($data_all_wpsipd[$key_program])) {
+                                                $_POST = array();
+                                                $_POST['api_key'] = $p['api_key'];
                                                 $_POST['jenis'] = 'program';
                                                 $_POST['parent_cascading'] = $v['detail']['kode_cascading_sasaran'];
-                                                $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $_POST['id_skpd'];
-                                                $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                                $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $p['id_skpd'];
+                                                $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                                $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                                $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                                 $data_all_wpsipd[$key_program] = $this->get_tujuan_sasaran_cascading(true);
                                             }
                                             
@@ -3126,11 +3145,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                             }
                                             
                                             if (empty($data_all_wpsipd[$key_kegiatan])) {
+                                                $_POST = array();
+                                                $_POST['api_key'] = $p['api_key'];
                                                 $_POST['jenis'] = 'kegiatan';
                                                 $_POST['parent_cascading'] = $kode_program_clean;
-                                                $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $_POST['id_skpd'];
-                                                $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                                $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $p['id_skpd'];
+                                                $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                                $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                                $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                                 $data_all_wpsipd[$key_kegiatan] = $this->get_tujuan_sasaran_cascading(true);
                                             }
                                             
@@ -3168,7 +3190,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                         if (empty($renaksi['detail']['kode_cascading_sub_kegiatan'])) {
                                             $keterangan .= '<li>Cascading Sub Kegiatan Belum dipilih</li>';
                                         } else {                                            
-                                            if ($uraian_renaksi['detail']['status_input_rencana_pagu'] == 1) {
+                                            if ($renaksi['detail']['status_input_rencana_pagu'] == 1) {
                                             	$parent_kode_cascading = $v['detail']['kode_cascading_kegiatan'];
                                             } else {                                                	
                                             	$parent_kode_cascading = $renaksi['detail']['kode_cascading_kegiatan'];
@@ -3180,11 +3202,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                             }
                                             
                                             if (empty($data_all_wpsipd[$key_cascading])) {
+                                                $_POST = array();
+                                                $_POST['api_key'] = $p['api_key'];
                                                 $_POST['jenis'] = 'sub_kegiatan';
                                                 $_POST['parent_cascading'] = $parent_kode_cascading;
-                                                $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $_POST['id_skpd'];
-                                                $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                                $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $p['id_skpd'];
+                                                $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                                $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                                $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                                 $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
                                             }
                                             
@@ -3235,11 +3260,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                         $key_cascading = 'program-' . $parent_kode_cascading;
                                         
                                         if (empty($data_all_wpsipd[$key_cascading])) {
+                                            $_POST = array();
+                                            $_POST['api_key'] = $p['api_key'];
                                             $_POST['jenis'] = 'program';
                                             $_POST['parent_cascading'] = $parent_kode_cascading;
-                                            $_POST['id_skpd'] = $_POST['id_skpd'];
-                                            $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                            $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                            $_POST['id_skpd'] = $p['id_skpd'];
+                                            $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                            $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                            $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                             $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
                                         }
                                         
@@ -3297,11 +3325,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                         }
                                         
                                         if (empty($data_all_wpsipd[$key_kegiatan])) {
+                                            $_POST = array();
+                                            $_POST['api_key'] = $p['api_key'];
                                             $_POST['jenis'] = 'kegiatan';
                                             $_POST['parent_cascading'] = $kode_program_clean;
-                                            $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                            $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
-                                            $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $_POST['id_skpd'];
+                                            $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                            $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                            $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $p['id_skpd'];
+                                            $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                             $data_all_wpsipd[$key_kegiatan] = $this->get_tujuan_sasaran_cascading(true);
                                         }
                                     }
@@ -3664,11 +3695,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                                 }
                                                 
                                                 if (empty($data_all_wpsipd[$key_kegiatan])) {
+                                                    $_POST = array();
+                                                    $_POST['api_key'] = $p['api_key'];
                                                     $_POST['jenis'] = 'kegiatan';
                                                     $_POST['parent_cascading'] = $kode_program_clean;
-                                                    $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $_POST['id_skpd'];
-                                                    $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                    $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                                    $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $p['id_skpd'];
+                                                    $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                                    $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                                    $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                                     $data_all_wpsipd[$key_kegiatan] = $this->get_tujuan_sasaran_cascading(true);
                                                 }
                                                 
@@ -3718,11 +3752,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                                 }
                                                 
                                                 if (empty($data_all_wpsipd[$key_cascading])) {
+                                                	$_POST = array();
+                                                    $_POST['api_key'] = $p['api_key'];
                                                     $_POST['jenis'] = 'sub_kegiatan';
                                                     $_POST['parent_cascading'] = $parent_kode_cascading;
-                                                    $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $_POST['id_skpd'];
-                                                    $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                    $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                                    $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $p['id_skpd'];
+                                                    $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                                    $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                                    $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                                     $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
                                                 }
                                                 
@@ -3777,11 +3814,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                             }
                                             
                                             if (empty($data_all_wpsipd[$key_cascading])) {
+                                            	$_POST = array();
+                                                $_POST['api_key'] = $p['api_key'];
                                                 $_POST['jenis'] = 'kegiatan';
                                                 $_POST['parent_cascading'] = $kode_program_clean;
-                                                $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $_POST['id_skpd'];
-                                                $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                                $_POST['id_skpd'] = $id_sub_skpd_prog != 0 ? $id_sub_skpd_prog : $p['id_skpd'];
+                                                $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                                $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                                $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                                 $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
                                             }
                                             
@@ -3829,21 +3869,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                             }
                                             
                                             // Prepare untuk sub_kegiatan
-                                            $parent_kode_kegiatan = $uraian_renaksi['detail']['kode_cascading_kegiatan'];
-                                            $id_sub_skpd_keg = $uraian_renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
-                                            $key_sub_kegiatan = 'sub_kegiatan-' . $parent_kode_kegiatan;
-                                            if ($id_sub_skpd_keg != 0) {
-                                                $key_sub_kegiatan .= '-' . $id_sub_skpd_keg;
-                                            }
+                                            // $parent_kode_kegiatan = $uraian_renaksi['detail']['kode_cascading_kegiatan'];
+                                            // $id_sub_skpd_keg = $uraian_renaksi['detail']['id_sub_skpd_cascading'] ?? 0;
+                                            // $key_sub_kegiatan = 'sub_kegiatan-' . $parent_kode_kegiatan;
+                                            // if ($id_sub_skpd_keg != 0) {
+                                            //     $key_sub_kegiatan .= '-' . $id_sub_skpd_keg;
+                                            // }
                                             
-                                            if (empty($data_all_wpsipd[$key_sub_kegiatan])) {
-                                                $_POST['jenis'] = 'sub_kegiatan';
-                                                $_POST['parent_cascading'] = $parent_kode_kegiatan;
-                                                $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $_POST['id_skpd'];
-                                                $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
-                                                $data_all_wpsipd[$key_sub_kegiatan] = $this->get_tujuan_sasaran_cascading(true);
-                                            }
+                                            // if (empty($data_all_wpsipd[$key_sub_kegiatan])) {
+                                            //     $_POST = array();
+                                            //     $_POST['api_key'] = $p['api_key'];
+                                            //     $_POST['jenis'] = 'sub_kegiatan';
+                                            //     $_POST['parent_cascading'] = $parent_kode_kegiatan;
+                                            //     $_POST['id_skpd'] = $id_sub_skpd_keg != 0 ? $id_sub_skpd_keg : $p['id_skpd'];
+                                            //     $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                            //     $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                            //     $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
+                                            //     $data_all_wpsipd[$key_sub_kegiatan] = $this->get_tujuan_sasaran_cascading(true);
+                                            // }
                                         }
                                     }
                                 }
@@ -4101,11 +4144,14 @@ class Wp_Eval_Sakip_Monev_Kinerja
                                             }
                                             
                                             if (empty($data_all_wpsipd[$key_cascading])) {
+                                                $_POST = array();
+                                                $_POST['api_key'] = $p['api_key'];
                                                 $_POST['jenis'] = 'sub_kegiatan';
                                                 $_POST['parent_cascading'] = $parent_kode_cascading;
-                                                $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $_POST['id_skpd'];
-                                                $_POST['id_jadwal_wpsipd'] = $_POST['id_jadwal_wpsipd'];
-                                                $_POST['id_jadwal_rpjmd_rhk'] = $_POST['id_jadwal_rpjmd_rhk'];
+                                                $_POST['id_skpd'] = $id_sub_skpd != 0 ? $id_sub_skpd : $p['id_skpd'];
+                                                $_POST['id_jadwal_wpsipd'] = $p['id_jadwal_wpsipd'];
+                                                $_POST['id_jadwal_rpjmd_rhk'] = $p['id_jadwal_rpjmd_rhk'];
+                                                $_POST['tahun_anggaran'] = $p['tahun_anggaran'];
                                                 $data_all_wpsipd[$key_cascading] = $this->get_tujuan_sasaran_cascading(true);
                                             }
                                             

@@ -6131,11 +6131,16 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 	            throw new Exception("Format tidak sesuai!", 1);
 	        }
 	    } catch (Exception $e) {
-	        echo json_encode([
+	    	$return = json_encode([
 	            'status' => false,
 	            'message' => $e->getMessage()
 	        ]);
-	        exit();
+	    	if(!empty($return_text)){
+	    		return $return;
+	    	}else{
+	    		echo $return;
+	        	exit();
+	    	}
 	    }
 	}
 
