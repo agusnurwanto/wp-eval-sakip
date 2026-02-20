@@ -6032,110 +6032,116 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 	public function get_tujuan_sasaran_cascading($return_text)
 	{
-		global $wpdb;
-		try {
-			if (!empty($_POST)) {
-				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
-					if (!empty($_POST['id_skpd'])) {
-						$id_skpd = $_POST['id_skpd'];
-					} else {
-						throw new Exception("Id Skpd Kosong!", 1);
-					}
-					if (!empty($_POST['jenis'])) {
-						$jenis = $_POST['jenis'];
-					} else {
-						throw new Exception("Jenis Data Kosong!", 1);
-					}
-					$parent_cascading = '';
-					$tahun_anggaran = '';
-					if (
-						$jenis != 'sasaran'
-						&& $jenis != 'program_renstra'
-						&& $jenis != 'tujuan'
-						&& $jenis != 'kegiatan_renstra'
-						&& $jenis != 'sub_giat_renstra'
-					) {
-						if (!empty($_POST['parent_cascading'])) {
-							$parent_cascading = $_POST['parent_cascading'];
-						} else {
-							throw new Exception("Parent Cascading Data Kosong!", 1);
-						}
-						if (!empty($_POST['tahun_anggaran'])) {
-							$tahun_anggaran = $_POST['tahun_anggaran'];
-						} else {
-							throw new Exception("Tahun Anggaran Kosong!", 1);
-						}
-					}
+	    global $wpdb;
+	    try {
+	        if (!empty($_POST)) {
+	            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	                if (!empty($_POST['id_skpd'])) {
+	                    $id_skpd = $_POST['id_skpd'];
+	                } else {
+	                    throw new Exception("Id Skpd Kosong!", 1);
+	                }
+	                if (!empty($_POST['jenis'])) {
+	                    $jenis = $_POST['jenis'];
+	                } else {
+	                    throw new Exception("Jenis Data Kosong!", 1);
+	                }
+	                $parent_cascading = '';
+	                $tahun_anggaran = '';
+	                if (
+	                    $jenis != 'sasaran'
+	                    && $jenis != 'program_renstra'
+	                    && $jenis != 'tujuan'
+	                    && $jenis != 'kegiatan_renstra'
+	                    && $jenis != 'sub_giat_renstra'
+	                ) {
+	                    if (!empty($_POST['parent_cascading'])) {
+	                        $parent_cascading = $_POST['parent_cascading'];
+	                    } else {
+	                        throw new Exception("Parent Cascading Data Kosong!", 1);
+	                    }
+	                    if (!empty($_POST['tahun_anggaran'])) {
+	                        $tahun_anggaran = $_POST['tahun_anggaran'];
+	                    } else {
+	                        throw new Exception("Tahun Anggaran Kosong!", 1);
+	                    }
+	                }
 
-					if ($jenis == 'sasaran' && empty($_POST['id_jadwal_wpsipd'])) {
-						throw new Exception("Id Jadwal WpSipd Kosong!", 1);
-					} else {
-						$id_jadwal_wpsipd = $_POST['id_jadwal_wpsipd'];
-						$id_jadwal_rpjmd_rhk = $_POST['id_jadwal_rpjmd_rhk'];
-					}
+	                if ($jenis == 'sasaran' && empty($_POST['id_jadwal_wpsipd'])) {
+	                    throw new Exception("Id Jadwal WpSipd Kosong!", 1);
+	                } else {
+	                    $id_jadwal_wpsipd = $_POST['id_jadwal_wpsipd'];
+	                    $id_jadwal_rpjmd_rhk = $_POST['id_jadwal_rpjmd_rhk'];
+	                }
 
-					$api_params = array(
-						'action' 		   => 'get_cascading_renstra',
-						'api_key'		   => get_option('_crb_apikey_wpsipd'),
-						'tahun_anggaran'   => $tahun_anggaran,
-						'id_skpd' 		   => $id_skpd,
-						'jenis' 		   => $jenis,
-						'parent_cascading' => $parent_cascading
-					);
+	                $api_params = array(
+	                    'action'           => 'get_cascading_renstra',
+	                    'api_key'          => get_option('_crb_apikey_wpsipd'),
+	                    'tahun_anggaran'   => $tahun_anggaran,
+	                    'id_skpd'          => $id_skpd,
+	                    'jenis'            => $jenis,
+	                    'parent_cascading' => $parent_cascading
+	                );
 
-					if (
-						$jenis == 'sasaran'
-						|| $jenis == 'tujuan'
-						|| $jenis == 'program_renstra'
-						|| $jenis == 'kegiatan_renstra'
-						|| $jenis == 'sub_giat_renstra'
-						|| $jenis == 'program'
-						|| $jenis == 'kegiatan'
-						|| $jenis == 'sub_kegiatan'
-					) {
-						$api_params['id_jadwal'] = $id_jadwal_wpsipd;
-						$api_params['id_jadwal_rhk'] = $id_jadwal_rpjmd_rhk;
-					}
+	                if (
+	                    $jenis == 'sasaran'
+	                    || $jenis == 'tujuan'
+	                    || $jenis == 'program_renstra'
+	                    || $jenis == 'kegiatan_renstra'
+	                    || $jenis == 'sub_giat_renstra'
+	                    || $jenis == 'program'
+	                    || $jenis == 'kegiatan'
+	                    || $jenis == 'sub_kegiatan'
+	                ) {
+	                    $api_params['id_jadwal'] = $id_jadwal_wpsipd;
+	                    $api_params['id_jadwal_rhk'] = $id_jadwal_rpjmd_rhk;
+	                }
 
-					$response_asli = wp_remote_post(
-						get_option('_crb_url_server_sakip'),
-						array(
-							'timeout' 	=> 1000,
-							'sslverify' => false,
-							'body' 		=> $api_params
-						)
-					);
+	                $response_asli = wp_remote_post(
+	                    get_option('_crb_url_server_sakip'),
+	                    array(
+	                        'timeout'   => 1000,
+	                        'sslverify' => false,
+	                        'body'      => $api_params
+	                    )
+	                );
 
-					$response = wp_remote_retrieve_body($response_asli);
-					$response = json_decode($response);
-					$data = $response->data;
-					$data_transformasi_cascading = $response->data_transformasi_cascading;
+	                $response = wp_remote_retrieve_body($response_asli);
+	                $response = json_decode($response);	                
+	                $data = isset($response->data) ? $response->data : array();
+	                $data_transformasi_cascading = isset($response->data_transformasi_cascading) ? $response->data_transformasi_cascading : array();
 
-					$return = array(
-						'status' => 'success',
-						'jenis' => $_POST['jenis'],
-						'data' => $data,
-						'param' => $api_params,
-						'response' => $response_asli
-					);
-					if (!empty($return_text)) {
-						return $return;
-					} else {
-						die(json_encode($return));
-					}
-				} else {
-					throw new Exception("API tidak ditemukan!", 1);
-				}
-			} else {
-				throw new Exception("Format tidak sesuai!", 1);
-			}
-		} catch (Exception $e) {
-			echo json_encode([
-				'status' => false,
-				'message' => $e->getMessage()
-			]);
-			exit();
-		}
+	                $return = array(
+	                    'status' => 'success',
+	                    'jenis' => $_POST['jenis'],
+	                    'data' => $data,
+	                    'data_transformasi_cascading' => $data_transformasi_cascading,
+	                    'param' => $api_params,
+	                    'response' => $response_asli
+	                );
+	                if (!empty($return_text)) {
+	                    return $return;
+	                } else {
+	                    die(json_encode($return));
+	                }
+	            } else {
+	                throw new Exception("API tidak ditemukan!", 1);
+	            }
+	        } else {
+	            throw new Exception("Format tidak sesuai!", 1);
+	        }
+	    } catch (Exception $e) {
+	    	$return = json_encode([
+	            'status' => false,
+	            'message' => $e->getMessage()
+	        ]);
+	    	if(!empty($return_text)){
+	    		return $return;
+	    	}else{
+	    		echo $return;
+	        	exit();
+	    	}
+	    }
 	}
 
 	public function get_table_skpd_input_iku()

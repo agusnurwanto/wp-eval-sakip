@@ -1606,7 +1606,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             let selectedOption = jQuery('#label_renaksi option:selected');
                             let id_unik = selectedOption.data('id-unik');
                             if(id_unik) {
-                                tampilkan_pokin_dari_cascading(saved_rhk_id, 'sub_kegiatan');
+                                tampilkan_pokin_dari_cascading(id_unik, 'sub_kegiatan');
                             } else {
                                 console.warn('ID unik RHK tidak ditemukan!');
                             }
@@ -3992,11 +3992,11 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             bg_sub_kegiatan = 'style="background:#33bc0b;" title="Nomenklatur yang ditampilkan di PK"';
                         }
 
-                        if (tipe == 1) {
+                        if (tipe == 1 && value['status_input_rencana_pagu'] == 0) {
                             id_parent_cascading = value['kode_cascading_sasaran'];
                             label_cascading = value['label_cascading_sasaran'] != null ? value['label_cascading_sasaran'] : '-';
                             tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${tipe + 1}, ${JSON.stringify(id_pokin)}, '${id_parent_cascading}')" title="Lihat Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
-                        } else if (tipe == 2) {
+                        } else if (tipe == 2 && value['status_input_rencana_pagu'] == 0) {
                             id_parent_cascading = value['kode_cascading_program'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
                             if (value['label_cascading_program']) {
@@ -4008,7 +4008,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                 label_cascading = value['kode_cascading_program'] + ' ' + nama_prog + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ' + bg_program + '>' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
                             }
                             tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${tipe + 1}, ${JSON.stringify(id_pokin)}, '${id_parent_cascading}', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Kegiatan Rencana Hasil Kerja"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
-                        } else if (tipe == 3) {
+                        } else if (tipe == 3 && value['status_input_rencana_pagu'] == 0) {
                             id_parent_cascading = value['kode_cascading_kegiatan'];
                             id_parent_sub_skpd_cascading = value['id_sub_skpd_cascading'] != null ? value['id_sub_skpd_cascading'] : 0;
                             if (value['label_cascading_kegiatan']) {
@@ -4020,7 +4020,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                 label_cascading = value['kode_cascading_kegiatan'] + ' ' + nama_keg + '</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ' + bg_kegiatan + '>' + value['kode_sub_skpd'] + ' ' + value['nama_sub_skpd'] + pagu + '</span>';
                             }
                             tombol_detail = `<a href="javascript:void(0)" data-id="${value.id}" class="btn btn-sm mb-1 btn-warning" onclick="lihat_rencana_aksi(${value.id}, ${tipe + 1}, ${JSON.stringify(id_pokin)}, '${id_parent_cascading}', ${id_parent_sub_skpd_cascading})" title="Lihat Uraian Teknis Kegiatan"><i class="dashicons dashicons dashicons-menu-alt"></i></a> `;
-                        } else if (tipe == 4) {
+                        } else if (tipe == 4 && value['status_input_rencana_pagu'] == 0) {
                             id_pokin = value['id_pokin_5'];
                             if (value['label_cascading_sub_kegiatan']) {
                                 let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
@@ -4049,6 +4049,13 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                     label_cascading += `</br>${value['kode_cascading_sub_kegiatan']} ${nama_subkeg}</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ${bg_sub_kegiatan}>${value['kode_sub_skpd']} ${value['nama_sub_skpd']} | Rp. ${formatRupiah(value['pagu_cascading'])}</span>`;
                                 }
                             }
+                            bg_input_pagu = 'style="background: #a1fe86;" title="Checklist Input Pagu RHK"';
+                        } else if(set_input_rencana_pagu == 1 && value['status_input_rencana_pagu'] == 1){
+                            label_cascading = '';
+                            if (value['label_cascading_sub_kegiatan']) {
+                                let nama_subkeg = value['label_cascading_sub_kegiatan'].split(" ").slice(1).join(" ");
+                                label_cascading += `</br>${value['kode_cascading_sub_kegiatan']} ${nama_subkeg}</br><span class="badge badge-primary p-2 mt-2 text-center text-wrap" ${bg_sub_kegiatan}>${value['kode_sub_skpd']} ${value['nama_sub_skpd']} | Rp. ${formatRupiah(value['pagu_cascading'])}</span>`;
+                            }                            
                             bg_input_pagu = 'style="background: #a1fe86;" title="Checklist Input Pagu RHK"';
                         }
 
@@ -5846,7 +5853,6 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         let html_rhk_options = '<option value="">Pilih RHK</option>';
                         rhk_from_input_pagu_data.forEach(function(rhk) {
                             if (rhk && rhk.text && rhk.id) {
-                                console.log('rhk', rhk);
                                 html_rhk_options += `<option value="${rhk.id}" 
                                     data-id-unik="${rhk.id_unik || ''}" 
                                     data-id-cascading="${rhk.id || ''}" 
