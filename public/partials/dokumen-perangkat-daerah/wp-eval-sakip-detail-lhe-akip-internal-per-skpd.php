@@ -590,15 +590,16 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     id_skpd: <?php echo $id_skpd; ?>
                 },
                 dataType: 'json',
-                success: function(response) {
-                    jQuery('#wrap-loading').hide();
+               success: function(response) {
                     alert(response.message);
-                    location.reload();
+                    jQuery('#wrap-loading').hide();
+                    if (response.status) {
+                        location.reload();
+                    }
                 },
                 error: function(xhr, status, error) {
                     jQuery('#wrap-loading').hide();
                     alert('Terjadi kesalahan saat kirim data!');
-                    location.reload();
                 }
             });
         }else{

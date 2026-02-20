@@ -30241,29 +30241,35 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									SELECT * 
 									FROM " . $nama_tabel . "
 									WHERE id IN " . $condition . " 
-									  AND active = %d
-									  AND tahun_anggaran = %d", 1, $tahun_anggaran),
+									  AND active = %d", 1),
 								ARRAY_A
 							);
 							break;
 					}
 
 					$ret_sql = $wpdb->last_query;
+
+					// die($ret_sql);
 					$ret_body = array();
+					if (empty($data_lokal)) {
+						throw new Exception("Data dokumen tidak ditemukan!", 1);
+					}
 					foreach ($data_lokal as $key => $data) {
+						$body_arr = array(
+							'dokumen_id' => intval($mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']),
+							'user_id' => intval($user_id),
+							'nama_file' => $data['dokumen'],
+							'path' => ESAKIP_PLUGIN_URL . $path_dokumen . $data['dokumen'],
+							'keterangan' => $data['keterangan']
+						);
+
 						$response = wp_remote_post(get_option('_crb_url_api_esr') . 'insert_data', [
 							'headers' => array(
 								'Accept' => 'application/json',
 								'Content-Type' => 'application/json; charset=utf-8',
 								'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr') . ':' . get_option('_crb_password_api_esr')),
 							),
-							'body' => json_encode([
-								'dokumen_id' => intval($mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']),
-								'user_id' => intval($user_id),
-								'nama_file' => $data['dokumen'],
-								'path' => ESAKIP_PLUGIN_URL . $path_dokumen . $data['dokumen'],
-								'keterangan' => $data['keterangan']
-							]),
+							'body' => json_encode($body_arr),
 						]);
 						$ret_body[] = $response;
 						if (is_wp_error($response)) {
@@ -30275,7 +30281,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							if (is_array($response)) {
 								$response = json_encode($response);
 							}
-							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Coba lagi! " . $response, 1);
+							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . "! Ada pesan error: " . $response . " | Param: " . json_encode($body_arr), 1);
 						}
 
 						if (!empty($body->data)) {
@@ -30339,6 +30345,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 									"tgl_upload" => date('Y-m-d H:i:s'),
 								], intval($user_id));
 							}
+						} else {
+							throw new Exception("Gagal kirim data dokumen: " . $data['dokumen'] . ", Data Kosong atau Error Lain: " . json_encode($response) . " | Param: " . json_encode($body_arr), 1);
 						}
 					}
 
@@ -30409,11 +30417,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					if (empty($users->data)) {
 						throw new Exception("Data tidak ditemukan di API ESR", 1);
 					}
+					// die(var_dump($users->data));
 
 					foreach ($users->data as $key => $user) {
 						$check = $wpdb->get_var($wpdb->prepare("SELECT id FROM esakip_data_user_esr WHERE user_id=%d", $user->user_id));
 						if (empty($check)) {
-							$wpdb->insert('esakip_data_user_esr', [
+							$input = $wpdb->insert('esakip_data_user_esr', [
 								'user_id' => $user->user_id,
 								'role_id' => $user->role_id,
 								'parent_id' => $user->parent_id,
@@ -30422,9 +30431,13 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'email' => $user->email,
 								'unit_kerja' => $user->unit_kerja,
 								'created_at' => current_time('mysql')
-							], ['%d', '%d', '%d', '%d', '%s', '%s', '%s', '%s']);
+							]);
+
+							if ($input === false) {
+								throw new Exception("Gagal menyimpan data user ESR dengan user_id: " . $user->user_id, 1);
+							}
 						} else {
-							$wpdb->update('esakip_data_user_esr', [
+							$update = $wpdb->update('esakip_data_user_esr', [
 								'role_id' => $user->role_id,
 								'parent_id' => $user->parent_id,
 								'instansi_id' => $user->instansi_id,
@@ -30434,7 +30447,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								'updated_at' => current_time('mysql')
 							], [
 								'user_id' => $user->user_id
-							], ['%d', '%d', '%d', '%d', '%s', '%s', '%s']);
+							]);
+
+							if ($update === false) {
+								throw new Exception("Gagal memperbarui data user ESR dengan user_id: " . $user->user_id, 1);
+							}
 						}
 					}
 

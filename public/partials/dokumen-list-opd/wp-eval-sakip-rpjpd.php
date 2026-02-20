@@ -7,7 +7,8 @@ if (!defined('WPINC')) {
 
 $input = shortcode_atts(array(
     'periode' => '',
-), $atts);$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
+), $atts);
+$tahun_anggaran_sakip = get_option(ESAKIP_TAHUN_ANGGARAN);
 
 $periode = $wpdb->get_row(
     $wpdb->prepare("
@@ -81,7 +82,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 <div style="margin-bottom: 25px;">
                     <button class="btn btn-primary" onclick="tambah_dokumen_rpjpd();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
                     <?php
-                    if($status_api_esr){
+                    if ($status_api_esr) {
                         echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
                     }
                     ?>
@@ -90,11 +91,11 @@ $status_api_esr = get_option('_crb_api_esr_status');
             <div class="wrap-table">
                 <table id="table_dokumen_rpjpd" cellpadding="2" cellspacing="0" style="font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
-                    <tr>
+                        <tr>
                             <th class="text-center" rowspan="2">No</th>
                             <?php
                             if (!$is_admin_panrb):
-                                if($status_api_esr){
+                                if ($status_api_esr) {
                                     echo '<th class="text-center" id="check-list-esr" style="display:none">Checklist ESR</th>';
                                 }
                             endif;
@@ -230,12 +231,12 @@ $status_api_esr = get_option('_crb_api_esr_status');
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
-                if(response.status_mapping_esr){
+                if (response.status_mapping_esr) {
                     tahun_anggaran_periode_dokumen = response.tahun_anggaran_periode_dokumen;
-                    let body_non_esr_lokal=``;
-                    if(response.non_esr_lokal.length > 0){
+                    let body_non_esr_lokal = ``;
+                    if (response.non_esr_lokal.length > 0) {
                         response.non_esr_lokal.forEach((value, index) => {
-                            body_non_esr_lokal+=`
+                            body_non_esr_lokal += `
                                 <tr>
                                     <td class="text-center" data-upload-id="${value.upload_id}">${index+1}.</td>
                                     <td>${value.nama_file}</td>
@@ -521,34 +522,34 @@ $status_api_esr = get_option('_crb_api_esr_status');
         });
     }
 
-    function sync_from_esr(){
-       jQuery('#wrap-loading').show();
-            jQuery.ajax({
-                url: esakip.url,
-                type: 'POST',
-                data: {
-                    action: 'sync_from_esr',
-                    api_key: esakip.api_key,
-                },
-                dataType: 'json',
-                success: function(response) {
-                    jQuery('#wrap-loading').hide();
-                    alert(response.message);
-                },
-                error: function(xhr, status, error) {
-                    jQuery('#wrap-loading').hide();
-                    alert('Terjadi kesalahan saat ambil data!');
-                }
-        }); 
+    function sync_from_esr() {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: esakip.url,
+            type: 'POST',
+            data: {
+                action: 'sync_from_esr',
+                api_key: esakip.api_key,
+            },
+            dataType: 'json',
+            success: function(response) {
+                jQuery('#wrap-loading').hide();
+                alert(response.message);
+            },
+            error: function(xhr, status, error) {
+                jQuery('#wrap-loading').hide();
+                alert('Terjadi kesalahan saat ambil data!');
+            }
+        });
     }
 
-    function sync_to_esr(){
+    function sync_to_esr() {
         let list = jQuery("input:checkbox[name=checklist_esr]:checked")
-                .map(function (){
+            .map(function() {
                 return jQuery(this).val();
-        }).toArray();            
-            
-        if(list.length){
+            }).toArray();
+
+        if (list.length) {
             if (!confirm('Apakah Anda ingin melakukan singkronisasi dokumen ke ESR?')) {
                 return;
             }
@@ -560,23 +561,25 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     action: 'sync_to_esr',
                     api_key: esakip.api_key,
                     list: list,
-                    tahun_anggaran:tahun_anggaran_periode_dokumen,
+                    tahun_anggaran: tahun_anggaran_periode_dokumen,
                     id_periode: <?php echo $input['periode']; ?>,
-                    nama_tabel_database:'esakip_rpjpd'
+                    nama_tabel_database: 'esakip_rpjpd'
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log(response);
-                    jQuery('#wrap-loading').hide();
                     alert(response.message);
+                    jQuery('#wrap-loading').hide();
+                    if (response.status) {
+                        location.reload();
+                    }
                 },
                 error: function(xhr, status, error) {
                     jQuery('#wrap-loading').hide();
                     alert('Terjadi kesalahan saat kirim data!');
                 }
             });
-        }else{
-            alert('Checklist ESR belum dipilih!'); 
+        } else {
+            alert('Checklist ESR belum dipilih!');
         }
     }
 </script>

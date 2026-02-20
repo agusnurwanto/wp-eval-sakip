@@ -23,9 +23,9 @@ $periode = $wpdb->get_row(
     ARRAY_A
 );
 
-if(!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1){
+if (!empty($periode['tahun_selesai_anggaran']) && $periode['tahun_selesai_anggaran'] > 1) {
     $tahun_periode = $periode['tahun_selesai_anggaran'];
-}else{
+} else {
     $tahun_periode = $periode['tahun_anggaran'] + $periode['lama_pelaksanaan'];
 }
 
@@ -45,9 +45,9 @@ $idtahun = $wpdb->get_results(
 $tahun = "<option value='-1'>Pilih Tahun Periode</option>";
 
 foreach ($idtahun as $val) {
-    if(!empty($val['tahun_selesai_anggaran']) && $val['tahun_selesai_anggaran'] > 1){
+    if (!empty($val['tahun_selesai_anggaran']) && $val['tahun_selesai_anggaran'] > 1) {
         $tahun_anggaran_selesai = $val['tahun_selesai_anggaran'];
-    }else{
+    } else {
         $tahun_anggaran_selesai = $val['tahun_anggaran'] + $val['lama_pelaksanaan'];
     }
 
@@ -66,15 +66,15 @@ $is_admin_panrb = in_array('admin_panrb', $user_roles);
 $is_administrator = in_array('administrator', $user_roles);
 $status_api_esr = get_option('_crb_api_esr_status');
 
-    $admin_role_pemda = array(
-        'admin_bappeda',
-        'admin_ortala'
-    );
+$admin_role_pemda = array(
+    'admin_bappeda',
+    'admin_ortala'
+);
 
-    $this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2 ;
+$this_jenis_role = (array_intersect($admin_role_pemda, $user_roles)) ? 1 : 2;
 
-    $cek_settingan_menu = $wpdb->get_var(
-        $wpdb->prepare(
+$cek_settingan_menu = $wpdb->get_var(
+    $wpdb->prepare(
         "SELECT 
             jenis_role
         FROM esakip_menu_dokumen 
@@ -82,10 +82,12 @@ $status_api_esr = get_option('_crb_api_esr_status');
           AND user_role='pemerintah_daerah' 
           AND active = 1
           AND id_jadwal=%d
-    ", $input['periode'])
-    );
+    ",
+        $input['periode']
+    )
+);
 
-    $hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
+$hak_akses_user = ($cek_settingan_menu == $this_jenis_role || $cek_settingan_menu == 3 || $is_administrator) ? true : false;
 ?>
 <style type="text/css">
     .wrap-table {
@@ -111,26 +113,26 @@ $status_api_esr = get_option('_crb_api_esr_status');
         <div style="padding: 10px;margin:0 0 3rem 0;">
             <h1 class="text-center" style="margin:3rem;">Dokumen Pohon Kinerja dan Cascading <br>Pemerintah Daerah<br><?php echo $periode['nama_jadwal'] . ' (' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ')'; ?></h1>
             <?php if (!$is_admin_panrb): ?>
-            <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                <?php
-                if($status_api_esr){
-                    echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
-                }
-                ?>
-            </div>
+                <div style="margin-bottom: 25px;">
+                    <button class="btn btn-primary" onclick="tambah_dokumen();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                    <?php
+                    if ($status_api_esr) {
+                        echo '<button class="btn btn-warning" onclick="sync_to_esr();" id="btn-sync-to-esr" style="display:none"><i class="dashicons dashicons-arrow-up-alt"></i> Kirim Data ke ESR</button>';
+                    }
+                    ?>
+                </div>
             <?php endif; ?>
             <div class="wrap-table">
                 <table id="table_dokumen" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                     <thead>
-                         <tr>
+                        <tr>
                             <th class="text-center">No</th>
                             <?php
-                                if (!$is_admin_panrb && $hak_akses_user):
-                                    if($status_api_esr){
-                                        echo '<th class="text-center" rowspan="2" id="check-list-esr" style="display:none">Checklist ESR</th>';
-                                    }
-                                endif;
+                            if (!$is_admin_panrb && $hak_akses_user):
+                                if ($status_api_esr) {
+                                    echo '<th class="text-center" rowspan="2" id="check-list-esr" style="display:none">Checklist ESR</th>';
+                                }
+                            endif;
                             ?>
                             <th class="text-center">Nama Dokumen</th>
                             <th class="text-center">Keterangan</th>
@@ -232,12 +234,12 @@ $status_api_esr = get_option('_crb_api_esr_status');
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 console.log(response);
-                if(response.status_mapping_esr){
+                if (response.status_mapping_esr) {
                     tahun_anggaran_periode_dokumen = response.tahun_anggaran_periode_dokumen;
-                    let body_non_esr_lokal=``;
-                    if(response.non_esr_lokal.length > 0){
+                    let body_non_esr_lokal = ``;
+                    if (response.non_esr_lokal.length > 0) {
                         response.non_esr_lokal.forEach((value, index) => {
-                            body_non_esr_lokal+=`
+                            body_non_esr_lokal += `
                                 <tr>
                                     <td class="text-center" data-upload-id="${value.upload_id}">${index+1}.</td>
                                     <td>${value.nama_file}</td>
@@ -287,7 +289,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 action: 'get_detail_pohon_kinerja_by_id',
                 api_key: esakip.api_key,
                 id: id,
-				tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
+                tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
             },
             dataType: 'json',
             success: function(response) {
@@ -389,7 +391,7 @@ $status_api_esr = get_option('_crb_api_esr_status');
                 api_key: esakip.api_key,
                 id: id,
                 tipe_dokumen: '<?php echo $tipe_dokumen; ?>',
-                
+
             },
             dataType: 'json',
             success: function(response) {
@@ -410,13 +412,13 @@ $status_api_esr = get_option('_crb_api_esr_status');
         });
     }
 
-    function sync_to_esr(){
+    function sync_to_esr() {
         let list = jQuery("input:checkbox[name=checklist_esr]:checked")
-                .map(function (){
+            .map(function() {
                 return jQuery(this).val();
-        }).toArray();            
-            
-        if(list.length){
+            }).toArray();
+
+        if (list.length) {
             if (!confirm('Apakah Anda ingin melakukan singkronisasi dokumen ke ESR?')) {
                 return;
             }
@@ -428,24 +430,25 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     action: 'sync_to_esr',
                     api_key: esakip.api_key,
                     list: list,
-                    tahun_anggaran:tahun_anggaran_periode_dokumen,
+                    tahun_anggaran: tahun_anggaran_periode_dokumen,
                     id_periode: <?php echo $input['periode']; ?>,
-                    nama_tabel_database:'esakip_pohon_kinerja_dan_cascading_pemda'
+                    nama_tabel_database: 'esakip_pohon_kinerja_dan_cascading_pemda'
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log(response);
-                    jQuery('#wrap-loading').hide();
                     alert(response.message);
+                    jQuery('#wrap-loading').hide();
+                    if (response.status) {
+                        location.reload();
+                    }
                 },
                 error: function(xhr, status, error) {
                     jQuery('#wrap-loading').hide();
                     alert('Terjadi kesalahan saat kirim data!');
                 }
             });
-        }else{
-            alert('Checklist ESR belum dipilih!'); 
+        } else {
+            alert('Checklist ESR belum dipilih!');
         }
     }
-
 </script>

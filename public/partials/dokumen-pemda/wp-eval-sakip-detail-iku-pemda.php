@@ -360,20 +360,21 @@ $status_api_esr = get_option('_crb_api_esr_status');
                     action: 'sync_to_esr',
                     api_key: esakip.api_key,
                     list: list,
-                    tahun_anggaran:tahun_anggaran_periode_dokumen,
+                    tahun_anggaran: tahun_anggaran_periode_dokumen,
                     id_periode: '<?php echo $input['id_jadwal']; ?>',
                     nama_tabel_database: 'esakip_iku_pemda'
                 },
                 dataType: 'json',
                 success: function(response) {
-                    jQuery('#wrap-loading').hide();
                     alert(response.message);
-                    location.reload();
+                    jQuery('#wrap-loading').hide();
+                    if (response.status) {
+                        location.reload();
+                    }
                 },
                 error: function(xhr, status, error) {
                     jQuery('#wrap-loading').hide();
                     alert('Terjadi kesalahan saat kirim data!');
-                    location.reload();
                 }
             });
         } else {
