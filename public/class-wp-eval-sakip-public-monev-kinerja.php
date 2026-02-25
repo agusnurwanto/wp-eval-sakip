@@ -9404,7 +9404,13 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$data['pangkat_pegawai_atasan'] = $data_atasan['pangkat'];
 				}
 
-				$wpdb->insert('esakip_finalisasi_tahap_laporan_pk', $data);
+				$insert = $wpdb->insert('esakip_finalisasi_tahap_laporan_pk', $data);
+				if ($insert == false) {
+					$ret['status'] = 'error';
+					$ret['message'] = 'Gagal menyimpan data finalisasi laporan PK!';
+					error_log('Error simpan_finalisasi_laporan_pk: ' . $wpdb->last_error);
+					die(json_encode($ret));
+				}
 			} else {
 				$ret['status'] = 'error';
 				$ret['message'] = 'API key tidak ditemukan!';

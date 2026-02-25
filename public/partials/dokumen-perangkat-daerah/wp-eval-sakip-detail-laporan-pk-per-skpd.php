@@ -953,8 +953,7 @@ $ttd_orientasi = 'text-left';
     <div class="page-print mt-5 text-center">
         <p class="title-laporan mt-3"><span class="jenis_pk_text">PERJANJIAN KINERJA</span> TAHUN <?php echo $input['tahun']; ?></p>
         <p class="title-laporan mb-5 nama-satker-view"><?php echo $pihak_pertama['nama_bidang']; ?></p>
-        <?php if (!empty($html_pk['html_sasaran'])) : ?>
-            <table class="table_data_anggaran" id="table-sasaran-view">
+        <table class="table_data_anggaran" id="table-sasaran-view" <?php if (empty($html_pk['html_sasaran'])) echo 'style="display:none"'; ?>>
                 <thead>
                     <tr>
                         <th class="esakip-text_tengah" style="width: 45px;">No</th>
@@ -964,13 +963,11 @@ $ttd_orientasi = 'text-left';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $html_pk['html_sasaran']; ?>
+                    <?php if (!empty($html_pk['html_sasaran'])) echo $html_pk['html_sasaran']; ?>
                 </tbody>
-            </table>
-        <?php endif; ?>
+        </table>
 
-        <?php if (!empty($html_pk['html_program'])) : ?>
-            <table class="table_data_anggaran" id="table-program-view">
+            <table class="table_data_anggaran" id="table-program-view" <?php if (empty($html_pk['html_program'])) echo 'style="display:none"'; ?>>
                 <thead>
                     <tr>
                         <th class="esakip-text_tengah" style="width: 45px;">No</th>
@@ -980,13 +977,11 @@ $ttd_orientasi = 'text-left';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $html_pk['html_program']; ?>
+                    <?php if (!empty($html_pk['html_program'])) echo $html_pk['html_program']; ?>
                 </tbody>
             </table>
-        <?php endif; ?>
 
-        <?php if (!empty($html_pk['html_kegiatan'])) : ?>
-            <table class="table_data_anggaran" id="table-kegiatan-view">
+            <table class="table_data_anggaran" id="table-kegiatan-view" <?php if (empty($html_pk['html_kegiatan'])) echo 'style="display:none"'; ?>>
                 <thead>
                     <tr>
                         <th class="esakip-text_tengah" style="width: 45px;">No</th>
@@ -996,13 +991,11 @@ $ttd_orientasi = 'text-left';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $html_pk['html_kegiatan']; ?>
+                    <?php if (!empty($html_pk['html_kegiatan'])) echo $html_pk['html_kegiatan']; ?>
                 </tbody>
             </table>
-        <?php endif; ?>
 
-        <?php if (!empty($html_pk['html_sub_kegiatan'])) : ?>
-            <table class="table_data_anggaran" id="table-subkegiatan-view">
+            <table class="table_data_anggaran" id="table-subkegiatan-view" <?php if (empty($html_pk['html_sub_kegiatan'])) echo 'style="display:none"'; ?>>
                 <thead>
                     <tr>
                         <th class="esakip-text_tengah" style="width: 45px;">No</th>
@@ -1012,10 +1005,9 @@ $ttd_orientasi = 'text-left';
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo $html_pk['html_sub_kegiatan']; ?>
+                    <?php if (!empty($html_pk['html_sub_kegiatan'])) echo $html_pk['html_sub_kegiatan']; ?>
                 </tbody>
             </table>
-        <?php endif; ?>
 
         <table id="table_data_pejabat" class="f-12 mt-5">
             <tbody>
