@@ -34571,51 +34571,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				throw new Exception("Data pegawai dengan ID {$pegawai_id} tidak ditemukan.", 404);
 			}
 
-			$satker_id_atasan = null;
-			$data_pegawai->atasan = null;
+			// Flag untuk JS: opsi Kepala Daerah muncul jika Plt/Plh di Satker Induk
+			$data_pegawai->show_kepala_daerah_option = (strlen($data_pegawai->satker_id) == 2 && $data_pegawai->plt_plh == 1);
 
-			$data_pegawai->show_kepala_daerah_option = false; //flag untuk JS
-
-			$is_kepala_definitif = ($data_pegawai->tipe_pegawai_id == 11);
-			$is_plt_plh = ($data_pegawai->plt_plh == 1);
-			$is_di_satker_induk = (strlen($data_pegawai->satker_id) == 2);
-
-			// Kasus 1: Kepala Definitif di Satker Induk. Atasan adalah Kepala Daerah (Definitif).
-			if ($is_di_satker_induk && $is_kepala_definitif) {
-				$nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
-				$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
-				$data_pegawai->atasan = (object) [
-					'id'           => 0, // ID khusus untuk Kepala Daerah
-					'nama_pegawai' => $nama_kepala_daerah,
-					'nip_baru'     => 'Kepala Daerah',
-					'jabatan'      => $status_jabatan_kepala_daerah
-				];
-				$satker_id_atasan = null; // Tidak perlu mencari lagi di DB.
-
-			// Kasus 2: Plt/Plh di Satker Induk. Atasan harus dipilih, opsi Kepala Daerah muncul.
-			} elseif ($is_di_satker_induk && $is_plt_plh) {
-				$data_pegawai->show_kepala_daerah_option = true;
-				$satker_id_atasan = null;
-
-			// Kasus 3: Kepala/Plt di Sub-Satker. Cari atasan di satker induknya.
-			} elseif (!$is_di_satker_induk && ($is_kepala_definitif || $is_plt_plh)) {
-				$satker_id_atasan = substr($data_pegawai->satker_id, 0, -2);
-
-			// Kasus 4: Staf biasa. Cari atasan di satkernya sendiri.
-			} else {
-				$satker_id_atasan = $data_pegawai->satker_id;
-			}
-
-			// Jika $satker_id_atasan ada, cari atasannya di database.
-			if ($satker_id_atasan) {
-				$data_pegawai->atasan = $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan, $_POST['tahun_anggaran']);
-			}
+			$data_pegawai->atasan = $this->_get_atasan_definitif($data_pegawai, $_POST['tahun_anggaran'], true);
 
 			// Jika data atasan tidak ketemu dan punya riwayat custom atasan
 			if (empty($data_pegawai->atasan) && !empty($data_pegawai->id_atasan)) {
 				$data_pegawai->atasan_custom = $this->get_data_pegawai_simpeg_by_id($data_pegawai->id_atasan, $_POST['tahun_anggaran']);
 			} else {
 				$data_pegawai->atasan_custom = null;
+			}
+
+			$data_pegawai->same_person = ($data_pegawai->atasan && $data_pegawai->atasan->nip_baru == $data_pegawai->nip_baru);
+
+			if ($data_pegawai->same_person) {
+				$data_pegawai->atasan = null; // Hilangkan data atasan jika sama dengan pegawai
 			}
 
 			echo json_encode([
@@ -34688,7 +34659,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	 * @param object $pegawai The employee data object.
 	 * @return object|null The atasan's data object, a virtual object for Kepala Daerah, or null if no definitive atasan is found.
 	 */
-	public function _get_atasan_definitif($pegawai, $tahun)
+	public function _get_atasan_definitif($pegawai, $tahun, $same_person_return = false)
 	{
 		global $wpdb;
 
@@ -34727,11 +34698,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		// Jika satker_id_atasan telah ditentukan
 		if ($satker_id_atasan) {
-			return $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan, $tahun);
+			$atasan = $this->get_data_pegawai_simpeg_atasan_by_satker_id($satker_id_atasan, $tahun);
+			
+			if (!$atasan) {
+				return null; // Tidak ditemukan atasan di satker induk
+			}
+
+			$same_person = ($atasan && $atasan->nip_baru == $pegawai->nip_baru);
+			if ($same_person && $same_person_return == false) {
+				return null; // Hilangkan data atasan jika sama dengan pegawai
+			} else if ($same_person && $same_person_return == true) {
+				return $atasan; // Kembalikan data atasan meskipun sama dengan pegawai, untuk keperluan tertentu seperti validasi di JS
+			}
 		}
 
 		// Jika tidak ada kasus yang cocok return null
-		return null;
+		return $atasan;
 	}
 
 	/**
@@ -34754,7 +34736,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			$id_pegawai = intval($_POST['id_pegawai']);
-			$id_atasan = !empty($_POST['id_atasan']) ? intval($_POST['id_atasan']) : null;
+			$id_atasan = isset($_POST['id_atasan']) && $_POST['id_atasan'] !== '' ? intval($_POST['id_atasan']) : null;
 			$jabatan_custom = isset($_POST['jabatan_custom']) ? sanitize_text_field($_POST['jabatan_custom']) : null;
 			$plt_plh_teks = isset($_POST['plt_plh_teks']) ? sanitize_text_field($_POST['plt_plh_teks']) : null;
 			$terapkan_all_satker = isset($_POST['terapkan_all_satker']) && $_POST['terapkan_all_satker'] == 1;

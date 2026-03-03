@@ -85,8 +85,20 @@ if (!empty($data_pegawai_1)) {
     }
 
     $data_atasan = $this->_get_atasan_definitif($data_pegawai_1, $input['tahun']);
-    if (empty($data_atasan) && !empty($data_pegawai_1->id_atasan)) {
-        $data_atasan = $this->get_data_pegawai_simpeg_by_id($data_pegawai_1->id_atasan, $input['tahun']);
+    if (empty($data_atasan)) {
+        if ($data_pegawai_1->id_atasan == '0') {
+            $nama_kepala_daerah = get_option('_crb_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+			$status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') ?: 'Kepala Daerah (set di halaman Pengaturan)';
+				
+			$data_atasan = (object) [
+				'id'           => 0,
+				'nama_pegawai' => $nama_kepala_daerah,
+				'nip_baru'     => 'Kepala Daerah',
+				'jabatan'      => $status_jabatan_kepala_daerah
+			];
+        } else {
+            $data_atasan = $this->get_data_pegawai_simpeg_by_id($data_pegawai_1->id_atasan, $input['tahun']);
+        }
     }
 
     $options = array(
@@ -234,7 +246,12 @@ if ($is_administrator || $this_admin_pemda == 1) {
     $nip_user_pegawai = 0;
 } else {
     // ----- hak akses by skpd terkait ----- //
-    $hak_akses_user_pegawai = $hak_akses_user_pegawai_per_skpd[$id_skpd];
+    if (empty($skpd_user_pegawai)) {
+        $hak_akses_user_pegawai = 3; // 3 = TIDAK ADA Akses (SKPD tidak ditemukan di mapping)
+        $nip_user_pegawai = 0; // jika tidak ada akses, nip diset 0
+    } else {
+        $hak_akses_user_pegawai = $hak_akses_user_pegawai_per_skpd[$id_skpd];
+    }
 }
 
 //////// end setting hak akses ////////
@@ -1355,6 +1372,10 @@ $ttd_orientasi = 'text-left';
 
         if (hak_akses_user_pegawai == 2 && nip_pihak_pertama != nip_akses_user_pegawai) {
             jQuery(".editable-field").attr("title", "").attr("contenteditable", "false");
+        }
+
+        if (hak_akses_user_pegawai == 3) {
+            alert('User tidak memiliki akses Finalisasi. Pastikan daftar pegawai sudah disinkron dengan SIMPEG untuk melakukan finalisasi, Kemudian muat ulang halaman ini!.');
         }
     });
 
