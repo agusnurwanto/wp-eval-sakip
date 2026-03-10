@@ -1107,7 +1107,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 										$btn_format_kke = '';
 										if (!empty($penilaian['id_kke'])) {
-											$page_format_kke = $this->generate_page_kke_by_id($penilaian['id_kke']);
+											$page_format_kke = $this->generate_page_kke_by_id($penilaian['id_kke'], $id_skpd, $tahun_anggaran);
 											$btn_format_kke = "<a href='{$page_format_kke}' class='btn btn-primary m-2' target='_blank' title='Isi KKE'><span class='dashicons dashicons-controls-forward'></span></a>";
 										}
 										//tbody isi
@@ -6074,21 +6074,982 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 		wp_die();
 	}
 
-	public function generate_page_kke_by_id($id)
+	public function generate_page_kke_by_id($id, $id_skpd = null, $tahun_anggaran = null)
 	{
-		$data = $this->get_kke_by_id($id);
+	    $data = $this->get_kke_by_id($id);
 
-		if (!empty($data)) {
-			$page = $this->functions->generatePage(array(
-				'nama_page' 	=> "Format {$data->id} | KKE (Kerangka Kerja Evaluasi)",
-				'content' 		=> '[format_kke_' . $data->id . ']',
-				'show_header' 	=> 1,
-				'post_status' 	=> 'private'
-			));
+	    if (!empty($data)) {
+	        $page = $this->functions->generatePage(array(
+	            'nama_page'     => "Format {$data->id} | KKE (Kerangka Kerja Evaluasi)",
+	            'content'       => '[format_kke_' . $data->id . ']',
+	            'show_header'   => 1,
+	            'post_status'   => 'private'
+	        ));
 
-			return $page['url'];
-		}
+	        $url = $page['url'];
 
-		return null;
+	        $url = add_query_arg(array(
+			    'id_kke' => $id,
+			    'id_skpd' => $id_skpd,
+			    'tahun_anggaran'   => $tahun_anggaran
+			), $url);
+
+	        return $url;
+	    }
+
+	    return null;
+	}
+
+	public function get_table_kke_format_1()
+	{
+	    global $wpdb;
+	    $ret = array(
+	        'status'  => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data'    => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+	            $id_data = intval($_POST['id'] ?? 0);
+	            if (!$id_data) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Parameter id kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            $id_skpd = intval($_POST['id_skpd'] ?? 0);
+	            if (!$id_skpd) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Parameter id_skpd kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            $tahun_anggaran = intval($_POST['tahun_anggaran'] ?? 0);
+	            if (!$tahun_anggaran) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Parameter tahun_anggaran kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            $id_jadwal_wpsipd = intval($_POST['id_jadwal_wpsipd'] ?? 0);
+
+	            $tipe_map = [
+	                'program'      => 3,
+	                'kegiatan'     => 4,
+	                'sub_kegiatan' => 5,
+	            ];
+
+	            foreach ($tipe_map as $tipe_str => $tipe_int) {
+	                $_POST['tipe'] = $tipe_str;
+	                $_POST['id_jadwal_wpsipd'] = $id_jadwal_wpsipd;
+
+	                $result = $this->get_api_renja(true);
+	                if (is_string($result)) {
+	                    $result = json_decode($result, true);
+	                }
+
+	                if (empty($result['status']) || $result['status'] !== 'success' || empty($result['data'])) {
+	                    continue;
+	                }
+
+	                foreach ($result['data'] as $item) {
+	                    $item['_tipe'] = $tipe_str;
+	                    $this->simpan_data_renja_kke_format_1($item, $tipe_int, $tipe_str, $tahun_anggaran, $id_skpd, $id_data);
+	                }
+	            }
+
+	            $ret['message'] = 'Berhasil sinkronisasi data KKE Format 1!';
+
+	            $rows = $wpdb->get_results($wpdb->prepare("
+	                SELECT 
+	                	*
+	                FROM esakip_data_kke_format_1
+	                WHERE id_skpd = %d
+	                  AND tahun_anggaran = %d
+	                  AND active = 1
+	                  AND tipe IN (3, 4, 5)
+	                ORDER BY kode ASC, id ASC
+	            ", $id_skpd, $tahun_anggaran), ARRAY_A);
+
+	            if (empty($rows)) {
+	                $ret['data']['html'] = '<tr><td class="text-center" colspan="14">Data masih kosong!</td></tr>';
+	                die(json_encode($ret));
+	            }
+
+	            $sort_kode_fn = function ($a, $b) {
+	                $a_parts = explode('.', str_replace(',', '.', (string)$a));
+	                $b_parts = explode('.', str_replace(',', '.', (string)$b));
+	                $len = max(count($a_parts), count($b_parts));
+	                for ($i = 0; $i < $len; $i++) {
+	                    $ap = isset($a_parts[$i]) ? intval($a_parts[$i]) : 0;
+	                    $bp = isset($b_parts[$i]) ? intval($b_parts[$i]) : 0;
+	                    if ($ap !== $bp) return ($ap < $bp) ? -1 : 1;
+	                }
+	                return 0;
+	            };
+
+	            usort($rows, function($a, $b) use ($sort_kode_fn) {
+	                $cmp = $sort_kode_fn($a['kode'], $b['kode']);
+	                if ($cmp !== 0) return $cmp;
+	                return intval($a['id']) - intval($b['id']);
+	            });
+
+	            $grouped_by_kode = [];
+	            $kode_order = [];
+	            foreach ($rows as $row) {
+	                $kode = trim($row['kode'] ?? '');
+	                if (!isset($grouped_by_kode[$kode])) {
+	                    $grouped_by_kode[$kode] = [];
+	                    $kode_order[] = $kode;
+	                }
+	                $grouped_by_kode[$kode][] = $row;
+	            }
+
+	            $prog_no = 0;
+	            $ket_no = 0;
+	            $sub_no = 0;
+	            $nomor_map = [];
+	            foreach ($kode_order as $kode) {
+	                $base_row = $grouped_by_kode[$kode][0];
+	                $tipe = intval($base_row['tipe']);
+
+	                if ($tipe == 3) {
+	                    $prog_no++;
+	                    $ket_no = 0;
+	                    $sub_no = 0;
+	                    $nomor_map[$kode] = (string)$prog_no;
+	                } elseif ($tipe == 4) {
+	                    $ket_no++;
+	                    $sub_no = 0;
+	                    $nomor_map[$kode] = $prog_no . '.' . $ket_no;
+	                } else {
+	                    $sub_no++;
+	                    $nomor_map[$kode] = $prog_no . '.' . $ket_no . '.' . $sub_no;
+	                }
+	            }
+
+	            $html = '';
+
+	            foreach ($kode_order as $kode) {
+	                $kode_rows = $grouped_by_kode[$kode];
+	                $rowspan = count($kode_rows);
+	                $base_row = $kode_rows[0];
+	                $tipe = intval($base_row['tipe']);
+	                $nomor = $nomor_map[$kode];
+	                $nama = esc_html($base_row['nama'] ?? '');
+	                $kode_esc = esc_html($kode);
+	                $nomor_esc = esc_html($nomor);
+
+	                $row_style = '';
+	                $row_class = '';
+	                if ($tipe == 3) {
+	                    $row_style = 'background-color:#e5d9f2;';
+	                    $row_class = 'tr-program';
+	                } elseif ($tipe == 4) {
+	                    $row_style = 'background-color:#13d0d03d;';
+	                    $row_class = 'tr-kegiatan';
+	                }
+
+	                $nama_style = '';
+	                if ($tipe == 3) {
+	                    $nama_style = 'font-weight:bold';
+	                } elseif ($tipe == 4) {
+	                    $nama_style = 'font-weight:600';
+	                }
+
+	                foreach ($kode_rows as $idx => $row) {
+	                    $id = intval($row['id']);
+	                    $indikator = esc_html($row['indikator'] ?? '');
+	                    $target = esc_html($row['target_capaian'] ?? '');
+	                    $satuan = esc_html($row['satuan_capaian'] ?? '');
+	                    $spesifik = $row['spesifik'];
+	                    $ukur = $row['ukur'];
+	                    $capaian = $row['capaian'];
+	                    $relavan = $row['relavan'];
+	                    $batas_waktu = $row['batas_waktu'];
+	                    $menantang = $row['menantang'];
+
+	                    $is_mapped = isset($row['status']) && intval($row['status']) === 1;
+
+	                    $nilai_total = 0;
+	                    foreach ([$spesifik, $ukur, $capaian, $relavan, $batas_waktu] as $v) {
+	                        if ($v !== null && $v !== '') $nilai_total += intval($v);
+	                    }
+
+	                    $html .= '<tr class="' . $row_class . '" data-rowid="' . $id . '" style="' . $row_style . '">';
+
+	                    if ($idx === 0) {
+	                        $rs_attr = $rowspan > 1 ? ' rowspan="' . $rowspan . '"' : '';
+
+	                        $html .= '<td' . $rs_attr . ' style="white-space:nowrap;text-align:left;font-weight:' . ($tipe == 3 ? 'bold' : 'normal') . ';">' . $nomor_esc . '</td>';
+
+	                        $html .= '<td' . $rs_attr . ' class="text-left" style="' . $nama_style . '; vertical-align:top !important; text-align:left !important;">' . ' ' . $kode_esc . ' ' . $nama . '</td>';
+	                    }
+
+	                    $html .= '<td class="text-left" style="vertical-align:top !important; text-align:left !important;">' . $indikator . '</td>';
+
+	                    $target_display = $target;
+	                    if ($satuan) $target_display .= ' ' . $satuan;
+	                    $html .= '<td>' . $target_display . '</td>';
+
+	                    $smart_fields = [
+	                        'spesifik'    => $spesifik,
+	                        'ukur'        => $ukur,
+	                        'capaian'     => $capaian,
+	                        'relavan'     => $relavan,
+	                        'batas_waktu' => $batas_waktu,
+	                    ];
+
+	                    foreach ($smart_fields as $sf_name => $sf_val) {
+	                        if ($is_mapped) {
+	                            $sv = ($sf_val === null || $sf_val === '') ? '' : intval($sf_val);
+	                            $html .= '<td>' . '<select class="smart-select" data-field="' . $sf_name . '" data-id="' . $id . '" onchange="onSmartChange(this)">' . '<option value="">-</option>' . '<option value="1"' . ($sv === 1 ? ' selected' : '') . '>1</option>' . '<option value="0"' . ($sv === 0 && $sv !== '' ? ' selected' : '') . '>0</option>' . '</select>' . '</td>';
+	                        } else {
+	                            $display_val = ($sf_val === null || $sf_val === '') ? '-' : intval($sf_val);
+	                            $html .= '<td class="text-center">' . $display_val . '</td>';
+	                        }
+	                    }
+
+	                    $badge_class = 'badge-nilai-low';
+	                    if ($nilai_total == 5) {
+	                        $badge_class = 'badge-nilai-5';
+	                    } elseif ($nilai_total == 4) {
+	                        $badge_class = 'badge-nilai-4';
+	                    } elseif ($nilai_total == 3) {
+	                        $badge_class = 'badge-nilai-3';
+	                    }
+	                    $html .= '<td><span class="badge-nilai ' . $badge_class . ' cell-nilai-total" data-nilai="' . $nilai_total . '">' . $nilai_total . '</span></td>';
+
+	                    if ($is_mapped) {
+	                        $mv = ($menantang === null || $menantang === '') ? '' : intval($menantang);
+	                        $html .= '<td>' . '<select class="smart-select" data-field="menantang" data-id="' . $id . '" onchange="onSmartChange(this)">' . '<option value="">-</option>' . '<option value="1"' . ($mv === 1 ? ' selected' : '') . '>1</option>' . '<option value="0"' . ($mv === 0 && $mv !== '' ? ' selected' : '') . '>0</option>' . '</select>'
+	                               . '</td>';
+	                    } else {
+	                        $display_menantang = ($menantang === null || $menantang === '') ? '-' : intval($menantang);
+	                        $html .= '<td class="text-center">' . $display_menantang . '</td>';
+	                    }
+
+	                    if ($is_mapped) {
+	                        $html .= '<td>' . '<textarea class="form-control form-control-sm input-ket" ' . 'placeholder="Keterangan..." ' . 'rows="3" ' . 'style="min-width:150px;font-size:0.8rem;resize:vertical;">'
+	                               . esc_html($row['keterangan'] ?? '') . '</textarea>' . '</td>';
+	                    } else {
+	                        $display_ket = esc_html($row['keterangan'] ?? '');
+	                        $html .= '<td class="text-left" style="min-width:150px;font-size:0.8rem;">' . ($display_ket !== '' ? $display_ket : '-') . '</td>';
+	                    }
+
+	                    $html .= '<td class="text-center">';
+
+	                    if ($is_mapped) {
+	                        $html .= '
+	                            <button id="btn-simpan-' . $id . '" class="btn btn-success" onclick="simpan_kke_row(' . $id . ', ' . $row['tipe'] . '); return false;" title="Simpan">
+	                                <span class="dashicons dashicons-yes"></span>
+	                            </button>
+	                        ';
+	                    } else {
+	                        $html .= '
+	                            <button id="btn-mapping-' . $id . '" class="btn btn-secondary" onclick="mapping_kke_format_1(' . $id . ', \'' . $row['kode'] . '\', \'' . $row['kode_indikator'] . '\', ' . $row['tipe'] . '); return false;" title="Mapping">
+	                                <span class="dashicons dashicons-update-alt"></span>
+	                            </button>
+
+	                            <button class="btn btn-danger" onclick="hapus_kke_format_1(' . $id . '); return false;" title="Hapus Data">
+	                                <span class="dashicons dashicons-trash"></span>
+	                            </button>
+	                        ';
+	                    }
+
+	                    $html .= '</td>';
+
+	                    $html .= '</tr>';
+	                }
+	            }
+
+	            $ret['data']['html'] = $html;
+	            die(json_encode($ret));
+
+	        } else {
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    } else {
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
+
+	    die(json_encode($ret));
+	}
+
+	public function simpan_data_renja_kke_format_1($item, $tipe_int, $tipe_str, $tahun_anggaran, $id_skpd, $id_data)
+	{
+	    global $wpdb;
+	    $table = 'esakip_data_kke_format_1';
+
+	    if ($tipe_str === 'program') {
+	        $kode = $item['kode_program'] ?? '';
+	        $nama = $item['nama_program'] ?? '';
+	        $kode_sbl_prefix = implode('.', array_slice(explode('.', $item['kode_sbl'] ?? ''), 0, 3));
+	    } elseif ($tipe_str === 'kegiatan') {
+	        $kode = $item['kode_giat'] ?? ($item['kode_kegiatan'] ?? '');
+	        $nama = $item['nama_giat'] ?? ($item['nama_kegiatan'] ?? '');
+	        $kode_sbl_prefix = implode('.', array_slice(explode('.', $item['kode_sbl'] ?? ''), 0, 4));
+	    } else {
+	        $kode = $item['kode_sub_giat'] ?? ($item['kode_sub_kegiatan'] ?? '');
+	        $nama = $item['nama_sub_giat'] ?? ($item['nama_sub_kegiatan'] ?? '');
+	        $kode_sbl_prefix = implode('.', array_slice(explode('.', $item['kode_sbl'] ?? ''), 0, 5));
+	    }
+
+	    $active_item = isset($item['active']) ? intval($item['active']) : 1;
+
+	    // Jika item sudah tidak aktif, nonaktifkan semua record terkait
+	    if ($active_item == 0) {
+	        $wpdb->query($wpdb->prepare("
+	            UPDATE {$table}
+	            SET status = 0,
+	                active = 0,
+	                updated_at = NOW()
+	            WHERE kode = %s
+	               AND tipe = %d
+	               AND tahun_anggaran = %d
+	               AND id_kke = %d
+	               AND id_skpd = %d
+	               AND active = 1
+	        ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data));
+	        return;
+	    }
+
+	    $raw_indikator = $item['indikator'] ?? [];
+
+	    $grouped_data = [];
+	    foreach ($raw_indikator as $ind) {
+	        $key = $ind['capaianteks'] ?? '';
+	        if ($key !== '' && !isset($grouped_data[$key])) {
+	            $grouped_data[$key] = $ind;
+	        }
+	    }
+	    $indikator_data  = array_values($grouped_data);
+	    $total_indikator = count($indikator_data);
+
+	    // Jika > 1 indikator, → kode_sbl.1, kode_sbl.2, dst
+	    // Jika hanya 1, kode_sbl saja
+	    $grouped_master = [];
+	    foreach ($indikator_data as $idx => $master_item) {
+	        if ($total_indikator > 1) {
+	            $kode_indikator = $kode_sbl_prefix . '.' . ($idx + 1);
+	        } else {
+	            $kode_indikator = $kode_sbl_prefix;
+	        }
+	        $grouped_master[$kode_indikator] = $master_item;
+	    }
+
+	    $existing_data = $wpdb->get_results($wpdb->prepare("
+	        SELECT id,
+	            kode_indikator,
+	            indikator,
+	            satuan_capaian,
+	            target_capaian_teks,
+	            capaian_teks,
+	            target_capaian,
+	            active,
+	            status
+	        FROM {$table}
+	        WHERE kode = %s
+	            AND tipe = %d
+	            AND tahun_anggaran = %d
+	            AND id_kke = %d
+	            AND id_skpd = %d
+	        ORDER BY kode_indikator ASC
+	    ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data), ARRAY_A);
+
+	    // Cocokkan existing dengan master, update jika berubah, insert jika baru
+	    $matched_existing_ids = [];
+
+	    foreach ($grouped_master as $kode_ind => $master_item) {
+	        $satuan_master = $master_item['satuancapaian'] ?? '';
+	        $target_teks = $master_item['targetcapaianteks'] ?? '';
+	        $capaian_teks = $master_item['capaianteks'] ?? '';
+	        $target_capaian = $master_item['targetcapaian'] ?? '';
+
+	        $found = false;
+
+	        foreach ($existing_data as $existing) {
+	            if ($existing['active'] == 0) continue;
+
+	            // Cek apakah kode_indikator sama
+	            if ($existing['kode_indikator'] == $kode_ind) {
+	                $found = true;
+	                $matched_existing_ids[] = $existing['id'];
+
+	                $berubah = (
+	                    $existing['satuan_capaian'] != $satuan_master ||
+	                    $existing['target_capaian_teks'] != $target_teks ||
+	                    $existing['capaian_teks'] != $capaian_teks ||
+	                    $existing['target_capaian'] != $target_capaian
+	                );
+
+	                if ($berubah) {
+	                    // Nonaktifkan record lama (status=0 berarti renstra/renja dihapus/berubah)
+	                    if ($existing['status'] != 0) {
+	                        $wpdb->update(
+	                            $table,
+	                            ['status' => 0, 
+		                            'active' => 0, 
+		                            'updated_at' => current_time('mysql')
+		                        ],
+	                            ['id' => $existing['id']]
+	                        );
+	                    }
+
+	                    $cek_baru = $wpdb->get_var($wpdb->prepare("
+	                        SELECT COUNT(*)
+	                        FROM  {$table}
+	                        WHERE  kode = %s
+	                           AND tipe = %d
+	                           AND tahun_anggaran = %d
+	                           AND id_kke = %d
+	                           AND id_skpd = %d
+	                           AND capaian_teks = %s
+	                           AND satuan_capaian = %s
+	                           AND target_capaian_teks = %s
+	                           AND target_capaian = %s
+	                           AND active = 1
+	                    ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data, $capaian_teks, $satuan_master, $target_teks, $target_capaian));
+
+	                    if ($cek_baru == 0) {
+	                        // Cari nomor urut baru untuk kode_indikator
+	                        $max_urut = $wpdb->get_var($wpdb->prepare("
+	                            SELECT MAX(CAST(SUBSTRING_INDEX(kode_indikator, '.', -1) AS UNSIGNED))
+	                            FROM {$table}
+	                            WHERE  kode = %s
+	                               AND tipe = %d
+	                               AND tahun_anggaran = %d
+	                               AND id_kke = %d
+	                               AND id_skpd = %d
+	                               AND kode_indikator  LIKE %s
+	                        ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data, $kode_sbl_prefix . '%'));
+
+	                        $new_urut = ($max_urut ? intval($max_urut) : 0) + 1;
+	                        $kode_ind_baru = $kode_sbl_prefix . '.' . $new_urut;
+
+	                        $wpdb->insert($table, [
+	                            'tipe'               => $tipe_int,
+	                            'kode'                => $kode,
+	                            'kode_indikator'      => $kode_ind_baru,
+	                            'nama'                => $nama,
+	                            'indikator'           => $capaian_teks,
+	                            'satuan_capaian'      => $satuan_master,
+	                            'target_capaian_teks' => $target_teks,
+	                            'capaian_teks'        => $capaian_teks,
+	                            'target_capaian'      => $target_capaian,
+	                            'id_skpd'             => $id_skpd,
+	                            'status'              => 1,
+	                            'tahun_anggaran'      => $tahun_anggaran,
+	                            'id_kke'              => $id_data,
+	                            'active'              => 1,
+	                            'created_at'          => current_time('mysql'),
+	                            'updated_at'          => current_time('mysql'),
+	                        ]);
+	                    }
+	                } else {
+	                    if ($existing['status'] != 1) {
+	                        $wpdb->update(
+	                            $table,
+	                            ['status' => 1, 
+	                            	'updated_at' => current_time('mysql')
+	                            ],
+	                            ['id' => $existing['id']]
+	                        );
+	                    }
+	                }
+	                break;
+	            }
+	        }
+
+	        // Tidak ditemukan di existing, insert baru
+	        if (!$found) {
+	            $cek_baru = $wpdb->get_var($wpdb->prepare("
+	                SELECT COUNT(*)
+	                FROM {$table}
+	                WHERE kode = %s
+	                   AND kode_indikator = %s
+	                   AND tipe = %d
+	                   AND tahun_anggaran = %d
+	                   AND id_skpd = %d
+	                   AND id_kke = %d
+	                   AND active = 1
+	            ", $kode, $kode_ind, $tipe_int, $tahun_anggaran, $id_skpd, $id_data));
+
+	            if ($cek_baru == 0) {
+	                $wpdb->insert($table, [
+	                    'tipe'               => $tipe_int,
+	                    'kode'                => $kode,
+	                    'kode_indikator'      => $kode_ind,
+	                    'nama'                => $nama,
+	                    'indikator'           => $capaian_teks,
+	                    'satuan_capaian'      => $satuan_master,
+	                    'target_capaian_teks' => $target_teks,
+	                    'capaian_teks'        => $capaian_teks,
+	                    'target_capaian'      => $target_capaian,
+	                    'id_skpd'             => $id_skpd,
+	                    'id_kke'             => $id_data,
+	                    'status'              => 1,
+	                    'tahun_anggaran'      => $tahun_anggaran,
+	                    'active'              => 1,
+	                    'created_at'          => current_time('mysql'),
+	                    'updated_at'          => current_time('mysql'),
+	                ]);
+	            }
+	        }
+	    }
+
+	    foreach ($existing_data as $existing) {
+	        if ($existing['active'] == 0) continue;
+	        if (in_array($existing['id'], $matched_existing_ids)) continue;
+
+	        // Cek apakah capaian / indikator masih ada di master
+	        $ada_di_master = false;
+	        foreach ($grouped_master as $master_item) {
+	            if ($existing['capaian_teks'] == ($master_item['capaianteks'] ?? '') &&
+	                $existing['satuan_capaian'] == ($master_item['satuancapaian'] ?? '') &&
+	                $existing['target_capaian_teks'] == ($master_item['targetcapaianteks'] ?? '') &&
+	                $existing['target_capaian'] == ($master_item['targetcapaian'] ?? '')) {
+	                $ada_di_master = true;
+	                break;
+	            }
+	        }
+
+	        if (!$ada_di_master && $existing['status'] != 0) {
+	            $wpdb->update(
+	                $table,
+	                ['status' => 0, 
+		                'active' => 0, 
+		                'updated_at' => current_time('mysql')
+		            ],
+	                ['id'  => $existing['id']]
+	            );
+	        }
+	    }
+	}
+
+	public function simpan_kke_format_1()
+	{
+	    global $wpdb;
+	    $ret = array(
+	        'status'  => 'success',
+	        'message' => 'Berhasil simpan data!',
+	        'data'    => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            $id = intval($_POST['id'] ?? 0);
+	            if (!$id) {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'ID tidak valid!';
+	                die(json_encode($ret));
+	            }
+
+	            $to_int_or_null = function ($v) {
+	                if ($v === '' || $v === null) return null;
+	                return intval($v);
+	            };
+
+	            $update_data = [
+	                'spesifik'    => $to_int_or_null($_POST['spesifik'] ?? ''),
+	                'ukur'        => $to_int_or_null($_POST['ukur'] ?? ''),
+	                'capaian'     => $to_int_or_null($_POST['capaian'] ?? ''),
+	                'relavan'     => $to_int_or_null($_POST['relavan'] ?? ''),
+	                'batas_waktu' => $to_int_or_null($_POST['batas_waktu'] ?? ''),
+	                'menantang'   => $to_int_or_null($_POST['menantang'] ?? ''),
+	                'keterangan'  => sanitize_text_field($_POST['ket'] ?? ''),
+	                'updated_at'  => current_time('mysql'),
+	            ];
+
+	            $format = [];
+	            foreach ($update_data as $val) {
+	                if ($val === null) {
+	                    $format[] = null;
+	                } elseif (is_int($val)) {
+	                    $format[] = '%d';
+	                } else {
+	                    $format[] = '%s';
+	                }
+	            }
+
+	            $result = $wpdb->update(
+	                'esakip_data_kke_format_1',
+	                $update_data,
+	                ['id' => $id],
+	                $format,
+	                ['%d']
+	            );
+
+	            if ($result === false) {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'Gagal update database: ' . $wpdb->last_error;
+	            }
+	        } else {
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    } else {
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
+
+	    die(json_encode($ret));
+	}
+
+    public function get_api_renja($return_text = false)
+	{
+        global $wpdb;
+	    try {
+	        if (empty($_POST)) {
+	            throw new Exception("Format tidak sesuai!", 1);
+	        }
+
+	        if (empty($_POST['api_key']) || $_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+	            throw new Exception("API tidak ditemukan!", 1);
+	        }
+
+	        if (empty($_POST['id_skpd'])) {
+	            throw new Exception("Id Skpd Kosong!", 1);
+	        }
+	        $id_skpd = intval($_POST['id_skpd']);
+
+	        if (empty($_POST['tipe'])) {
+	            throw new Exception("Jenis Data Kosong!", 1);
+	        }
+	        $tipe = sanitize_text_field($_POST['tipe']);
+
+	        if (empty($_POST['tahun_anggaran'])) {
+	            throw new Exception("Tahun Anggaran Kosong!", 1);
+	        }
+	        $tahun_anggaran = intval($_POST['tahun_anggaran']);
+
+	        $id_jadwal_wpsipd = intval($_POST['id_jadwal_wpsipd'] ?? 0);
+
+	        $api_params = [
+	            'action'           => 'get_api_renja',
+	            'api_key'          => get_option('_crb_apikey_wpsipd'),
+	            'tahun_anggaran'   => $tahun_anggaran,
+	            'id_skpd'          => $id_skpd,
+	            'tipe'            => $tipe,
+	            'id_jadwal_wpsipd' => $id_jadwal_wpsipd,
+	        ];
+
+
+	        $response_asli = wp_remote_post(
+	            get_option('_crb_url_server_sakip'),
+	            [
+	                'timeout'   => 30,
+	                'sslverify' => false,
+	                'body'      => $api_params,
+	            ]
+	        );
+	        if (is_wp_error($response_asli)) {
+	            throw new Exception("Koneksi ke API server gagal: " . $response_asli->get_error_message(), 1);
+	        }
+
+	        $body = wp_remote_retrieve_body($response_asli);
+	        $response = json_decode($body, true);
+	        $data = $response['data'] ?? [];
+
+
+	        $return = [
+	            'status' => 'success',
+	            'tipe'  => $tipe,
+	            'data'   => $data,
+	            'param'  => $api_params,
+	        ];
+
+	        if ($return_text) {
+	            return $return;
+	        }
+	        die(json_encode($return));
+
+	    } catch (Exception $e) {
+	        $return = [
+	            'status'  => false,
+	            'message' => $e->getMessage(),
+	        ];
+	        if ($return_text) {
+	            return $return;
+	        }
+	        echo json_encode($return);
+	        exit();
+	    }
+	}
+
+	public function mapping_kke_format_1()
+	{
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil ambil data!',
+	        'data' => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+	            if (!empty($_POST['tahun_anggaran'])) {
+	                $tahun_anggaran = intval($_POST['tahun_anggaran']);
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Tahun Anggaran kosong!';
+	                wp_send_json($ret);
+	            }
+
+	            if (!empty($_POST['id_skpd'])) {
+	                $id_skpd = intval($_POST['id_skpd']);
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'ID SKPD kosong!';
+	                wp_send_json($ret);
+	            }
+
+	            if (!empty($_POST['id'])) {
+	                $id = intval($_POST['id']);
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'ID kosong!';
+	                wp_send_json($ret);
+	            }
+	          
+	            if (isset($_POST['tipe']) && is_numeric($_POST['tipe'])) {
+	                $tipe = intval($_POST['tipe']);
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Tipe kosong!';
+	                wp_send_json($ret);
+	            }
+
+	            if (!empty($_POST['kode'])) {
+	                $kode = $_POST['kode'];
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Kode kosong!';
+	                wp_send_json($ret);
+	            }
+
+	            if (!empty($_POST['kode_indikator'])) {
+	                $kode_indikator = $_POST['kode_indikator'];
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Kode Indikator kosong!';
+	                wp_send_json($ret);
+	            }
+	            
+	            $get_data = $wpdb->get_results($wpdb->prepare("
+				    SELECT 
+				        id,
+				        capaian_teks,
+				        target_capaian_teks
+				    FROM esakip_data_kke_format_1 
+				    WHERE kode = %s
+				        AND tahun_anggaran = %d
+				        AND id_skpd = %d
+				        AND id != %d
+				        AND active = 1
+				    ORDER BY capaian_teks ASC
+				", $kode, $tahun_anggaran, $id_skpd, $id), ARRAY_A);
+
+	            if (!empty($get_data)) {
+	                $ret['data'] = $get_data;
+	            } else {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Data tidak ditemukan!';
+	            }
+
+	        } else {
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'API key tidak ditemukan!';
+	        }
+	    } else {
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format salah!';
+	    }
+
+	    wp_send_json($ret);
+	}
+
+	public function hapus_kke_format_1()
+	{
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil hapus data!'
+	    );
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+	            if (empty($_POST['id'])) {
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'ID kosong!';
+	                die(json_encode($ret));
+	            }
+	            
+	            $id = $_POST['id'];
+	            
+                $wpdb->update(
+                    'esakip_data_kke_format_1',
+                    array('active' => 0),
+                    array('id' => $id)
+                );
+	        } else {
+	            $ret['status'] = 'error';
+	            $ret['message'] = 'API key tidak ditemukan!';
+	        }
+	    } else {
+	        $ret['status'] = 'error';
+	        $ret['message'] = 'Format salah!';
+	    }
+	    die(json_encode($ret));
+	}
+
+	public function submit_mapping_kke_format_1()
+	{
+	    global $wpdb;
+	    $ret = array(
+	        'status'  => 'success',
+	        'message' => 'Berhasil mapping data!',
+	        'data'    => array()
+	    );
+
+	    if (!empty($_POST)) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
+
+	            if (!empty($_POST['tahun_anggaran'])) {
+	                $tahun_anggaran = intval($_POST['tahun_anggaran']);
+	            } else {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'Tahun Anggaran kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            if (!empty($_POST['id_skpd'])) {
+	                $id_skpd = intval($_POST['id_skpd']);
+	            } else {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'ID SKPD kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            if (!empty($_POST['id'])) {
+	                $id = intval($_POST['id']);
+	            } else {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'ID sumber kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            if (!empty($_POST['id_tujuan'])) {
+	                $id_tujuan = intval($_POST['id_tujuan']);
+	            } else {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'ID Tujuan kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            if (isset($_POST['tipe']) && is_numeric($_POST['tipe'])) {
+	                $tipe = intval($_POST['tipe']);
+	            } else {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'Tipe kosong!';
+	                die(json_encode($ret));
+	            }
+
+	            // Ambil data tujuan
+	            $get_data_tujuan = $wpdb->get_row($wpdb->prepare("
+	                SELECT *
+	                FROM esakip_data_kke_format_1
+	                WHERE id = %d
+	                    AND tahun_anggaran = %d
+	                    AND id_skpd = %d
+	                    AND active = 1
+	            ", $id_tujuan, $tahun_anggaran, $id_skpd), ARRAY_A);
+
+	            if (empty($get_data_tujuan)) {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'Data tujuan tidak ditemukan!';
+	                die(json_encode($ret));
+	            }
+
+	            $cek_data = array(
+	                'spesifik', 'ukur', 'capaian', 'relavan',
+	                'batas_waktu', 'nilai', 'menantang', 'keterangan'
+	            );
+
+	            $sudah_terisi = false;
+	            foreach ($cek_data as $field) {
+	                $val = isset($get_data_tujuan[$field]) ? trim($get_data_tujuan[$field]) : '';
+	                if ($val !== '' && $val !== null && $val !== '0') {
+	                    $sudah_terisi = true;
+	                    break;
+	                }
+	            }
+
+	            if ($sudah_terisi) {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'Data tujuan sudah terisi!';
+	                die(json_encode($ret));
+	            }
+
+	            $get_data_sumber = $wpdb->get_row($wpdb->prepare("
+	                SELECT *
+	                FROM esakip_data_kke_format_1
+	                WHERE id = %d
+	                    AND tahun_anggaran = %d
+	                    AND id_skpd = %d
+	                    AND active = 1
+	            ", $id, $tahun_anggaran, $id_skpd), ARRAY_A);
+
+	            if (empty($get_data_sumber)) {
+	                $ret['status']  = 'error';
+	                $ret['message'] = 'Data sumber tidak ditemukan!';
+	                die(json_encode($ret));
+	            }
+
+	            $wpdb->update(
+	                'esakip_data_kke_format_1',
+	                array(
+	                    'spesifik'    => $get_data_sumber['spesifik'],
+	                    'ukur'        => $get_data_sumber['ukur'],
+	                    'capaian'     => $get_data_sumber['capaian'],
+	                    'relavan'     => $get_data_sumber['relavan'],
+	                    'batas_waktu' => $get_data_sumber['batas_waktu'],
+	                    'nilai'       => $get_data_sumber['nilai'],
+	                    'menantang'   => $get_data_sumber['menantang'],
+	                    'keterangan'  => $get_data_sumber['keterangan']
+	                ),
+	                array(
+	                    'id'             => $id_tujuan,
+	                    'tahun_anggaran' => $tahun_anggaran,
+	                    'id_skpd'        => $id_skpd
+	                )
+	            );
+
+	            $wpdb->update(
+	                'esakip_data_kke_format_1',
+	                array('active' => 0),
+	                array(
+	                    'id'             => $id,
+	                    'tahun_anggaran' => $tahun_anggaran,
+	                    'id_skpd'        => $id_skpd
+	                )
+	            );
+
+	            $ret['message'] = 'Berhasil mapping data KKE!';
+
+	        } else {
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'API key tidak ditemukan!';
+	        }
+	    } else {
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format salah!';
+	    }
+
+	    die(json_encode($ret));
 	}
 }

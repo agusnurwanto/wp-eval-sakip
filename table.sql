@@ -2586,3 +2586,34 @@ CREATE TABLE `esakip_data_rhk_individu` (
   KEY `id_skpd` (`id_skpd`),
   KEY `tahun_anggaran` (`tahun_anggaran`)
 );
+
+CREATE TABLE `esakip_data_kke_format_1` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_kke` int(11) DEFAULT NULL,
+  `tipe` int(11) DEFAULT NULL COMMENT '1=tujuan, 2=sasaran, 3=program, 4=kegiatan, 5=sub_kegiatan',
+  `kode` text DEFAULT NULL,
+  `kode_indikator` text DEFAULT NULL,
+  `nama` text DEFAULT NULL,
+  `indikator` text DEFAULT NULL,
+  `satuan_capaian` varchar(255) DEFAULT NULL,
+  `target_capaian_teks` varchar(255) DEFAULT NULL,
+  `capaian_teks` text DEFAULT NULL,
+  `target_capaian` varchar(255) DEFAULT NULL,
+  `spesifik` int(11) DEFAULT NULL COMMENT '0=tidak, 1=iya',
+  `ukur` int(11) DEFAULT NULL COMMENT '0=tidak, 1=iya',
+  `capaian` int(11) DEFAULT NULL COMMENT '0=tidak, 1=iya',
+  `relavan` int(11) DEFAULT NULL COMMENT '0=tidak, 1=iya',
+  `batas_waktu` int(11) DEFAULT NULL COMMENT '0=tidak, 1=iya',
+  `nilai` varchar(255) DEFAULT NULL,
+  `menantang` int(11) DEFAULT NULL COMMENT '0=tidak, 1=iya',
+  `keterangan` text DEFAULT NULL,
+  `id_skpd` int(11) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL COMMENT '0=renstra/renja dihapus, 1=renstra/renja ada',
+  `tahun_anggaran` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY key (id),
+  KEY `id_skpd` (`id_skpd`),
+  KEY `tahun_anggaran` (`tahun_anggaran`)
+);
