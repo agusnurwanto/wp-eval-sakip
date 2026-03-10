@@ -376,6 +376,14 @@ $status_jabatan_kepala_daerah = get_option('_crb_status_jabatan_kepala_daerah') 
                         satkerIdDropDown = data.satker_id;
                     }
 
+                    if (data.same_person) {
+                        if (data.satker_id.length >= 6) {
+                            satkerIdDropDown = data.satker_id.slice(0, -4);
+                        } else {
+                            pegawaiOptions += `<option value="0"><?php echo $nama_kepala_daerah; ?> (Kepala Daerah) | <?php echo $status_jabatan_kepala_daerah; ?></option>`;
+                        }
+                    }
+
                     getPegawaiBySatkerId(satkerIdDropDown)
                         .done(function(pegawaiResponse) {
                             if (pegawaiResponse.status && pegawaiResponse.data.length > 0) {

@@ -2257,6 +2257,7 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                             p.jabatan,
                             p.tipe_pegawai,
                             p.tipe_pegawai_id,
+                            p.plt_plh,
                             p.active,
                             p.id_atasan,
                             s.nama AS nama_bidang,
@@ -2335,13 +2336,20 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
                     } else {
                         $ret['non_aktif']++;
                     }
-                    $atasan = 'Definitif';
-                    if (
-                        !empty($v_pgw['id_atasan'])
-                        && !empty($all_atasan[$v_pgw['id_atasan']])
-                    ) {
+                    
+                    $pegawai_object = (object) $v_pgw;
+                    $has_definitif_atasan = $this->_get_atasan_definitif($pegawai_object, $_POST['tahun_anggaran']);
+
+                    if ($has_definitif_atasan) {
+                        $atasan = 'Definitif';
+                    } elseif (isset($v_pgw['id_atasan']) && $v_pgw['id_atasan'] !== null && strval($v_pgw['id_atasan']) === '0') {
+                        $atasan = 'Kepala Daerah';
+                    } elseif (!empty($v_pgw['id_atasan']) && !empty($all_atasan[$v_pgw['id_atasan']])) {
                         $atasan = $all_atasan[$v_pgw['id_atasan']];
+                    } else {
+                        $atasan = '<span class="text-danger">Belum di set</span>';
                     }
+
                     $custom_nama_jabatan = '';
                     if (!empty($v_pgw['custom_jabatan'])) {
                         $custom_nama_jabatan = '<hr class="mt-1 mb-1"><span class="text-muted">' . $v_pgw['custom_jabatan'] . '</span>';
