@@ -326,7 +326,7 @@ $get_satker = $wpdb->get_results(
                 </tbody>
             </table>
         </div>
-        <div style="overflow-x: auto; max-width: 100%;" class="hide_print">
+        <div style="overflow-x: auto; max-width: 100%;">
             <table id="tabel-cascading-kegiatan" style="min-width: 600px;">
                 <h2 class="text-center get-nama-program">Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: Program belum dipilih </h2>
                 <tbody>
