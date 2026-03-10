@@ -203,7 +203,7 @@ $get_satker = $wpdb->get_results(
         max-width: 300px;
     }
 
-    .indikator {
+    #container-table-cascading .indikator {
         font-size: 14px;
     }
 
@@ -215,7 +215,7 @@ $get_satker = $wpdb->get_results(
         max-width: 300px;
     }
 
-    .nama_satker {
+    #container-table-cascading .nama_satker {
         font-size: 14px;
     }
 
@@ -238,41 +238,41 @@ $get_satker = $wpdb->get_results(
         }
     }
 
-    table {
+    #container-table-cascading table {
         width: 100%;
         border-collapse: collapse;
     }
 
-    td {
+    #container-table-cascading td {
         border: 1px solid #ccc;
         padding: 0;
         height: 100px;
     }
 
-    .button-container {
+    #container-table-cascading .button-container {
         display: flex;
         align-items: stretch;
         height: 100%;
     }
 
-    .get_button {
+    #container-table-cascading .get_button {
         flex: 1;
         padding: 10px;
     }
 
-    .view-kegiatan-button {
+    #container-table-cascading .view-kegiatan-button {
         background-color: transparent;
         border: none;
         cursor: pointer;
         padding: 5px;
     }
 
-    .view-kegiatan-button i {
+    #container-table-cascading .view-kegiatan-button i {
         font-size: 2rem;
         color: #fff;
     }
 
-    .view-kegiatan-button:hover i {
+    #container-table-cascading .view-kegiatan-button:hover i {
         color: #f0f0f0;
     }
 </style>
@@ -326,7 +326,7 @@ $get_satker = $wpdb->get_results(
                 </tbody>
             </table>
         </div>
-        <div style="overflow-x: auto; max-width: 100%;">
+        <div style="overflow-x: auto; max-width: 100%;" class="hide_print">
             <table id="tabel-cascading-kegiatan" style="min-width: 600px;">
                 <h2 class="text-center get-nama-program">Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: Program belum dipilih </h2>
                 <tbody>

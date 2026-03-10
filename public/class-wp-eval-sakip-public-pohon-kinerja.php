@@ -6716,7 +6716,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                                                 <span class="nama_satker">Satuan Kerja : <ol style="text-align: left;">' . $nama_satker . '</ol></span>
                                                 <br />
                                                 <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
-                                                <button class="btn btn-danger view-kegiatan-button" onclick="view_kegiatan(this, \'' . $p['id'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-visibility visibility-icon"></i>
+                                                <button class="btn btn-danger view-kegiatan-button hide_print" onclick="view_kegiatan(this, \'' . $p['id'] . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-visibility visibility-icon"></i>
                                                 </button>
                                             </div>
                                         </div>

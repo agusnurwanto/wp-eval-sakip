@@ -198,32 +198,31 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         max-width: 300px;
     }
 
-    .indikator {
+    #container-table-cascading .indikator {
         font-size: 14px;
     }
 
     #tabel-cascading-kegiatan div span.nama_satker {
         font-size: 14px;
-        margin-top: 10px; 
-        display: block; 
+        margin-top: 10px;
+        display: block;
         width: 100%;
         max-width: 300px;
     }
 
-    .nama_satker {
+    #container-table-cascading .nama_satker {
         font-size: 14px;
     }
 
     #tabel-cascading-kegiatan div span.nama_pokin {
         font-size: 14px;
-        margin-top: 10px; 
-        display: block; 
+        margin-top: 10px;
+        display: block;
         width: 100%;
         max-width: 300px;
     }
 
-
-    .nama_pokin {
+    #container-table-cascading .nama_pokin {
         font-size: 14px;
     }
 
@@ -237,6 +236,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             size: landscape;
         }
 
+        .hide_print,
         #action-sakip,
         .site-header,
         .site-footer,
@@ -244,55 +244,55 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             display: none;
         }
     }
-    table {
+    #container-table-cascading table {
         width: 100%;
         border-collapse: collapse;
     }
-    td {
-        border: 1px solid #ccc; 
-        padding: 0; 
-        height: 100px; 
+    #container-table-cascading td {
+        border: 1px solid #ccc;
+        padding: 0;
+        height: 100px;
     }
-    .button-container {
+    #container-table-cascading .button-container {
         display: flex;
         align-items: stretch;
         height: 100%;
     }
-    .get_button {
+    #container-table-cascading .get_button {
         flex: 1;
         padding: 10px;
     }
 
-    .view-kegiatan-button {
+    #container-table-cascading .view-kegiatan-button {
         background-color: transparent;
         border: none;
         cursor: pointer;
         padding: 5px;
     }
 
-    .view-kegiatan-button i {
+    #container-table-cascading .view-kegiatan-button i {
         font-size: 2rem;
-        color: #fff; 
+        color: #fff;
     }
 
-    .view-kegiatan-button:hover i {
-        color: #f0f0f0; 
+    #container-table-cascading .view-kegiatan-button:hover i {
+        color: #f0f0f0;
     }
 
-    .edit-pegawai-button {
+    #container-table-cascading .edit-pegawai-button {
         background-color: transparent;
         border: none;
         cursor: pointer;
         padding: 5px;
     }
 
-    .edit-pegawai-button i {
+    #container-table-cascading .edit-pegawai-button i {
         font-size: 2rem;
-        color: #fff; 
+        color: #fff;
     }
 
-    .edit-pegawai-button:hover i {
-        color: #f0f0f0; 
+    #container-table-cascading .edit-pegawai-button:hover i {
+        color: #f0f0f0;
     }
 </style>
 
@@ -301,7 +301,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
     <div class="cetak">
         <div style="padding: 10px; margin: 0 0 3rem 0;">
             <h1 class="text-center">CASCADING <br><?php echo $skpd['nama_skpd']; ?><br><?php echo $nama_jadwal; ?></h1>
-            <div class="text-center">
+            <div class="text-center hide_print">
                 <div style="display: block;">
                     <div class="custom-control custom-checkbox custom-control-inline mt-4">
                         <input type="checkbox" class="custom-control-input" id="show_pokin">
@@ -332,7 +332,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 </tbody>
             </table>
         </div>
-        <div style="overflow-x: auto; max-width: 100%;">
+        <div style="overflow-x: auto; max-width: 100%;" class="hide_print">
             <table id="tabel-cascading-kegiatan" style="min-width: 600px;">
                 <h2 class="text-center get-nama-program">Cascading Kegiatan dan Sub Kegiatan<br>PROGRAM: Program belum dipilih </h2>
                 <tbody>
