@@ -124,7 +124,7 @@ foreach ($idtahun as $val) {
 <div class="container-md">
     <div id="cetak" title="Rencana Aksi Pemda" style="padding: 5px;">
         <div style="padding: 10px;margin:0 0 3rem 0;">
-            <h1 style="margin-top: 20px;" class="text-center">Rencana Aksi <?php echo $periode['nama_jadwal'] . ' ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ''; ?><br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1 style="margin-top: 20px;">
+            <h1 style="margin-top: 20px;" class="text-center">Rencana Aksi <?php echo $periode['nama_jadwal'] . ' ( ' . $periode['tahun_anggaran'] . ' - ' . $tahun_periode . ' )'; ?><br>Pemerintah Daerah<br> Tahun Anggaran <?php echo $input['tahun']; ?></h1 style="margin-top: 20px;">
             <div class="text-center" style="margin-bottom: 25px;">
                 <div id="action" class="action-section hide-excel"></div>
             </div>
