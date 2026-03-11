@@ -13301,20 +13301,37 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					                    label,
 					                    kode_cascading_program,
 					                    label_cascading_program,
-					                    pagu_cascading
+					                    pagu_cascading,
+										active
 					                FROM esakip_data_rencana_aksi_opd
-					                WHERE active = 1
-					                    AND id = %d
+					                WHERE id = %d
 					                ORDER BY id ASC
 					            ", $vv['parent_renaksi_opd']), ARRAY_A);
+
+								$rencana_pagu_rhk = $wpdb->get_var(
+									$wpdb->prepare("
+										SELECT 
+											SUM(rencana_pagu)
+										FROM esakip_data_rencana_aksi_indikator_opd
+										WHERE active = 1
+										  AND id_renaksi = %d
+					            	", $vv['parent_renaksi_opd'])
+								);
 
 								$group_by_skpd[$id_skpd]['nama_skpd'] = $nama_skpd;
 								$group_by_skpd[$id_skpd]['id_skpd_label'] = $id_skpd_label;
 
 								if (!empty($get_renaksi_opd)) {
 									foreach ($get_renaksi_opd as $renaksi) {
+										if ($renaksi['active'] != 1) {
+											$label = $renaksi['label'] . '<br><span class="text-danger">( Dihapus )</span>';
+										} else {
+											$label = $renaksi['label'];
+										}
 										$group_by_skpd[$id_skpd]['renaksi'][] = [
-											'label' => $renaksi['label'],
+											'id_rhk' => $vv['parent_renaksi_opd'],
+											'label' => $label,
+											'rencana_pagu' => $rencana_pagu_rhk ?? 0,
 											'label_cascading_program' => $renaksi['label_cascading_program'],
 											'kode_cascading_program' => $renaksi['kode_cascading_program'],
 											'pagu_cascading' => $renaksi['pagu_cascading']
@@ -13322,7 +13339,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									}
 								} else {
 									$group_by_skpd[$id_skpd]['renaksi'][] = [
-										'label' => '',
+										'id_rhk' => $vv['parent_renaksi_opd'],
+										'label' => '<span class="text-danger">Tidak ditemukan</span>',
+										'rencana_pagu' => 0,
 										'label_cascading_program' => '',
 										'kode_cascading_program' => '',
 										'pagu_cascading' => 0
@@ -13334,6 +13353,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								'nama_skpd' => '',
 								'id_skpd_label' => null,
 								'renaksi' => [[
+									'id_rhk' => null,
 									'label' => '',
 									'label_cascading_program' => '',
 									'kode_cascading_program' => '',
@@ -13341,6 +13361,31 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								]]
 							];
 						}
+
+						foreach ($group_by_skpd as $id_skpd => &$group) {
+
+							$grouped_renaksi = [];
+
+							foreach ($group['renaksi'] as $renaksi) {
+
+								$key = ($renaksi['label'] ?? '') . '|' . ($renaksi['kode_cascading_program'] ?? '');
+
+								if (!isset($grouped_renaksi[$key])) {
+
+									$grouped_renaksi[$key] = $renaksi;
+									$grouped_renaksi[$key]['id_rhk_list'] = [$renaksi['id_rhk']];
+
+								} else {
+
+									$grouped_renaksi[$key]['rencana_pagu'] += $renaksi['rencana_pagu'];
+									$grouped_renaksi[$key]['id_rhk_list'][] = $renaksi['id_rhk'];
+
+								}
+							}
+
+							$group['renaksi'] = array_values($grouped_renaksi);
+						}
+						unset($group);
 
 						$rowspan_total = 0;
 						foreach ($group_by_skpd as $gr) {
@@ -13351,12 +13396,41 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$no++;
 
 						foreach ($group_by_skpd as $id_skpd => $group) {
+							$grouped_renaksi = [];
+
+							foreach ($group['renaksi'] as $renaksi) {
+
+								$key = ($renaksi['label'] ?? '') . '|' . ($renaksi['kode_cascading_program'] ?? '');
+
+								if (!isset($grouped_renaksi[$key])) {
+
+									$grouped_renaksi[$key] = $renaksi;
+
+									// simpan id rhk pertama
+									$grouped_renaksi[$key]['id_rhk_list'] = [$renaksi['id_rhk']];
+
+								} else {
+
+									// jumlahkan pagu
+									$grouped_renaksi[$key]['rencana_pagu'] += $renaksi['rencana_pagu'];
+
+									// simpan semua id rhk
+									$grouped_renaksi[$key]['id_rhk_list'][] = $renaksi['id_rhk'];
+								}
+							}
+
+							$group['renaksi'] = array_values($grouped_renaksi);
+
 							$jumlah_renaksi = count($group['renaksi']);
 							$bg = !empty($group['nama_skpd']) && !($group['id_skpd_label'] == $id_skpd && $id_skpd != 0);
 
 							foreach ($group['renaksi'] as $i => $renaksi) {
-								$html .= '<tr>';
 
+								$id_rhk_attr = !empty($renaksi['id_rhk_list'])
+									? implode(',', $renaksi['id_rhk_list'])
+									: $renaksi['id_rhk'];
+
+								$html .= '<tr id-rhk="' . $id_rhk_attr . '">';
 
 								if (!empty($v['id_iku']) && !empty($v['ik_label_sasaran'])) {
 									$label_sasaran = $v['ik_label_sasaran'];
@@ -13378,6 +13452,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								}
 
 								$html .= '<td style="border: 1px solid black;">' . $renaksi['label'] . '</td>';
+								$html .= '<td style="border: 1px solid black;">' . number_format((float)$renaksi['rencana_pagu'], 0, ",", ".") . '</td>';
 								$html .= '<td style="border: 1px solid black;">' . $renaksi['kode_cascading_program'] . ' ' . $renaksi['label_cascading_program'] . '</td>';
 								$html .= '<td style="border: 1px solid black; text-align: right;">' . number_format((float)$renaksi['pagu_cascading'], 0, ",", ".") . '</td>';
 

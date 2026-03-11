@@ -2934,13 +2934,13 @@ class Wp_Eval_Sakip_Admin
 				foreach ($group['tahun_list'] as $tahun_setting) {
 					$tahun_key = $id_jadwal . '_' . $tahun_setting;
 
-					$rencana_aksi_pemda = $this->functions->generatePage([
-						'nama_page'     => 'Rencana Aksi Pemerintah Daerah Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] . ' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
-						'content'       => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
-						'show_header'   => 1,
-						'no_key'        => 1,
-						'post_status'   => 'private'
-					]);
+					// $rencana_aksi_pemda = $this->functions->generatePage([
+					// 	'nama_page'     => 'Rencana Aksi Pemerintah Daerah Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] . ' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
+					// 	'content'       => '[list_pengisian_rencana_aksi_pemda tahun=' . $tahun_setting . ' periode=' . $v['id'] . ' ]',
+					// 	'show_header'   => 1,
+					// 	'no_key'        => 1,
+					// 	'post_status'   => 'private'
+					// ]);
 
 					$rencana_aksi_pemda_baru = $this->functions->generatePage([
 						'nama_page'     => 'Rencana Aksi Pemerintah Daerah Baru Tahun ' . $tahun_setting . ' | ' . $v['nama_jadwal'] . ' ' . $v['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai,
@@ -2957,7 +2957,6 @@ class Wp_Eval_Sakip_Admin
 	                        </h4>
 	                        <div class="esakip-body-tahun" tahun="' . $tahun_key . '">
 	                            <ul style="margin-left: 20px; margin-bottom: 20px">
-	                                <li><a target="_blank" href="' . $rencana_aksi_pemda['url'] . '">' . $rencana_aksi_pemda['title'] . '</a></li>
 	                                <li><a target="_blank" href="' . $rencana_aksi_pemda_baru['url'] . '">' . $rencana_aksi_pemda_baru['title'] . '</a></li>
 	                            </ul>
 	                        </div>

@@ -137,8 +137,9 @@ foreach ($idtahun as $val) {
                             <th class="atas kiri bawah kanan text-center">INDIKATOR KINERJA</th>
                             <th class="atas kiri bawah kanan text-center">NAMA PERANGKAT DAERAH</th>
                             <th class="atas kiri bawah kanan text-center">RENCANA AKSI PERANGKAT DAERAH</th>
-                            <th class="atas kiri bawah kanan text-center">PROGRAM PERANGKAT DAERAH</th>
                             <th class="atas kiri bawah kanan text-center" style="width: 200px;">RENCANA PAGU</th>
+                            <th class="atas kiri bawah kanan text-center">PROGRAM PERANGKAT DAERAH</th>
+                            <th class="atas kiri bawah kanan text-center">PAGU APBD</th>
                         </tr>
                     </thead>
                     <tbody>
