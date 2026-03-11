@@ -13260,6 +13260,24 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					    ", $_POST['tahun_anggaran'], $_POST['id_jadwal']),
 						ARRAY_A
 					);
+
+					$all_skpd = $wpdb->get_results(
+						$wpdb->prepare("
+							SELECT 
+								id_skpd,
+								nama_skpd 
+							FROM esakip_data_unit 
+							WHERE tahun_anggaran = %d 
+							  AND active = 1
+						", $_POST['tahun_anggaran']),
+						ARRAY_A
+					);
+
+					$skpd_lookup = [];
+					foreach ($all_skpd as $skpd) {
+						$skpd_lookup[$skpd['id_skpd']] = $skpd['nama_skpd'];
+					}
+
 					$html = '';
 					$no = 0;
 
@@ -13288,23 +13306,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 								$id_skpd = $vv['id_skpd'];
 								$id_skpd_label = $vv['id_skpd_label'];
 
-								$nama_skpd = $wpdb->get_var($wpdb->prepare("
-					                SELECT nama_skpd 
-					                FROM esakip_data_unit 
-					                WHERE tahun_anggaran = %d 
-					                    AND id_skpd = %d 
-					                    AND active = 1
-					            ", $vv['tahun_anggaran'], $id_skpd)) ?? '';
+								$nama_skpd = $skpd_lookup[$id_skpd] ?? 'Nama SKPD tidak ditemukan';
 
 								$get_renaksi_opd = $wpdb->get_results($wpdb->prepare("
 					                SELECT 
 					                    label,
+					                    id_sub_skpd_cascading,
 					                    kode_cascading_program,
 					                    label_cascading_program,
 					                    pagu_cascading,
 										active
 					                FROM esakip_data_rencana_aksi_opd
 					                WHERE id = %d
+									  AND active = 1
 					                ORDER BY id ASC
 					            ", $vv['parent_renaksi_opd']), ARRAY_A);
 
@@ -13323,30 +13337,28 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 								if (!empty($get_renaksi_opd)) {
 									foreach ($get_renaksi_opd as $renaksi) {
-										if ($renaksi['active'] != 1) {
-											$label = $renaksi['label'] . '<br><span class="text-danger">( Dihapus )</span>';
-										} else {
-											$label = $renaksi['label'];
-										}
 										$group_by_skpd[$id_skpd]['renaksi'][] = [
 											'id_rhk' => $vv['parent_renaksi_opd'],
-											'label' => $label,
+											'label' => $renaksi['label'],
+											'id_skpd' => $renaksi['id_sub_skpd_cascading'],
 											'rencana_pagu' => $rencana_pagu_rhk ?? 0,
 											'label_cascading_program' => $renaksi['label_cascading_program'],
 											'kode_cascading_program' => $renaksi['kode_cascading_program'],
 											'pagu_cascading' => $renaksi['pagu_cascading']
 										];
 									}
-								} else {
-									$group_by_skpd[$id_skpd]['renaksi'][] = [
-										'id_rhk' => $vv['parent_renaksi_opd'],
-										'label' => '<span class="text-danger">Tidak ditemukan</span>',
-										'rencana_pagu' => 0,
-										'label_cascading_program' => '',
-										'kode_cascading_program' => '',
-										'pagu_cascading' => 0
-									];
 								}
+							}
+
+							if (empty($group_by_skpd[$id_skpd]['renaksi'])) {
+								$group_by_skpd[$id_skpd]['renaksi'][] = [
+									'id_rhk' => null,
+									'label' => '<span class="text-danger">Tidak ditemukan</span>',
+									'label_cascading_program' => '',
+									'id_skpd' => '',
+									'kode_cascading_program' => '',
+									'pagu_cascading' => 0
+								];
 							}
 						} else {
 							$group_by_skpd[0] = [
@@ -13368,7 +13380,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 							foreach ($group['renaksi'] as $renaksi) {
 
-								$key = ($renaksi['label'] ?? '') . '|' . ($renaksi['kode_cascading_program'] ?? '');
+								$key = ($renaksi['kode_cascading_program'] ?? '') . '|' . ($renaksi['label'] ?? '');
 
 								if (!isset($grouped_renaksi[$key])) {
 
@@ -13379,11 +13391,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 									$grouped_renaksi[$key]['rencana_pagu'] += $renaksi['rencana_pagu'];
 									$grouped_renaksi[$key]['id_rhk_list'][] = $renaksi['id_rhk'];
-
+									
 								}
 							}
 
 							$group['renaksi'] = array_values($grouped_renaksi);
+							ksort($grouped_renaksi);
 						}
 						unset($group);
 
@@ -13396,39 +13409,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						$no++;
 
 						foreach ($group_by_skpd as $id_skpd => $group) {
-							$grouped_renaksi = [];
-
-							foreach ($group['renaksi'] as $renaksi) {
-
-								$key = ($renaksi['label'] ?? '') . '|' . ($renaksi['kode_cascading_program'] ?? '');
-
-								if (!isset($grouped_renaksi[$key])) {
-
-									$grouped_renaksi[$key] = $renaksi;
-
-									// simpan id rhk pertama
-									$grouped_renaksi[$key]['id_rhk_list'] = [$renaksi['id_rhk']];
-
-								} else {
-
-									// jumlahkan pagu
-									$grouped_renaksi[$key]['rencana_pagu'] += $renaksi['rencana_pagu'];
-
-									// simpan semua id rhk
-									$grouped_renaksi[$key]['id_rhk_list'][] = $renaksi['id_rhk'];
-								}
-							}
-
-							$group['renaksi'] = array_values($grouped_renaksi);
-
+							
 							$jumlah_renaksi = count($group['renaksi']);
-							$bg = !empty($group['nama_skpd']) && !($group['id_skpd_label'] == $id_skpd && $id_skpd != 0);
 
 							foreach ($group['renaksi'] as $i => $renaksi) {
 
 								$id_rhk_attr = !empty($renaksi['id_rhk_list'])
 									? implode(',', $renaksi['id_rhk_list'])
 									: $renaksi['id_rhk'];
+
+								$bg = false; // default beri background merah
+								if (empty($id_rhk_attr)) {
+									$bg = true; // jika tidak ada id rhk, maka jangan beri background merah
+								}
 
 								$html .= '<tr id-rhk="' . $id_rhk_attr . '">';
 
@@ -13453,7 +13446,12 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 								$html .= '<td style="border: 1px solid black;">' . $renaksi['label'] . '</td>';
 								$html .= '<td style="border: 1px solid black;">' . number_format((float)$renaksi['rencana_pagu'], 0, ",", ".") . '</td>';
-								$html .= '<td style="border: 1px solid black;">' . $renaksi['kode_cascading_program'] . ' ' . $renaksi['label_cascading_program'] . '</td>';
+								$html .= '<td style="border: 1px solid black;">'
+									. $renaksi['kode_cascading_program'] . ' '
+									. $renaksi['label_cascading_program']
+									. '<span class="text-muted"><br>'
+									. (!empty($skpd_lookup[$renaksi['id_skpd']]) ? '(' . $skpd_lookup[$renaksi['id_skpd']] . ')' : '')
+									. '</span></td>';
 								$html .= '<td style="border: 1px solid black; text-align: right;">' . number_format((float)$renaksi['pagu_cascading'], 0, ",", ".") . '</td>';
 
 								$html .= '</tr>';
