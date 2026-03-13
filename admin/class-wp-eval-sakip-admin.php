@@ -2363,12 +2363,20 @@ class Wp_Eval_Sakip_Admin
 			Field::make('radio', 'crb_api_esr_status', 'Status API ESR')
 				->add_options(['0' => 'Dikunci', '1' => 'Dibuka'])
 				->set_default_value('1'),
+			Field::make('radio', 'crb_auth_method_api_esr', 'Metode Autentikasi API ESR')
+				->add_options([
+					'basic' => 'Authorization Basic (Header)',
+					'post' => 'POST Parameter'
+				])
+				->set_default_value('basic')
+				->set_help_text('Pilih metode pengiriman username & password ke API ESR.'),
 			Field::make('text', 'crb_url_api_esr', 'URL API ESR')
 				->set_help_text('Wajib diisi. ' . $url_testing_esr),
 			Field::make('text', 'crb_username_api_esr', 'Username API ESR')
-				->set_help_text('Auth Type: Basic Auth'),
+				->set_help_text('Akan dikirim sesuai Metode Autentikasi yang dipilih.'),
 			Field::make('text', 'crb_password_api_esr', 'Password API ESR')
-				->set_help_text('Auth Type: Basic Auth'),
+				->set_attribute('type', 'password')
+				->set_help_text('Akan dikirim sesuai Metode Autentikasi yang dipilih.'),
 			Field::make('text', 'crb_expired_time_esr_lokal', 'Expired Time Data ESR Lokal')
 				->set_default_value('60')
 				->set_help_text('Minimal 1 detik. Waktu cache data lokal ESR.'),
