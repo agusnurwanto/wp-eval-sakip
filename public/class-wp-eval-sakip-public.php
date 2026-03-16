@@ -30280,14 +30280,28 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							'keterangan' => $data['keterangan']
 						);
 
-						$response = wp_remote_post(get_option('_crb_url_api_esr') . 'insert_data', [
-							'headers' => array(
-								'Accept' => 'application/json',
-								'Content-Type' => 'application/json; charset=utf-8',
-								'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr') . ':' . get_option('_crb_password_api_esr')),
-							),
-							'body' => json_encode($body_arr),
-						]);
+						$esr_auth_method = get_option('_crb_auth_method_api_esr');
+						$esr_user = get_option('_crb_username_api_esr');
+						$esr_pass = get_option('_crb_password_api_esr');
+
+						if ($esr_auth_method === 'post') {
+							$body_arr['username'] = $esr_user;
+							$body_arr['password'] = $esr_pass;
+							$request_args = [
+								'body' => $body_arr,
+							];
+						} else {
+							$request_args = [
+								'headers' => array(
+									'Accept' => 'application/json',
+									'Content-Type' => 'application/json; charset=utf-8',
+									'Authorization' => 'Basic ' . base64_encode($esr_user . ':' . $esr_pass),
+								),
+								'body' => json_encode($body_arr),
+							];
+						}
+
+						$response = wp_remote_post(get_option('_crb_url_api_esr') . 'insert_data', $request_args);
 						$ret_body[] = $response;
 						if (is_wp_error($response)) {
 							$error_message = $response->get_error_message();
@@ -30423,12 +30437,25 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			if (!empty($_POST)) {
 				if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(ESAKIP_APIKEY)) {
 
-					$response = wp_remote_get(get_option('_crb_url_api_esr') . 'get_user_id', [
-						'headers' => array(
-							'Accept' => 'application/json',
-							'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr') . ':' . get_option('_crb_password_api_esr')),
-						),
-					]);
+					$esr_auth_method = get_option('_crb_auth_method_api_esr');
+					$esr_user = get_option('_crb_username_api_esr');
+					$esr_pass = get_option('_crb_password_api_esr');
+
+					if ($esr_auth_method === 'post') {
+						$response = wp_remote_post(get_option('_crb_url_api_esr') . 'get_user_id', [
+							'body' => [
+								'username' => $esr_user,
+								'password' => $esr_pass
+							]
+						]);
+					} else {
+						$response = wp_remote_get(get_option('_crb_url_api_esr') . 'get_user_id', [
+							'headers' => array(
+								'Accept' => 'application/json',
+								'Authorization' => 'Basic ' . base64_encode($esr_user . ':' . $esr_pass),
+							),
+						]);
+					}
 
 					$users = json_decode(wp_remote_retrieve_body($response));
 					if (empty($users->data)) {
@@ -30956,12 +30983,25 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						'data_esr_lokal' => $esrLokal
 					];
 				} else {
-					$response = wp_remote_get(get_option('_crb_url_api_esr') . 'get_data', [
-						'headers' => array(
-							'Accept' => 'application/json',
-							'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr') . ':' . get_option('_crb_password_api_esr')),
-						),
-					]);
+					$esr_auth_method = get_option('_crb_auth_method_api_esr');
+					$esr_user = get_option('_crb_username_api_esr');
+					$esr_pass = get_option('_crb_password_api_esr');
+
+					if ($esr_auth_method === 'post') {
+						$response = wp_remote_post(get_option('_crb_url_api_esr') . 'get_data', [
+							'body' => [
+								'username' => $esr_user,
+								'password' => $esr_pass
+							]
+						]);
+					} else {
+						$response = wp_remote_get(get_option('_crb_url_api_esr') . 'get_data', [
+							'headers' => array(
+								'Accept' => 'application/json',
+								'Authorization' => 'Basic ' . base64_encode($esr_user . ':' . $esr_pass),
+							),
+						]);
+					}
 
 					$body = json_decode(wp_remote_retrieve_body($response));
 
@@ -31627,12 +31667,25 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$data_esr_server = array();
 				if (!empty($mapping_jenis_dokumen_esr)) {
 					$array_data_esr = [];
-					$response = wp_remote_get(get_option('_crb_url_api_esr') . 'get_data', [
-						'headers' => array(
-							'Accept' => 'application/json',
-							'Authorization' => 'Basic ' . base64_encode(get_option('_crb_username_api_esr') . ':' . get_option('_crb_password_api_esr')),
-						),
-					]);
+					$esr_auth_method = get_option('_crb_auth_method_api_esr');
+					$esr_user = get_option('_crb_username_api_esr');
+					$esr_pass = get_option('_crb_password_api_esr');
+
+					if ($esr_auth_method === 'post') {
+						$response = wp_remote_post(get_option('_crb_url_api_esr') . 'get_data', [
+							'body' => [
+								'username' => $esr_user,
+								'password' => $esr_pass
+							]
+						]);
+					} else {
+						$response = wp_remote_get(get_option('_crb_url_api_esr') . 'get_data', [
+							'headers' => array(
+								'Accept' => 'application/json',
+								'Authorization' => 'Basic ' . base64_encode($esr_user . ':' . $esr_pass),
+							),
+						]);
+					}
 
 					$data_esr_server = json_decode(wp_remote_retrieve_body($response));
 
