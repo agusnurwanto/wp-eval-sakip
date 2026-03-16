@@ -13915,4 +13915,181 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			exit();
 		}
 	}
+
+	public function get_current_triwulan()
+	{
+		$month = date('n');
+
+		// Calculate the quarter (1-4)
+		$quarter = ceil($month / 3);
+		return $quarter;
+	}
+
+	public function get_data_monitoring_indikator_rhk()
+	{
+		try {
+			$this->functions->validate($_POST, [
+				'api_key' 			=> 'required|string',
+				'tahun_anggaran' 	=> 'required'
+			]);
+
+			if ($_POST['api_key'] !== get_option(ESAKIP_APIKEY)) {
+				throw new Exception("API key tidak valid!", 401);
+			}
+
+			$current_triwulan = $this->get_current_triwulan();
+			$selected_triwulan = isset($_POST['triwulan']) && in_array($_POST['triwulan'], [1, 2, 3, 4])
+				? intval($_POST['triwulan'])
+				: $current_triwulan;
+
+			$realisasi_col = 'realisasi_tw_' . $selected_triwulan;
+
+			global $wpdb;
+
+			// Get all RHK for the year
+			$all_rhk = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT *
+					FROM esakip_data_rencana_aksi_opd
+					WHERE tahun_anggaran = %d
+					  AND active = 1
+				", $_POST['tahun_anggaran']),
+				ARRAY_A
+			);
+
+			// Get all indikator for the year
+			$all_indikator = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT i.*
+					FROM esakip_data_rencana_aksi_indikator_opd i
+					INNER JOIN esakip_data_rencana_aksi_opd r
+						ON i.id_renaksi = r.id
+					WHERE i.tahun_anggaran = %d
+					  AND i.active = 1
+					  AND r.active = 1
+				", $_POST['tahun_anggaran']),
+				ARRAY_A
+			);
+
+			// Get all OPD units
+			$all_unit = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT *
+					FROM esakip_data_unit
+					WHERE tahun_anggaran = %d
+					  AND active = 1
+					  AND is_skpd = 1
+				", $_POST['tahun_anggaran']),
+				ARRAY_A
+			);
+
+			// Index RHK by id_skpd
+			$rhk_by_skpd = [];
+			foreach ($all_rhk as $rhk) {
+				$skpd_id = $rhk['id_skpd'];
+				if (!isset($rhk_by_skpd[$skpd_id])) {
+					$rhk_by_skpd[$skpd_id] = [];
+				}
+				$rhk_by_skpd[$skpd_id][] = $rhk;
+			}
+
+			// Index indikator by id_skpd
+			$indikator_by_skpd = [];
+			foreach ($all_indikator as $ind) {
+				$skpd_id = $ind['id_skpd'];
+				if (!isset($indikator_by_skpd[$skpd_id])) {
+					$indikator_by_skpd[$skpd_id] = [];
+				}
+				$indikator_by_skpd[$skpd_id][] = $ind;
+			}
+
+			// Summary counters
+			$total_rhk = count($all_rhk);
+			$tagged_rhk = 0;
+			$total_indikator = count($all_indikator);
+			$filled_indikator = 0;
+
+			foreach ($all_rhk as $rhk) {
+				if (!empty(trim($rhk['nip'] ?? ''))) {
+					$tagged_rhk++;
+				}
+			}
+
+			foreach ($all_indikator as $ind) {
+				if (!empty(trim($ind[$realisasi_col] ?? ''))) {
+					$filled_indikator++;
+				}
+			}
+
+			// Build per-OPD details
+			$details = [];
+			foreach ($all_unit as $unit) {
+				$skpd_id = $unit['id_skpd'];
+				$nama_skpd = $unit['nama_skpd'];
+
+				$opd_rhk = $rhk_by_skpd[$skpd_id] ?? [];
+				$opd_indikator = $indikator_by_skpd[$skpd_id] ?? [];
+
+				$opd_total_rhk = count($opd_rhk);
+				$opd_tagged_rhk = 0;
+				$opd_total_indikator = count($opd_indikator);
+				$opd_filled_indikator = 0;
+
+				foreach ($opd_rhk as $rhk) {
+					if (!empty(trim($rhk['nip'] ?? ''))) {
+						$opd_tagged_rhk++;
+					}
+				}
+
+				foreach ($opd_indikator as $ind) {
+					if (!empty(trim($ind[$realisasi_col] ?? ''))) {
+						$opd_filled_indikator++;
+					}
+				}
+
+				$tagging_pct = $opd_total_rhk > 0
+					? round(($opd_tagged_rhk / $opd_total_rhk) * 100)
+					: 0;
+				$realisasi_pct = $opd_total_indikator > 0
+					? round(($opd_filled_indikator / $opd_total_indikator) * 100)
+					: 0;
+
+				$details[] = [
+					'id_skpd'              => $skpd_id,
+					'nama_skpd'            => $nama_skpd,
+					'total_rhk'            => $opd_total_rhk,
+					'tagged_rhk'           => $opd_tagged_rhk,
+					'tagging_pct'          => $tagging_pct,
+					'total_indikator'      => $opd_total_indikator,
+					'filled_indikator'     => $opd_filled_indikator,
+					'realisasi_pct'        => $realisasi_pct,
+				];
+			}
+
+			$return = [
+				'selected_triwulan' => $selected_triwulan,
+				'summary' => [
+					'rencana_aksi_total'  => $total_rhk,
+					'tagged_rencana_aksi' => $tagged_rhk,
+					'indikator_total'     => $total_indikator,
+					'filled_indikator'    => $filled_indikator,
+				],
+				'details' => $details,
+			];
+
+			echo json_encode([
+				'status'  => true,
+				'message' => 'Data berhasil ditemukan.',
+				'data'    => $return
+			]);
+		} catch (Exception $e) {
+			$code = is_int($e->getCode()) && $e->getCode() !== 0 ? $e->getCode() : 500;
+			http_response_code($code);
+			echo json_encode([
+				'status'  => false,
+				'message' => $e->getMessage()
+			]);
+		}
+		wp_die();
+	}
 }

@@ -681,6 +681,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_data_capaian_indikator', $plugin_public, 'get_data_capaian_indikator');
 		$this->loader->add_action('wp_ajax_simpan_data_capaian_indikator', $plugin_public, 'simpan_data_capaian_indikator');
 		$this->loader->add_action('wp_ajax_edit_capaian_indikator', $plugin_public, 'edit_capaian_indikator');
+
+		$this->loader->add_action('wp_ajax_get_data_monitoring_indikator_rhk', $plugin_public, 'get_data_monitoring_indikator_rhk');
+		$this->loader->add_action('wp_ajax_nopriv_get_data_monitoring_indikator_rhk', $plugin_public, 'get_data_monitoring_indikator_rhk');
 		$this->loader->add_action('wp_ajax_hapus_capaian_indikator', $plugin_public, 'hapus_capaian_indikator');
 
 		$this->loader->add_action('wp_ajax_mapping_jenis_dokumen_esr',  $plugin_public, 'mapping_jenis_dokumen_esr');
@@ -933,6 +936,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('input_rpjpd', array($plugin_public, 'input_rpjpd'));
 		add_shortcode('input_rpjmd', array($plugin_public, 'input_rpjmd'));
 		add_shortcode('halaman_cek_dokumen', array($plugin_public, 'halaman_cek_dokumen'));
+		add_shortcode('monitor_rhk', array($plugin_public, 'monitor_rhk'));
 		add_shortcode('cascading_pemda', array($plugin_public, 'cascading_pemda'));
 		
 		add_shortcode('croscutting_pemda', array($plugin_public, 'crosscutting_pemda'));

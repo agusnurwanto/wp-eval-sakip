@@ -953,6 +953,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monitor-upload/wp-eval-sakip-halaman-pengecekan-dokumen.php';
 	}
 
+	public function monitor_rhk($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-monitor-rhk.php';
+	}
+
 	public function list_pengisian_rencana_aksi_pemda($atts)
 	{
 		// untuk disable render shortcode di halaman edit page/post
@@ -20933,7 +20942,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
+		$monitor_rhk = $this->functions->generatePage(array(
+			'nama_page' => 'Monitor RHK ' . $_GET['tahun'],
+			'content' => '[monitor_rhk tahun_anggaran=' . $_GET['tahun'] . ']',
+			'show_header' => 1,
+			'post_status' => 'private'
+		));
 		$halaman_monitor_upload_dokumen .= '<a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary"> Laporan Monitor Upload Dokumen </a>';
+		$halaman_monitor_rhk = '<a target="_blank" href="' . $monitor_rhk['url'] . '" class="btn btn-primary"> Monitor RHK </a>';
 
 		if (!empty($cek_data_perencanaan['pemerintah_daerah']['SKP']) && $cek_data_perencanaan['pemerintah_daerah']['SKP']['active'] == 1) {
 			$skp_pemda = $this->functions->generatePage(array(
@@ -22187,6 +22203,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				<div class="card custom-blur shadow-lg">
 					<div class="card-body">
 						<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
+						<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_rhk . '</div>
         					<ul class="daftar-menu-sakip">
 								<li>' . $halaman_sakip_perencanaan_pemda . '</li>
 								<li>' . $halaman_sakip_pengukuran_kinerja_pemda . '</li>
