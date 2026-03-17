@@ -20942,14 +20942,18 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'show_header' => 1,
 			'post_status' => 'private'
 		));
-		$monitor_rhk = $this->functions->generatePage(array(
-			'nama_page' => 'Monitor RHK ' . $_GET['tahun'],
-			'content' => '[monitor_rhk tahun_anggaran=' . $_GET['tahun'] . ']',
-			'show_header' => 1,
-			'post_status' => 'private'
-		));
+
+		$halaman_monitor_rhk = '';
+		if ($this->is_admin_panrb()) {
+			$monitor_rhk = $this->functions->generatePage(array(
+				'nama_page'   => 'Monitor RHK ' . $_GET['tahun'],
+				'content' 	  => '[monitor_rhk tahun_anggaran=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));	
+			$halaman_monitor_rhk = '<a target="_blank" href="' . $monitor_rhk['url'] . '" class="btn btn-primary"> Monitor RHK </a>';
+		}
 		$halaman_monitor_upload_dokumen .= '<a target="_blank" href="' . $monitor_upload_dokumen['url'] . '" class="btn btn-primary"> Laporan Monitor Upload Dokumen </a>';
-		$halaman_monitor_rhk = '<a target="_blank" href="' . $monitor_rhk['url'] . '" class="btn btn-primary"> Monitor RHK </a>';
 
 		if (!empty($cek_data_perencanaan['pemerintah_daerah']['SKP']) && $cek_data_perencanaan['pemerintah_daerah']['SKP']['active'] == 1) {
 			$skp_pemda = $this->functions->generatePage(array(
