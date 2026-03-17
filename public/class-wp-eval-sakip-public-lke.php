@@ -6136,6 +6136,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            $id_jadwal_wpsipd = intval($_POST['id_jadwal_wpsipd'] ?? 0);
 
 	            $tipe_map = [
+	                'tujuan'       => 1,
+	                'sasaran'      => 2,
 	                'program'      => 3,
 	                'kegiatan'     => 4,
 	                'sub_kegiatan' => 5,
@@ -6164,12 +6166,12 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 	            $rows = $wpdb->get_results($wpdb->prepare("
 	                SELECT 
-	                	*
+	                    *
 	                FROM esakip_data_kke_format_1
 	                WHERE id_skpd = %d
 	                  AND tahun_anggaran = %d
 	                  AND active = 1
-	                  AND tipe IN (3, 4, 5)
+	                  AND tipe IN (1, 2, 3, 4, 5)
 	                ORDER BY kode ASC, id ASC
 	            ", $id_skpd, $tahun_anggaran), ARRAY_A);
 
@@ -6199,63 +6201,84 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            $grouped_by_kode = [];
 	            $kode_order = [];
 	            foreach ($rows as $row) {
-	                $kode = trim($row['kode'] ?? '');
-	                if (!isset($grouped_by_kode[$kode])) {
-	                    $grouped_by_kode[$kode] = [];
-	                    $kode_order[] = $kode;
+	                $key = $row['tipe'] . '|' . trim($row['kode'] ?? '');
+	                if (!isset($grouped_by_kode[$key])) {
+	                    $grouped_by_kode[$key] = [];
+	                    $kode_order[] = $key;
 	                }
-	                $grouped_by_kode[$kode][] = $row;
+	                $grouped_by_kode[$key][] = $row;
 	            }
 
-	            $prog_no = 0;
-	            $ket_no = 0;
-	            $sub_no = 0;
-	            $nomor_map = [];
-	            foreach ($kode_order as $kode) {
-	                $base_row = $grouped_by_kode[$kode][0];
-	                $tipe = intval($base_row['tipe']);
+	            $tuj_no = 0;
+				$sas_no = 0;
+				$prog_no = 0;
+				$ket_no = 0;
+				$sub_no = 0;
+				$nomor_map = [];
 
-	                if ($tipe == 3) {
-	                    $prog_no++;
-	                    $ket_no = 0;
-	                    $sub_no = 0;
-	                    $nomor_map[$kode] = (string)$prog_no;
-	                } elseif ($tipe == 4) {
-	                    $ket_no++;
-	                    $sub_no = 0;
-	                    $nomor_map[$kode] = $prog_no . '.' . $ket_no;
-	                } else {
-	                    $sub_no++;
-	                    $nomor_map[$kode] = $prog_no . '.' . $ket_no . '.' . $sub_no;
-	                }
-	            }
+				foreach ($kode_order as $key) {
+				    $base_row = $grouped_by_kode[$key][0];
+				    $tipe = intval($base_row['tipe']);
+
+				    if ($tipe == 1) {
+				        $tuj_no++;
+				        $sas_no = 0;
+				        $prog_no = 0;
+				        $ket_no = 0;
+				        $sub_no = 0;
+				        $nomor_map[$key] = $tuj_no;
+				    } elseif ($tipe == 2) {
+				        $sas_no++;
+				        $prog_no = 0;
+				        $ket_no = 0;
+				        $sub_no = 0;
+				        $nomor_map[$key] = $tuj_no . '.' . $sas_no;
+				    } elseif ($tipe == 3) {
+				        $prog_no++;
+				        $ket_no = 0;
+				        $sub_no = 0;
+				        $nomor_map[$key] = $tuj_no . '.' . $sas_no . '.' . $prog_no;
+				    } elseif ($tipe == 4) {
+				        $ket_no++;
+				        $sub_no = 0;
+				        $nomor_map[$key] = $tuj_no . '.' . $sas_no . '.' . $prog_no . '.' . $ket_no;
+				    } else {
+				        $sub_no++;
+				        $nomor_map[$key] = $tuj_no . '.' . $sas_no . '.' . $prog_no . '.' . $ket_no . '.' . $sub_no;
+				    }
+				}
 
 	            $html = '';
 
-	            foreach ($kode_order as $kode) {
-	                $kode_rows = $grouped_by_kode[$kode];
+	            foreach ($kode_order as $key) {
+	                $kode_rows = $grouped_by_kode[$key];
 	                $rowspan = count($kode_rows);
 	                $base_row = $kode_rows[0];
 	                $tipe = intval($base_row['tipe']);
-	                $nomor = $nomor_map[$kode];
+	                $nomor = $nomor_map[$key];
 	                $nama = esc_html($base_row['nama'] ?? '');
-	                $kode_esc = esc_html($kode);
+	                $kode_esc = esc_html(trim($base_row['kode'] ?? ''));
 	                $nomor_esc = esc_html($nomor);
 
 	                $row_style = '';
 	                $row_class = '';
-	                if ($tipe == 3) {
+	                $nama_style = '';
+
+	                if ($tipe == 1) {
+	                    $row_style = 'background-color:#FDFFB6;';
+	                    $row_class = 'tr-tujuan';
+	                    $nama_style = 'font-weight:bold';
+	                } elseif ($tipe == 2) {
+	                    $row_style = 'background-color:#CAFFBF;';
+	                    $row_class = 'tr-sasaran';
+	                    $nama_style = 'font-weight:bold';
+	                } elseif ($tipe == 3) {
 	                    $row_style = 'background-color:#e5d9f2;';
 	                    $row_class = 'tr-program';
+	                    $nama_style = 'font-weight:bold';
 	                } elseif ($tipe == 4) {
 	                    $row_style = 'background-color:#13d0d03d;';
 	                    $row_class = 'tr-kegiatan';
-	                }
-
-	                $nama_style = '';
-	                if ($tipe == 3) {
-	                    $nama_style = 'font-weight:bold';
-	                } elseif ($tipe == 4) {
 	                    $nama_style = 'font-weight:600';
 	                }
 
@@ -6283,9 +6306,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    if ($idx === 0) {
 	                        $rs_attr = $rowspan > 1 ? ' rowspan="' . $rowspan . '"' : '';
 
-	                        $html .= '<td' . $rs_attr . ' style="white-space:nowrap;text-align:left;font-weight:' . ($tipe == 3 ? 'bold' : 'normal') . ';">' . $nomor_esc . '</td>';
+	                        $html .= '<td' . $rs_attr . ' style="white-space:nowrap;text-align:left;font-weight:' . ($tipe <= 3 ? 'bold' : 'normal') . ';">' . $nomor_esc . '</td>';
 
-	                        $html .= '<td' . $rs_attr . ' class="text-left" style="' . $nama_style . '; vertical-align:top !important; text-align:left !important;">' . ' ' . $kode_esc . ' ' . $nama . '</td>';
+	                        $html .= '<td' . $rs_attr . ' class="text-left" style="' . $nama_style . '; vertical-align:top !important; text-align:left !important;"> ' . $kode_esc . ' ' . $nama . '</td>';
 	                    }
 
 	                    $html .= '<td class="text-left" style="vertical-align:top !important; text-align:left !important;">' . $indikator . '</td>';
@@ -6305,7 +6328,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    foreach ($smart_fields as $sf_name => $sf_val) {
 	                        if ($is_mapped) {
 	                            $sv = ($sf_val === null || $sf_val === '') ? '' : intval($sf_val);
-	                            $html .= '<td>' . '<select class="smart-select" data-field="' . $sf_name . '" data-id="' . $id . '" onchange="onSmartChange(this)">' . '<option value="">-</option>' . '<option value="1"' . ($sv === 1 ? ' selected' : '') . '>1</option>' . '<option value="0"' . ($sv === 0 && $sv !== '' ? ' selected' : '') . '>0</option>' . '</select>' . '</td>';
+	                            $html .= '<td>'
+	                                . '<select class="smart-select" data-field="' . $sf_name . '" data-id="' . $id . '" onchange="onSmartChange(this)">' . '<option value="">-</option>' . '<option value="1"' . ($sv === 1 ? ' selected' : '') . '>1</option>' . '<option value="0"' . ($sv === 0 && $sv !== '' ? ' selected' : '') . '>0</option>' . '</select>'
+	                                . '</td>';
 	                        } else {
 	                            $display_val = ($sf_val === null || $sf_val === '') ? '-' : intval($sf_val);
 	                            $html .= '<td class="text-center">' . $display_val . '</td>';
@@ -6314,26 +6339,30 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 	                    $badge_class = 'badge-nilai-low';
 	                    if ($nilai_total == 5) {
-	                        $badge_class = 'badge-nilai-5';
+	                    	$badge_class = 'badge-nilai-5';
 	                    } elseif ($nilai_total == 4) {
-	                        $badge_class = 'badge-nilai-4';
+	                    	$badge_class = 'badge-nilai-4';
 	                    } elseif ($nilai_total == 3) {
-	                        $badge_class = 'badge-nilai-3';
+	                    	$badge_class = 'badge-nilai-3';
 	                    }
+
 	                    $html .= '<td><span class="badge-nilai ' . $badge_class . ' cell-nilai-total" data-nilai="' . $nilai_total . '">' . $nilai_total . '</span></td>';
 
 	                    if ($is_mapped) {
 	                        $mv = ($menantang === null || $menantang === '') ? '' : intval($menantang);
-	                        $html .= '<td>' . '<select class="smart-select" data-field="menantang" data-id="' . $id . '" onchange="onSmartChange(this)">' . '<option value="">-</option>' . '<option value="1"' . ($mv === 1 ? ' selected' : '') . '>1</option>' . '<option value="0"' . ($mv === 0 && $mv !== '' ? ' selected' : '') . '>0</option>' . '</select>'
-	                               . '</td>';
+	                        $html .= '<td>'
+	                            . '<select class="smart-select" data-field="menantang" data-id="' . $id . '" onchange="onSmartChange(this)">' . '<option value="">-</option>' . '<option value="1"' . ($mv === 1 ? ' selected' : '') . '>1</option>' . '<option value="0"' . ($mv === 0 && $mv !== '' ? ' selected' : '') . '>0</option>' . '</select>'
+	                            . '</td>';
 	                    } else {
 	                        $display_menantang = ($menantang === null || $menantang === '') ? '-' : intval($menantang);
 	                        $html .= '<td class="text-center">' . $display_menantang . '</td>';
 	                    }
 
 	                    if ($is_mapped) {
-	                        $html .= '<td>' . '<textarea class="form-control form-control-sm input-ket" ' . 'placeholder="Keterangan..." ' . 'rows="3" ' . 'style="min-width:150px;font-size:0.8rem;resize:vertical;">'
-	                               . esc_html($row['keterangan'] ?? '') . '</textarea>' . '</td>';
+	                        $html .= '<td>'
+	                            . '<textarea class="form-control form-control-sm input-ket" ' . 'placeholder="Keterangan..." ' . 'rows="3" ' . 'style="min-width:150px;font-size:0.8rem;resize:vertical;">'
+	                            . esc_html($row['keterangan'] ?? '') . '</textarea>'
+	                            . '</td>';
 	                    } else {
 	                        $display_ket = esc_html($row['keterangan'] ?? '');
 	                        $html .= '<td class="text-left" style="min-width:150px;font-size:0.8rem;">' . ($display_ket !== '' ? $display_ket : '-') . '</td>';
@@ -6352,7 +6381,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                            <button id="btn-mapping-' . $id . '" class="btn btn-secondary" onclick="mapping_kke_format_1(' . $id . ', \'' . $row['kode'] . '\', \'' . $row['kode_indikator'] . '\', ' . $row['tipe'] . '); return false;" title="Mapping">
 	                                <span class="dashicons dashicons-update-alt"></span>
 	                            </button>
-
 	                            <button class="btn btn-danger" onclick="hapus_kke_format_1(' . $id . '); return false;" title="Hapus Data">
 	                                <span class="dashicons dashicons-trash"></span>
 	                            </button>
@@ -6360,7 +6388,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    }
 
 	                    $html .= '</td>';
-
 	                    $html .= '</tr>';
 	                }
 	            }
@@ -6383,67 +6410,42 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	public function simpan_data_renja_kke_format_1($item, $tipe_int, $tipe_str, $tahun_anggaran, $id_skpd, $id_data)
 	{
 	    global $wpdb;
-	    $table = 'esakip_data_kke_format_1';
 
-	    if ($tipe_str === 'program') {
+	    if ($tipe_str === 'tujuan') {
+	        $kode = $item['kode_bidang_urusan'] ?? '';
+	        $nama = $item['tujuan_teks'] ?? '';
+	        $kode_sbl_prefix = '';
+	        $is_tujuan_sasaran = true;
+	    } else if ($tipe_str === 'sasaran') {
+	        $kode = $item['kode_bidang_urusan'] ?? '';
+	        $nama = $item['sasaran_teks'] ?? '';
+	        $kode_sbl_prefix = '';
+	        $is_tujuan_sasaran = true;
+	    } else if ($tipe_str === 'program') {
 	        $kode = $item['kode_program'] ?? '';
 	        $nama = $item['nama_program'] ?? '';
 	        $kode_sbl_prefix = implode('.', array_slice(explode('.', $item['kode_sbl'] ?? ''), 0, 3));
+	        $is_tujuan_sasaran = false;
 	    } elseif ($tipe_str === 'kegiatan') {
 	        $kode = $item['kode_giat'] ?? ($item['kode_kegiatan'] ?? '');
 	        $nama = $item['nama_giat'] ?? ($item['nama_kegiatan'] ?? '');
 	        $kode_sbl_prefix = implode('.', array_slice(explode('.', $item['kode_sbl'] ?? ''), 0, 4));
+	        $is_tujuan_sasaran = false;
 	    } else {
 	        $kode = $item['kode_sub_giat'] ?? ($item['kode_sub_kegiatan'] ?? '');
 	        $nama = $item['nama_sub_giat'] ?? ($item['nama_sub_kegiatan'] ?? '');
 	        $kode_sbl_prefix = implode('.', array_slice(explode('.', $item['kode_sbl'] ?? ''), 0, 5));
+	        $is_tujuan_sasaran = false;
 	    }
 
-	    $active_item = isset($item['active']) ? intval($item['active']) : 1;
+	    if (empty($kode)) return;
 
-	    // Jika item sudah tidak aktif, nonaktifkan semua record terkait
-	    if ($active_item == 0) {
-	        $wpdb->query($wpdb->prepare("
-	            UPDATE {$table}
-	            SET status = 0,
-	                active = 0,
-	                updated_at = NOW()
-	            WHERE kode = %s
-	               AND tipe = %d
-	               AND tahun_anggaran = %d
-	               AND id_kke = %d
-	               AND id_skpd = %d
-	               AND active = 1
-	        ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data));
-	        return;
-	    }
+	    $item_active = isset($item['active']) ? intval($item['active']) : 1;
+	    $indikator_list = !empty($item['indikator']) ? $item['indikator'] : [];
 
-	    $raw_indikator = $item['indikator'] ?? [];
-
-	    $grouped_data = [];
-	    foreach ($raw_indikator as $ind) {
-	        $key = $ind['capaianteks'] ?? '';
-	        if ($key !== '' && !isset($grouped_data[$key])) {
-	            $grouped_data[$key] = $ind;
-	        }
-	    }
-	    $indikator_data  = array_values($grouped_data);
-	    $total_indikator = count($indikator_data);
-
-	    // Jika > 1 indikator, → kode_sbl.1, kode_sbl.2, dst
-	    // Jika hanya 1, kode_sbl saja
-	    $grouped_master = [];
-	    foreach ($indikator_data as $idx => $master_item) {
-	        if ($total_indikator > 1) {
-	            $kode_indikator = $kode_sbl_prefix . '.' . ($idx + 1);
-	        } else {
-	            $kode_indikator = $kode_sbl_prefix;
-	        }
-	        $grouped_master[$kode_indikator] = $master_item;
-	    }
-
-	    $existing_data = $wpdb->get_results($wpdb->prepare("
-	        SELECT id,
+	    $existing_data_all = $wpdb->get_results($wpdb->prepare("
+	        SELECT 
+	            id,
 	            kode_indikator,
 	            indikator,
 	            satuan_capaian,
@@ -6452,180 +6454,265 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            target_capaian,
 	            active,
 	            status
-	        FROM {$table}
+	        FROM esakip_data_kke_format_1
 	        WHERE kode = %s
-	            AND tipe = %d
-	            AND tahun_anggaran = %d
-	            AND id_kke = %d
-	            AND id_skpd = %d
-	        ORDER BY kode_indikator ASC
+	        	AND tipe = %d
+	        	AND tahun_anggaran = %d
+	        	AND id_skpd = %d
+	        	AND id_kke = %d
+	        ORDER BY id ASC
 	    ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data), ARRAY_A);
 
-	    // Cocokkan existing dengan master, update jika berubah, insert jika baru
-	    $matched_existing_ids = [];
+	    if ($item_active == 0) {
+	        $wpdb->query($wpdb->prepare("
+	            UPDATE esakip_data_kke_format_1
+	            SET status = 0
+	            WHERE kode = %s
+	            	AND tipe = %d
+	            	AND tahun_anggaran = %d
+	            	AND id_skpd = %d
+	            	AND id_kke = %d
+	            	AND active = 1
+	            	AND status = 1
+	        ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data));
+	        return;
+	    }
 
-	    foreach ($grouped_master as $kode_ind => $master_item) {
-	        $satuan_master = $master_item['satuancapaian'] ?? '';
-	        $target_teks = $master_item['targetcapaianteks'] ?? '';
-	        $capaian_teks = $master_item['capaianteks'] ?? '';
-	        $target_capaian = $master_item['targetcapaian'] ?? '';
-
-	        $found = false;
-
-	        foreach ($existing_data as $existing) {
-	            if ($existing['active'] == 0) continue;
-
-	            // Cek apakah kode_indikator sama
-	            if ($existing['kode_indikator'] == $kode_ind) {
-	                $found = true;
-	                $matched_existing_ids[] = $existing['id'];
-
-	                $berubah = (
-	                    $existing['satuan_capaian'] != $satuan_master ||
-	                    $existing['target_capaian_teks'] != $target_teks ||
-	                    $existing['capaian_teks'] != $capaian_teks ||
-	                    $existing['target_capaian'] != $target_capaian
-	                );
-
-	                if ($berubah) {
-	                    // Nonaktifkan record lama (status=0 berarti renstra/renja dihapus/berubah)
-	                    if ($existing['status'] != 0) {
-	                        $wpdb->update(
-	                            $table,
-	                            ['status' => 0, 
-		                            'active' => 0, 
-		                            'updated_at' => current_time('mysql')
-		                        ],
-	                            ['id' => $existing['id']]
-	                        );
-	                    }
-
-	                    $cek_baru = $wpdb->get_var($wpdb->prepare("
-	                        SELECT COUNT(*)
-	                        FROM  {$table}
-	                        WHERE  kode = %s
-	                           AND tipe = %d
-	                           AND tahun_anggaran = %d
-	                           AND id_kke = %d
-	                           AND id_skpd = %d
-	                           AND capaian_teks = %s
-	                           AND satuan_capaian = %s
-	                           AND target_capaian_teks = %s
-	                           AND target_capaian = %s
-	                           AND active = 1
-	                    ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data, $capaian_teks, $satuan_master, $target_teks, $target_capaian));
-
-	                    if ($cek_baru == 0) {
-	                        // Cari nomor urut baru untuk kode_indikator
-	                        $max_urut = $wpdb->get_var($wpdb->prepare("
-	                            SELECT MAX(CAST(SUBSTRING_INDEX(kode_indikator, '.', -1) AS UNSIGNED))
-	                            FROM {$table}
-	                            WHERE  kode = %s
-	                               AND tipe = %d
-	                               AND tahun_anggaran = %d
-	                               AND id_kke = %d
-	                               AND id_skpd = %d
-	                               AND kode_indikator  LIKE %s
-	                        ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data, $kode_sbl_prefix . '%'));
-
-	                        $new_urut = ($max_urut ? intval($max_urut) : 0) + 1;
-	                        $kode_ind_baru = $kode_sbl_prefix . '.' . $new_urut;
-
-	                        $wpdb->insert($table, [
-	                            'tipe'               => $tipe_int,
-	                            'kode'                => $kode,
-	                            'kode_indikator'      => $kode_ind_baru,
-	                            'nama'                => $nama,
-	                            'indikator'           => $capaian_teks,
-	                            'satuan_capaian'      => $satuan_master,
-	                            'target_capaian_teks' => $target_teks,
-	                            'capaian_teks'        => $capaian_teks,
-	                            'target_capaian'      => $target_capaian,
-	                            'id_skpd'             => $id_skpd,
-	                            'status'              => 1,
-	                            'tahun_anggaran'      => $tahun_anggaran,
-	                            'id_kke'              => $id_data,
-	                            'active'              => 1,
-	                            'created_at'          => current_time('mysql'),
-	                            'updated_at'          => current_time('mysql'),
-	                        ]);
-	                    }
-	                } else {
-	                    if ($existing['status'] != 1) {
-	                        $wpdb->update(
-	                            $table,
-	                            ['status' => 1, 
-	                            	'updated_at' => current_time('mysql')
-	                            ],
-	                            ['id' => $existing['id']]
-	                        );
-	                    }
-	                }
+	    // TIDAK ADA INDIKATOR > simpan baris induk saja
+	    if (empty($indikator_list)) {
+	        $existing_no_ind = null;
+	        foreach ($existing_data_all as $ex) {
+	            if (empty($ex['kode_indikator']) && $ex['active'] == 1 && $ex['status'] == 1) {
+	                $existing_no_ind = $ex;
 	                break;
 	            }
 	        }
 
-	        // Tidak ditemukan di existing, insert baru
-	        if (!$found) {
+	        if (empty($existing_no_ind)) {
+	            // Cek apakah ada yang status=0 (pernah ada lalu di-nonaktifkan) > reaktivasi
+	            $existing_outdated = null;
+	            foreach ($existing_data_all as $ex) {
+	                if (empty($ex['kode_indikator']) && $ex['active'] == 1 && $ex['status'] == 0) {
+	                    $existing_outdated = $ex;
+	                    break;
+	                }
+	            }
+
+	            if (!empty($existing_outdated)) {
+	                $wpdb->update(
+	                    'esakip_data_kke_format_1',
+	                    [
+	                        'status'     => 1,
+	                        'nama'       => $nama,
+	                        'updated_at' => current_time('mysql'),
+	                    ],
+	                    ['id' => $existing_outdated['id']]
+	                );
+	            } else {
+	                $wpdb->insert(
+	                    'esakip_data_kke_format_1',
+	                    [
+	                        'id_kke'              => $id_data,
+	                        'tipe'                => $tipe_int,
+	                        'kode'                => $kode,
+	                        'kode_indikator'      => null,
+	                        'nama'                => $nama,
+	                        'indikator'           => null,
+	                        'satuan_capaian'      => null,
+	                        'target_capaian_teks' => null,
+	                        'capaian_teks'        => null,
+	                        'target_capaian'      => null,
+	                        'id_skpd'             => $id_skpd,
+	                        'tahun_anggaran'      => $tahun_anggaran,
+	                        'status'              => 1,
+	                        'active'              => 1,
+	                        'created_at'          => current_time('mysql'),
+	                    ]
+	                );
+	            }
+	        }
+	        return;
+	    }
+
+	    // DEDUPLIKASI & MAPPING kode_indikator dari master
+	    $grouped_data = [];
+	    foreach ($indikator_list as $ind) {
+	        $key = $ind['capaianteks'] ?? '';
+	        if (!isset($grouped_data[$key])) {
+	            $grouped_data[$key] = $ind;
+	        }
+	    }
+	    $indikator_data = array_values($grouped_data);
+	    $total_indikator = count($indikator_data);
+	    $kode_base = $indikator_data[0]['kode_sbl'] ?? $kode;
+
+	    $grouped_master = [];
+	    foreach ($indikator_data as $idx => $ind_item) {
+	        $kode_ind = ($total_indikator > 1) ? $kode_base . '.' . ($idx + 1) : $kode_base;
+	        $grouped_master[$kode_ind] = $ind_item;
+	    }
+
+	    // PROSES TIAP INDIKATOR MASTER
+	    foreach ($grouped_master as $kode_ind => $master_item) {
+	        $capaian_teks_master = $master_item['capaianteks'] ?? null;
+	        $satuan_capaian_master = $master_item['satuancapaian'] ?? null;
+	        $target_capaian_teks_master = $master_item['targetcapaianteks'] ?? null;
+	        $target_capaian_master = $master_item['targetcapaian'] ?? null;
+
+	        // Cek apakah sudah ada baris aktif & valid (status=1) dengan nilai SAMA
+	        $sudah_ada_aktif = false;
+	        foreach ($existing_data_all as $ex) {
+	            if ($ex['active'] == 1
+	                && $ex['status'] == 1
+	                && $ex['capaian_teks'] == $capaian_teks_master
+	                && $ex['satuan_capaian'] == $satuan_capaian_master
+	                && $ex['target_capaian_teks'] == $target_capaian_teks_master
+	                && $ex['target_capaian'] == $target_capaian_master
+	            ) {
+	                $sudah_ada_aktif = true;
+	                break;
+	            }
+	        }
+
+	        if ($sudah_ada_aktif) continue;
+
+	        // Cari baris existing dengan kode_indikator SAMA
+	        $existing_by_kode = null;
+	        foreach ($existing_data_all as $ex) {
+	            if ($ex['kode_indikator'] == $kode_ind) {
+	                $existing_by_kode = $ex;
+	                break;
+	            }
+	        }
+
+	        if (!empty($existing_by_kode)) {
+	            // Tandai lama status=0 jika masih active & status=1
+	            if ($existing_by_kode['active'] == 1 && $existing_by_kode['status'] == 1) {
+	                $wpdb->update(
+	                    'esakip_data_kke_format_1',
+	                    ['status' => 0, 'updated_at' => current_time('mysql')],
+	                    ['id'     => $existing_by_kode['id']]
+	                );
+	            }
+	        }
+
+	        // Cek apakah ada baris lama dengan nilai SAMA tapi status=0
+	        // (data dikembalikan ke nilai semula) > REAKTIVASI
+	        $existing_reaktivasi = null;
+	        foreach ($existing_data_all as $ex) {
+	            if ($ex['active'] == 1
+	                && $ex['status'] == 0
+	                && $ex['capaian_teks'] == $capaian_teks_master
+	                && $ex['satuan_capaian'] == $satuan_capaian_master
+	                && $ex['target_capaian_teks'] == $target_capaian_teks_master
+	                && $ex['target_capaian'] == $target_capaian_master
+	            ) {
+	                $existing_reaktivasi = $ex;
+	                break;
+	            }
+	        }
+
+	        if (!empty($existing_reaktivasi)) {
+	            $wpdb->update(
+	                'esakip_data_kke_format_1',
+	                [
+	                    'status'        => 1,
+	                    'kode_indikator'=> $kode_ind,
+	                    'nama'          => $nama,
+	                    'updated_at'    => current_time('mysql'),
+	                ],
+	                ['id' => $existing_reaktivasi['id']]
+	            );
+	        } else {
 	            $cek_baru = $wpdb->get_var($wpdb->prepare("
 	                SELECT COUNT(*)
-	                FROM {$table}
+	                FROM esakip_data_kke_format_1
 	                WHERE kode = %s
-	                   AND kode_indikator = %s
-	                   AND tipe = %d
-	                   AND tahun_anggaran = %d
-	                   AND id_skpd = %d
-	                   AND id_kke = %d
-	                   AND active = 1
+	                	AND kode_indikator = %s
+	                	AND tipe = %d
+	                	AND tahun_anggaran = %d
+	                	AND id_skpd = %d
+	                	AND id_kke = %d
+	                	AND active = 1
+	                	AND status = 1
 	            ", $kode, $kode_ind, $tipe_int, $tahun_anggaran, $id_skpd, $id_data));
 
 	            if ($cek_baru == 0) {
-	                $wpdb->insert($table, [
-	                    'tipe'               => $tipe_int,
-	                    'kode'                => $kode,
-	                    'kode_indikator'      => $kode_ind,
-	                    'nama'                => $nama,
-	                    'indikator'           => $capaian_teks,
-	                    'satuan_capaian'      => $satuan_master,
-	                    'target_capaian_teks' => $target_teks,
-	                    'capaian_teks'        => $capaian_teks,
-	                    'target_capaian'      => $target_capaian,
-	                    'id_skpd'             => $id_skpd,
-	                    'id_kke'             => $id_data,
-	                    'status'              => 1,
-	                    'tahun_anggaran'      => $tahun_anggaran,
-	                    'active'              => 1,
-	                    'created_at'          => current_time('mysql'),
-	                    'updated_at'          => current_time('mysql'),
-	                ]);
+	                // Jika kode_ind sudah dipakai (status=1 oleh baris lain)
+	                $kode_ind_insert = $kode_ind;
+	                $kode_ind_taken  = false;
+	                foreach ($existing_data_all as $ex) {
+	                    if ($ex['kode_indikator'] == $kode_ind
+	                        && $ex['active'] == 1
+	                        && $ex['status'] == 1
+	                    ) {
+	                        $kode_ind_taken = true;
+	                        break;
+	                    }
+	                }
+
+	                if ($kode_ind_taken) {
+	                    $max_suffix = $wpdb->get_var($wpdb->prepare("
+	                        SELECT MAX(CAST(SUBSTRING_INDEX(kode_indikator, '.', -1) AS UNSIGNED))
+	                        FROM esakip_data_kke_format_1
+	                        WHERE kode = %s
+	                        	AND tipe = %d
+	                        	AND tahun_anggaran = %d
+	                        	AND id_skpd = %d
+	                        	AND id_kke = %d
+	                        	AND kode_indikator LIKE %s
+	                    ", $kode, $tipe_int, $tahun_anggaran, $id_skpd, $id_data,
+	                       $kode_base . '%'
+	                    ));
+	                    $kode_ind_insert = $kode_base . '.' . (($max_suffix ? intval($max_suffix) : 0) + 1);
+	                }
+
+	                $wpdb->insert(
+	                    'esakip_data_kke_format_1',
+	                    [
+	                        'id_kke'              => $id_data,
+	                        'tipe'                => $tipe_int,
+	                        'kode'                => $kode,
+	                        'kode_indikator'      => $kode_ind_insert,
+	                        'nama'                => $nama,
+	                        'indikator'           => $capaian_teks_master,
+	                        'satuan_capaian'      => $satuan_capaian_master,
+	                        'target_capaian_teks' => $target_capaian_teks_master,
+	                        'capaian_teks'        => $capaian_teks_master,
+	                        'target_capaian'      => $target_capaian_master,
+	                        'id_skpd'             => $id_skpd,
+	                        'tahun_anggaran'      => $tahun_anggaran,
+	                        'status'              => 1,
+	                        'active'              => 1,
+	                        'created_at'          => current_time('mysql'),
+	                    ]
+	                );
 	            }
 	        }
 	    }
 
-	    foreach ($existing_data as $existing) {
-	        if ($existing['active'] == 0) continue;
-	        if (in_array($existing['id'], $matched_existing_ids)) continue;
+	    // indikator existing (status=1) yang tidak ada
+	    // di master > tandai status = 0
+	    foreach ($existing_data_all as $ex) {
+	        if ($ex['active'] != 1 || $ex['status'] != 1) continue;
 
-	        // Cek apakah capaian / indikator masih ada di master
 	        $ada_di_master = false;
 	        foreach ($grouped_master as $master_item) {
-	            if ($existing['capaian_teks'] == ($master_item['capaianteks'] ?? '') &&
-	                $existing['satuan_capaian'] == ($master_item['satuancapaian'] ?? '') &&
-	                $existing['target_capaian_teks'] == ($master_item['targetcapaianteks'] ?? '') &&
-	                $existing['target_capaian'] == ($master_item['targetcapaian'] ?? '')) {
+	            if ($ex['capaian_teks'] == ($master_item['capaianteks'] ?? null) &&
+	                $ex['satuan_capaian'] == ($master_item['satuancapaian'] ?? null) &&
+	                $ex['target_capaian_teks'] == ($master_item['targetcapaianteks'] ?? null) &&
+	                $ex['target_capaian'] == ($master_item['targetcapaian'] ?? null)
+	            ) {
 	                $ada_di_master = true;
 	                break;
 	            }
 	        }
 
-	        if (!$ada_di_master && $existing['status'] != 0) {
+	        if (!$ada_di_master) {
 	            $wpdb->update(
-	                $table,
-	                ['status' => 0, 
-		                'active' => 0, 
-		                'updated_at' => current_time('mysql')
-		            ],
-	                ['id'  => $existing['id']]
+	                'esakip_data_kke_format_1',
+	                ['status' => 0, 'updated_at' => current_time('mysql')],
+	                ['id'     => $ex['id']]
 	            );
 	        }
 	    }
@@ -6750,6 +6837,8 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	        if (is_wp_error($response_asli)) {
 	            throw new Exception("Koneksi ke API server gagal: " . $response_asli->get_error_message(), 1);
 	        }
+
+	        // die(print_r($response_asli));
 
 	        $body = wp_remote_retrieve_body($response_asli);
 	        $response = json_decode($body, true);
