@@ -8584,8 +8584,6 @@ class Wp_Eval_Sakip_Monev_Kinerja
 	        );
 	    }
 
-	    // print_r($data_rhk_child); die($wpdb->last_query);
-
 	    $jenis_level = array(
 	        '1' => 'sasaran',
 	        '2' => 'program',
