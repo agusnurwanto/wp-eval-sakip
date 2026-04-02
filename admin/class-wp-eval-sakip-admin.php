@@ -1926,7 +1926,7 @@ class Wp_Eval_Sakip_Admin
 
 	public function generate_fields_dokumen_renaksi_opd()
 	{
-		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_aksi1.php') {
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_rencana_hasil_kerja1.php') {
 			return array();
 		}
 
