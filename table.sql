@@ -394,6 +394,7 @@ CREATE TABLE esakip_subkomponen (
 
 CREATE TABLE esakip_komponen_penilaian (
   `id` int(11) NOT NULL auto_increment,
+  `id_kke` int(11) NOT NULL,
   `id_subkomponen` int(11) NOT NULL,
   `nomor_urut` DECIMAL(10,2) NOT NULL,
   `nama` varchar(255) DEFAULT NULL,
