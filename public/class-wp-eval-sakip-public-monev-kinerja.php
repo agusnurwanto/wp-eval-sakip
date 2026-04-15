@@ -10033,27 +10033,28 @@ class Wp_Eval_Sakip_Monev_Kinerja
 						if (!empty($v_ekin['rencana_hasil_kerja'])) {
 							foreach ($v_ekin['rencana_hasil_kerja'] as $k_rhk => $v_rhk) {
 
+								// get rhk valid dari database
 								$get_id_rhk_ekin = explode('|', $v_rhk['rhk_id']);
-								
 								$id_rhk_valid = null;
-								foreach ($get_id_rhk_ekin as $id_for_rhk) {
-									$id_for_rhk = trim($id_for_rhk);
-									
-									$cek_id_rhk = $wpdb->get_var(
-										$wpdb->prepare("
-										SELECT 
-											id 
-										FROM esakip_data_rencana_aksi_opd
-										WHERE id = %d 
-											AND tahun_anggaran = %d 
-											AND id_skpd = %d 
-											AND active = 1
-										", $id_for_rhk, $tahun, $id_skpd)
-									);
-									
-									if (!empty($cek_id_rhk)) {
-										$id_rhk_valid = $id_for_rhk;
-										break;
+								$id_for_rhk = array();
+								foreach ($get_id_rhk_ekin as $ids) {
+									$id_for_rhk[] = $wpdb->prepare("%d", trim($ids));
+								}
+								$cek_id_rhk = $wpdb->get_results(
+									$wpdb->prepare("
+									SELECT 
+										id 
+									FROM esakip_data_rencana_aksi_opd
+									WHERE id IN (".implode(',', $id_for_rhk).") 
+										AND tahun_anggaran = %d 
+										AND id_skpd = %d 
+										AND active = 1
+									", $tahun, $id_skpd)
+								);
+								if (!empty($cek_id_rhk)) {
+									$id_rhk_valid = array();
+									foreach($cek_id_rhk as $id_db){
+										$id_rhk_valid[] = $id_db->id;
 									}
 								}
 								
@@ -10062,12 +10063,19 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									continue;
 								}
 								
+								// get id rhk final atau yang sama dengan input list rhk
+								$id_rhk_final = false;
 								if ($opsi_param['tipe'] == 'indikator') {
 									$list_rhk = is_array($id_rhk) ? $id_rhk : array($id_rhk);
-									if (!in_array($id_rhk_valid, $list_rhk)) {
+									$id_rhk_final = array_intersect($id_rhk_valid, $list_rhk);
+									if (empty($id_rhk_final)) {
 										continue;
 									}
+								}else{
+									$id_rhk_final = $id_rhk_valid;
 								}
+								// get value array pertama
+								$id_rhk_valid = reset($id_rhk_final);
 								
 								if (!empty($v_rhk['indikator'])) {
 									foreach ($v_rhk['indikator'] as $k_indikator => $v_indikator) {
