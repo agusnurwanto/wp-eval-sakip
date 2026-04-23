@@ -198,6 +198,13 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'wp_ajax_mapping_skpd', $plugin_public, 'mapping_skpd' );
 
+		// 2FA OTP
+		$this->loader->add_action('wp_login', $plugin_public, 'handle_2fa_login', 10, 2);
+		$this->loader->add_action('wp_ajax_verify_2fa_otp', $plugin_public, 'verify_2fa_otp');
+		$this->loader->add_action('wp_ajax_nopriv_verify_2fa_otp', $plugin_public, 'verify_2fa_otp');
+		$this->loader->add_action('wp_ajax_resend_2fa_otp', $plugin_public, 'resend_2fa_otp');
+		$this->loader->add_action('wp_ajax_nopriv_resend_2fa_otp', $plugin_public, 'resend_2fa_otp');
+
 		$this->loader->add_action('wp_ajax_get_data_penjadwalan_lke', $plugin_public, 'get_data_penjadwalan_lke');
 		$this->loader->add_action('wp_ajax_submit_jadwal_lke',  $plugin_public, 'submit_jadwal_lke');
 		$this->loader->add_action('wp_ajax_submit_edit_jadwal_lke',  $plugin_public, 'submit_edit_jadwal_lke');
@@ -829,6 +836,8 @@ class Wp_Eval_Sakip {
 		add_shortcode('upload_dokumen_renstra', array($plugin_public, 'upload_dokumen_renstra'));
 		add_shortcode('upload_dokumen_rpjmd', array($plugin_public, 'upload_dokumen_rpjmd'));
 		add_shortcode('upload_dokumen_rpjpd', array($plugin_public, 'upload_dokumen_rpjpd'));
+
+		add_shortcode('esakip_2fa_input', array($plugin_public, 'esakip_2fa_input'));
 		
 		add_shortcode('renstra', array($plugin_public, 'renstra'));
 		add_shortcode('dpa', array($plugin_public, 'dpa'));

@@ -152,6 +152,10 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($basic_options_container)
 			->add_fields($this->generate_fields_options_auto_login());
 
+		Container::make('theme_options', __('Keamanan 2FA'))
+			->set_page_parent($basic_options_container)
+			->add_fields($this->generate_fields_2fa_otp());
+
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.1)
 			->set_icon('dashicons-bank')
@@ -2432,6 +2436,33 @@ class Wp_Eval_Sakip_Admin
 							</ol>
 						')
 				])
+		];
+	}
+
+	public function generate_fields_2fa_otp()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_keamanan_2fa.php') {
+			return array();
+		}
+
+		global $wp_roles;
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+		
+		$roles = $wp_roles->get_names();
+		$role_options = array();
+		foreach ( $roles as $role_value => $role_name ) {
+			$role_options[ $role_value ] = $role_name;
+		}
+
+		return [
+			Field::make('checkbox', 'crb_esakip_2fa_enabled', 'Aktifkan 2FA OTP via Email')
+				->set_help_text('Centang untuk mengaktifkan fitur 2FA OTP untuk user saat login.'),
+				
+			Field::make('multiselect', 'crb_esakip_2fa_roles', 'Role Pengguna yang Wajib 2FA')
+				->add_options($role_options)
+				->set_help_text('Pilih peran (role) mana saja yang diwajibkan menggunakan OTP saat login. Kosongkan jika tidak ada yang wajib 2FA.')
 		];
 	}
 

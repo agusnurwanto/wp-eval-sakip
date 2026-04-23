@@ -35026,4 +35026,228 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		    ];
 		}
 	}
+
+	/**
+	 * Mencegat proses wp_login untuk mengirim OTP jika fitur diaktifkan 
+	 * dan user memiliki role yang diwajibkan.
+	 */
+	public function handle_2fa_login($user_login, $user)
+	{
+		$is_2fa_enabled = get_option('_crb_esakip_2fa_enabled');
+		if ($is_2fa_enabled !== 'yes') {
+			return;
+		}
+
+		$required_roles = $this->functions->get_option_multiselect('_crb_esakip_2fa_roles');
+		if (empty($required_roles)) {
+			return;
+		}
+
+		$user_roles = $user->roles;
+		if (empty($user_roles)) {
+			return;
+		}
+
+		$intersect = array_intersect($required_roles, $user_roles);
+		if (!empty($intersect)) {
+			$otp_code = wp_rand(100000, 999999);
+			$otp_token = wp_generate_password(32, false);
+			
+			set_transient('esakip_2fa_' . $otp_token, array(
+				'user_id' => $user->ID,
+				'otp' => $otp_code
+			), 10 * 60);
+
+			$to = $user->user_email;
+			if(empty($to)){
+				// Jika tidak ada email, skip 2fa agar tidak locked out, atau biarkan locked out?
+				// Lebih baik biarkan skip.
+				return;
+			}
+			$subject = "Kode OTP Login - E-SAKIP";
+			$message = "Berikut adalah kode OTP untuk login Anda: " . $otp_code . "\n\n";
+			$message .= "Kode ini berlaku selama 10 menit.";
+			wp_mail($to, $subject, $message);
+
+			// hapus data login
+			wp_destroy_current_session();
+			wp_clear_auth_cookie();
+			wp_set_current_user( 0 );
+			
+			$halaman_verifikasi = $this->functions->generatePage(array(
+				'nama_page' 	=> 'Verifikasi 2FA OTP',
+				'content' 		=> '[esakip_2fa_input]',
+				'show_header' 	=> 1,
+				'update' 		=> 1,
+				'no_key' 		=> 1,
+				'post_status' 	=> 'publish'
+			), false, '[esakip_2fa_input]');
+			
+			if (isset($halaman_verifikasi['url'])) {
+				$redirect_url = add_query_arg('token', $otp_token, $halaman_verifikasi['url']);
+			} else {
+				$page_obj = get_page_by_path('verifikasi-2fa-otp');
+				if ($page_obj) {
+					$redirect_url = add_query_arg('token', $otp_token, get_permalink($page_obj->ID));
+				} else {
+					$redirect_url = home_url('/verifikasi-2fa-otp/?token=' . $otp_token);
+				}
+			}
+
+			wp_redirect($redirect_url);
+			exit;
+		}
+	}
+
+	public function esakip_2fa_input($atts)
+	{
+		if (!isset($_GET['token'])) {
+			return "<div class='alert alert-warning text-center mt-4'>Token tidak valid.</div>";
+		}
+		
+		$token = sanitize_text_field($_GET['token']);
+		$data = get_transient('esakip_2fa_' . $token);
+		
+		if (empty($data)) {
+			return "<div class='alert alert-danger text-center mt-4'>Sesi OTP telah berakhir atau diakses secara tidak valid. Silakan login kembali.</div>";
+		}
+
+		ob_start();
+		?>
+		<div class="row justify-content-center" style="margin-top: 50px;">
+			<div class="col-md-6 col-md-offset-3">
+				<div class="card panel panel-default shadow-sm">
+					<div class="card-header panel-heading bg-primary text-white">
+						<h3 class="card-title panel-title text-center m-0">Verifikasi 2FA OTP</h3>
+					</div>
+					<div class="card-body panel-body" style="padding: 20px;">
+						<p class="text-center">Kode OTP telah dikirimkan ke email Anda. Silakan periksa kotak masuk atau folder spam Anda.</p>
+						<form id="form-2fa-otp" class="mt-4">
+							<div class="form-group mb-3">
+								<label for="otp_code"><strong>Kode OTP (*):</strong></label>
+								<input type="text" name="otp_code" id="otp_code" class="form-control input-lg" required placeholder="Masukkan 6 digit kode" style="text-align:center; font-size: 24px; letter-spacing: 10px;" maxlength="6">
+							</div>
+							<input type="hidden" name="token" value="<?php echo esc_attr($token); ?>">
+							<input type="hidden" name="action" value="verify_2fa_otp">
+							<button type="submit" class="btn btn-primary btn-lg btn-block w-100 mt-2">Verifikasi Login</button>
+							<div id="otp-message" class="mt-3"></div>
+						</form>
+						<div class="text-center mt-4 border-top pt-3">
+							<p class="text-muted mb-1">Belum menerima kode?</p>
+							<button type="button" id="btn-resend-otp" class="btn btn-link btn-sm">Kirim Ulang Kode OTP</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+		jQuery(document).ready(function($) {
+			$('#form-2fa-otp').on('submit', function(e) {
+				e.preventDefault();
+				var btn = $(this).find('button[type="submit"]');
+				btn.prop('disabled', true).text('Memverifikasi...');
+				
+				var data = $(this).serialize();
+				$.post(esakip.url, data, function(response) {
+					if(response.success) {
+						$('#otp-message').html('<div class="alert alert-success">Verifikasi berhasil! Mengarahkan...</div>');
+						window.location.href = response.data.redirect_url;
+					} else {
+						$('#otp-message').html('<div class="alert alert-danger">' + response.data.message + '</div>');
+						btn.prop('disabled', false).text('Verifikasi Login');
+					}
+				}).fail(function() {
+					$('#otp-message').html('<div class="alert alert-danger">Terjadi kesalahan pada server.</div>');
+					btn.prop('disabled', false).text('Verifikasi Login');
+				});
+			});
+
+			$('#btn-resend-otp').on('click', function(e) {
+				e.preventDefault();
+				var btn = $(this);
+				btn.prop('disabled', true).text('Mengirim...');
+				var token = $('input[name="token"]').val();
+				$.post(esakip.url, {
+					action: 'resend_2fa_otp',
+					token: token
+				}, function(response) {
+					if(response.success) {
+						$('#otp-message').html('<div class="alert alert-success">' + response.data.message + '</div>');
+						// Cooldown 30 detik
+						var counter = 30;
+						var interval = setInterval(function() {
+							btn.text('Tunggu ' + counter + 's');
+							counter--;
+							if(counter < 0) {
+								clearInterval(interval);
+								btn.prop('disabled', false).text('Kirim Ulang Kode OTP');
+							}
+						}, 1000);
+					} else {
+						$('#otp-message').html('<div class="alert alert-danger">' + response.data.message + '</div>');
+						btn.prop('disabled', false).text('Kirim Ulang Kode OTP');
+					}
+				});
+			});
+		});
+		</script>
+		<?php
+		return ob_get_clean();
+	}
+
+	public function verify_2fa_otp()
+	{
+		$token = sanitize_text_field($_POST['token']);
+		$otp_input = sanitize_text_field($_POST['otp_code']);
+		
+		$data = get_transient('esakip_2fa_' . $token);
+		
+		if (empty($data)) {
+			wp_send_json_error(array('message' => 'Sesi OTP telah berakhir. Silakan login kembali.'));
+		}
+
+		if ($otp_input !== (string)$data['otp']) {
+			wp_send_json_error(array('message' => 'Kode OTP salah.'));
+		}
+
+		delete_transient('esakip_2fa_' . $token);
+		
+		$user_id = $data['user_id'];
+		wp_clear_auth_cookie();
+		wp_set_current_user($user_id);
+		wp_set_auth_cookie($user_id);
+		
+		wp_send_json_success(array(
+			'message' => 'Berhasil login!',
+			'redirect_url' => admin_url()
+		));
+	}
+
+	public function resend_2fa_otp()
+	{
+		$token = sanitize_text_field($_POST['token']);
+		$data = get_transient('esakip_2fa_' . $token);
+		
+		if (empty($data)) {
+			wp_send_json_error(array('message' => 'Sesi OTP telah berakhir. Silakan login kembali.'));
+		}
+
+		$new_otp_code = wp_rand(100000, 999999);
+		$user_id = $data['user_id'];
+		$user = get_user_by('id', $user_id);
+
+		set_transient('esakip_2fa_' . $token, array(
+			'user_id' => $user_id,
+			'otp' => $new_otp_code
+		), 10 * 60);
+
+		$to = $user->user_email;
+		$subject = "Kode OTP Baru Login - E-SAKIP";
+		$message = "Berikut adalah kode OTP peringatan Anda: " . $new_otp_code . "\n\n";
+		$message .= "Kode ini berlaku selama 10 menit.";
+		wp_mail($to, $subject, $message);
+
+		wp_send_json_success(array('message' => 'Kode OTP baru telah dikirim ke email Anda.'));
+	}
 }
