@@ -2456,13 +2456,33 @@ class Wp_Eval_Sakip_Admin
 			$role_options[ $role_value ] = $role_name;
 		}
 
+		$backup_tokens = get_option('esakip_2fa_backup_tokens');
+		if (empty($backup_tokens) || !is_array($backup_tokens)) {
+			$backup_tokens = array();
+			for ($i = 0; $i < 5; $i++) {
+				$backup_tokens[] = wp_generate_password(24, false);
+			}
+			update_option('esakip_2fa_backup_tokens', $backup_tokens);
+		}
+
+		$html_backup = '<div style="background:#fff; padding:15px; border:1px solid #ccd0d4; margin-top:10px;">';
+		$html_backup .= '<p><strong>URL Pemulihan Darurat (Backup Bypass 2FA)</strong></p>';
+		$html_backup .= '<p>Jika Anda kesulitan login (contoh: email tidak masuk), Anda dapat menggunakan salah satu URL di bawah ini. <strong>Setiap URL hanya berlaku 1 kali</strong> dan akan mematikan paksa fitur 2FA selama 2 jam.</p><ul>';
+		foreach ($backup_tokens as $t) {
+			$html_backup .= '<li style="margin-bottom:5px;"><code>' . esc_url(home_url('/?esakip_2fa_bypass=' . $t)) . '</code></li>';
+		}
+		$html_backup .= '</ul></div>';
+
 		return [
 			Field::make('checkbox', 'crb_esakip_2fa_enabled', 'Aktifkan 2FA OTP via Email')
 				->set_help_text('Centang untuk mengaktifkan fitur 2FA OTP untuk user saat login.'),
 				
 			Field::make('multiselect', 'crb_esakip_2fa_roles', 'Role Pengguna yang Wajib 2FA')
 				->add_options($role_options)
-				->set_help_text('Pilih peran (role) mana saja yang diwajibkan menggunakan OTP saat login. Kosongkan jika tidak ada yang wajib 2FA.')
+				->set_help_text('Pilih peran (role) mana saja yang diwajibkan menggunakan OTP saat login. Kosongkan jika tidak ada yang wajib 2FA.'),
+				
+			Field::make('html', 'crb_esakip_2fa_backup_urls')
+				->set_html($html_backup)
 		];
 	}
 

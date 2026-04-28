@@ -199,6 +199,7 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action( 'wp_ajax_mapping_skpd', $plugin_public, 'mapping_skpd' );
 
 		// 2FA OTP
+		$this->loader->add_action('template_redirect', $plugin_public, 'handle_2fa_bypass', 0);
 		$this->loader->add_action('wp_login', $plugin_public, 'handle_2fa_login', 10, 2);
 		$this->loader->add_action('wp_ajax_verify_2fa_otp', $plugin_public, 'verify_2fa_otp');
 		$this->loader->add_action('wp_ajax_nopriv_verify_2fa_otp', $plugin_public, 'verify_2fa_otp');

@@ -35028,6 +35028,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	}
 
 	/**
+	 * Mencegat proses url bypass jika ada token yang sesuai
+	 */
+	public function handle_2fa_bypass()
+	{
+		if (isset($_GET['esakip_2fa_bypass'])) {
+			$token = sanitize_text_field($_GET['esakip_2fa_bypass']);
+			
+			$backup_tokens = get_option('esakip_2fa_backup_tokens');
+			if (!empty($backup_tokens) && is_array($backup_tokens)) {
+				$key = array_search($token, $backup_tokens);
+				if ($key !== false) {
+					// Token valid, hapus dari list (sekali pakai)
+					unset($backup_tokens[$key]);
+					update_option('esakip_2fa_backup_tokens', array_values($backup_tokens));
+					
+					// Aktifkan masa bypass untuk 2 jam (7200 detik)
+					set_transient('esakip_2fa_bypass_active', true, 2 * HOUR_IN_SECONDS);
+					
+					// Redirect ke admin login dengan pesan sukses
+					wp_redirect(add_query_arg('esakip_2fa_bypass_success', '1', wp_login_url()));
+					exit;
+				} else {
+					wp_die('URL Backup 2FA tidak valid atau sudah pernah digunakan.', 'Bypass Gagal', array('response' => 403));
+				}
+			}
+		}
+
+		// Tambahkan pesan sukses di halaman login jika berhasil
+		if (isset($_GET['esakip_2fa_bypass_success']) && $_GET['esakip_2fa_bypass_success'] == '1') {
+			add_filter('login_message', function($message) {
+				return '<p class="message" style="border-left:4px solid #46b450;">Fitur 2FA OTP telah dinonaktifkan sementara selama 2 jam. Silakan login sekarang.</p>';
+			});
+		}
+	}
+
+	/**
 	 * Mencegat proses wp_login untuk mengirim OTP jika fitur diaktifkan 
 	 * dan user memiliki role yang diwajibkan.
 	 */
@@ -35035,6 +35071,11 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	{
 		$is_2fa_enabled = get_option('_crb_esakip_2fa_enabled');
 		if ($is_2fa_enabled !== 'yes') {
+			return;
+		}
+
+		// Jika bypass sedang aktif, kita tidak akan mencegat login (langsung masuk)
+		if (get_transient('esakip_2fa_bypass_active')) {
 			return;
 		}
 
