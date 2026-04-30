@@ -35097,7 +35097,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			set_transient('esakip_2fa_' . $otp_token, array(
 				'user_id' => $user->ID,
 				'otp' => $otp_code
-			), 10 * 60);
+			), 2 * 60);
 
 			$to = $user->user_email;
 			if(empty($to)){
@@ -35107,7 +35107,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 			$subject = "Kode OTP Login - E-SAKIP";
 			$message = "Berikut adalah kode OTP untuk login Anda: " . $otp_code . "\n\n";
-			$message .= "Kode ini berlaku selama 10 menit.";
+			$message .= "Kode ini berlaku selama 2 menit.";
 			wp_mail($to, $subject, $message);
 
 			// hapus data login
@@ -35281,12 +35281,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		set_transient('esakip_2fa_' . $token, array(
 			'user_id' => $user_id,
 			'otp' => $new_otp_code
-		), 10 * 60);
+		), 2 * 60);
 
 		$to = $user->user_email;
 		$subject = "Kode OTP Baru Login - E-SAKIP";
 		$message = "Berikut adalah kode OTP peringatan Anda: " . $new_otp_code . "\n\n";
-		$message .= "Kode ini berlaku selama 10 menit.";
+		$message .= "Kode ini berlaku selama 2 menit.";
 		wp_mail($to, $subject, $message);
 
 		wp_send_json_success(array('message' => 'Kode OTP baru telah dikirim ke email Anda.'));
