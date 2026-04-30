@@ -1833,6 +1833,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							$v != 'esakip_renstra'
 							&& $v != 'esakip_rpjmd'
 							&& $v != 'esakip_rpjpd'
+							&& $v != 'esakip_iku'
 							&& $v != 'esakip_pohon_kinerja_dan_cascading'
 						) {
 							$sql .= $wpdb->prepare(' AND tahun_anggaran=%d', $tahun_bd);
@@ -1848,6 +1849,40 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							foreach ($all_dokumen[$v] as $key => $dok) {
 								$all_dokumen[$v][$key]['dokumen'] = 'dokumen_pemda/' . $dok['dokumen'];
 							}
+						}
+
+						if ($v == 'esakip_iku') {
+							$jadwal_periode = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT 
+										id,
+										nama_jadwal,
+										tahun_anggaran,
+										lama_pelaksanaan,
+										nama_jadwal_renstra
+									FROM esakip_data_jadwal
+									WHERE tipe = %s
+									  	AND status = 1
+									ORDER BY id ASC
+								", 'RPJMD'),
+								ARRAY_A
+							);
+							foreach ($jadwal_periode as $jadwal_periode_item) {
+								$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+								if ($v == 'esakip_iku') {
+									$detail_iku = $this->functions->generatePage(array(
+										'nama_page' 	=> 'Dokumen IKU per SKPD | ' . $jadwal_periode_item['id'] . '-' . $jadwal_periode_item['nama_jadwal_renstra'],
+										'content' 		=> '[dokumen_detail_iku id_jadwal=' . $jadwal_periode_item['id'] . ']',
+										'show_header' 	=> 1,
+										'post_status' 	=> 'private'
+									));
+									
+									$detail_iku['url'] .= '&id_skpd=' . $_POST['id_skpd'];
+									$title_iku = 'Dokumen IKU | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+									$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $detail_iku['url'] . '">' . $title_iku . '</a>';
+								}
+							}
+							continue;
 						}
 
 						if ($v == 'esakip_renstra') {
@@ -1933,13 +1968,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							$dokumen = $this->functions->generatePage(array(
 								'nama_page' => 'Rencana Aksi ' . $tahun_bd,
 								'content' => '[dokumen_detail_rencana_aksi tahun=' . $tahun_bd . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-						} else if ($v == 'esakip_iku') {
-							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'IKU ' . $tahun_bd,
-								'content' => '[dokumen_detail_iku tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
