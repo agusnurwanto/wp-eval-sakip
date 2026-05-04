@@ -284,6 +284,19 @@ $tahun_anggaran_select = $wpdb->get_col(
 </div>
 <?php endif; ?>
 <script>
+    var selectedBuktiDukung = {};
+
+    function syncCheckboxState() {
+        jQuery('#tableBuktiDukung tbody .list-dokumen').each(function() {
+            var val = jQuery(this).val();
+            if (jQuery(this).is(':checked')) {
+                selectedBuktiDukung[val] = true;
+            } else {
+                delete selectedBuktiDukung[val];
+            }
+        });
+    }
+
     jQuery(document).ready(function() {
         get_table_pengisian_sakip();
     <?php if(empty($excel)): ?>
@@ -479,16 +492,16 @@ $tahun_anggaran_select = $wpdb->get_col(
                 console.log(response);
                 jQuery('#wrap-loading').hide();
                 if (response.status == 'success') {
+                    selectedBuktiDukung = {};
+                    response.data_existing.map(function(b, i) {
+                        selectedBuktiDukung[b] = true;
+                    });
                     var html = '';
                     var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>';
-                    var bukti_dukung_existing = {};
-                    response.data_existing.map(function(b, i) {
-                        bukti_dukung_existing[b] = b;
-                    });
                     for (var i in response.data) {
                         response.data[i].map(function(data, ii) {
                             var checked = '';
-                            if (bukti_dukung_existing[data.dokumen]) {
+                            if (selectedBuktiDukung[data.dokumen]) {
                                 checked = 'checked';
                             }
                             html += '' +
@@ -521,6 +534,7 @@ $tahun_anggaran_select = $wpdb->get_col(
         var id = jQuery('#id_komponen').val();
         var tahunBd = jQuery('#tahunAnggaranBuktiDukung').val();
         if (!idSkpd || !id) return;
+        syncCheckboxState();
         jQuery('#wrap-loading').show();
         jQuery.ajax({
             url: esakip.url,
@@ -539,14 +553,10 @@ $tahun_anggaran_select = $wpdb->get_col(
                 if (response.status == 'success') {
                     var html = '';
                     var url = '<?php echo ESAKIP_PLUGIN_URL . 'public/media/dokumen/'; ?>';
-                    var bukti_dukung_existing = {};
-                    response.data_existing.map(function(b, i) {
-                        bukti_dukung_existing[b] = b;
-                    });
                     for (var i in response.data) {
                         response.data[i].map(function(data, ii) {
                             var checked = '';
-                            if (bukti_dukung_existing[data.dokumen]) {
+                            if (selectedBuktiDukung[data.dokumen]) {
                                 checked = 'checked';
                             }
                             html += '' +
@@ -580,13 +590,9 @@ $tahun_anggaran_select = $wpdb->get_col(
     function submit_bukti_dukung() {
         var id_komponen = jQuery('#id_komponen').val();
         var idSkpd = jQuery('#idSkpd_komponen').val();
-        var bukti_dukung = [];
 
-        jQuery('#tableBuktiDukung tbody .list-dokumen').map(function(i, b) {
-            if (jQuery(b).is(':checked')) {
-                bukti_dukung.push(jQuery(b).val());
-            }
-        });
+        syncCheckboxState();
+        var bukti_dukung = Object.keys(selectedBuktiDukung);
 
         jQuery('#wrap-loading').show();
 
