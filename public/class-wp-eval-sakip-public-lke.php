@@ -1815,6 +1815,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						$jenis_bukti_dukung = array();
 					}
 					$ret['upload_bukti_dukung'] = '';
+					$tahun_bd = $_POST['tahun_anggaran'];
+					if (!empty($_POST['tahun_anggaran_bukti_dukung'])) {
+						$tahun_bd = $_POST['tahun_anggaran_bukti_dukung'];
+					}
 					foreach ($jenis_bukti_dukung as $v) {
 						$sql = $wpdb->prepare("
 							SELECT
@@ -1829,9 +1833,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							$v != 'esakip_renstra'
 							&& $v != 'esakip_rpjmd'
 							&& $v != 'esakip_rpjpd'
+							&& $v != 'esakip_iku'
 							&& $v != 'esakip_pohon_kinerja_dan_cascading'
 						) {
-							$sql .= $wpdb->prepare(' AND tahun_anggaran=%d', $_POST['tahun_anggaran']);
+							$sql .= $wpdb->prepare(' AND tahun_anggaran=%d', $tahun_bd);
 						}
 						$all_dokumen[$v] = $wpdb->get_results($sql, ARRAY_A);
 						if (
@@ -1844,6 +1849,40 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 							foreach ($all_dokumen[$v] as $key => $dok) {
 								$all_dokumen[$v][$key]['dokumen'] = 'dokumen_pemda/' . $dok['dokumen'];
 							}
+						}
+
+						if ($v == 'esakip_iku') {
+							$jadwal_periode = $wpdb->get_results(
+								$wpdb->prepare("
+									SELECT 
+										id,
+										nama_jadwal,
+										tahun_anggaran,
+										lama_pelaksanaan,
+										nama_jadwal_renstra
+									FROM esakip_data_jadwal
+									WHERE tipe = %s
+									  	AND status = 1
+									ORDER BY id ASC
+								", 'RPJMD'),
+								ARRAY_A
+							);
+							foreach ($jadwal_periode as $jadwal_periode_item) {
+								$tahun_anggaran_selesai = $jadwal_periode_item['tahun_anggaran'] + $jadwal_periode_item['lama_pelaksanaan'];
+								if ($v == 'esakip_iku') {
+									$detail_iku = $this->functions->generatePage(array(
+										'nama_page' 	=> 'Dokumen IKU per SKPD | ' . $jadwal_periode_item['id'] . '-' . $jadwal_periode_item['nama_jadwal_renstra'],
+										'content' 		=> '[dokumen_detail_iku id_jadwal=' . $jadwal_periode_item['id'] . ']',
+										'show_header' 	=> 1,
+										'post_status' 	=> 'private'
+									));
+									
+									$detail_iku['url'] .= '&id_skpd=' . $_POST['id_skpd'];
+									$title_iku = 'Dokumen IKU | ' . $jadwal_periode_item['nama_jadwal_renstra'] . ' ' . 'Periode ' . $jadwal_periode_item['tahun_anggaran'] . ' - ' . $tahun_anggaran_selesai;
+									$ret['upload_bukti_dukung'] .= '<a style="margin-left: 5px;" class="btn btn-warning" target="_blank" href="' . $detail_iku['url'] . '">' . $title_iku . '</a>';
+								}
+							}
+							continue;
 						}
 
 						if ($v == 'esakip_renstra') {
@@ -1913,92 +1952,85 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 						if ($v == 'esakip_renja_rkt') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'RENJA / RKT-' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_renja_rkt tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'RENJA / RKT-' . $tahun_bd,
+								'content' => '[dokumen_detail_renja_rkt tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_skp') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'SKP ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_skp tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'SKP ' . $tahun_bd,
+								'content' => '[dokumen_detail_skp tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_rencana_aksi') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'Rencana Aksi ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_rencana_aksi tahun=' . $_POST['tahun_anggaran'] . ']',
-								'show_header' => 1,
-								'post_status' => 'private'
-							));
-						} else if ($v == 'esakip_iku') {
-							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'IKU ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_iku tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'Rencana Aksi ' . $tahun_bd,
+								'content' => '[dokumen_detail_rencana_aksi tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_pengukuran_kinerja') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'Pengukuran Kinerja ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'Pengukuran Kinerja ' . $tahun_bd,
+								'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_laporan_kinerja') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'Laporan Kinerja ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_laporan_kinerja tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'Laporan Kinerja ' . $tahun_bd,
+								'content' => '[dokumen_detail_laporan_kinerja tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_dpa') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'DPA ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_dpa tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'DPA ' . $tahun_bd,
+								'content' => '[dokumen_detail_dpa tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_evaluasi_internal') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'Evaluasi Internal ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_evaluasi_internal tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'Evaluasi Internal ' . $tahun_bd,
+								'content' => '[dokumen_detail_evaluasi_internal tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_dokumen_lainnya') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'Lainnya ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'Lainnya ' . $tahun_bd,
+								'content' => '[dokumen_detail_dokumen_lainnya tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_perjanjian_kinerja') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'Perjanjian Kinerja ' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'Perjanjian Kinerja ' . $tahun_bd,
+								'content' => '[dokumen_detail_perjanjian_kinerja tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_lhe_akip_internal') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'LHE AKIP Internal' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_lhe_akip_internal tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'LHE AKIP Internal' . $tahun_bd,
+								'content' => '[dokumen_detail_lhe_akip_internal tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_tl_lhe_akip_internal') {
 							$dokumen = $this->functions->generatePage(array(
-								'nama_page' => 'TL LHE AKIP Internal' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_tl_lhe_akip_internal tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'TL LHE AKIP Internal' . $tahun_bd,
+								'content' => '[dokumen_detail_tl_lhe_akip_internal tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));
 						} else if ($v == 'esakip_laporan_monev_renaksi') {
 							$laporan_monev_renaksi_skpd = $this->functions->generatePage(array(
-								'nama_page' => 'Laporan Monev Renaksi' . $_POST['tahun_anggaran'],
-								'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $_POST['tahun_anggaran'] . ']',
+								'nama_page' => 'Laporan Monev Renaksi' . $tahun_bd,
+								'content' => '[dokumen_detail_laporan_monev_renaksi tahun=' . $tahun_bd . ']',
 								'show_header' => 1,
 								'post_status' => 'private'
 							));

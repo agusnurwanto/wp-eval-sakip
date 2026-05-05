@@ -20566,6 +20566,56 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			return;
 		}
 
+		// Visibilitas Menu Utama
+		$mv_admin = array(
+			'perencanaan' => get_option('_crb_menu_vis_admin_perencanaan'),
+			'pengukuran_kinerja' => get_option('_crb_menu_vis_admin_pengukuran_kinerja'),
+			'pelaporan' => get_option('_crb_menu_vis_admin_pelaporan'),
+			'evaluasi' => get_option('_crb_menu_vis_admin_evaluasi'),
+			'setting_jadwal' => get_option('_crb_menu_vis_admin_setting_jadwal'),
+			'perencanaan_pemda' => get_option('_crb_menu_vis_admin_perencanaan_pemda'),
+			'perencanaan_opd' => get_option('_crb_menu_vis_admin_perencanaan_opd'),
+			'pemda_rpjpd' => get_option('_crb_menu_vis_admin_pemda_rpjpd'),
+			'pemda_pohon_kinerja' => get_option('_crb_menu_vis_admin_pemda_pohon_kinerja'),
+			'pemda_rpjmd' => get_option('_crb_menu_vis_admin_pemda_rpjmd'),
+			'pemda_cascading' => get_option('_crb_menu_vis_admin_pemda_cascading'),
+			'pemda_iku' => get_option('_crb_menu_vis_admin_pemda_iku'),
+			'pemda_rencana_aksi' => get_option('_crb_menu_vis_admin_pemda_rencana_aksi'),
+			'pemda_pk' => get_option('_crb_menu_vis_admin_pemda_pk'),
+			'pemda_unggah_dokumen' => get_option('_crb_menu_vis_admin_pemda_unggah_dokumen'),
+			'opd_pohon_kinerja' => get_option('_crb_menu_vis_admin_opd_pohon_kinerja'),
+			'opd_cascading' => get_option('_crb_menu_vis_admin_opd_cascading'),
+			'opd_iku' => get_option('_crb_menu_vis_admin_opd_iku'),
+			'opd_rencana_aksi' => get_option('_crb_menu_vis_admin_opd_rencana_aksi'),
+			'opd_pk' => get_option('_crb_menu_vis_admin_opd_pk'),
+			'opd_unggah_dokumen' => get_option('_crb_menu_vis_admin_opd_unggah_dokumen'),
+			'pengukuran_pemda' => get_option('_crb_menu_vis_admin_pengukuran_pemda'),
+			'pengukuran_opd' => get_option('_crb_menu_vis_admin_pengukuran_opd'),
+			'pelaporan_pemda' => get_option('_crb_menu_vis_admin_pelaporan_pemda'),
+			'pelaporan_opd' => get_option('_crb_menu_vis_admin_pelaporan_opd'),
+			'evaluasi_pemda' => get_option('_crb_menu_vis_admin_evaluasi_pemda'),
+			'evaluasi_opd' => get_option('_crb_menu_vis_admin_evaluasi_opd'),
+			'evaluasi_kelembagaan' => get_option('_crb_menu_vis_admin_evaluasi_kelembagaan'),
+			'evaluasi_lke' => get_option('_crb_menu_vis_admin_evaluasi_lke'),
+		);
+		$mv_skpd = array(
+			'perencanaan' => get_option('_crb_menu_vis_skpd_perencanaan'),
+			'pengukuran_kinerja' => get_option('_crb_menu_vis_skpd_pengukuran_kinerja'),
+			'pelaporan' => get_option('_crb_menu_vis_skpd_pelaporan'),
+			'evaluasi' => get_option('_crb_menu_vis_skpd_evaluasi'),
+			'pohon_kinerja' => get_option('_crb_menu_vis_skpd_pohon_kinerja'),
+			'cascading' => get_option('_crb_menu_vis_skpd_cascading'),
+			'iku' => get_option('_crb_menu_vis_skpd_iku'),
+			'rhk' => get_option('_crb_menu_vis_skpd_rhk'),
+			'pk' => get_option('_crb_menu_vis_skpd_pk'),
+			'unggah_perencanaan' => get_option('_crb_menu_vis_skpd_unggah_perencanaan'),
+			'rencana_aksi' => get_option('_crb_menu_vis_skpd_rencana_aksi'),
+			'unggah_pelaporan' => get_option('_crb_menu_vis_skpd_unggah_pelaporan'),
+			'lke' => get_option('_crb_menu_vis_skpd_lke'),
+			'kelembagaan' => get_option('_crb_menu_vis_skpd_kelembagaan'),
+			'unggah_evaluasi' => get_option('_crb_menu_vis_skpd_unggah_evaluasi'),
+		);
+
 		$cek_menu_aktif = $wpdb->get_results($wpdb->prepare("
 			SELECT 
 				*
@@ -21696,7 +21746,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$halaman_sakip_opd .= stripslashes(htmlspecialchars_decode($set_html_opd));
 		}
 
-		$halaman_input_rpjpd_rpjmd = '
+		$halaman_input_rpjpd_rpjmd = '';
+		if ($mv_admin['pemda_rpjpd']) {
+			if ($mv_admin['pemda_rpjmd']) {
+			if ($mv_admin['pemda_cascading']) {
+			if ($mv_admin['pemda_iku']) {
+			if ($mv_admin['pemda_rencana_aksi']) {
+			if ($mv_admin['pemda_pk']) {
+			$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="halaman-input-rpjpd" style="margin: 0;">Buat RPJPD (Rencana Pembangunan Jangka Panjang Daerah)</h5>
@@ -21707,7 +21764,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>
 			</li>';
-		if (!empty($cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
+		}
+		if ($mv_admin['pemda_pohon_kinerja'] && !empty($cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['pemerintah_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
 			$halaman_input_rpjpd_rpjmd .= '
 				<li>
 					<div class="accordion">
@@ -21731,6 +21789,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</div>
 			</li>';
+		}
 
 		$halaman_input_rpjpd_rpjmd .= '
 			<li>
@@ -21742,7 +21801,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>
-			</li>
+			</li>';
+		}
+
+		$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="halaman-input-iku-pemda" style="margin: 0;">Buat IKU (Indikator Kinerja Utama)</h5>
@@ -21752,7 +21814,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>
-			</li>
+			</li>';
+		}
+
+		$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="pengisian-rencana-pemda" style="margin: 0;">Buat Rencana Aksi</h5>
@@ -21762,7 +21827,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>
-			</li>
+			</li>';
+		}
+
+		$halaman_input_rpjpd_rpjmd .= '
 			<li>
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="laporan-pk-pemda" style="margin: 0;">Buat PK (Perjanjian Kinerja)</h5>
@@ -21772,10 +21840,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>
-			</li>
-			';
+			</li>';
+		}
 
-		if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
+		if ($mv_admin['opd_pohon_kinerja'] && !empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
 			$halaman_input_perangkat_daerah .= '
 				<li>
 					<div class="accordion">
@@ -21788,7 +21856,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					</div>
 				</li>';
 		}
-		$halaman_pengisian_rencana_aksi = '
+		$halaman_pengisian_rencana_aksi = '';
+		if ($mv_admin['opd_cascading']) {
+			if ($mv_admin['opd_iku']) {
+			$halaman_pengisian_rencana_aksi .= '
 			<li>
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="halaman-input-cascading-opd" style="margin: 0;">Buat Cascading</h5>
@@ -21798,7 +21869,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>
-			</li>
+			</li>';
+		}
+
+		$halaman_pengisian_rencana_aksi .= '
 			<li>
 				<div class="accordion">
 					<h5 class="esakip-header-tahun" data-id="halaman-input-iku-wpsipd" style="margin: 0;">Buat IKU (Indikator Kinerja Utama)</h5>
@@ -21808,8 +21882,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						</ul>
 					</div>
 				</div>
-			</li>
-			';
+			</li>';
+		}
 		$halaman_sakip_opd .= '
 							</ul>
 					</div>
@@ -21858,9 +21932,15 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
 							$halaman_perencanaan_opd .= $halaman_input_perangkat_daerah;
 							$halaman_perencanaan_opd .= $halaman_pengisian_rencana_aksi;
-							$halaman_perencanaan_opd .= $pengisian_rencana_aksi;
-							$halaman_perencanaan_opd .= $laporan_pk_btn;
-							$halaman_perencanaan_opd .= $dokumen_perencanaan_opd;
+							if ($mv_admin['opd_rencana_aksi']) {
+								$halaman_perencanaan_opd .= $pengisian_rencana_aksi;
+							}
+							if ($mv_admin['opd_pk']) {
+								$halaman_perencanaan_opd .= $laporan_pk_btn;
+							}
+							if ($mv_admin['opd_unggah_dokumen']) {
+								$halaman_perencanaan_opd .= $dokumen_perencanaan_opd;
+							}
 
 							$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
 							if (!empty($set_html_opd_perencanaan)) {
@@ -21895,7 +21975,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<div class="esakip-body-tahun" data-id="halaman-perencanaan-pemda">
 						<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
 							$halaman_perencanaan_pemda .= $halaman_input_rpjpd_rpjmd;
-							$halaman_perencanaan_pemda .= $dokumen_perencanaan_pemda;
+							if ($mv_admin['pemda_unggah_dokumen']) {
+								$halaman_perencanaan_pemda .= $dokumen_perencanaan_pemda;
+							}
 
 							$set_html_pemda_perencanaan = get_option('sakip_menu_khusus_set_html_pemda_PERENCANAAN_' . $_GET['tahun']);
 							if (!empty($set_html_pemda_perencanaan)) {
@@ -21916,8 +21998,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// 	|| in_array("admin_bappeda", $user_meta->roles)
 							// 	|| in_array("administrator", $user_meta->roles)
 							// ) {
-								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_pemda;
-								$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_opd;
+								if ($mv_admin['perencanaan_pemda']) {
+									$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_pemda;
+								}
+								if ($mv_admin['perencanaan_opd']) {
+									$halaman_sakip_perencanaan_pemda .= $halaman_perencanaan_opd;
+								}
 							// }
 			$halaman_sakip_perencanaan_pemda .= '
 						</ul>
@@ -21998,8 +22084,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// 	|| in_array("admin_bappeda", $user_meta->roles)
 							// 	|| in_array("administrator", $user_meta->roles)
 							// ) {
-								$halaman_sakip_pengukuran_kinerja_pemda .= $halaman_pengukuran_kinerja_pemda;
-								$halaman_sakip_pengukuran_kinerja_pemda .= $halaman_pengukuran_kinerja_opd;
+								if ($mv_admin['pengukuran_pemda']) {
+									$halaman_sakip_pengukuran_kinerja_pemda .= $halaman_pengukuran_kinerja_pemda;
+								}
+								if ($mv_admin['pengukuran_opd']) {
+									$halaman_sakip_pengukuran_kinerja_pemda .= $halaman_pengukuran_kinerja_opd;
+								}
 							// }
 			$halaman_sakip_pengukuran_kinerja_pemda .= '
 						</ul>
@@ -22081,8 +22171,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// 	|| in_array("admin_bappeda", $user_meta->roles)
 							// 	|| in_array("administrator", $user_meta->roles)
 							// ) {
-								$halaman_sakip_pelaporan_pemda .= $halaman_pelaporan_pemda;
-								$halaman_sakip_pelaporan_pemda .= $halaman_pelaporan_opd;
+								if ($mv_admin['pelaporan_pemda']) {
+									$halaman_sakip_pelaporan_pemda .= $halaman_pelaporan_pemda;
+								}
+								if ($mv_admin['pelaporan_opd']) {
+									$halaman_sakip_pelaporan_pemda .= $halaman_pelaporan_opd;
+								}
 							// }
 			$halaman_sakip_pelaporan_pemda .= '
 						</ul>
@@ -22189,11 +22283,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							// 	|| in_array("admin_bappeda", $user_meta->roles)
 							// 	|| in_array("administrator", $user_meta->roles)
 							// ) {
-								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_pemda;
-								$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_opd;
-								$halaman_sakip_evaluasi_pemda .= $halaman_sakip_kelembagaan_skpd;
+								if ($mv_admin['evaluasi_pemda']) {
+									$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_pemda;
+								}
+								if ($mv_admin['evaluasi_opd']) {
+									$halaman_sakip_evaluasi_pemda .= $halaman_evaluasi_opd;
+								}
+								if ($mv_admin['evaluasi_kelembagaan']) {
+									$halaman_sakip_evaluasi_pemda .= $halaman_sakip_kelembagaan_skpd;
+								}
 							// }
-							$halaman_sakip_evaluasi_pemda .= $halaman_lke;
+							if ($mv_admin['evaluasi_lke']) {
+								$halaman_sakip_evaluasi_pemda .= $halaman_lke;
+							}
 			$halaman_sakip_evaluasi_pemda .= '
 						</ul>
 					</div>
@@ -22208,14 +22310,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					<div class="card-body">
 						<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_upload_dokumen . '</div>
 						<div class="text-center" style="margin: 0 0 10px 0;">' . $halaman_monitor_rhk . '</div>
-        					<ul class="daftar-menu-sakip">
-								<li>' . $halaman_sakip_perencanaan_pemda . '</li>
-								<li>' . $halaman_sakip_pengukuran_kinerja_pemda . '</li>
-								<li>' . $halaman_sakip_pelaporan_pemda . '</li>
-								<li>' . $halaman_sakip_evaluasi_pemda . '</li>
-								<li>' . $halaman_menu_jadwal_admin . '</li>';
-			echo '</ul>';
-			echo '</div></div>';
+        					<ul class="daftar-menu-sakip">';
+				if ($mv_admin['perencanaan']) { echo '<li>' . $halaman_sakip_perencanaan_pemda . '</li>'; }
+				if ($mv_admin['pengukuran_kinerja']) { echo '<li>' . $halaman_sakip_pengukuran_kinerja_pemda . '</li>'; }
+				if ($mv_admin['pelaporan']) { echo '<li>' . $halaman_sakip_pelaporan_pemda . '</li>'; }
+				if ($mv_admin['evaluasi']) { echo '<li>' . $halaman_sakip_evaluasi_pemda . '</li>'; }
+				if ($mv_admin['setting_jadwal']) { echo '<li>' . $halaman_menu_jadwal_admin . '</li>'; }
+				echo '</ul>';
+				echo '</div></div>';
 
 		} else if (
 			in_array("PA", $user_meta->roles)
@@ -22874,7 +22976,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								</div>
 							</div>';
 
-					if (!empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
+					if ($mv_skpd['pohon_kinerja'] && !empty($cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']) && $cek_data['perangkat_daerah']['Penyusunan Pohon Kinerja']['active'] == 1) {
 						$halaman_sakip_pokin_opd = '
 								<div class="accordion">
 									<h5 class="esakip-header-tahun" data-id="halaman-input-pokin-opd-' . $skpd_db['id_skpd'] . '" style="margin: 0;">Buat Pohon Kinerja & Croscutting</h5>
@@ -22907,6 +23009,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							</ul>
 						</div>
 					</div>';
+
 					$dokumen_perencanaan = '
 						<li>
 							<div class="accordion">
@@ -22929,12 +23032,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 							<h5 class="esakip-header-tahun" data-id="halaman-sakip-perencanaan-skpd-' . $skpd_db['id_skpd'] . '" style="margin: 0;">PERENCANAAN</h5>
 							<div class="esakip-body-tahun" data-id="halaman-sakip-perencanaan-skpd-' . $skpd_db['id_skpd'] . '">
 								<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-								$halaman_sakip_perencanaan_skpd .= $halaman_sakip_pokin_opd;
-								$halaman_sakip_perencanaan_skpd .= $halaman_sakip_cascading_opd;
-								$halaman_sakip_perencanaan_skpd .= $halaman_input_iku;
-								$halaman_sakip_perencanaan_skpd .= $pengisian_rencana_aksi_per_skpd_page;
-								$halaman_sakip_perencanaan_skpd .= $laporan_pk_btn;
-								$halaman_sakip_perencanaan_skpd .= $dokumen_perencanaan;
+								if ($mv_skpd['pohon_kinerja']) {
+									$halaman_sakip_perencanaan_skpd .= $halaman_sakip_pokin_opd;
+								}
+								if ($mv_skpd['cascading']) { $halaman_sakip_perencanaan_skpd .= $halaman_sakip_cascading_opd; }
+								if ($mv_skpd['iku']) { $halaman_sakip_perencanaan_skpd .= $halaman_input_iku; }
+								if ($mv_skpd['rhk']) { $halaman_sakip_perencanaan_skpd .= $pengisian_rencana_aksi_per_skpd_page; }
+								if ($mv_skpd['pk']) { $halaman_sakip_perencanaan_skpd .= $laporan_pk_btn; }
+								if ($mv_skpd['unggah_perencanaan']) { $halaman_sakip_perencanaan_skpd .= $dokumen_perencanaan; }
 								$set_html_opd_perencanaan = get_option('sakip_menu_khusus_set_html_opd_PERENCANAAN_' . $_GET['tahun']);
 								if (!empty($set_html_opd_perencanaan)) {
 								  $halaman_sakip_perencanaan_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_perencanaan)));
@@ -22955,7 +23060,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 								if (!empty($set_html_opd_pengukuran_kinerja)) {
 								  $halaman_pengukuran_kinerja_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_pengukuran_kinerja)));
 								}
-								$halaman_pengukuran_kinerja_skpd .= $laporan_pk_renaksi_btn;
+								if ($mv_skpd['rencana_aksi']) {
+										$halaman_pengukuran_kinerja_skpd .= $laporan_pk_renaksi_btn;
+									}
 					$halaman_pengukuran_kinerja_skpd .= '
 								</ul>
 							</div>
@@ -22983,7 +23090,9 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<h5 class="esakip-header-tahun" data-id="halaman-sakip-pelaporan-skpd-' . $skpd_db['id_skpd'] . '" style="margin: 0;">PELAPORAN</h5>
 						<div class="esakip-body-tahun" data-id="halaman-sakip-pelaporan-skpd-' . $skpd_db['id_skpd'] . '">
 							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							$halaman_pelaporan_skpd .= $dokumen_pelaporan;
+							if ($mv_skpd['unggah_pelaporan']) {
+									$halaman_pelaporan_skpd .= $dokumen_pelaporan;
+								}
 							$set_html_opd_pelaporan = get_option('sakip_menu_khusus_set_html_opd_PELAPORAN_' . $_GET['tahun']);
 							if (!empty($set_html_opd_pelaporan)) {
 							  $halaman_pelaporan_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_pelaporan)));
@@ -23014,14 +23123,22 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<h5 class="esakip-header-tahun" data-id="halaman-sakip-evaluasi-skpd-' . $skpd_db['id_skpd'] . '" style="margin: 0;">EVALUASI</h5>
 						<div class="esakip-body-tahun" data-id="halaman-sakip-evaluasi-skpd-' . $skpd_db['id_skpd'] . '">
 							<ul style="margin-left: 20px; margin-bottom: 10px; margin-top: 5px;">';
-							$halaman_evaluasi_skpd .= $halaman_lke_per_skpd;
+							if ($mv_skpd['lke']) {
+								$halaman_evaluasi_skpd .= $halaman_lke_per_skpd;
+							}
 							if (
 								in_array("PA", $user_meta->roles) ||
 								in_array("pa", $user_meta->roles)
 							) {
-								$halaman_evaluasi_skpd .= $halaman_sakip_kelembagaan_opd;
+								if ($mv_skpd['kelembagaan']) {
+									$halaman_evaluasi_skpd .= $halaman_sakip_kelembagaan_opd;
+								}
 							}
-							$halaman_evaluasi_skpd .= $dokumen_evaluasi;
+
+							if ($mv_skpd['unggah_evaluasi']) {
+								$halaman_evaluasi_skpd .= $dokumen_evaluasi;
+							}
+
 							$set_html_opd_evaluasi = get_option('sakip_menu_khusus_set_html_opd_EVALUASI_' . $_GET['tahun']);
 							if (!empty($set_html_opd_evaluasi)) {
 							  $halaman_evaluasi_skpd .= do_shortcode(stripslashes(htmlspecialchars_decode($set_html_opd_evaluasi)));
@@ -23035,12 +23152,12 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						<div class="card custom-blur shadow-lg">
 							<div class="card-body">
 								<h2 class="text-center">' . $skpd_db['nama_skpd'] . '</h2>
-								<ul class="daftar-menu-sakip mb-3">
-									<li>' . $halaman_sakip_perencanaan_skpd . '</li>
-									<li>' . $halaman_pengukuran_kinerja_skpd . '</li>
-									<li>' . $halaman_pelaporan_skpd . '</li>
-									<li>' . $halaman_evaluasi_skpd . '</li>
-								</ul>
+								<ul class="daftar-menu-sakip mb-3">';
+									if ($mv_skpd['perencanaan']) { echo '<li>' . $halaman_sakip_perencanaan_skpd . '</li>'; }
+									if ($mv_skpd['pengukuran_kinerja']) { echo '<li>' . $halaman_pengukuran_kinerja_skpd . '</li>'; }
+									if ($mv_skpd['pelaporan']) { echo '<li>' . $halaman_pelaporan_skpd . '</li>'; }
+									if ($mv_skpd['evaluasi']) { echo '<li>' . $halaman_evaluasi_skpd . '</li>'; }
+									echo '</ul>
 							</div>
 						</div>';
 
@@ -34810,7 +34927,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			}
 
 			$id_pegawai = intval($_POST['id_pegawai']);
-			$id_atasan = isset($_POST['id_atasan']) && $_POST['id_atasan'] !== '' ? intval($_POST['id_atasan']) : null;
+			$id_atasan = isset($_POST['id_atasan']) && $_POST['id_atasan'] ? intval($_POST['id_atasan']) : null;
 			$jabatan_custom = isset($_POST['jabatan_custom']) ? sanitize_text_field($_POST['jabatan_custom']) : null;
 			$plt_plh_teks = isset($_POST['plt_plh_teks']) ? sanitize_text_field($_POST['plt_plh_teks']) : null;
 			$terapkan_all_satker = isset($_POST['terapkan_all_satker']) && $_POST['terapkan_all_satker'] == 1;
@@ -34908,5 +35025,270 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		        'png'      => 'image/png',
 		    ];
 		}
+	}
+
+	/**
+	 * Mencegat proses url bypass jika ada token yang sesuai
+	 */
+	public function handle_2fa_bypass()
+	{
+		if (isset($_GET['esakip_2fa_bypass'])) {
+			$token = sanitize_text_field($_GET['esakip_2fa_bypass']);
+			
+			$backup_tokens = get_option('esakip_2fa_backup_tokens');
+			if (!empty($backup_tokens) && is_array($backup_tokens)) {
+				$key = array_search($token, $backup_tokens);
+				if ($key !== false) {
+					// Token valid, hapus dari list (sekali pakai)
+					unset($backup_tokens[$key]);
+					update_option('esakip_2fa_backup_tokens', array_values($backup_tokens));
+					
+					// Aktifkan masa bypass untuk 2 jam (7200 detik)
+					set_transient('esakip_2fa_bypass_active', true, 2 * HOUR_IN_SECONDS);
+					
+					// Redirect ke admin login dengan pesan sukses
+					wp_redirect(add_query_arg('esakip_2fa_bypass_success', '1', wp_login_url()));
+					exit;
+				} else {
+					wp_die('URL Backup 2FA tidak valid atau sudah pernah digunakan.', 'Bypass Gagal', array('response' => 403));
+				}
+			}
+		}
+
+		// Tambahkan pesan sukses di halaman login jika berhasil
+		if (isset($_GET['esakip_2fa_bypass_success']) && $_GET['esakip_2fa_bypass_success'] == '1') {
+			add_filter('login_message', function($message) {
+				return '<p class="message" style="border-left:4px solid #46b450;">Fitur 2FA OTP telah dinonaktifkan sementara selama 2 jam. Silakan login sekarang.</p>';
+			});
+		}
+	}
+
+	/**
+	 * Mencegat proses wp_login untuk mengirim OTP jika fitur diaktifkan 
+	 * dan user memiliki role yang diwajibkan.
+	 */
+	public function handle_2fa_login($user_login, $user)
+	{
+		$is_2fa_enabled = get_option('_crb_esakip_2fa_enabled');
+		if ($is_2fa_enabled !== 'yes') {
+			return;
+		}
+
+		// Jika bypass sedang aktif, kita tidak akan mencegat login (langsung masuk)
+		if (get_transient('esakip_2fa_bypass_active')) {
+			return;
+		}
+
+		$required_roles = $this->functions->get_option_multiselect('_crb_esakip_2fa_roles');
+		if (empty($required_roles)) {
+			return;
+		}
+
+		$user_roles = $user->roles;
+		if (empty($user_roles)) {
+			return;
+		}
+
+		$intersect = array_intersect($required_roles, $user_roles);
+		if (!empty($intersect)) {
+			$otp_code = wp_rand(100000, 999999);
+			$otp_token = wp_generate_password(32, false);
+			
+			set_transient('esakip_2fa_' . $otp_token, array(
+				'user_id' => $user->ID,
+				'otp' => $otp_code
+			), 2 * 60);
+
+			$to = $user->user_email;
+			if(empty($to)){
+				// Jika tidak ada email, skip 2fa agar tidak locked out, atau biarkan locked out?
+				// Lebih baik biarkan skip.
+				return;
+			}
+			$subject = "Kode OTP Login - E-SAKIP";
+			$message = "Berikut adalah kode OTP untuk login Anda: " . $otp_code . "\n\n";
+			$message .= "Kode ini berlaku selama 2 menit.";
+			wp_mail($to, $subject, $message);
+
+			// hapus data login
+			wp_destroy_current_session();
+			wp_clear_auth_cookie();
+			wp_set_current_user( 0 );
+			
+			$halaman_verifikasi = $this->functions->generatePage(array(
+				'nama_page' 	=> 'Verifikasi 2FA OTP',
+				'content' 		=> '[esakip_2fa_input]',
+				'show_header' 	=> 1,
+				'update' 		=> 1,
+				'no_key' 		=> 1,
+				'post_status' 	=> 'publish'
+			), false, '[esakip_2fa_input]');
+			
+			if (isset($halaman_verifikasi['url'])) {
+				$redirect_url = add_query_arg('token', $otp_token, $halaman_verifikasi['url']);
+			} else {
+				$page_obj = get_page_by_path('verifikasi-2fa-otp');
+				if ($page_obj) {
+					$redirect_url = add_query_arg('token', $otp_token, get_permalink($page_obj->ID));
+				} else {
+					$redirect_url = home_url('/verifikasi-2fa-otp/?token=' . $otp_token);
+				}
+			}
+
+			wp_redirect($redirect_url);
+			exit;
+		}
+	}
+
+	public function esakip_2fa_input($atts)
+	{
+		if (!isset($_GET['token'])) {
+			return "<div class='alert alert-warning text-center mt-4'>Token tidak valid.</div>";
+		}
+		
+		$token = sanitize_text_field($_GET['token']);
+		$data = get_transient('esakip_2fa_' . $token);
+		
+		if (empty($data)) {
+			return "<div class='alert alert-danger text-center mt-4'>Sesi OTP telah berakhir atau diakses secara tidak valid. Silakan login kembali.</div>";
+		}
+
+		ob_start();
+		?>
+		<div class="row justify-content-center" style="margin-top: 50px;">
+			<div class="col-md-6 col-md-offset-3">
+				<div class="card panel panel-default shadow-sm">
+					<div class="card-header panel-heading bg-primary text-white">
+						<h3 class="card-title panel-title text-center m-0">Verifikasi 2FA OTP</h3>
+					</div>
+					<div class="card-body panel-body" style="padding: 20px;">
+						<p class="text-center">Kode OTP telah dikirimkan ke email Anda. Silakan periksa kotak masuk atau folder spam Anda.</p>
+						<form id="form-2fa-otp" class="mt-4">
+							<div class="form-group mb-3">
+								<label for="otp_code"><strong>Kode OTP (*):</strong></label>
+								<input type="text" name="otp_code" id="otp_code" class="form-control input-lg" required placeholder="Masukkan 6 digit kode" style="text-align:center; font-size: 24px; letter-spacing: 10px;" maxlength="6">
+							</div>
+							<input type="hidden" name="token" value="<?php echo esc_attr($token); ?>">
+							<input type="hidden" name="action" value="verify_2fa_otp">
+							<button type="submit" class="btn btn-primary btn-lg btn-block w-100 mt-2">Verifikasi Login</button>
+							<div id="otp-message" class="mt-3"></div>
+						</form>
+						<div class="text-center mt-4 border-top pt-3">
+							<p class="text-muted mb-1">Belum menerima kode?</p>
+							<button type="button" id="btn-resend-otp" class="btn btn-link btn-sm">Kirim Ulang Kode OTP</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+		jQuery(document).ready(function($) {
+			$('#form-2fa-otp').on('submit', function(e) {
+				e.preventDefault();
+				var btn = $(this).find('button[type="submit"]');
+				btn.prop('disabled', true).text('Memverifikasi...');
+				
+				var data = $(this).serialize();
+				$.post(esakip.url, data, function(response) {
+					if(response.success) {
+						$('#otp-message').html('<div class="alert alert-success">Verifikasi berhasil! Mengarahkan...</div>');
+						window.location.href = response.data.redirect_url;
+					} else {
+						$('#otp-message').html('<div class="alert alert-danger">' + response.data.message + '</div>');
+						btn.prop('disabled', false).text('Verifikasi Login');
+					}
+				}).fail(function() {
+					$('#otp-message').html('<div class="alert alert-danger">Terjadi kesalahan pada server.</div>');
+					btn.prop('disabled', false).text('Verifikasi Login');
+				});
+			});
+
+			$('#btn-resend-otp').on('click', function(e) {
+				e.preventDefault();
+				var btn = $(this);
+				btn.prop('disabled', true).text('Mengirim...');
+				var token = $('input[name="token"]').val();
+				$.post(esakip.url, {
+					action: 'resend_2fa_otp',
+					token: token
+				}, function(response) {
+					if(response.success) {
+						$('#otp-message').html('<div class="alert alert-success">' + response.data.message + '</div>');
+						// Cooldown 30 detik
+						var counter = 30;
+						var interval = setInterval(function() {
+							btn.text('Tunggu ' + counter + 's');
+							counter--;
+							if(counter < 0) {
+								clearInterval(interval);
+								btn.prop('disabled', false).text('Kirim Ulang Kode OTP');
+							}
+						}, 1000);
+					} else {
+						$('#otp-message').html('<div class="alert alert-danger">' + response.data.message + '</div>');
+						btn.prop('disabled', false).text('Kirim Ulang Kode OTP');
+					}
+				});
+			});
+		});
+		</script>
+		<?php
+		return ob_get_clean();
+	}
+
+	public function verify_2fa_otp()
+	{
+		$token = sanitize_text_field($_POST['token']);
+		$otp_input = sanitize_text_field($_POST['otp_code']);
+		
+		$data = get_transient('esakip_2fa_' . $token);
+		
+		if (empty($data)) {
+			wp_send_json_error(array('message' => 'Sesi OTP telah berakhir. Silakan login kembali.'));
+		}
+
+		if ($otp_input !== (string)$data['otp']) {
+			wp_send_json_error(array('message' => 'Kode OTP salah.'));
+		}
+
+		delete_transient('esakip_2fa_' . $token);
+		
+		$user_id = $data['user_id'];
+		wp_clear_auth_cookie();
+		wp_set_current_user($user_id);
+		wp_set_auth_cookie($user_id);
+		
+		wp_send_json_success(array(
+			'message' => 'Berhasil login!',
+			'redirect_url' => admin_url()
+		));
+	}
+
+	public function resend_2fa_otp()
+	{
+		$token = sanitize_text_field($_POST['token']);
+		$data = get_transient('esakip_2fa_' . $token);
+		
+		if (empty($data)) {
+			wp_send_json_error(array('message' => 'Sesi OTP telah berakhir. Silakan login kembali.'));
+		}
+
+		$new_otp_code = wp_rand(100000, 999999);
+		$user_id = $data['user_id'];
+		$user = get_user_by('id', $user_id);
+
+		set_transient('esakip_2fa_' . $token, array(
+			'user_id' => $user_id,
+			'otp' => $new_otp_code
+		), 2 * 60);
+
+		$to = $user->user_email;
+		$subject = "Kode OTP Baru Login - E-SAKIP";
+		$message = "Berikut adalah kode OTP peringatan Anda: " . $new_otp_code . "\n\n";
+		$message .= "Kode ini berlaku selama 2 menit.";
+		wp_mail($to, $subject, $message);
+
+		wp_send_json_success(array('message' => 'Kode OTP baru telah dikirim ke email Anda.'));
 	}
 }

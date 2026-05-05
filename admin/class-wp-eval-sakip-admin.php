@@ -138,6 +138,11 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($basic_options_container)
 			->add_fields($this->generate_fields_options_menu_settings());
 
+		Container::make('theme_options', __('Visibilitas Menu Utama'))
+			->set_page_parent($basic_options_container)
+			->add_tab(__('Menu Admin'), $this->generate_fields_menu_vis_admin())
+			->add_tab(__('Menu PA/KPA/Kepala'), $this->generate_fields_menu_vis_skpd());
+
 		Container::make('theme_options', __('Tampilan Beranda'))
 			->set_page_parent($basic_options_container)
 			->add_tab(__('🏠 Frontpage / Halaman Depan'), $this->generate_fields_front_page())
@@ -146,6 +151,10 @@ class Wp_Eval_Sakip_Admin
 		Container::make('theme_options', __('Auto Login'))
 			->set_page_parent($basic_options_container)
 			->add_fields($this->generate_fields_options_auto_login());
+
+		Container::make('theme_options', __('Keamanan 2FA'))
+			->set_page_parent($basic_options_container)
+			->add_fields($this->generate_fields_2fa_otp());
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.1)
@@ -2224,6 +2233,219 @@ class Wp_Eval_Sakip_Admin
 		];
 	}
 
+	public function generate_fields_menu_vis_admin()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_visibilitas_menu_utama.php') {
+			return array();
+		}
+		
+		return [
+			Field::make('html', 'crb_menu_vis_admin_info')
+				->set_html('<div style="padding:12px 16px; background:#f0f6fc; border-left:4px solid #2271b1; margin-bottom:15px; border-radius:3px;">
+					<strong>Pengaturan Visibilitas Menu untuk User Admin</strong><br>
+					<span style="color:#555;">Centang = menu ditampilkan. Kosongkan = menu disembunyikan.<br>
+					Jika menu parent dinonaktifkan, seluruh child di bawahnya otomatis tersembunyi.</span>
+				</div>'),
+
+			// ── PERENCANAAN ──────────────────────────────
+			Field::make('html', 'crb_mv_admin_h_perencanaan')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:10px; font-size:15px; font-weight:bold;">1. PERENCANAAN</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_perencanaan', 'Tampilkan menu PERENCANAAN')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			Field::make('html', 'crb_mv_admin_h_prcn_pemda')
+				->set_html('<div style="padding:6px 12px 6px 30px; background:#e8f0fe; border-left:3px solid #2271b1; margin:5px 0; font-weight:600;">1.1 Pemerintah Daerah</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_perencanaan_pemda', 'Tampilkan sub-menu Pemerintah Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('html', 'crb_mv_admin_h_prcn_pemda_child')
+				->set_html('<div style="padding:4px 12px 4px 50px; color:#555; font-size:13px;">Item di bawah Pemerintah Daerah:</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_rpjpd', '├── Buat RPJPD')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_pohon_kinerja', '├── Buat Pohon Kinerja & Croscutting')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_rpjmd', '├── Buat RPJMD / RPD')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_cascading', '├── Buat Cascading')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_iku', '├── Buat IKU')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_rencana_aksi', '├── Buat Rencana Aksi')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_pk', '├── Buat PK (Perjanjian Kinerja)')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pemda_unggah_dokumen', '└── Unggah Dokumen')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			Field::make('html', 'crb_mv_admin_h_prcn_opd')
+				->set_html('<div style="padding:6px 12px 6px 30px; background:#e8f0fe; border-left:3px solid #2271b1; margin:5px 0; font-weight:600;">1.2 Perangkat Daerah</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_perencanaan_opd', 'Tampilkan sub-menu Perangkat Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('html', 'crb_mv_admin_h_prcn_opd_child')
+				->set_html('<div style="padding:4px 12px 4px 50px; color:#555; font-size:13px;">Item di bawah Perangkat Daerah:</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_opd_pohon_kinerja', '├── Buat Pohon Kinerja & Croscutting')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_opd_cascading', '├── Buat Cascading')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_opd_iku', '├── Buat IKU')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_opd_rencana_aksi', '├── Pengisian Rencana Aksi')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_opd_pk', '├── PK (Perjanjian Kinerja)')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_opd_unggah_dokumen', '└── Unggah Dokumen')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			// ── PENGUKURAN KINERJA ───────────────────────
+			Field::make('html', 'crb_mv_admin_h_pengukuran')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:20px; font-size:15px; font-weight:bold;">2. PENGUKURAN KINERJA</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pengukuran_kinerja', 'Tampilkan menu PENGUKURAN KINERJA')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pengukuran_pemda', '├── Pemerintah Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pengukuran_opd', '└── Perangkat Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			// ── PELAPORAN ────────────────────────────────
+			Field::make('html', 'crb_mv_admin_h_pelaporan')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:20px; font-size:15px; font-weight:bold;">3. PELAPORAN</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pelaporan', 'Tampilkan menu PELAPORAN')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pelaporan_pemda', '├── Pemerintah Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_pelaporan_opd', '└── Perangkat Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			// ── EVALUASI ─────────────────────────────────
+			Field::make('html', 'crb_mv_admin_h_evaluasi')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:20px; font-size:15px; font-weight:bold;">4. EVALUASI</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_evaluasi', 'Tampilkan menu EVALUASI')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_evaluasi_pemda', '├── Pemerintah Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_evaluasi_opd', '├── Perangkat Daerah')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_evaluasi_kelembagaan', '├── Evaluasi Kelembagaan')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_admin_evaluasi_lke', '└── Pengisian LKE')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			// ── SETTING MENU JADWAL ──────────────────────
+			Field::make('html', 'crb_mv_admin_h_jadwal')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:20px; font-size:15px; font-weight:bold;">5. SETTING MENU JADWAL</div>'),
+			Field::make('checkbox', 'crb_menu_vis_admin_setting_jadwal', 'Tampilkan menu Setting Menu Jadwal')
+				->set_default_value(1)
+				->set_option_value('1'),
+		];
+	}
+
+	public function generate_fields_menu_vis_skpd()
+	{
+		return [
+			Field::make('html', 'crb_menu_vis_skpd_info')
+				->set_html('<div style="padding:12px 16px; background:#f0f6fc; border-left:4px solid #2271b1; margin-bottom:15px; border-radius:3px;">
+					<strong>Pengaturan Visibilitas Menu untuk User PA / KPA / Kepala</strong><br>
+					<span style="color:#555;">Centang = menu ditampilkan. Kosongkan = menu disembunyikan.<br>
+					Jika menu parent dinonaktifkan, seluruh child di bawahnya otomatis tersembunyi.</span>
+				</div>'),
+
+			// ── PERENCANAAN ──────────────────────────────
+			Field::make('html', 'crb_mv_skpd_h_perencanaan')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:10px; font-size:15px; font-weight:bold;">1. PERENCANAAN</div>'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_perencanaan', 'Tampilkan menu PERENCANAAN')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('html', 'crb_mv_skpd_h_prcn_child')
+				->set_html('<div style="padding:4px 12px 4px 30px; color:#555; font-size:13px;">Item di bawah PERENCANAAN:</div>'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_pohon_kinerja', '├── Buat Pohon Kinerja & Croscutting')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_cascading', '├── Buat Cascading')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_iku', '├── Buat IKU')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_rhk', '├── Rencana Hasil Kerja')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_pk', '├── PK (Perjanjian Kinerja)')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_unggah_perencanaan', '└── Unggah Dokumen Perencanaan')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			// ── PENGUKURAN KINERJA ───────────────────────
+			Field::make('html', 'crb_mv_skpd_h_pengukuran')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:20px; font-size:15px; font-weight:bold;">2. PENGUKURAN KINERJA</div>'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_pengukuran_kinerja', 'Tampilkan menu PENGUKURAN KINERJA')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_rencana_aksi', '└── Rencana Aksi')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			// ── PELAPORAN ────────────────────────────────
+			Field::make('html', 'crb_mv_skpd_h_pelaporan')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:20px; font-size:15px; font-weight:bold;">3. PELAPORAN</div>'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_pelaporan', 'Tampilkan menu PELAPORAN')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_unggah_pelaporan', '└── Unggah Dokumen Pelaporan')
+				->set_default_value(1)
+				->set_option_value('1'),
+
+			// ── EVALUASI ─────────────────────────────────
+			Field::make('html', 'crb_mv_skpd_h_evaluasi')
+				->set_html('<div style="padding:8px 12px; background:#2271b1; color:#fff; border-radius:4px; margin-top:20px; font-size:15px; font-weight:bold;">4. EVALUASI</div>'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_evaluasi', 'Tampilkan menu EVALUASI')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_lke', '├── LKE (Lembar Kerja Evaluasi)')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_kelembagaan', '├── Evaluasi Kelembagaan')
+				->set_default_value(1)
+				->set_option_value('1'),
+			Field::make('checkbox', 'crb_menu_vis_skpd_unggah_evaluasi', '└── Unggah Dokumen Evaluasi')
+				->set_default_value(1)
+				->set_option_value('1'),
+		];
+	}
+
+	public function generate_fields_main_menu_visibility()
+	{
+		return array();
+	}
+
 	public function generate_fields_options_auto_login()
 	{
 		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_auto_login.php') {
@@ -2267,6 +2489,53 @@ class Wp_Eval_Sakip_Admin
 							</ol>
 						')
 				])
+		];
+	}
+
+	public function generate_fields_2fa_otp()
+	{
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_keamanan_2fa.php') {
+			return array();
+		}
+
+		global $wp_roles;
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+		
+		$roles = $wp_roles->get_names();
+		$role_options = array();
+		foreach ( $roles as $role_value => $role_name ) {
+			$role_options[ $role_value ] = $role_name;
+		}
+
+		$backup_tokens = get_option('esakip_2fa_backup_tokens');
+		if (empty($backup_tokens) || !is_array($backup_tokens)) {
+			$backup_tokens = array();
+			for ($i = 0; $i < 5; $i++) {
+				$backup_tokens[] = wp_generate_password(24, false);
+			}
+			update_option('esakip_2fa_backup_tokens', $backup_tokens);
+		}
+
+		$html_backup = '<div style="background:#fff; padding:15px; border:1px solid #ccd0d4; margin-top:10px;">';
+		$html_backup .= '<p><strong>URL Pemulihan Darurat (Backup Bypass 2FA)</strong></p>';
+		$html_backup .= '<p>Jika Anda kesulitan login (contoh: email tidak masuk), Anda dapat menggunakan salah satu URL di bawah ini. <strong>Setiap URL hanya berlaku 1 kali</strong> dan akan mematikan paksa fitur 2FA selama 2 jam.</p><ul>';
+		foreach ($backup_tokens as $t) {
+			$html_backup .= '<li style="margin-bottom:5px;"><code>' . esc_url(home_url('/?esakip_2fa_bypass=' . $t)) . '</code></li>';
+		}
+		$html_backup .= '</ul></div>';
+
+		return [
+			Field::make('checkbox', 'crb_esakip_2fa_enabled', 'Aktifkan 2FA OTP via Email')
+				->set_help_text('Centang untuk mengaktifkan fitur 2FA OTP untuk user saat login.'),
+				
+			Field::make('multiselect', 'crb_esakip_2fa_roles', 'Role Pengguna yang Wajib 2FA')
+				->add_options($role_options)
+				->set_help_text('Pilih peran (role) mana saja yang diwajibkan menggunakan OTP saat login. Kosongkan jika tidak ada yang wajib 2FA.'),
+				
+			Field::make('html', 'crb_esakip_2fa_backup_urls')
+				->set_html($html_backup)
 		];
 	}
 
@@ -2414,8 +2683,7 @@ class Wp_Eval_Sakip_Admin
 
 		return [
 			Field::make('radio', 'crb_api_esr_status', 'Status API ESR')
-				->add_options(['0' => 'Dikunci', '1' => 'Dibuka'])
-				->set_default_value('1'),
+				->add_options(['0' => 'Dikunci', '1' => 'Dibuka']),
 			Field::make('radio', 'crb_auth_method_api_esr', 'Metode Autentikasi API ESR')
 				->add_options([
 					'basic' => 'Authorization Basic (Header)',
@@ -2444,8 +2712,7 @@ class Wp_Eval_Sakip_Admin
 
 		return [
 			Field::make('radio', 'crb_api_ekinerja_status', 'Status API E-Kinerja')
-				->add_options(['0' => 'Dikunci', '1' => 'Dibuka'])
-				->set_default_value('1'),
+				->add_options(['0' => 'Dikunci', '1' => 'Dibuka']),
 			Field::make('text', 'crb_url_api_ekinerja', 'URL API E-Kinerja')
 				->set_help_text('Wajib diisi.'),
 			Field::make('text', 'crb_api_key_ekinerja', 'API KEY E-Kinerja')
