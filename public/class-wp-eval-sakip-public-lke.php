@@ -793,6 +793,127 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								}
 
 								if (!empty($data_komponen_penilaian)) {
+								    foreach ($data_komponen_penilaian as &$penilaian) {
+								        if (empty($penilaian['pl_bukti_dukung'])) {
+								            continue;
+								        }
+
+								        $bukti_dukung_arr = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
+								        if (empty($bukti_dukung_arr) || !is_array($bukti_dukung_arr)) {
+								            continue;
+								        }
+
+								        // Ambil jenis_bukti_dukung dari komponen penilaian
+								        $kp_id = !empty($prefix_history) ? $penilaian['kp_id_asli'] : $penilaian['kp_id'];
+								        $jenis_bukti_dukung_db = $wpdb->get_var($wpdb->prepare("
+								            SELECT jenis_bukti_dukung
+								            FROM esakip_komponen_penilaian
+								            WHERE id = %d
+								        ", $kp_id));
+
+								        $jenis_bukti_dukung = json_decode(stripslashes($jenis_bukti_dukung_db), true);
+								        if (json_last_error() !== JSON_ERROR_NONE || empty($jenis_bukti_dukung)) {
+								            continue;
+								        }
+
+								        $tabel_skip = [
+								            'esakip_renstra',
+								            'esakip_iku',
+								            'esakip_pohon_kinerja_dan_cascading',
+								        ];
+
+								        $bukti_dukung_bersih = [];
+
+								        foreach ($bukti_dukung_arr as $nama_file) {
+								            $file_masih_aktif = false;
+
+								            foreach ($jenis_bukti_dukung as $tabel) {
+								                if (in_array($tabel, $tabel_skip)) {
+								                    $file_masih_aktif = true;
+								                    break;
+								                }
+
+								                // Tabel dengan prefix path dokumen_pemda
+								                $tabel_prefix_pemda = [
+								                    'esakip_rpjmd',
+								                    'esakip_rpjpd',
+								                    'esakip_rkpd',
+								                    'esakip_lkjip_lppd',
+								                    'esakip_other_file',
+								                ];
+
+								                if (in_array($tabel, $tabel_prefix_pemda)) {
+								                    $check_nama_file = str_replace('dokumen_pemda/', '', $nama_file);
+								                } else {
+								                    $check_nama_file = $nama_file;
+								                }
+
+								                $sql_cek = $wpdb->prepare("
+								                    SELECT COUNT(id)
+								                    FROM {$tabel}
+								                    WHERE dokumen = %s
+								                      AND id_skpd = %d
+								                      AND active = 1
+								                ", $check_nama_file, $id_skpd);
+
+								                // Tabel yang tidak pakai filter tahun
+								                $tabel_tanpa_tahun = [
+								                    'esakip_rpjmd',
+								                    'esakip_rpjpd',
+								                ];
+								                if (!in_array($tabel, $tabel_tanpa_tahun)) {
+								                    $sql_cek .= $wpdb->prepare(' AND tahun_anggaran = %d', $tahun_anggaran);
+								                }
+
+								                $count_aktif = $wpdb->get_var($sql_cek);
+
+								                if ($count_aktif > 0) {
+								                    $file_masih_aktif = true;
+								                    break;
+								                }
+								            }
+
+								            if ($file_masih_aktif) {
+								                // File masih aktif, pertahankan di array
+								                $bukti_dukung_bersih[] = $nama_file;
+								            }
+								            // Jika tidak aktif, tidak dimasukkan (otomatis terhapus dari array)
+								        }
+
+								        if (count($bukti_dukung_bersih) !== count($bukti_dukung_arr)) {
+								            $new_bukti_dukung = !empty($bukti_dukung_bersih) ? json_encode(array_values($bukti_dukung_bersih)) : null;
+
+								            if (empty($prefix_history)) {
+								                $wpdb->update(
+								                    'esakip_pengisian_lke',
+								                    ['bukti_dukung' => $new_bukti_dukung],
+								                    [
+								                        'id_komponen_penilaian' => $penilaian['kp_id'],
+								                        'id_skpd'               => $id_skpd,
+								                        'tahun_anggaran'        => $tahun_anggaran,
+								                    ]
+								                );
+								            } else {
+								                $wpdb->update(
+								                    'esakip_pengisian_lke_history',
+								                    ['bukti_dukung' => $new_bukti_dukung],
+								                    [
+								                        'id_komponen_penilaian' => $penilaian['kp_id_asli'],
+								                        'id_skpd'               => $id_skpd,
+								                        'tahun_anggaran'        => $tahun_anggaran,
+								                        'id_jadwal'             => $id_jadwal,
+								                    ]
+								                );
+								            }
+
+								            // Update nilai di array lokal supaya tampilan ikut terupdate
+								            $penilaian['pl_bukti_dukung'] = $new_bukti_dukung;
+								        }
+								    }
+								    unset($penilaian);
+								}
+
+								if (!empty($data_komponen_penilaian)) {
 									foreach ($data_komponen_penilaian as $penilaian) {
 										if (empty($prefix_history)) {
 											$opsi_custom = $wpdb->get_results(
