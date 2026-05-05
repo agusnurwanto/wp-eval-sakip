@@ -301,6 +301,10 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($dokumen_menu)
 			->add_fields($this->generate_fields_dokumen_dokumen_lain_opd());
 
+		Container::make('theme_options', __('Dokumen Pengukuran Kinerja'))
+			->set_page_parent($dokumen_menu)
+			->add_fields($this->generate_fields_dokumen_pengukuran_kinerja_opd());
+
 		Container::make('theme_options', __('Pengisian LKE SAKIP'))
 			->set_page_menu_position(3.3)
 			->set_icon('dashicons-edit-page')
@@ -2116,6 +2120,55 @@ class Wp_Eval_Sakip_Admin
 					</style>
 				'),
 			Field::make('html', 'crb_dokumen_lainnya_opd_menu')
+				->set_html($html)
+		];
+	}
+
+	public function generate_fields_dokumen_pengukuran_kinerja_opd()
+	{
+		
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_dokumen_pengukuran_kinerja.php') {
+			return array();
+		}
+
+		$get_tahun = $this->get_tahun();
+		
+		$html = '';
+		if (!empty($get_tahun)) {
+			foreach ($get_tahun as $v) {
+				$pengukuran_kinerja_page = $this->functions->generatePage(array(
+					'nama_page' => 'Halaman Dokumen Pengukuran Kinerja tahun ' . $v['tahun_anggaran'],
+					'content' => '[pengukuran_kinerja tahun=' . $v['tahun_anggaran'] . ']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$html .= '
+				<div class="accordion">
+					<h3 class="esakip-header-tahun" tahun="' . $v['tahun_anggaran'] . '">Tahun Anggaran ' . $v['tahun_anggaran'] . '</h3>
+					<div class="esakip-body-tahun" tahun="' . $v['tahun_anggaran'] . '">
+						<ul style="margin-left: 20px;">
+							<li><a target="_blank" href="' . $pengukuran_kinerja_page['url'] . '">' . $pengukuran_kinerja_page['title'] . '</a></li>
+						</ul>
+					</div>
+				</div>';
+			}
+		} else {
+			$html = '
+				<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">
+					Tahun Anggaran tidak tersedia
+				</span>';
+		}
+
+
+		return [
+			Field::make('html', 'crb_dokumen_pengukuran_kinerja_hide_sidebar')
+				->set_html('
+					<style>
+						.postbox-container { display: none; }
+						#poststuff #post-body.columns-2 { margin: 0 !important; }
+					</style>
+				'),
+			Field::make('html', 'crb_dokumen_pengukuran_kinerja_menu')
 				->set_html($html)
 		];
 	}
