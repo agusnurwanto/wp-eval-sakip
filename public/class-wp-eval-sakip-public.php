@@ -7134,10 +7134,121 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($pengukuran_kinerjas)) {
 					$counter = 1;
 					$tbody = '';
+					$mapping_jenis_dokumen_esr = [];
+					$status_api_esr = get_option('_crb_api_esr_status');
+
+					if ($status_api_esr) {
+						$mapping_jenis_dokumen_esr = $wpdb->get_row($wpdb->prepare("
+								SELECT 
+										a.*
+								FROM 
+									esakip_data_mapping_jenis_dokumen_esr a 
+								JOIN esakip_menu_dokumen b 
+									ON b.id=a.esakip_menu_dokumen_id AND 
+										a.tahun_anggaran=b.tahun_anggaran AND b.active=1
+			                    JOIN esakip_data_jenis_dokumen_esr c 
+			                       	ON c.jenis_dokumen_esr_id=a.jenis_dokumen_esr_id  AND 
+			                      		c.tahun_anggaran=a.tahun_anggaran AND c.active=1
+			                    where 
+			                      	a.tahun_anggaran=%d and
+			                        b.nama_tabel = 'esakip_pengukuran_kinerja'
+						", $tahun_anggaran), ARRAY_A);
+
+						if (!empty($mapping_jenis_dokumen_esr)) {
+							$array_data_esr = [];
+							$data_esr = $this->data_esr($id_skpd);
+							if ($data_esr['status'] == 'success') {
+								$diff_data_esr = intval($data_esr['data_esr_lokal']->diff);
+								$data_esr = json_decode($data_esr['data_esr_lokal']->response_json);
+
+								foreach ($data_esr as $key => $esr) {
+									if ($esr->dokumen_id == $mapping_jenis_dokumen_esr['jenis_dokumen_esr_id']) {
+										$esr_lokal = $wpdb->get_row($wpdb->prepare("SELECT id, upload_id FROM esakip_pengukuran_kinerja WHERE tahun_anggaran=%d AND upload_id=%d AND active=%d", $tahun_anggaran, $esr->upload_id, 1), ARRAY_A);
+
+										if (!empty($esr_lokal)) {
+											$wpdb->update('esakip_pengukuran_kinerja', [
+												'path_esr' => $esr->path
+											], [
+												'id' => $esr_lokal['id']
+											]);
+										}
+
+										$path = explode("/", $esr->path);
+										$nama_file = end($path);
+										$array_data_esr[] = [
+											'upload_id' => $esr->upload_id,
+											'nama_file' => $nama_file,
+											'keterangan' => $esr->keterangan,
+											'path' => $esr->path
+										];
+									}
+								}
+							} else {
+								$ret['data_esr'] = $data_esr;
+							}
+						}
+					}
 
 					foreach ($pengukuran_kinerjas as $kk => $vv) {
 						$tbody .= "<tr>";
 						$tbody .= "<td class='text-center'>" . $counter++ . "</td>";
+						$status_integrasi_esr = false;
+						if ($status_api_esr) {
+							if (!empty($mapping_jenis_dokumen_esr)) {
+								if (!empty($vv['upload_id'])) {
+									if (in_array($vv['upload_id'], array_column($array_data_esr, 'upload_id'))) {
+										$status_integrasi_esr = true;
+										$tbody .= "<td class='text-center'><span class='badge badge-success' style='padding: .5em 1.4em;' data-upload-id='".$vv['upload_id']."'>Integrasi<span></td>";
+									} else {
+									
+									    if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
+												    <div style='margin-top: 5px;'>
+												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+												    </div>
+												</td>";
+										} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
+											$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</span>
+												    <div style='margin-top: 5px;'>
+												        <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+												    </div>
+												</td>";
+										} else{
+										    $tbody .= "<td class = 'text-center'>";
+											$tbody .= "<div><input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'></div>";
+										}
+									    $tbody .= "<ul>";
+
+									    $tbody .= "</ul></td>";
+									}
+								} else if (in_array($vv['dokumen'], array_column($array_data_esr, 'nama_file'))) {
+									$tbody .= "<td class='text-center'><span class='badge badge-warning' style='padding: .5em 1.4em;'>Dokumen Ada</a>";
+
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
+									    $tbody .= "
+									        <div style='margin-top: 5px;'>
+									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+									        </div>";
+									}
+
+									$tbody .= "</td>";
+								} else if (in_array($vv['keterangan'], array_column($array_data_esr, 'keterangan'))) {
+									$tbody .= "<td class='text-center'>
+									    <a href='#' class='btn btn-sm btn-warning'>Keterangan Ada</a>";
+
+									if ($data_verifikasi['status_verifikasi'] != 2 && $data_verifikasi['status_verifikasi'] != 3 && $text_badge != 'Menunggu') { 
+									    $tbody .= "
+									        <div style='margin-top: 5px;'>
+									            <input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'>
+									        </div>";
+									}
+
+									$tbody .= "</td>";
+								} else {
+									$tbody .= "<td class='text-center'><input type='checkbox' name='checklist_esr' value='" . $vv['id'] . "'></td>";
+								}
+							}
+						}
 						$tbody .= "<td>" . $vv['opd'] . "</td>";
 						$tbody .= "<td>" . $vv['dokumen'] . "</td>";
 						$tbody .= "<td>" . $vv['keterangan'] . "</td>";
@@ -7155,7 +7266,30 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$tbody .= "</tr>";
 					}
 
+					$non_esr_lokal = [];
+					if ($status_api_esr && !empty($mapping_jenis_dokumen_esr)) {
+						foreach ($array_data_esr as $data_esr) {
+							foreach ($dokumen_lains as $esr_lokal) {
+								if (!empty($esr_lokal['upload_id']) && $data_esr['upload_id'] != $esr_lokal['upload_id']) {
+									if (empty($non_esr_lokal[$data_esr['nama_file']])) {
+										$non_esr_lokal[$data_esr['nama_file']] = $data_esr;
+									}
+								} else if (trim($data_esr['nama_file']) != trim($esr_lokal['dokumen'])) {
+									if (empty($non_esr_lokal[$data_esr['nama_file']])) {
+										$non_esr_lokal[$data_esr['nama_file']] = $data_esr;
+									}
+								} else if (trim($data_esr['keterangan']) != trim($esr_lokal['keterangan'])) {
+									if (empty($non_esr_lokal[$data_esr['nama_file']])) {
+										$non_esr_lokal[$data_esr['nama_file']] = $data_esr;
+									}
+								}
+							}
+						}
+						$ret['non_esr_lokal'] = array_values($non_esr_lokal);
+					}
+
 					$ret['data'] = $tbody;
+					$ret['status_mapping_esr'] = !empty($mapping_jenis_dokumen_esr) ? true : false;
 				} else {
 					$ret['data'] = "<tr><td colspan='6' class='text-center'>Tidak ada data tersedia</td></tr>";
 				}
@@ -30237,6 +30371,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			'esakip_renstra' => 'esakip_renstra',
 			'esakip_skp' => 'esakip_skp',
 			'esakip_dokumen_lainnya' => 'esakip_dokumen_lainnya',
+			'esakip_pengukuran_kinerja' => 'esakip_pengukuran_kinerja',
 			'esakip_dpa' => 'esakip_dpa',
 			'esakip_evaluasi_internal' => 'esakip_evaluasi_internal',
 			'esakip_iku' => 'esakip_iku',
