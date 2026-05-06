@@ -4515,7 +4515,7 @@ class Wp_Eval_Sakip_Admin
 					$user_data = array();
 					$user_data['pass'] = $_POST['pass'];
 					$user_data['jabatan'] = 'admin_bappeda';
-					if (empty($user_exist)) {
+					if (empty($users_bappeda)) {
 						$user_data['loginname'] = 'admin_perencanaan';
 						$user_data['nama'] = 'Admin Perencanaan';
 						$this->gen_user_esakip($user_data, $update_pass);
@@ -4533,16 +4533,16 @@ class Wp_Eval_Sakip_Admin
 						'orderby' => 'user_nicename',
 						'order'   => 'ASC'
 					);
-					$users_fanrb = get_users($args);
+					$users_panrb = get_users($args);
 					$user_data = array();
 					$user_data['pass'] = $_POST['pass'];
 					$user_data['jabatan'] = 'admin_panrb';
-					if (empty($user_exist)) {
+					if (empty($users_panrb)) {
 						$user_data['loginname'] = 'admin_panrb';
 						$user_data['nama'] = 'Admin Review';
 						$this->gen_user_esakip($user_data, $update_pass);
 					} else {
-						foreach ($users_fanrb as $user_exist) {
+						foreach ($users_panrb as $user_exist) {
 							$user_data['loginname'] = $user_exist->user_login;
 							$user_data['nama'] = $user_exist->display_name;
 						}
@@ -4559,7 +4559,7 @@ class Wp_Eval_Sakip_Admin
 					$user_data = array();
 					$user_data['pass'] = $_POST['pass'];
 					$user_data['jabatan'] = 'admin_ortala';
-					if (empty($user_exist)) {
+					if (empty($users_ortala)) {
 						$user_data['loginname'] = 'admin_organisasi';
 						$user_data['nama'] = 'Admin Organisasi';
 						$this->gen_user_esakip($user_data, $update_pass);
