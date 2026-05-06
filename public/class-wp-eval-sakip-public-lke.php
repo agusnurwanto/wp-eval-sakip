@@ -803,7 +803,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								            continue;
 								        }
 
-								        // Ambil jenis_bukti_dukung dari komponen penilaian
 								        $kp_id = !empty($prefix_history) ? $penilaian['kp_id_asli'] : $penilaian['kp_id'];
 								        $jenis_bukti_dukung_db = $wpdb->get_var($wpdb->prepare("
 								            SELECT jenis_bukti_dukung
@@ -816,11 +815,25 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								            continue;
 								        }
 
-								        $tabel_skip = [
+								        // Tabel yang tidak pakai filter tahun
+								        $tabel_tanpa_dokumen = [];
+								        $tabel_tanpa_tahun = [
 								            'esakip_renstra',
 								            'esakip_iku',
 								            'esakip_pohon_kinerja_dan_cascading',
+								            'esakip_rpjmd',
+								            'esakip_rpjpd',
 								        ];
+
+								        // Tabel dengan prefix path dokumen_pemda
+								        $tabel_prefix_pemda = [
+								            'esakip_rpjmd',
+								            'esakip_rpjpd',
+								            'esakip_rkpd',
+								            'esakip_lkjip_lppd',
+								            'esakip_other_file',
+								        ];
+
 
 								        $bukti_dukung_bersih = [];
 
@@ -828,19 +841,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								            $file_masih_aktif = false;
 
 								            foreach ($jenis_bukti_dukung as $tabel) {
-								                if (in_array($tabel, $tabel_skip)) {
+								                if (in_array($tabel, $tabel_tanpa_dokumen)) {
 								                    $file_masih_aktif = true;
-								                    break;
+								                    continue;
 								                }
-
-								                // Tabel dengan prefix path dokumen_pemda
-								                $tabel_prefix_pemda = [
-								                    'esakip_rpjmd',
-								                    'esakip_rpjpd',
-								                    'esakip_rkpd',
-								                    'esakip_lkjip_lppd',
-								                    'esakip_other_file',
-								                ];
 
 								                if (in_array($tabel, $tabel_prefix_pemda)) {
 								                    $check_nama_file = str_replace('dokumen_pemda/', '', $nama_file);
@@ -856,28 +860,16 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								                      AND active = 1
 								                ", $check_nama_file, $id_skpd);
 
-								                // Tabel yang tidak pakai filter tahun
-								                $tabel_tanpa_tahun = [
-								                    'esakip_rpjmd',
-								                    'esakip_rpjpd',
-								                ];
-								                if (!in_array($tabel, $tabel_tanpa_tahun)) {
-								                    $sql_cek .= $wpdb->prepare(' AND tahun_anggaran = %d', $tahun_anggaran);
-								                }
-
 								                $count_aktif = $wpdb->get_var($sql_cek);
 
 								                if ($count_aktif > 0) {
 								                    $file_masih_aktif = true;
-								                    break;
 								                }
 								            }
 
 								            if ($file_masih_aktif) {
-								                // File masih aktif, pertahankan di array
 								                $bukti_dukung_bersih[] = $nama_file;
 								            }
-								            // Jika tidak aktif, tidak dimasukkan (otomatis terhapus dari array)
 								        }
 
 								        if (count($bukti_dukung_bersih) !== count($bukti_dukung_arr)) {
@@ -890,7 +882,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								                    [
 								                        'id_komponen_penilaian' => $penilaian['kp_id'],
 								                        'id_skpd'               => $id_skpd,
-								                        'tahun_anggaran'        => $tahun_anggaran,
 								                    ]
 								                );
 								            } else {
@@ -900,13 +891,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								                    [
 								                        'id_komponen_penilaian' => $penilaian['kp_id_asli'],
 								                        'id_skpd'               => $id_skpd,
-								                        'tahun_anggaran'        => $tahun_anggaran,
 								                        'id_jadwal'             => $id_jadwal,
 								                    ]
 								                );
 								            }
 
-								            // Update nilai di array lokal supaya tampilan ikut terupdate
 								            $penilaian['pl_bukti_dukung'] = $new_bukti_dukung;
 								        }
 								    }
