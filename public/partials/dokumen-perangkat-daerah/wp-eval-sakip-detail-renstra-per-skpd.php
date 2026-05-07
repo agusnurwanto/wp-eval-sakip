@@ -307,6 +307,14 @@ $status_api_esr = get_option('_crb_api_esr_status');
 </div>
 
 <script>
+ let debug = {
+    current_user: <?php echo json_encode($current_user); ?>,
+    is_admin_panrb: <?php echo json_encode($is_admin_panrb); ?>,
+    is_administrator: <?php echo json_encode($is_administrator); ?>,
+    status_api_esr: <?php echo json_encode($status_api_esr); ?>,
+    hak_akses_user: <?php echo json_encode($hak_akses_user); ?>
+};
+       
     var tahun_anggaran_periode_dokumen = null;
     jQuery(document).ready(function() {
         getTableTahun();
