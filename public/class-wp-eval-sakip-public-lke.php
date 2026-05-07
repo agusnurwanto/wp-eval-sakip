@@ -798,10 +798,17 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								            continue;
 								        }
 
-								        $bukti_dukung_arr = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
+								        $bukti_dukung_arr = json_decode($penilaian['pl_bukti_dukung'], true, 512, JSON_UNESCAPED_UNICODE);
+								        if (empty($bukti_dukung_arr) || !is_array($bukti_dukung_arr)) {
+								            $bukti_dukung_arr = json_decode(stripslashes($penilaian['pl_bukti_dukung']), true);
+								        }
 								        if (empty($bukti_dukung_arr) || !is_array($bukti_dukung_arr)) {
 								            continue;
 								        }
+
+								        $bukti_dukung_arr = array_map(function($nama_file) {
+								            return $decoded !== null ? $decoded : $nama_file;
+								        }, $bukti_dukung_arr);
 
 								        $kp_id = !empty($prefix_history) ? $penilaian['kp_id_asli'] : $penilaian['kp_id'];
 								        $jenis_bukti_dukung_db = $wpdb->get_var($wpdb->prepare("
@@ -815,17 +822,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								            continue;
 								        }
 
-								        // Tabel yang tidak pakai filter tahun
-								        $tabel_tanpa_dokumen = [];
-								        $tabel_tanpa_tahun = [
-								            'esakip_renstra',
-								            'esakip_iku',
-								            'esakip_pohon_kinerja_dan_cascading',
-								            'esakip_rpjmd',
-								            'esakip_rpjpd',
-								        ];
-
-								        // Tabel dengan prefix path dokumen_pemda
 								        $tabel_prefix_pemda = [
 								            'esakip_rpjmd',
 								            'esakip_rpjpd',
@@ -834,46 +830,68 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 								            'esakip_other_file',
 								        ];
 
-
 								        $bukti_dukung_bersih = [];
 
 								        foreach ($bukti_dukung_arr as $nama_file) {
-								            $file_masih_aktif = false;
+								            $nama_file_decoded = html_entity_decode($nama_file, ENT_QUOTES, 'UTF-8');
+
+								            $ditemukan_aktif    = false;
+								            $ditemukan_nonaktif = false;
 
 								            foreach ($jenis_bukti_dukung as $tabel) {
-								                if (in_array($tabel, $tabel_tanpa_dokumen)) {
-								                    $file_masih_aktif = true;
-								                    continue;
-								                }
+								                $is_pemda_table = in_array($tabel, $tabel_prefix_pemda);
 
-								                if (in_array($tabel, $tabel_prefix_pemda)) {
-								                    $check_nama_file = str_replace('dokumen_pemda/', '', $nama_file);
+								                $check_variants = [];
+
+								                if ($is_pemda_table) {
+								                    $stripped = str_replace('dokumen_pemda/', '', $nama_file_decoded);
+								                    $check_variants[] = $stripped;
+								                    $check_variants[] = 'dokumen_pemda/' . $stripped;
 								                } else {
-								                    $check_nama_file = $nama_file;
+								                    $check_variants[] = $nama_file_decoded;
+								                    $check_variants[] = basename($nama_file_decoded);
 								                }
 
-								                $sql_cek = $wpdb->prepare("
-								                    SELECT COUNT(id)
-								                    FROM {$tabel}
-								                    WHERE dokumen = %s
-								                      AND id_skpd = %d
-								                      AND active = 1
-								                ", $check_nama_file, $id_skpd);
+								                $check_variants = array_unique($check_variants);
 
-								                $count_aktif = $wpdb->get_var($sql_cek);
+								                foreach ($check_variants as $check_nama_file) {
+								                    $count_aktif = $wpdb->get_var($wpdb->prepare("
+								                        SELECT COUNT(id)
+								                        FROM {$tabel}
+								                        WHERE dokumen = %s
+								                          AND id_skpd = %d
+								                          AND active = 1
+								                    ", $check_nama_file, $id_skpd));
 
-								                if ($count_aktif > 0) {
-								                    $file_masih_aktif = true;
+								                    if ($count_aktif > 0) {
+								                        $ditemukan_aktif = true;
+								                        break 2;
+								                    }
+
+								                    $count_nonaktif = $wpdb->get_var($wpdb->prepare("
+								                        SELECT COUNT(id)
+								                        FROM {$tabel}
+								                        WHERE dokumen = %s
+								                          AND id_skpd = %d
+								                    ", $check_nama_file, $id_skpd));
+
+								                    if ($count_nonaktif > 0) {
+								                        $ditemukan_nonaktif = true;
+								                    }
+								                }
+
+								                if ($ditemukan_aktif) {
+								                    break;
 								                }
 								            }
 
-								            if ($file_masih_aktif) {
+								            if ($ditemukan_aktif) {
 								                $bukti_dukung_bersih[] = $nama_file;
 								            }
 								        }
 
 								        if (count($bukti_dukung_bersih) !== count($bukti_dukung_arr)) {
-								            $new_bukti_dukung = !empty($bukti_dukung_bersih) ? json_encode(array_values($bukti_dukung_bersih)) : null;
+								            $new_bukti_dukung = !empty($bukti_dukung_bersih) ? json_encode(array_values($bukti_dukung_bersih), JSON_UNESCAPED_UNICODE) : null;
 
 								            if (empty($prefix_history)) {
 								                $wpdb->update(
