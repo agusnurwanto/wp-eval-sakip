@@ -22935,6 +22935,19 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 						$skp_skpd_detail .= '<li><a href="' . $skp_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_skp_skpd . '</a></li>';
 						$cek_data_perencanaan['perangkat_daerah']['SKP']['link'] = $skp_skpd_detail;
 					}
+
+					if (!empty($cek_data_perencanaan['perangkat_daerah']['Pengukuran Kinerja']) && $cek_data_perencanaan['perangkat_daerah']['Pengukuran Kinerja']['active'] == 1) {
+						$pengukuran_kinerja_skpd = $this->functions->generatePage(array(
+							'nama_page' => 'Dokumen Pengukuran Kinerja ' . $_GET['tahun'],
+							'content' => '[dokumen_detail_pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+						$title_pengukuran_kinerja_skpd = 'Pengukuran Kinerja';
+						$pengukuran_kinerja_skpd['url'] .= '&id_skpd=' . $skpd_db['id_skpd'];
+						$pengukuran_kinerja_skpd_detail .= '<li><a href="' . $pengukuran_kinerja_skpd['url'] . '" target="_blank" class="btn btn-primary">' .  $title_pengukuran_kinerja_skpd . '</a></li>';
+						$cek_data_perencanaan['perangkat_daerah']['Pengukuran Kinerja']['link'] = $pengukuran_kinerja_skpd_detail;
+					}
 	
 					if (!empty($cek_data_perencanaan['perangkat_daerah']['Rencana Aksi']) && $cek_data_perencanaan['perangkat_daerah']['Rencana Aksi']['active'] == 1) {
 						$rencana_aksi_skpd = $this->functions->generatePage(array(
