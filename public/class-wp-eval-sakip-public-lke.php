@@ -2283,7 +2283,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 						}
 
 						//jika sukses insert
-						if ($ret['status'] = 'success') {
+						if ($ret['status'] == 'success') {
 							$wpdb->insert(
 								'esakip_pengisian_lke',
 								array(
