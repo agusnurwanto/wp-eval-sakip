@@ -80,7 +80,7 @@ $id_jadwal_wpsipd = !empty($data_id_jadwal['id_jadwal_wp_sipd'])
     <div class="card card-evaluasi shadow-sm">
         <div class="card-header text-center py-3">
             <h5 class="mb-1 font-weight-bold">
-                KKE EVALUASI PERENCANAAN KINERJA <?php echo $skpd['nama_skpd']; ?> (Format 1)
+                KKE EVALUASI PERENCANAAN KINERJA (Format 1)<br><?php echo $skpd['nama_skpd']; ?> TAHUN <?php echo $tahun_anggaran; ?>
             </h5>
             <p class="mb-0 text-muted" style="font-size:0.9rem;">
                 Sub Komponen Kualitas: Ukuran Keberhasilan (Indikator Kinerja) telah Memenuhi Kriteria SMART-C
