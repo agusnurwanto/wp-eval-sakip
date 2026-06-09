@@ -10640,14 +10640,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				if (!empty($queryRecords)) {
 					foreach ($queryRecords as $recKey => $recVal) {
 						$desain_lke_page = $this->functions->generatePage(array(
-							'nama_page' => 'Halaman Desain LKE SAKIP ' . $recVal['nama_jadwal'],
+							'nama_page' => 'Halaman Desain LKE SAKIP ' . $recVal['nama_jadwal'].' '.$recVal['id'],
 							'content' => '[desain_lke_sakip id_jadwal=' . $recVal['id'] . ']',
 							'show_header' => 1,
 							'no_key' => 1,
 							'post_status' => 'private'
 						));
 						$lke = $this->functions->generatePage(array(
-						    'nama_page' => 'Pengisian LKE | ' . $recVal['nama_jadwal'],
+						    'nama_page' => 'Pengisian LKE | ' . $recVal['nama_jadwal'].' '.$recVal['id'],
 						    'content' => '[pengisian_lke_sakip id_jadwal=' . $recVal['id'] . ']',
 						    'show_header' => 1,
 						    'post_status' => 'private'
@@ -21521,6 +21521,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			));
 			$title_dpa = 'DPA (Dokumen Pelaksanaan Anggaran)';
 			$cek_data_perencanaan['perangkat_daerah']['DPA']['link'] = '<li><a target="_blank" href="' . $dpa['url'] . '" class="btn btn-primary">' .  $title_dpa . '</a></li>';
+		}
+
+		if (!empty($cek_data_perencanaan['perangkat_daerah']['Pengukuran Kinerja']) && $cek_data_perencanaan['perangkat_daerah']['Pengukuran Kinerja']['active'] == 1) {
+			$pengukuran_kinerja = $this->functions->generatePage(array(
+				'nama_page' => 'Halaman Dokumen Pengukuran Kinerja tahun ' . $_GET['tahun'],
+				'content' => '[pengukuran_kinerja tahun=' . $_GET['tahun'] . ']',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			$title_pengukuran_kinerja = 'Pengukuran Kinerja';
+			$cek_data_perencanaan['perangkat_daerah']['Pengukuran Kinerja']['link'] = '<li><a target="_blank" href="' . $pengukuran_kinerja['url'] . '"  class="btn btn-info">' .  $title_pengukuran_kinerja . '</a></li>';
 		}
 
 		// if (!empty($cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']) && $cek_data['perangkat_daerah']['Pohon Kinerja dan Cascading']['active'] == 1) {
