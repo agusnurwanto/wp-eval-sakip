@@ -349,3 +349,15 @@ function generate_master_data(that) {
         }
     });
 }
+
+function kirim_request_ajax_ekin(){
+    jQuery("#wrap-loading").show();
+    var ajaxUrl = jQuery('#url-ajax-ekin').val();
+    var params = JSON.parse(jQuery('#params-ajax-ekin').val());
+    jQuery("#respon-ajax-ekin").val("Loading..."); 
+    jQuery.post(ajaxUrl, params, function(response){ 
+        console.log("E-Kinerja response:", response); 
+        jQuery("#respon-ajax-ekin").val(response); 
+        jQuery("#wrap-loading").hide();
+    });
+}

@@ -2709,15 +2709,71 @@ class Wp_Eval_Sakip_Admin
 		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_e-sakip_options.php') {
 			return array();
 		}
-
-		return [
+		global $wpdb;
+		$fields = array(
 			Field::make('radio', 'crb_api_ekinerja_status', 'Status API E-Kinerja')
 				->add_options(['0' => 'Dikunci', '1' => 'Dibuka']),
 			Field::make('text', 'crb_url_api_ekinerja', 'URL API E-Kinerja')
 				->set_help_text('Wajib diisi.'),
 			Field::make('text', 'crb_api_key_ekinerja', 'API KEY E-Kinerja')
 				->set_help_text('Wajib diisi.'),
-		];
+		);
+
+				// Build AJAX request for testing E-Kinerja API
+		if(get_option('_crb_api_ekinerja_status') == 1){
+			$tahun_anggaran_sakip = get_option('_crb_tahun_wpsipd');
+			$unit = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT 
+							*
+						FROM 
+							esakip_data_unit 
+						WHERE 
+							active=1 
+						AND is_skpd=1 
+						AND tahun_anggaran=%d
+						ORDER BY kode_skpd ASC
+						LIMIT 1
+					",
+					$tahun_anggaran_sakip
+				),
+				ARRAY_A
+			);
+
+			$id_skpd = 0;
+			$id_skpd_simpeg = 0;
+			if (!empty($unit)) {
+				$get_mapping = $wpdb->get_var($wpdb->prepare('
+						SELECT 
+							u.id_satker_simpeg
+						FROM esakip_data_mapping_unit_sipd_simpeg AS u
+						WHERE u.tahun_anggaran = %d
+							AND u.id_skpd = %d
+							AND u.active = 1
+					', $tahun_anggaran_sakip, $unit['id_skpd']));
+				$id_skpd = $unit['id_skpd'];
+				$id_skpd_simpeg = $get_mapping;
+			}
+			$ajax_url = admin_url('admin-ajax.php');
+			$ekinerja_params = array(
+				'action' => 'get_data_target_bulanan_ekinerja',
+				'api_key' => get_option('_crb_apikey_esakip'),
+				'tahun' => $tahun_anggaran_sakip,
+				'satker_id' => $id_skpd_simpeg,
+				'id_skpd' => $id_skpd,
+				'tipe' => 'satker',
+				'debug' => 1,
+			);
+			// Encode parameters as JSON for use in JS
+			$params_json = json_encode($ekinerja_params);
+			$fields[] = Field::make('html', 'crb_esakip_cek_api_ekin')
+				->set_html('<h4>Testing request API E-Kinerja via AJAX</h4>
+				Menunggu request ajax ke <textarea id="url-ajax-ekin" style="width: 100%">'.$ajax_url.'</textarea>
+				<br>dengan parameter body <textarea id="params-ajax-ekin" style="width: 100%">'.$params_json.'</textarea>
+				<br><a onclick="kirim_request_ajax_ekin(); return false;" href="#" class="button button-primary" style="margin: 20px 0;">Kirim Request</a>
+				<br><b>RESPON AJAX:</b> <textarea id="respon-ajax-ekin" style="width: 100%"></textarea>');
+		}
+		return $fields;
 	}
 
 	public function generate_fields_perangkat_daerah_options()

@@ -175,7 +175,6 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_get_data_total_pegawai_simpeg', $plugin_admin, 'get_data_total_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_coba_auto_login',  $plugin_admin, 'coba_auto_login');
 		$this->loader->add_action('wp_ajax_handle_sql_migrate_ajax',  $plugin_admin, 'handle_sql_migrate_ajax');
-		
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_esakip_options');
 		$this->loader->add_action('template_redirect', $plugin_admin, 'allow_access_private_post', 0);
 		$this->loader->add_action('template_redirect', $plugin_admin, 'handle_sso_login', 0);
