@@ -9991,6 +9991,8 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				),
 				'body' => $body_param
 			]);
+			$ret['url_api'] = $url_api;
+			$ret['body'] = $body_param;
 
 			if (!empty($_POST['debug'])) {
 				$endTimeOp1 = microtime(true);
@@ -10000,11 +10002,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 
 			if (is_wp_error($response)) {
 				$error_message = $response->get_error_message();
-				$ret = array(
-					'status'  => false,
-					'is_error' => true,
-					'message' => "Something went wrong: $error_message"
-				);
+				$ret['status']  = false;
+				$ret['is_error'] = true;
+				$ret['message'] = "Something went wrong: $error_message";
 				return json_encode($ret);
 			}
 
@@ -10014,11 +10014,9 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				if (is_array($response)) {
 					$response = json_encode($response);
 				}
-				$ret = array(
-					'status'  => false,
-					'is_error' => true,
-					'message' => "Gagal Mendapatkan Data E-Kinerja, Coba lagi! " . $response
-				);
+				$ret['status']  = false;
+				$ret['is_error'] = true;
+				$ret['message'] = "Gagal Mendapatkan Data E-Kinerja, Coba lagi! " . $response;
 				return json_encode($ret);
 			}
 
@@ -10840,6 +10838,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 					$data_ekin_terbaru = json_decode($data_ekin, true);
 					$ret['message'] = $data_ekin_terbaru['message'];
 					$ret['debug'] = $data_ekin_terbaru['debug'];
+					$ret['api'] = $data_ekin_terbaru;
 					if (!empty($data_ekin_terbaru['is_error']) && $data_ekin_terbaru['is_error']) {
 						$ret['show_alert_bulanan'] = 1;
 					}

@@ -2604,6 +2604,9 @@ class Wp_Eval_Sakip_Admin
             ')
 				->set_width(33.33)
 				->set_help_text('Tombol untuk generate data master.'),
+			Field::make('text', 'crb_custom_timeout_esakip', 'Custom CURL Timeout')
+				->set_default_value(5)
+				->set_help_text('Satuan dalam detik'),
 		];
 	}
 
@@ -5422,5 +5425,12 @@ class Wp_Eval_Sakip_Admin
 	function handle_sso_login()
 	{
 		return $this->functions->handle_sso_login();
+	}
+	function custom_http_request_timeout( $timeout, $url ) {
+		$custom_timeout = get_option('_crb_custom_timeout_esakip');
+		if(!empty($custom_timeout)){
+			$timeout = $custom_timeout;
+		}
+		return $timeout;
 	}
 }

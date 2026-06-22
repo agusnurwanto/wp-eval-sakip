@@ -178,6 +178,8 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_attach_esakip_options');
 		$this->loader->add_action('template_redirect', $plugin_admin, 'allow_access_private_post', 0);
 		$this->loader->add_action('template_redirect', $plugin_admin, 'handle_sso_login', 0);
+
+		$this->loader->add_filter('http_request_timeout', $plugin_admin, 'custom_http_request_timeout', 10, 2);
 	}
 
 	/**
