@@ -430,7 +430,6 @@ class Wp_Eval_Sakip_Admin
 		$response = wp_remote_post(
 			get_option(ESAKIP_URL_WPSIPD),
 			array(
-				'timeout' 	=> 1000,
 				'sslverify' => false,
 				'body' 		=> $api_params
 			)
@@ -4814,7 +4813,8 @@ class Wp_Eval_Sakip_Admin
 		global $wpdb;
 		$ret = array(
 			'status'  => 'success',
-			'message' => 'Berhasil Get Data Unit WP-SIPD!'
+			'message' => 'Berhasil Get Data Unit WP-SIPD!',
+			'debug' => array()
 		);
 		if (empty($_POST['server'])) {
 			$ret['status'] 	= 'error';
@@ -4850,32 +4850,59 @@ class Wp_Eval_Sakip_Admin
 			'no_option' 	 => true
 		);
 
+		$startTimeOp1 = microtime(true);
 		$response_get_skpd = wp_remote_post(
 			$_POST['server'],
 			array(
-				'timeout' 	=> 1000,
 				'sslverify' => false,
 				'body' 		=> $api_params_get_skpd
 			)
 		);
+		$endTimeOp1 = microtime(true);
+		$durationOp1 = $endTimeOp1 - $startTimeOp1;
+		$ret['debug'][] = "Operasi 1 (" . $_POST['server'] . ") selesai dalam " . number_format($durationOp1, 4) . " detik. body " . json_encode($response_get_skpd);
+		if (is_wp_error($response_get_skpd)) {
+			$error_message = $response_get_skpd->get_error_message();
+			$ret['status']  = 'error';
+			$ret['message'] = "Something went wrong: $error_message";
+			die(json_encode($ret));
+		}
 
+		$startTimeOp2 = microtime(true);
 		$response_get_rekening = wp_remote_post(
 			$_POST['server'],
 			array(
-				'timeout' 	=> 1000,
 				'sslverify' => false,
 				'body' 		=> $api_params_get_rekening
 			)
 		);
+		$endTimeOp2 = microtime(true);
+		$durationOp2 = $endTimeOp2 - $startTimeOp2;
+		$ret['debug'][] = "Operasi 2 (" . $_POST['server'] . ") selesai dalam " . number_format($durationOp2, 4) . " detik. body " . json_encode($response_get_rekening);
+		if (is_wp_error($response_get_rekening)) {
+			$error_message = $response_get_rekening->get_error_message();
+			$ret['status']  = 'error';
+			$ret['message'] = "Something went wrong: $error_message";
+			die(json_encode($ret));
+		}
 
+		$startTimeOp3 = microtime(true);
 		$response_get_satuan = wp_remote_post(
 			$_POST['server'],
 			array(
-				'timeout' 	=> 1000,
 				'sslverify' => false,
 				'body' 		=> $api_params_get_satuan
 			)
 		);
+		$endTimeOp3 = microtime(true);
+		$durationOp3 = $endTimeOp3 - $startTimeOp3;
+		$ret['debug'][] = "Operasi 3 (" . $_POST['server'] . ") selesai dalam " . number_format($durationOp3, 4) . " detik. body " . json_encode($response_get_satuan);
+		if (is_wp_error($response_get_satuan)) {
+			$error_message = $response_get_satuan->get_error_message();
+			$ret['status']  = 'error';
+			$ret['message'] = "Something went wrong: $error_message";
+			die(json_encode($ret));
+		}
 
 		$response_get_skpd 		= wp_remote_retrieve_body($response_get_skpd);
 		$response_get_rekening 	= wp_remote_retrieve_body($response_get_rekening);
@@ -5384,7 +5411,6 @@ class Wp_Eval_Sakip_Admin
                     
                     // Kirim request ke target
                     $response = wp_remote_post($check_url, array(
-                        'timeout' => 10,
                         'sslverify' => false,
                         'body' => array(
                             'username' => $opsi['username'],
