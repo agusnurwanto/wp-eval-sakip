@@ -6313,6 +6313,9 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				    if (is_string($result)) {
 				        $result = json_decode($result, true);
 				    }
+					if($tipe_str == 'tujuan' || $tipe_str == 'sasaran'){
+						$ret[$tipe_str] = $result;
+					}
 
 				    if (empty($result['status']) || $result['status'] !== 'success' || empty($result['data'])) {
 				        continue;

@@ -911,6 +911,7 @@ class Wp_Eval_Sakip {
 		add_shortcode('format_kke_5', array($plugin_public, 'format_kke_5'));
 		add_shortcode('format_kke_6', array($plugin_public, 'format_kke_6'));
 
+		add_shortcode('homepage_bjg_1', array($plugin_public, 'homepage_bjg_1'));
 		add_shortcode('menu_depan', array($plugin_public, 'menu_depan'));
 		add_shortcode('background_menu', array($plugin_public, 'background_menu'));
 		add_shortcode('pohon_kinerja_publish', array($plugin_public, 'pohon_kinerja_publish'));

@@ -403,6 +403,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-detail_crosscutting_pemda.php';
 	}
+	public function homepage_bjg_1($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-bjg-1.php';
+	}
 
 	public function pohon_kinerja_publish($atts)
 	{
