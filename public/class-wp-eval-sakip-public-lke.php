@@ -6607,7 +6607,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 	        $kode_raw = $item['kode_bidang_urusan_multiple'] ?? '';
 	        $kode_arr = json_decode($kode_raw, true);
-	        $kode_bidur = (is_array($kode_arr) && !empty($kode_arr)) ? $kode_arr[0] : '';
+			$kode_bidur = '';
+			if(!empty($kode_arr) && is_array($kode_arr)){
+				sort($kode_arr);
+				$kode_bidur = $kode_arr[0];
+			}
 
 	        $id_unik_tujuan = $item['id_unik'] ?? '';
 	        $kode = $kode_bidur . '|' . $id_unik_tujuan;
@@ -6707,7 +6711,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	        // Nonaktifkan semua baris (induk + indikator)
 	        $wpdb->query($wpdb->prepare("
 	            UPDATE esakip_data_kke_format_1
-	            SET status = 0, updated_at = %s
+	            SET status = 0, updated_at = %s, active = 0
 	            WHERE kode = %s
 	              AND tipe = %d
 	              AND tahun_anggaran = %d
@@ -6739,36 +6743,34 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                }
 	            }
 
+				$data_db = array(
+					'id_kke'              => $id_data,
+					'tipe'                => $tipe_int,
+					'kode'                => $kode,
+					'kode_indikator'      => null,
+					'nama'                => $nama,
+					'indikator'           => null,
+					'satuan_capaian'      => null,
+					'target_capaian_teks' => null,
+					'capaian_teks'        => null,
+					'target_capaian'      => null,
+					'id_skpd'             => $id_skpd,
+					'tahun_anggaran'      => $tahun_anggaran,
+					'status'              => 1,
+					'active'              => 1,
+					'created_at'          => current_time('mysql')
+				);
+
 	            if (!empty($existing_outdated)) {
 	                $wpdb->update(
-	                    'esakip_data_kke_format_1',
-	                    [
-	                        'status'     => 1,
-	                        'nama'       => $nama,
-	                        'updated_at' => current_time('mysql'),
-	                    ],
+	                    'esakip_data_kke_format_1', 
+						$data_db,
 	                    ['id' => $existing_outdated['id']]
 	                );
 	            } else {
 	                $wpdb->insert(
 	                    'esakip_data_kke_format_1',
-	                    [
-	                        'id_kke'              => $id_data,
-	                        'tipe'                => $tipe_int,
-	                        'kode'                => $kode,
-	                        'kode_indikator'      => null,
-	                        'nama'                => $nama,
-	                        'indikator'           => null,
-	                        'satuan_capaian'      => null,
-	                        'target_capaian_teks' => null,
-	                        'capaian_teks'        => null,
-	                        'target_capaian'      => null,
-	                        'id_skpd'             => $id_skpd,
-	                        'tahun_anggaran'      => $tahun_anggaran,
-	                        'status'              => 1,
-	                        'active'              => 1,
-	                        'created_at'          => current_time('mysql'),
-	                    ]
+	                    $data_db
 	                );
 	            }
 	        }
@@ -6840,7 +6842,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			        ) {
 			            $wpdb->update(
 			                'esakip_data_kke_format_1',
-			                ['status' => 0, 'updated_at' => current_time('mysql')],
+			                [
+								'status' => 0, 
+								'active' => 0, 
+								'updated_at' => current_time('mysql')
+							],
 			                ['id' => $ex['id']]
 			            );
 			        }
@@ -6860,38 +6866,35 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			        }
 			    }
 
+				$data_db = array(
+					'id_kke'              => $id_data,
+					'tipe'                => $tipe_int,
+					'kode'                => $kode,
+					'kode_indikator'      => $kode_ind,
+					'nama'                => $nama,
+					'indikator'           => $indikator_teks_master,
+					'satuan_capaian'      => $satuan_master,
+					'target_capaian_teks' => (string)$target_capaian_master,
+					'capaian_teks'        => $indikator_teks_master,
+					'target_capaian'      => $target_capaian_master,
+					'id_skpd'             => $id_skpd,
+					'tahun_anggaran'      => $tahun_anggaran,
+					'status'              => 1,
+					'active'              => 1,
+					'created_at'          => current_time('mysql')
+				);
+
 			    if (!empty($existing_reaktivasi)) {
 			        // hidupkan baris lama, update kode_indikator & nama saja
 			        $wpdb->update(
 			            'esakip_data_kke_format_1',
-			            [
-			                'status'         => 1,
-			                'kode_indikator' => $kode_ind,
-			                'nama'           => $nama,
-			                'updated_at'     => current_time('mysql'),
-			            ],
+			            $data_db,
 			            ['id' => $existing_reaktivasi['id']]
 			        );
 			    } else {
 			        $wpdb->insert(
 			            'esakip_data_kke_format_1',
-			            [
-			                'id_kke'              => $id_data,
-			                'tipe'                => $tipe_int,
-			                'kode'                => $kode,
-			                'kode_indikator'      => $kode_ind,
-			                'nama'                => $nama,
-			                'indikator'           => $indikator_teks_master,
-			                'satuan_capaian'      => $satuan_master,
-			                'target_capaian_teks' => (string)$target_capaian_master,
-			                'capaian_teks'        => $indikator_teks_master,
-			                'target_capaian'      => $target_capaian_master,
-			                'id_skpd'             => $id_skpd,
-			                'tahun_anggaran'      => $tahun_anggaran,
-			                'status'              => 1,
-			                'active'              => 1,
-			                'created_at'          => current_time('mysql'),
-			            ]
+			            $data_db
 			        );
 			    }
 			}
@@ -6906,7 +6909,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            if (!$ada_di_master) {
 	                $wpdb->update(
 	                    'esakip_data_kke_format_1',
-	                    ['status' => 0, 'updated_at' => current_time('mysql')],
+	                    [
+							'status' => 0, 
+							'active' => 0, 
+							'updated_at' => current_time('mysql')
+						],
 	                    ['id'     => $ex['id']]
 	                );
 	            }
@@ -6971,7 +6978,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            if ($existing_by_kode['active'] == 1 && $existing_by_kode['status'] == 1) {
 	                $wpdb->update(
 	                    'esakip_data_kke_format_1',
-	                    ['status' => 0, 'updated_at' => current_time('mysql')],
+	                    [
+							'status' => 0, 
+							'active' => 0, 
+							'updated_at' => current_time('mysql')
+						],
 	                    ['id'     => $existing_by_kode['id']]
 	                );
 	            }
@@ -6993,15 +7004,27 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            }
 	        }
 
+			$data_db = array(
+				'id_kke'              => $id_data,
+				'tipe'                => $tipe_int,
+				'kode'                => $kode,
+				'nama'                => $nama,
+				'indikator'           => $capaian_teks_master,
+				'satuan_capaian'      => $satuan_capaian_master,
+				'target_capaian_teks' => $target_capaian_teks_master,
+				'capaian_teks'        => $capaian_teks_master,
+				'target_capaian'      => $target_capaian_master,
+				'id_skpd'             => $id_skpd,
+				'tahun_anggaran'      => $tahun_anggaran,
+				'status'              => 1,
+				'active'              => 1,
+				'created_at'          => current_time('mysql')
+			);
+
 	        if (!empty($existing_reaktivasi)) {
 	            $wpdb->update(
 	                'esakip_data_kke_format_1',
-	                [
-	                    'status'        => 1,
-	                    'kode_indikator'=> $kode_ind,
-	                    'nama'          => $nama,
-	                    'updated_at'    => current_time('mysql'),
-	                ],
+	                $data_db,
 	                ['id' => $existing_reaktivasi['id']]
 	            );
 	        } else {
@@ -7048,25 +7071,10 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    $kode_ind_insert = $kode_base . '.' . (($max_suffix ? intval($max_suffix) : 0) + 1);
 	                }
 
+					$data_db['kode_indikator'] = $kode_ind_insert;
 	                $wpdb->insert(
 	                    'esakip_data_kke_format_1',
-	                    [
-	                        'id_kke'              => $id_data,
-	                        'tipe'                => $tipe_int,
-	                        'kode'                => $kode,
-	                        'kode_indikator'      => $kode_ind_insert,
-	                        'nama'                => $nama,
-	                        'indikator'           => $capaian_teks_master,
-	                        'satuan_capaian'      => $satuan_capaian_master,
-	                        'target_capaian_teks' => $target_capaian_teks_master,
-	                        'capaian_teks'        => $capaian_teks_master,
-	                        'target_capaian'      => $target_capaian_master,
-	                        'id_skpd'             => $id_skpd,
-	                        'tahun_anggaran'      => $tahun_anggaran,
-	                        'status'              => 1,
-	                        'active'              => 1,
-	                        'created_at'          => current_time('mysql'),
-	                    ]
+	                    $data_db
 	                );
 	            }
 	        }
@@ -7092,7 +7100,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	        if (!$ada_di_master) {
 	            $wpdb->update(
 	                'esakip_data_kke_format_1',
-	                ['status' => 0, 'updated_at' => current_time('mysql')],
+	                [
+						'status' => 0, 
+						'active' => 0, 
+						'updated_at' => current_time('mysql')
+					],
 	                ['id'     => $ex['id']]
 	            );
 	        }
