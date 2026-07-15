@@ -6303,8 +6303,19 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                'sub_kegiatan' => 5,
 	            ];
 
-	            $tujuan_cache = [];
+				// non aktifkan semua data
+				$wpdb->query($wpdb->prepare("
+					UPDATE esakip_data_kke_format_1
+					SET status = 0, updated_at = %s
+					WHERE active = 1
+						AND tipe IN (1, 2, 3, 4, 5)
+						AND tahun_anggaran = %d
+						AND id_skpd = %d
+						AND id_kke = %d
+						AND status = 1
+				", current_time('mysql'), $tahun_anggaran, $id_skpd, $id_data));
 
+	            $tujuan_cache = [];
 				foreach ($tipe_map as $tipe_str => $tipe_int) {
 				    $_POST['tipe'] = $tipe_str;
 				    $_POST['id_jadwal_wpsipd'] = $id_jadwal_wpsipd;
@@ -6355,13 +6366,14 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    *
 	                FROM esakip_data_kke_format_1
 	                WHERE id_skpd = %d
-	                  AND tahun_anggaran = %d
-	                  AND active = 1
-	                  AND tipe IN (1, 2, 3, 4, 5)
-	                  AND kode_indikator IS NOT NULL
-	                  AND indikator IS NOT NULL
-	                ORDER BY kode ASC, id ASC
-	            ", $id_skpd, $tahun_anggaran), ARRAY_A);
+	                	AND tahun_anggaran = %d
+	                	AND active = 1
+	                	AND tipe IN (1, 2, 3, 4, 5)
+	                	AND kode_indikator IS NOT NULL
+	                	AND indikator IS NOT NULL
+						AND id_kke = %d
+	                ORDER BY tipe ASC, kode ASC, id ASC
+	            ", $id_skpd, $tahun_anggaran, $id_data), ARRAY_A);
 
 	            if (empty($rows)) {
 	                $ret['data']['html'] = '<tr><td class="text-center" colspan="14">Data masih kosong!</td></tr>';
@@ -6711,7 +6723,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	        // Nonaktifkan semua baris (induk + indikator)
 	        $wpdb->query($wpdb->prepare("
 	            UPDATE esakip_data_kke_format_1
-	            SET status = 0, updated_at = %s, active = 0
+	            SET status = 0, updated_at = %s
 	            WHERE kode = %s
 	              AND tipe = %d
 	              AND tahun_anggaran = %d
@@ -6844,7 +6856,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 			                'esakip_data_kke_format_1',
 			                [
 								'status' => 0, 
-								'active' => 0, 
 								'updated_at' => current_time('mysql')
 							],
 			                ['id' => $ex['id']]
@@ -6911,7 +6922,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    'esakip_data_kke_format_1',
 	                    [
 							'status' => 0, 
-							'active' => 0, 
 							'updated_at' => current_time('mysql')
 						],
 	                    ['id'     => $ex['id']]
@@ -6980,7 +6990,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                    'esakip_data_kke_format_1',
 	                    [
 							'status' => 0, 
-							'active' => 0, 
 							'updated_at' => current_time('mysql')
 						],
 	                    ['id'     => $existing_by_kode['id']]
@@ -7102,7 +7111,6 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	                'esakip_data_kke_format_1',
 	                [
 						'status' => 0, 
-						'active' => 0, 
 						'updated_at' => current_time('mysql')
 					],
 	                ['id'     => $ex['id']]
