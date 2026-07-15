@@ -6328,7 +6328,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 				            $id_unik  = $item['id_unik'] ?? null;
 				            $kode_raw = $item['kode_bidang_urusan_multiple'] ?? '';
 				            $kode_arr = json_decode($kode_raw, true);
-				            $kode_val = (is_array($kode_arr) && !empty($kode_arr)) ? $kode_arr[0] : '';
+							$kode_val = '';
+							if(!empty($kode_arr) && is_array($kode_arr)){
+								sort($kode_arr);
+								$kode_val = $kode_arr[0];
+							}
 				            if (!empty($id_unik) && !empty($kode_val)) {
 				                $tujuan_cache[$id_unik] = $kode_val;
 				            }
