@@ -6395,7 +6395,7 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 	            usort($rows, function($a, $b) use ($sort_kode_fn) {
 	                $cmp = $sort_kode_fn($a['kode'], $b['kode']);
 	                if ($cmp !== 0) return $cmp;
-	                return intval($a['id']) - intval($b['id']);
+	                return intval($a['tipe']) - intval($b['tipe']);
 	            });
 
 	            $grouped_by_kode = [];
@@ -6510,6 +6510,11 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 	                        $html .= '<td' . $rs_attr . ' style="white-space:nowrap;vertical-align:top !important; text-align:left !important;font-weight:' . ($tipe <= 3 ? 'bold' : 'normal') . '; !important; text-align:left !important;">' . $nomor_esc . '</td>';
 
+							if($tipe == 4){
+								$nama_a = explode(' ', $nama);
+								unset($nama_a[0]);
+								$nama = implode(' ', $nama_a);
+							}
 	                        $html .= '<td' . $rs_attr . ' class="text-left" style="' . $nama_style . '; vertical-align:top !important; text-align:left !important;"> ' . $kode_esc . ' ' . $nama . '</td>';
 	                    }
 
