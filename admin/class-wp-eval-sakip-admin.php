@@ -2954,13 +2954,31 @@ class Wp_Eval_Sakip_Admin
 			$fields[] = Field::make('html', 'crb_no_tahun_notice')
 				->set_html('<span class="badge" style="display:inline-block; padding:5px 10px; background:#ccc; border-radius:5px;">Tahun Anggaran tidak tersedia</span>');
 		}
+		
+		$halaman_template_1 = $this->functions->generatePage(array(
+			'nama_page' 	=> 'Halaman Homepage Template 1',
+			'content' 		=> '[menu_depan]',
+			'show_header' 	=> 1,
+			'no_key' 		=> 1,
+			'post_status' 	=> 'publish'
+		));
+		$halaman_template_2 = $this->functions->generatePage(array(
+			'nama_page' 	=> 'Halaman Homepage Template 2',
+			'content' 		=> '[homepage_bjg_1]',
+			'show_header' 	=> false,
+			'no_key' 		=> 1,
+			'post_status' 	=> 'publish'
+		));
 
 		return [
 			Field::make('html', 'crb_menu_depan_note_1')
 				->set_html('
 					<div style="text-align: center;">
-						<h3 style="font-weight: bold;">IKON MENU</h3>
-						<p>Tampilan Beranda dapat diaktifkan melalui shortcode <code>[menu_depan]</code></p>.
+						<h3 style="font-weight: bold;">Halaman Beranda (Template)</h3>
+						<ol style="text-align: left;">
+							<li><a target="_blank" href="' . $halaman_template_1['url'] . '">' . $halaman_template_1['title'] . ' dengan shortcode <code>[menu_depan]</code></a></li>
+							<li><a target="_blank" href="' . $halaman_template_2['url'] . '">' . $halaman_template_2['title'] . ' dengan shortcode <code>[homepage_bjg_1]</code></a></li>
+						</ol>
 					</div>'
 				),
 

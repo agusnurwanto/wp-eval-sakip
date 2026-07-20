@@ -1,82 +1,54 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page - SAKIP</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <style>
-        .hero-section {
-            background: linear-gradient(135deg, #0056b3 0%, #002d62 100%);
-            color: white;
-            padding: 80px 0;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-img {
-            max-width: 100%;
-            height: auto;
-            object-fit: contain;
-        }
-        .card-laporan {
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        .card-laporan:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .icon-box {
-            font-size: 2.5rem;
-            color: #0056b3;
-            margin-bottom: 15px;
-        }
-        .app-card {
-            border: 1px solid #eef2f5;
-            transition: all 0.3s;
-            text-decoration: none;
-            color: initial;
-        }
-        .app-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
+<?php
+// If this file is called directly, abort.
+if (! defined('WPINC')) {
+    die;
+}
+?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+    .wp-eval-sakip-bjg-1 .hero-section {
+        background: linear-gradient(135deg, #0056b3 0%, #002d62 100%);
+        color: white;
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .wp-eval-sakip-bjg-1 .hero-img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+    .wp-eval-sakip-bjg-1 .card-laporan {
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .wp-eval-sakip-bjg-1 .card-laporan:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .wp-eval-sakip-bjg-1 .icon-box {
+        font-size: 2.5rem;
+        color: #0056b3;
+        margin-bottom: 15px;
+    }
+    .wp-eval-sakip-bjg-1 .app-card {
+        border: 1px solid #eef2f5;
+        transition: all 0.3s;
+        text-decoration: none;
+        color: initial;
+    }
+    .wp-eval-sakip-bjg-1 .app-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        border-color: #0056b3;
+    }
+</style>
 
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent position-absolute w-100" style="z-index: 10;">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center fw-bold" href="#">
-                <!-- Ganti src dengan logo pemkab jika ada -->
-                <div class="bg-light rounded-circle me-2" style="width: 30px; height: 30px;"></div> 
-                Pemerintah Kab. Bojonegoro
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul class="navbar-nav align-items-center">
-                    <li class="nav-item"><a class="nav-link active" href="#">Beranda</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Laporan</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Peraturan</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Infografis</a></li>
-                    <li class="nav-item ms-lg-3">
-                        <a class="btn btn-info text-white px-4" href="#">Masuk</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<div class="wp-eval-sakip-bjg-1">
 
     <!-- HERO SECTION -->
-    <header class="hero-section d-flex align-items-center pt-5">
-        <div class="container pt-5">
+    <header class="hero-section d-flex align-items-center">
+        <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
                     <!-- Placeholder Logo SAKIP -->
@@ -216,14 +188,4 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="bg-dark text-white py-3 border-top border-secondary">
-        <div class="container text-center">
-            <p class="mb-0 small">Copyright &copy; 2026 <a href="#" class="text-info text-decoration-none">Pemerintah Kab. Bojonegoro</a>. All Rights Reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
