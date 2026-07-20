@@ -413,6 +413,16 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		require plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-bjg-1.php';
 		return ob_get_clean();
 	}
+	public function homepage_bjg_2($atts)
+	{
+		// untuk disable render shortcode di halaman edit page/post
+		if (!empty($_GET) && !empty($_GET['POST'])) {
+			return '';
+		}
+		ob_start();
+		require plugin_dir_path(dirname(__FILE__)) . 'public/partials/homepage/wp-eval-sakip-bjg-2.php';
+		return ob_get_clean();
+	}
 
 	public function pohon_kinerja_publish($atts)
 	{

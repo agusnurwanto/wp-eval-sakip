@@ -2965,7 +2965,14 @@ class Wp_Eval_Sakip_Admin
 		$halaman_template_2 = $this->functions->generatePage(array(
 			'nama_page' 	=> 'Halaman Homepage Template 2',
 			'content' 		=> '[homepage_bjg_1]',
-			'show_header' 	=> false,
+			'show_header' 	=> 1,
+			'no_key' 		=> 1,
+			'post_status' 	=> 'publish'
+		));
+		$halaman_template_3 = $this->functions->generatePage(array(
+			'nama_page' 	=> 'Halaman Homepage Template 3',
+			'content' 		=> '[homepage_bjg_2]',
+			'show_header' 	=> 1,
 			'no_key' 		=> 1,
 			'post_status' 	=> 'publish'
 		));
@@ -2978,9 +2985,33 @@ class Wp_Eval_Sakip_Admin
 						<ol style="text-align: left;">
 							<li><a target="_blank" href="' . $halaman_template_1['url'] . '">' . $halaman_template_1['title'] . ' dengan shortcode <code>[menu_depan]</code></a></li>
 							<li><a target="_blank" href="' . $halaman_template_2['url'] . '">' . $halaman_template_2['title'] . ' dengan shortcode <code>[homepage_bjg_1]</code></a></li>
+							<li><a target="_blank" href="' . $halaman_template_3['url'] . '">' . $halaman_template_3['title'] . ' dengan shortcode <code>[homepage_bjg_2]</code></a></li>
 						</ol>
 					</div>'
 				),
+
+			Field::make('image', 'crb_foto_kepala_daerah', __('Foto Kepala Daerah'))
+				->set_value_type('url')
+				->set_help_text('Upload foto kepala daerah.')
+				->set_width(33.33),
+
+			Field::make('rich_text', 'crb_html_aplikasi_pendukung', __('HTML Aplikasi Pendukung'))
+				->set_settings(array(
+					'teeny' => false,
+					'quicktags' => true,
+					'media_buttons' => true,
+				))
+				->set_default_value('<div class="col">
+                    <a href="#" class="card h-100 p-3 text-center app-card rounded-3">
+                        <div class="p-3 mb-2 bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                            <i class="bi bi-person-workspace text-primary fs-3"></i>
+                        </div>
+                        <h4 class="h6 fw-bold mb-1">E-Kinerja</h4>
+                        <p class="text-muted card-text" style="font-size: 0.75rem;">E-Kinerja Badan Kepegawaian Negara</p>
+                    </a>
+                </div>')
+				->set_help_text('Konten HTML untuk aplikasi pendukung. Gunakan tab Text untuk edit kode HTML langsung.')
+				->set_width(66.66),
 
 			Field::make('image', 'crb_icon_pohon_kinerja', __('Ikon Pohon Kinerja'))
 				->set_value_type('url')

@@ -66,7 +66,7 @@ if (! defined('WPINC')) {
                 </div>
                 <div class="col-lg-6 text-center">
                     <!-- Placeholder gambar bupati/wakil atau ilustrasi -->
-                    <img src="https://via.placeholder.com/500x400?text=Ilustrasi/Foto+Pejabat" alt="Mockup SAKIP" class="hero-img">
+                    <img src="<?php echo get_option('_crb_foto_kepala_daerah'); ?>" alt="Mockup SAKIP" class="hero-img">
                 </div>
             </div>
         </div>
@@ -130,60 +130,11 @@ if (! defined('WPINC')) {
             <div class="text-center mb-5">
                 <span class="text-primary text-uppercase fw-semibold tracking-wider">Aplikasi Pendukung</span>
                 <h2 class="fw-bold mt-1">Aplikasi Pendukung</h2>
-                <p class="text-muted">Aplikasi yang mendukung SAKIP Kabupaten Bojonegoro</p>
+                <p class="text-muted">Aplikasi yang mendukung SAKIP Kabupaten xxx</p>
             </div>
 
             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3 justify-content-center">
-                <!-- E-Kinerja -->
-                <div class="col">
-                    <a href="#" class="card h-100 p-3 text-center app-card rounded-3">
-                        <div class="p-3 mb-2 bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
-                            <i class="bi bi-person-workspace text-primary fs-3"></i>
-                        </div>
-                        <h4 class="h6 fw-bold mb-1">E-Kinerja</h4>
-                        <p class="text-muted card-text" style="font-size: 0.75rem;">E-Kinerja Badan Kepegawaian Negara</p>
-                    </a>
-                </div>
-                <!-- e-Monev -->
-                <div class="col">
-                    <a href="#" class="card h-100 p-3 text-center app-card rounded-3">
-                        <div class="p-3 mb-2 bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
-                            <i class="bi bi-tv text-primary fs-3"></i>
-                        </div>
-                        <h4 class="h6 fw-bold mb-1">e-Monev</h4>
-                        <p class="text-muted card-text" style="font-size: 0.75rem;">Monitoring & Evaluasi Kinerja Anggaran</p>
-                    </a>
-                </div>
-                <!-- e-SAKIP REVIU -->
-                <div class="col">
-                    <a href="#" class="card h-100 p-3 text-center app-card rounded-3">
-                        <div class="p-3 mb-2 bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
-                            <i class="bi bi-search text-primary fs-3"></i>
-                        </div>
-                        <h4 class="h6 fw-bold mb-1">e-SAKIP REVIU</h4>
-                        <p class="text-muted card-text" style="font-size: 0.75rem;">Kementerian PAN-RB</p>
-                    </a>
-                </div>
-                <!-- Perisai -->
-                <div class="col">
-                    <a href="#" class="card h-100 p-3 text-center app-card rounded-3">
-                        <div class="p-3 mb-2 bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
-                            <i class="bi bi-shield-check text-primary fs-3"></i>
-                        </div>
-                        <h4 class="h6 fw-bold mb-1">Perisai</h4>
-                        <p class="text-muted card-text" style="font-size: 0.75rem;">Penilaian Mandiri Implementasi AKIP</p>
-                    </a>
-                </div>
-                <!-- Si-Pinter -->
-                <div class="col">
-                    <a href="#" class="card h-100 p-3 text-center app-card rounded-3">
-                        <div class="p-3 mb-2 bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
-                            <i class="bi bi-cpu text-primary fs-3"></i>
-                        </div>
-                        <h4 class="h6 fw-bold mb-1">Si-Pinter v.3.7</h4>
-                        <p class="text-muted card-text" style="font-size: 0.75rem;">Aplikasi Pengendalian Internal Terintegrasi</p>
-                    </a>
-                </div>
+                <?php echo get_option('_crb_html_aplikasi_pendukung'); ?>
             </div>
         </div>
     </section>
