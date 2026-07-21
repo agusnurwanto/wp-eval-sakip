@@ -35601,4 +35601,72 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 
 		wp_send_json_success(array('message' => 'Kode OTP baru telah dikirim ke email Anda.'));
 	}
+
+	function get_jadwal_sakip(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data jadwal!',
+			'periode' => array(),
+			'tahun_anggaran' => array()
+		);
+		$ret['periode'] = $wpdb->get_results("
+			SELECT * 
+			FROM esakip_data_jadwal
+			WHERE tipe = 'RPJMD' 
+				AND status = 1
+			order by tahun_selesai_anggaran DESC, id DESC",
+			ARRAY_A
+		);
+		$ret['tahun_anggaran'] = $wpdb->get_results('
+			select 
+				tahun_anggaran 
+			from esakip_data_unit 
+			group by tahun_anggaran 
+			order by tahun_anggaran DESC', ARRAY_A);
+		die(json_encode($ret));
+	}
+
+	function get_data_sakip_publik(){
+		global $wpdb;
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil get data!',
+			'data' => array()
+		);
+
+		if(empty($_POST) || empty($_POST['target'])){
+			$ret['status'] = 'error';
+			$res['message'] = 'param tidak boleh kosong!';
+			die(json_encode($ret));
+		}
+
+		$status_api_esr = get_option('_crb_api_esr_status');
+		$where_esr = '';
+		if($status_api_esr){
+			$where_esr = 'AND upload_id not null';
+		}
+
+		if($_POST['target'] == 'rpjmd'){
+			if (empty($_POST['id_periode'])) {
+				$ret['status'] = 'error';
+				$ret['message'] = 'Id Jadwal kosong!';
+				die(json_encode($ret));
+			}
+			$id_jadwal = $_POST['id_periode'];
+			$rpjmds = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT * 
+					FROM esakip_rpjmd
+					WHERE id_jadwal = %d 
+						AND active = 1
+						$where_esr
+				", $id_jadwal),
+				ARRAY_A
+			);
+			$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
+			
+		}
+		die(json_encode($ret));
+	}
 }

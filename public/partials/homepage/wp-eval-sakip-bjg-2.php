@@ -340,8 +340,26 @@ jQuery(document).ready(function(){
     }else if (urlParams.get('tab') === 'evaluasi') {
         targetMenu = jQuery('.menu-item[data-target="lhe"]');
     }
-    targetMenu.click();
+    getjadwal(function(){
+        targetMenu.click();
+    });
 });
+
+function getjadwal(cb){
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        url: esakip.url,
+        type: 'POST',
+        data: {
+            action: 'get_jadwal_sakip'
+        },
+        success: function(response) {
+            window.jadwal_sakip = response;
+            jQuery('#wrap-loading').hide();
+            cb();
+        }
+    });
+}
 
 function getTableSakip(target) {
     return; // belum selesai
@@ -351,7 +369,8 @@ function getTableSakip(target) {
         type: 'POST',
         data: {
             action: 'get_data_sakip_publik',
-            tahun_anggaran: ''
+            tahun_anggaran: '',
+            target: target
         },
         success: function(response) {
             jQuery('#wrap-loading').hide();
