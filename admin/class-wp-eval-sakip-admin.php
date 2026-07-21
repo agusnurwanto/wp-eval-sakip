@@ -2990,10 +2990,15 @@ class Wp_Eval_Sakip_Admin
 					</div>'
 				),
 
+			Field::make('image', 'crb_logo_sakip', __('Logo Aplikasi SAKIP'))
+				->set_value_type('url')
+				->set_help_text('Upload logo aplikasi SAKIP.')
+				->set_width(50),
+
 			Field::make('image', 'crb_foto_kepala_daerah', __('Foto Kepala Daerah'))
 				->set_value_type('url')
 				->set_help_text('Upload foto kepala daerah.')
-				->set_width(33.33),
+				->set_width(50),
 
 			Field::make('rich_text', 'crb_html_aplikasi_pendukung', __('HTML Aplikasi Pendukung'))
 				->set_settings(array(
@@ -3010,8 +3015,7 @@ class Wp_Eval_Sakip_Admin
                         <p class="text-muted card-text" style="font-size: 0.75rem;">E-Kinerja Badan Kepegawaian Negara</p>
                     </a>
                 </div>')
-				->set_help_text('Konten HTML untuk aplikasi pendukung. Gunakan tab Text untuk edit kode HTML langsung.')
-				->set_width(66.66),
+				->set_help_text('Konten HTML untuk aplikasi pendukung. Gunakan tab Text untuk edit kode HTML langsung.'),
 
 			Field::make('image', 'crb_icon_pohon_kinerja', __('Ikon Pohon Kinerja'))
 				->set_value_type('url')
