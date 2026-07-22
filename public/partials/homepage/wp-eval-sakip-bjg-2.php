@@ -251,14 +251,14 @@
                 <div class="menu-group">
                     <h3>Perencanaan</h3>
                     <ul>
-                        <li class="menu-item active" data-target="rpjmd">📄 RPJMD / RENSTRA</li>
-                        <li class="menu-item" data-target="iku">📄 Indikator Kinerja Utama</li>
-                        <li class="menu-item" data-target="rkpd">📄 RKPD / RENJA</li>
-                        <li class="menu-item" data-target="ra">📄 Rencana Aksi</li>
-                        <li class="menu-item" data-target="pk">📄 Perjanjian Kinerja</li>
-                        <li class="menu-item" data-target="pohon">📄 Pohon Kinerja</li>
-                        <li class="menu-item" data-target="rpjpd">🔗 RPJPD</li>
                         <li class="menu-item" data-target="jnis-plan">🔗 Pedoman Teknis Perencanaan</li>
+                        <li class="menu-item" data-target="rpjpd">🔗 RPJPD</li>
+                        <li class="menu-item" data-target="pohon">📄 Pohon Kinerja</li>
+                        <li class="menu-item active" data-target="rpjmd">📄 RPJMD / RENSTRA</li>
+                        <li class="menu-item" data-target="rkpd">📄 RKPD / RENJA</li>
+                        <li class="menu-item" data-target="iku">📄 Indikator Kinerja Utama</li>
+                        <li class="menu-item" data-target="pk">📄 Perjanjian Kinerja</li>
+                        <li class="menu-item" data-target="ra">📄 Rencana Aksi</li>
                     </ul>
                 </div>
                 <div class="menu-group">
@@ -289,12 +289,18 @@
             <!-- Area Tabel Kanan -->
             <section class="sakip-main-table">
                 <div class="table-card">
-                    <h2 id="dynamic-table-title">RPJMD / RENSTRA</h2>
+                    <h2 id="dynamic-table-title" data-id="rpjmd">RPJMD / RENSTRA</h2>
+                    <div class="table-toolbar row align-items-center mb-3">
+                        <label for="dynamic-periode" class="col-md-3 text-md-end mb-0 text-right label-dynamic-periode">Tahun</label>
+                        <div class="col-md-6">
+                            <select id="dynamic-periode" class="form-select"></select>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table id="tabel-dinamis-sakip" class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Tahun</th>
+                                    <th class="label-dynamic-periode">Tahun</th>
                                     <th>Perangkat Daerah</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -319,12 +325,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             const menuText = this.innerText.replace(/[^\w\s\/]/g, '').trim(); 
             tableTitle.innerText = menuText;
+            var target = jQuery(this).attr('data-target');
+            jQuery(tableTitle).attr('data-id', target);
 
             tableSection.scrollIntoView({ 
                 behavior: 'smooth', 
                 block: 'start' 
             });
-            getTableSakip(jQuery(this).attr('data-target'));
+            getTableSakip(target);
         });
     });
 
@@ -350,6 +358,7 @@ function getjadwal(cb){
     jQuery.ajax({
         url: esakip.url,
         type: 'POST',
+        dataType: 'json',
         data: {
             action: 'get_jadwal_sakip'
         },
@@ -362,27 +371,76 @@ function getjadwal(cb){
 }
 
 function getTableSakip(target) {
-    return; // belum selesai
-    jQuery('#wrap-loading').show();
+    const label = jQuery('.label-dynamic-periode');
+    const select = document.getElementById('dynamic-periode');
+    const data = window.jadwal_sakip;
+    select.innerHTML = '';
+
+    if (['rpjmd', 'iku', 'pohon'].includes(target)) {
+        label.text('Periode');
+        data.periode.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id; // Or specific ID field
+            option.textContent = `${item.nama_jadwal} (${item.tahun_anggaran} - ${item.tahun_selesai_anggaran})`;
+            select.appendChild(option);
+        });
+    } else {
+        label.text('Tahun');
+        data.tahun_anggaran.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.tahun_anggaran;
+            option.textContent = item.tahun_anggaran;
+            select.appendChild(option);
+        });
+    }
+    getTableSakipAjax();
+}
+
+function getTableSakipAjax() {
+    const slug = document.getElementById('dynamic-table-title').getAttribute('data-id');
+    const periode = document.getElementById('dynamic-periode').value;
+    const $loading = jQuery('#wrap-loading');
+
+    if (jQuery.fn.DataTable.isDataTable('#tabel-dinamis-sakip')) {
+        jQuery('#tabel-dinamis-sakip').DataTable().destroy();
+    }
+
     jQuery('#tabel-dinamis-sakip').DataTable({
-        url: esakip.url,
-        type: 'POST',
-        data: {
-            action: 'get_data_sakip_publik',
-            tahun_anggaran: '',
-            target: target
+        "processing": false, // Kita gunakan custom loader
+        "serverSide": false,
+        "ajax": {
+            "url": esakip.url,
+            "type": "POST",
+            beforeSend: function() {
+                $loading.show();
+            },
+            "data": {
+                "action": "get_data_sakip_publik",
+                "target": slug,
+                "periode": periode
+            },
+            "dataSrc": function(json) {
+                $loading.hide();
+                return json.data || [];
+            },
+            "error": function() {
+                $loading.hide();
+                alert('Gagal mengambil data.');
+            }
         },
-        success: function(response) {
-            jQuery('#wrap-loading').hide();
-        },
-        error: function(response) {
-            jQuery('#wrap-loading').hide();
-        },
-        columns: [
-            { data: 'tahun' },
-            { data: 'nama_perangkat_daerah' },
-            { data: 'aksi' }
-        ]
+        "columns": [
+            { "data": "tahun" },
+            { "data": "perangkat_daerah" },
+            { 
+                "data": "aksi",
+                "render": function(data, type, row) {
+                    return `<a href="${row.file_url}" class="btn-view" target="_blank">Lihat</a>`;
+                }
+            }
+        ],
+        "drawCallback": function(settings) {
+            $loading.hide();
+        }
     });
 }
 </script>
