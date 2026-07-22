@@ -35618,6 +35618,14 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			order by tahun_selesai_anggaran DESC, id DESC",
 			ARRAY_A
 		);
+		$ret['periode_rpjpd'] = $wpdb->get_results("
+			SELECT * 
+			FROM esakip_data_jadwal
+			WHERE tipe = 'RPJPD' 
+				AND status = 1
+			order by tahun_selesai_anggaran DESC, id DESC",
+			ARRAY_A
+		);
 		$ret['tahun_anggaran'] = $wpdb->get_results('
 			select 
 				tahun_anggaran 
@@ -35644,7 +35652,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$status_api_esr = get_option('_crb_api_esr_status');
 		$where_esr = '';
 		if($status_api_esr){
-			$where_esr = 'AND upload_id not null';
+			$where_esr = 'AND upload_id is not null';
 		}
 
 		if (empty($_POST['periode'])) {
@@ -35706,6 +35714,40 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					'data' => implode('<br>', $dok)
 				);
 			}
+		}else if($_POST['target'] == 'rpjpd'){
+			$id_jadwal = $_POST['periode'];
+			$rpjmds = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT * 
+					FROM esakip_rpjpd
+					WHERE id_jadwal = %d 
+						AND active = 1
+				", $id_jadwal),
+				ARRAY_A
+			);
+			$ret['sql_rpjpd'] = $wpdb->last_query;
+			$upload_dir = ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/';
+			$dokumen = array();
+			foreach($rpjmds as $dok){
+				$dokumen[] = '<a href="'.$upload_dir.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
+			}
+			$data[] = array(
+				'periode' => $id_jadwal,
+				'perangkat_daerah' => $nama_pemda,
+				'data' => implode('<br>', $dokumen)
+			);
+		}else if($_POST['target'] == 'pohon'){
+		}else if($_POST['target'] == 'rkpd'){
+		}else if($_POST['target'] == 'iku'){
+		}else if($_POST['target'] == 'pk'){
+		}else if($_POST['target'] == 'ra'){
+		}else if($_POST['target'] == 'monev'){
+		}else if($_POST['target'] == 'pko'){
+		}else if($_POST['target'] == 'pkop'){
+		}else if($_POST['target'] == 'lkj'){
+		}else if($_POST['target'] == 'lhe'){
+		}else if($_POST['target'] == 'tl-lhe'){
+
 		}
 		$ret['data'] = $data;
 		die(json_encode($ret));

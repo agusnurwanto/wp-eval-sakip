@@ -1,3 +1,16 @@
+<?php
+// If this file is called directly, abort.
+if (! defined('WPINC')) {
+    die;
+}
+$nama_pemda = get_option('_crb_nama_pemda');
+$page_pohon_kinerja_publish = $this->functions->generatePage([
+    'nama_page'   => 'Pohon Kinerja',
+    'content'     => '[pohon_kinerja_publish]',
+    'show_header' => 1,
+    'post_status' => 'publish'
+]);
+?>
 <style>
     /* CSS Scoped khusus agar tidak merusak layout bawaan WordPress */
     .sakip-container {
@@ -6,7 +19,6 @@
         background-color: #f4f7f6;
         padding: 20px;
         border-radius: 8px;
-        margin: 20px 0;
     }
     .sakip-header {
         display: flex;
@@ -258,12 +270,15 @@
     #tabel-dinamis-sakip_filter {
         margin-bottom: 15px !important;
     }
+    .ast-desktop .ast-primary-header-bar.main-header-bar, .ast-header-break-point #masthead .ast-primary-header-bar.main-header-bar {
+        marging-bottom: 0; 
+    }
 </style>
 <div class="sakip-container">
     <!-- Konten Utama -->
     <main class="sakip-content">
         <div class="sakip-hero">
-            <h1>Laporan Kinerja</h1>
+            <h1>Laporan Kinerja <span id="nama_pemda"><?php echo $nama_pemda; ?></span></h1>
             <p>Proses pemilihan dan pengembangan tindakan yang terbaik dan menguntungkan mencapai tujuan.</p>
         </div>
 
@@ -274,7 +289,7 @@
                     <h3>Perencanaan</h3>
                     <ul>
                         <li class="menu-item" data-target="jnis-plan">🔗 Pedoman Teknis Perencanaan</li>
-                        <li class="menu-item" data-target="rpjpd">🔗 RPJPD</li>
+                        <li class="menu-item" data-target="rpjpd">📄 RPJPD</li>
                         <li class="menu-item" data-target="pohon">📄 Pohon Kinerja</li>
                         <li class="menu-item active" data-target="rpjmd">📄 RPJMD / RENSTRA</li>
                         <li class="menu-item" data-target="rkpd">📄 RKPD / RENJA</li>
@@ -348,6 +363,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const menuText = this.innerText.replace(/[^\w\s\/]/g, '').trim(); 
             tableTitle.innerText = menuText;
             var target = jQuery(this).attr('data-target');
+            tableTitle.setAttribute('data-id', target);
+
+            if(target == 'jnis-plan'){
+                return window.open('https://peraturan.go.id/id/permendagri-no-86-tahun-2017', '_blank');
+            }else if(target == 'jnis-ukur'){
+                return window.open('https://peraturan.go.id/id/permenpanrb-no-53-tahun-2014', '_blank');
+            }else if(target == 'jnis-eval'){
+                return window.open('https://peraturan.go.id/id/permenpanrb-no-88-tahun-2021', '_blank');
+            }
+
             jQuery(tableTitle).attr('data-id', target);
 
             tableSection.scrollIntoView({ 
@@ -398,12 +423,23 @@ function getTableSakip(target) {
     const data = window.jadwal_sakip;
     select.innerHTML = '';
 
-    if (['rpjmd', 'iku', 'pohon'].includes(target)) {
+    if (['rpjpd'].includes(target)) {
+        label.text('Periode');
+        data.periode_rpjpd.forEach(item => {
+            const option = document.createElement('option');
+            var tahun_selesai = +item.tahun_anggaran + +item.lama_pelaksanaan;
+            option.value = item.id; // Or specific ID field
+            option.textContent = `${item.nama_jadwal} (${item.tahun_anggaran} - ${tahun_selesai})`;
+            option.setAttribute('data-tahun', item.tahun_anggaran);
+            select.appendChild(option);
+        });
+    }else if (['rpjmd', 'iku', 'pohon'].includes(target)) {
         label.text('Periode');
         data.periode.forEach(item => {
             const option = document.createElement('option');
             option.value = item.id; // Or specific ID field
             option.textContent = `${item.nama_jadwal} (${item.tahun_anggaran} - ${item.tahun_selesai_anggaran})`;
+            option.setAttribute('data-tahun', item.tahun_anggaran);
             select.appendChild(option);
         });
     } else {
@@ -422,6 +458,22 @@ function getTableSakipAjax() {
     const slug = document.getElementById('dynamic-table-title').getAttribute('data-id');
     const periode = document.getElementById('dynamic-periode');
     const text_periode = periode.options[periode.selectedIndex].text;
+
+    if(slug == 'pohon'){
+        var url_pokin = '<?php echo $page_pohon_kinerja_publish['url']; ?>';
+        var tahun_anggaran = periode.options[periode.selectedIndex].getAttribute('data-tahun');
+        var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
+        var html = `
+            <tr>
+                <td>${text_periode}</td>
+                <td>${nama_pemda}</td>
+                <td><a href="${url_pokin+'&tahun='+tahun_anggaran}" target="_blank">POHON KINERJA</a></td>
+            </tr>
+        `;
+        jQuery('#tabel-dinamis-sakip tbody').html(html);
+        return;
+    }
+
     const $loading = jQuery('#wrap-loading');
 
     if (jQuery.fn.DataTable.isDataTable('#tabel-dinamis-sakip')) {

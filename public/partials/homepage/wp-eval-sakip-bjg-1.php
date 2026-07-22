@@ -3,6 +3,7 @@
 if (! defined('WPINC')) {
     die;
 }
+global $wpdb;
 
 $halaman_template_laporan = $this->functions->generatePage(array(
     'nama_page' 	=> 'Halaman Homepage Template 3',
@@ -13,11 +14,19 @@ $halaman_template_laporan = $this->functions->generatePage(array(
 ));
 
 $page_pohon_kinerja_publish = $this->functions->generatePage([
-        'nama_page'   => 'Pohon Kinerja',
-        'content'     => '[pohon_kinerja_publish]',
-        'show_header' => 1,
-        'post_status' => 'publish'
-    ]);
+    'nama_page'   => 'Pohon Kinerja',
+    'content'     => '[pohon_kinerja_publish]',
+    'show_header' => 1,
+    'post_status' => 'publish'
+]);
+
+$tahun_rpjmd = $wpdb->get_var("
+    SELECT tahun_anggaran 
+    FROM esakip_data_jadwal
+    WHERE tipe = 'RPJMD' 
+        AND status = 1
+    order by tahun_selesai_anggaran DESC, id DESC limit 1"
+);
 ?>
 <link rel="stylesheet" href="<?php echo ESAKIP_PLUGIN_URL.'public/css/bootstrap-icons.css'; ?>">
 <style>
@@ -63,6 +72,9 @@ $page_pohon_kinerja_publish = $this->functions->generatePage([
         letter-spacing: -0.02em;
         line-height: 1.2;
     }
+    .ast-desktop .ast-primary-header-bar.main-header-bar, .ast-header-break-point #masthead .ast-primary-header-bar.main-header-bar {
+        marging-bottom: 0; 
+    }
 </style>
 
 <div class="wp-eval-sakip-bjg-1">
@@ -79,7 +91,7 @@ $page_pohon_kinerja_publish = $this->functions->generatePage([
                     </p>
                     <div class="text-center">
                         <a href="<?php echo $halaman_template_laporan['url']; ?>" class="btn btn-info btn-outline-light px-4 py-2 fw-semibold">Laporan SAKIP <i class="bi bi-arrow-right ms-1"></i></a>
-                        <a href="<?php echo $page_pohon_kinerja_publish['url']; ?>" class="btn btn-warning btn-outline-light px-4 py-2 ml-2">Pohon Kinerja</a>
+                        <a href="<?php echo $page_pohon_kinerja_publish['url']; ?>&tahun=<?php echo $tahun_rpjmd;?>" class="btn btn-warning btn-outline-light px-4 py-2 ml-2">Pohon Kinerja</a>
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">
@@ -146,7 +158,7 @@ $page_pohon_kinerja_publish = $this->functions->generatePage([
         <div class="container py-4">
             <div class="text-center mb-5">
                 <h2 class="fw-bold mt-1">Aplikasi Pendukung</h2>
-                <p class="text-muted">Aplikasi yang mendukung SAKIP Kabupaten xxx</p>
+                <p class="text-muted">Aplikasi yang mendukung SAKIP <?php echo get_option('_crb_nama_pemda'); ?></p>
             </div>
 
             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3 justify-content-center">
