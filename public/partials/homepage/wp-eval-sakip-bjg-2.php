@@ -236,6 +236,28 @@
             flex-direction: column;
         }
     }
+    .dataTables_wrapper .dataTables_filter {
+        margin-right: 2px;
+    }
+    
+    #tabel-dinamis-sakip_length label,
+    #tabel-dinamis-sakip_filter label {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px;
+        white-space: nowrap;
+    }
+    
+    #tabel-dinamis-sakip_length select,
+    #tabel-dinamis-sakip_filter input {
+        width: auto !important;
+        display: inline-block !important;
+    }
+    
+    #tabel-dinamis-sakip_length, 
+    #tabel-dinamis-sakip_filter {
+        margin-bottom: 15px !important;
+    }
 </style>
 <div class="sakip-container">
     <!-- Konten Utama -->
@@ -293,16 +315,16 @@
                     <div class="table-toolbar row align-items-center mb-3">
                         <label for="dynamic-periode" class="col-md-3 text-md-end mb-0 text-right label-dynamic-periode">Tahun</label>
                         <div class="col-md-6">
-                            <select id="dynamic-periode" class="form-select"></select>
+                            <select id="dynamic-periode" class="form-select" onchange="getTableSakipAjax();"></select>
                         </div>
                     </div>
                     <div class="table-responsive">
                         <table id="tabel-dinamis-sakip" class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th class="label-dynamic-periode">Tahun</th>
+                                    <th class="label-dynamic-periode" style="max-width: 250px">Tahun</th>
                                     <th>Perangkat Daerah</th>
-                                    <th>Aksi</th>
+                                    <th>Data</th>
                                 </tr>
                             </thead>
                         </table>
@@ -398,7 +420,8 @@ function getTableSakip(target) {
 
 function getTableSakipAjax() {
     const slug = document.getElementById('dynamic-table-title').getAttribute('data-id');
-    const periode = document.getElementById('dynamic-periode').value;
+    const periode = document.getElementById('dynamic-periode');
+    const text_periode = periode.options[periode.selectedIndex].text;
     const $loading = jQuery('#wrap-loading');
 
     if (jQuery.fn.DataTable.isDataTable('#tabel-dinamis-sakip')) {
@@ -408,6 +431,7 @@ function getTableSakipAjax() {
     jQuery('#tabel-dinamis-sakip').DataTable({
         "processing": false, // Kita gunakan custom loader
         "serverSide": false,
+        "ordering": false,
         "ajax": {
             "url": esakip.url,
             "type": "POST",
@@ -417,7 +441,7 @@ function getTableSakipAjax() {
             "data": {
                 "action": "get_data_sakip_publik",
                 "target": slug,
-                "periode": periode
+                "periode": periode.value
             },
             "dataSrc": function(json) {
                 $loading.hide();
@@ -429,14 +453,19 @@ function getTableSakipAjax() {
             }
         },
         "columns": [
-            { "data": "tahun" },
-            { "data": "perangkat_daerah" },
             { 
-                "data": "aksi",
+                "data": "periode",
                 "render": function(data, type, row) {
-                    return `<a href="${row.file_url}" class="btn-view" target="_blank">Lihat</a>`;
+                    return text_periode;
                 }
-            }
+            },
+            { 
+                "data": "perangkat_daerah",
+                "render": function(data, type, row) {
+                    return data.toUpperCase();
+                }
+            },
+            { "data": "data" }
         ],
         "drawCallback": function(settings) {
             $loading.hide();

@@ -35647,13 +35647,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$where_esr = 'AND upload_id not null';
 		}
 
+		if (empty($_POST['periode'])) {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Periode tidak boleh kosong!';
+			die(json_encode($ret));
+		}
+
+		$nama_pemda = get_option('_crb_nama_pemda');
+		$data = array();
+
 		if($_POST['target'] == 'rpjmd'){
-			if (empty($_POST['id_periode'])) {
-				$ret['status'] = 'error';
-				$ret['message'] = 'Id Jadwal kosong!';
-				die(json_encode($ret));
-			}
-			$id_jadwal = $_POST['id_periode'];
+			$id_jadwal = $_POST['periode'];
 			$rpjmds = $wpdb->get_results(
 				$wpdb->prepare("
 					SELECT * 
@@ -35664,9 +35668,46 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				", $id_jadwal),
 				ARRAY_A
 			);
-			$upload_dir = ESAKIP_PLUGIN_PATH . 'public/media/dokumen/dokumen_pemda/';
-			
+			$ret['sql_rpjmd'] = $wpdb->last_query;
+			$upload_dir = ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/';
+			$dokumen = array();
+			foreach($rpjmds as $dok){
+				$dokumen[] = '<a href="'.$upload_dir.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
+			}
+			$data[] = array(
+				'periode' => $id_jadwal,
+				'perangkat_daerah' => $nama_pemda,
+				'data' => implode('<br>', $dokumen)
+			);
+
+			$renstra = $wpdb->get_results(
+				$wpdb->prepare("
+					SELECT * 
+					FROM esakip_renstra
+					WHERE id_jadwal = %d 
+						AND active = 1
+						$where_esr
+				", $id_jadwal),
+				ARRAY_A
+			);
+			$ret['sql_renstra'] = $wpdb->last_query;
+			$upload_dir_opd = ESAKIP_PLUGIN_URL . 'public/media/dokumen/';
+			$dokumen = array();
+			foreach($renstra as $dok){
+				if(empty($dokumen[$dok['opd']])){
+					$dokumen[$dok['opd']] = array();
+				}
+				$dokumen[$dok['opd']][] = '<a href="'.$upload_dir_opd.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
+			}
+			foreach($dokumen as $opd => $dok){
+				$data[] = array(
+					'periode' => $id_jadwal,
+					'perangkat_daerah' => $opd,
+					'data' => implode('<br>', $dok)
+				);
+			}
 		}
+		$ret['data'] = $data;
 		die(json_encode($ret));
 	}
 }
