@@ -35649,72 +35649,29 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			die(json_encode($ret));
 		}
 
-		$status_api_esr = get_option('_crb_api_esr_status');
-		$where_esr = '';
-		if($status_api_esr){
-			$where_esr = 'AND upload_id is not null';
-		}
-
 		if (empty($_POST['periode'])) {
 			$ret['status'] = 'error';
 			$ret['message'] = 'Periode tidak boleh kosong!';
 			die(json_encode($ret));
 		}
 
-		$nama_pemda = get_option('_crb_nama_pemda');
 		$data = array();
 
 		if($_POST['target'] == 'rpjmd'){
-			$id_jadwal = $_POST['periode'];
-			$rpjmds = $wpdb->get_results(
-				$wpdb->prepare("
-					SELECT * 
-					FROM esakip_rpjmd
-					WHERE id_jadwal = %d 
-						AND active = 1
-						$where_esr
-				", $id_jadwal),
-				ARRAY_A
-			);
-			$ret['sql_rpjmd'] = $wpdb->last_query;
-			$upload_dir = ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/';
-			$dokumen = array();
-			foreach($rpjmds as $dok){
-				$dokumen[] = '<a href="'.$upload_dir.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
-			}
-			$data[] = array(
-				'periode' => $id_jadwal,
-				'perangkat_daerah' => $nama_pemda,
-				'data' => implode('<br>', $dokumen)
-			);
-
-			$renstra = $wpdb->get_results(
-				$wpdb->prepare("
-					SELECT * 
-					FROM esakip_renstra
-					WHERE id_jadwal = %d 
-						AND active = 1
-						$where_esr
-				", $id_jadwal),
-				ARRAY_A
-			);
-			$ret['sql_renstra'] = $wpdb->last_query;
-			$upload_dir_opd = ESAKIP_PLUGIN_URL . 'public/media/dokumen/';
-			$dokumen = array();
-			foreach($renstra as $dok){
-				if(empty($dokumen[$dok['opd']])){
-					$dokumen[$dok['opd']] = array();
-				}
-				$dokumen[$dok['opd']][] = '<a href="'.$upload_dir_opd.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
-			}
-			foreach($dokumen as $opd => $dok){
-				$data[] = array(
-					'periode' => $id_jadwal,
-					'perangkat_daerah' => $opd,
-					'data' => implode('<br>', $dok)
-				);
-			}
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_rpjmd',
+				'tabel_opd' => 'esakip_renstra',
+				'kolom_periode' => 'id_jadwal'
+			));
 		}else if($_POST['target'] == 'rpjpd'){
+			$status_api_esr = get_option('_crb_api_esr_status');
+			$where_esr = '';
+			if($status_api_esr){
+				$where_esr = 'AND upload_id is not null';
+			}
+			$nama_pemda = get_option('_crb_nama_pemda');
+
 			$id_jadwal = $_POST['periode'];
 			$rpjmds = $wpdb->get_results(
 				$wpdb->prepare("
@@ -35722,6 +35679,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					FROM esakip_rpjpd
 					WHERE id_jadwal = %d 
 						AND active = 1
+						$where_esr
 				", $id_jadwal),
 				ARRAY_A
 			);
@@ -35731,16 +35689,42 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			foreach($rpjmds as $dok){
 				$dokumen[] = '<a href="'.$upload_dir.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
 			}
+			if(empty($dokumen)){
+				$dokumen[] = '<a onclik="return false;" href="#" class="badge badge-danger">Belum Diunggah</a>';
+			}
 			$data[] = array(
 				'periode' => $id_jadwal,
 				'perangkat_daerah' => $nama_pemda,
 				'data' => implode('<br>', $dokumen)
 			);
-		}else if($_POST['target'] == 'pohon'){
 		}else if($_POST['target'] == 'rkpd'){
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_rkpd_pemda',
+				'tabel_opd' => 'esakip_rkpd',
+				'kolom_periode' => 'tahun_anggaran'
+			));
 		}else if($_POST['target'] == 'iku'){
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_iku_pemda',
+				'tabel_opd' => 'esakip_iku',
+				'kolom_periode' => 'id_jadwal'
+			));
 		}else if($_POST['target'] == 'pk'){
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_perjanjian_kinerja_pemda',
+				'tabel_opd' => 'esakip_perjanjian_kinerja',
+				'kolom_periode' => 'tahun_anggaran'
+			));
 		}else if($_POST['target'] == 'ra'){
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_rencana_aksi_pemda',
+				'tabel_opd' => 'esakip_rencana_aksi',
+				'kolom_periode' => 'tahun_anggaran'
+			));
 		}else if($_POST['target'] == 'monev'){
 		}else if($_POST['target'] == 'pko'){
 		}else if($_POST['target'] == 'pkop'){
@@ -35749,7 +35733,97 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}else if($_POST['target'] == 'tl-lhe'){
 
 		}
-		$ret['data'] = $data;
+		foreach($res as $k => $v){
+			if($k == 'data'){
+				$ret['data'] = $v;
+			}else{
+				$ret[$k] = $v;
+			}
+		}
 		die(json_encode($ret));
+	}
+
+	function get_dokumen_publik($opsi){
+		global $wpdb;
+		$ret = array(
+			'data' => array()
+		);
+		
+		$tahun_skpd = get_option('_crb_tahun_wpsipd');
+		$status_api_esr = get_option('_crb_api_esr_status');
+		$where_esr = '';
+		if($status_api_esr){
+			$where_esr = 'AND upload_id is not null';
+		}
+		$nama_pemda = get_option('_crb_nama_pemda');
+
+		$tahun_anggaran = $opsi['periode'];
+		$tabel_pemda = $opsi['tabel_pemda'];
+		$tabel_opd = $opsi['tabel_opd'];
+		$kolom = $opsi['kolom_periode'];
+
+		$dok_pemda = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT * 
+				FROM $tabel_pemda
+				WHERE $kolom = %d 
+					AND active = 1
+					$where_esr
+			", $tahun_anggaran),
+			ARRAY_A
+		);
+		$ret['sql_dok_pemda'] = $wpdb->last_query;
+		$upload_dir = ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/';
+		$dokumen = array();
+		foreach($dok_pemda as $dok){
+			$dokumen[] = '<a href="'.$upload_dir.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
+		}
+		if(empty($dokumen)){
+			$dokumen[] = '<a onclik="return false;" href="#" class="badge badge-danger">Belum Diunggah</a>';
+		}
+		$ret['data'][] = array(
+			'periode' => $tahun_anggaran,
+			'perangkat_daerah' => $nama_pemda,
+			'data' => implode('<br>', $dokumen)
+		);
+
+		$dok_opd = $wpdb->get_results(
+			$wpdb->prepare("
+				SELECT
+					u.nama_skpd as opd, 
+					o.dokumen 
+				FROM esakip_data_unit u
+				LEFT JOIN $tabel_opd o on o.id_skpd=u.id_skpd
+					AND o.$kolom = %d 
+					AND o.active = 1
+				WHERE u.active=1
+					AND u.is_skpd=1
+					AND u.tahun_anggaran = %d
+					$where_esr
+			", $tahun_anggaran, $tahun_skpd),
+			ARRAY_A
+		);
+		$ret['sql_dok_opd'] = $wpdb->last_query;
+		$upload_dir_opd = ESAKIP_PLUGIN_URL . 'public/media/dokumen/';
+		$dokumen = array();
+		foreach($dok_opd as $dok){
+			if(empty($dokumen[$dok['opd']])){
+				$dokumen[$dok['opd']] = array();
+			}
+			if(!empty($dok['dokumen'])){
+				$dokumen[$dok['opd']][] = '<a href="'.$upload_dir_opd.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
+			}
+		}
+		foreach($dokumen as $opd => $dok){
+			if(empty($dok)){
+				$dok[] = '<a onclik="return false;" href="#" class="badge badge-danger">Belum Diunggah</a>';
+			}
+			$ret['data'][] = array(
+				'periode' => $id_jadwal,
+				'perangkat_daerah' => $opd,
+				'data' => implode('<br>', $dok)
+			);
+		}
+		return $ret;
 	}
 }

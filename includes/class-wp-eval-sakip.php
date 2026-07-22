@@ -386,9 +386,9 @@ class Wp_Eval_Sakip {
 		$this->loader->add_action('wp_ajax_hapus_tahun_dokumen_rpjmd', $plugin_public, 'hapus_tahun_dokumen_rpjmd');
 		
 		$this->loader->add_action('wp_ajax_get_data_sakip_publik', $plugin_public, 'get_data_sakip_publik');
-		$this->loader->add_action('wp_ajax_no_priv_get_data_sakip_publik', $plugin_public, 'no_priv_get_data_sakip_publik');
+		$this->loader->add_action('wp_ajax_nopriv_get_data_sakip_publik', $plugin_public, 'get_data_sakip_publik');
 		$this->loader->add_action('wp_ajax_get_jadwal_sakip', $plugin_public, 'get_jadwal_sakip');
-		$this->loader->add_action('wp_ajax_no_priv_get_jadwal_sakip', $plugin_public, 'no_priv_get_jadwal_sakip');
+		$this->loader->add_action('wp_ajax_nopriv_get_jadwal_sakip', $plugin_public, 'get_jadwal_sakip');
 
 		$this->loader->add_action('wp_ajax_get_detail_rpjpd_by_id', $plugin_public, 'get_detail_rpjpd_by_id');
 		$this->loader->add_action('wp_ajax_tambah_dokumen_rpjpd', $plugin_public, 'tambah_dokumen_rpjpd');

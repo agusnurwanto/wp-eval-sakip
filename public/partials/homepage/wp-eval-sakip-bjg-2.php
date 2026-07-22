@@ -337,9 +337,9 @@ $page_pohon_kinerja_publish = $this->functions->generatePage([
                         <table id="tabel-dinamis-sakip" class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th class="label-dynamic-periode" style="max-width: 250px">Tahun</th>
-                                    <th>Perangkat Daerah</th>
-                                    <th>Data</th>
+                                    <th class="label-dynamic-periode text-center" style="max-width: 250px">Tahun</th>
+                                    <th class="text-center">Perangkat Daerah</th>
+                                    <th class="text-center">Data</th>
                                 </tr>
                             </thead>
                         </table>
@@ -507,6 +507,7 @@ function getTableSakipAjax() {
         "columns": [
             { 
                 "data": "periode",
+                "className": "text-center",
                 "render": function(data, type, row) {
                     return text_periode;
                 }
