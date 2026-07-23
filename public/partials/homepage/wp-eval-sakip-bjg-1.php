@@ -4,6 +4,7 @@ if (! defined('WPINC')) {
     die;
 }
 global $wpdb;
+$nama_pemda = get_option('_crb_nama_pemda');
 
 $halaman_template_laporan = $this->functions->generatePage(array(
     'nama_page' 	=> 'Halaman Homepage Template 3',
@@ -85,7 +86,7 @@ $tahun_rpjmd = $wpdb->get_var("
             <div class="row align-items-center">
                 <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
                     <img src="<?php echo get_option('_crb_logo_sakip'); ?>" alt="Logo SAKIP" class="hero-img mb-3" style="max-height: 125px;">
-                    <h1 class="display-5 fw-bold mb-3">Sistem Akuntabilitas Kinerja Instansi Pemerintah</h1>
+                    <h1 class="display-5 fw-bold mb-3">Sistem Akuntabilitas Kinerja Instansi Pemerintah<br><?php echo $nama_pemda; ?></h1>
                     <p class="lead mb-4" style="opacity: 0.85;">
                         Rangkaian sistematik pelaporan kinerja pada instansi pemerintah, dalam rangka pertanggungjawaban dan peningkatan kinerja instansi pemerintah.
                     </p>

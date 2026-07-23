@@ -10,6 +10,12 @@ $page_pohon_kinerja_publish = $this->functions->generatePage([
     'show_header' => 1,
     'post_status' => 'publish'
 ]);
+$page_cascading_publish = $this->functions->generatePage([
+    'nama_page'   => 'Cascading',
+    'content'     => '[cascading_publish]',
+    'show_header' => 1,
+    'post_status' => 'publish'
+]);
 ?>
 <style>
     /* CSS Scoped khusus agar tidak merusak layout bawaan WordPress */
@@ -290,7 +296,8 @@ $page_pohon_kinerja_publish = $this->functions->generatePage([
                     <ul>
                         <li class="menu-item" data-target="jnis-plan">🔗 Pedoman Teknis Perencanaan</li>
                         <li class="menu-item" data-target="rpjpd">📄 RPJPD</li>
-                        <li class="menu-item" data-target="pohon">📄 Pohon Kinerja</li>
+                        <li class="menu-item" data-target="pohon">🔗 Pohon Kinerja</li>
+                        <li class="menu-item" data-target="cascading">🔗 Cascading</li>
                         <li class="menu-item active" data-target="rpjmd">📄 RPJMD / RENSTRA</li>
                         <li class="menu-item" data-target="rkpd">📄 RKPD / RENJA</li>
                         <li class="menu-item" data-target="iku">📄 Indikator Kinerja Utama</li>
@@ -433,7 +440,7 @@ function getTableSakip(target) {
             option.setAttribute('data-tahun', item.tahun_anggaran);
             select.appendChild(option);
         });
-    }else if (['rpjmd', 'iku', 'pohon'].includes(target)) {
+    }else if (['rpjmd', 'iku', 'pohon', 'cascading'].includes(target)) {
         label.text('Periode');
         data.periode.forEach(item => {
             const option = document.createElement('option');
@@ -468,6 +475,19 @@ function getTableSakipAjax() {
                 <td>${text_periode}</td>
                 <td>${nama_pemda}</td>
                 <td><a href="${url_pokin+'&tahun='+tahun_anggaran}" target="_blank">POHON KINERJA</a></td>
+            </tr>
+        `;
+        jQuery('#tabel-dinamis-sakip tbody').html(html);
+        return;
+    }else if(slug == 'cascading'){
+        var url_cascading = '<?php echo $page_cascading_publish['url']; ?>';
+        var tahun_anggaran = periode.options[periode.selectedIndex].getAttribute('data-tahun');
+        var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
+        var html = `
+            <tr>
+                <td>${text_periode}</td>
+                <td>${nama_pemda}</td>
+                <td><a href="${url_cascading+'&tahun='+tahun_anggaran}" target="_blank">CASCADING</a></td>
             </tr>
         `;
         jQuery('#tabel-dinamis-sakip tbody').html(html);
