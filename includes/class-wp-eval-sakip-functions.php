@@ -357,6 +357,71 @@ class Esakip_Functions
         return (ctype_digit(strval($input)));
     }
 
+    function chat_ai($options = array()){
+        $cek_ai = get_option('_crb_ai_enabled');
+        $ret = '';
+        if(!empty($cek_ai)){
+            $model = get_option('_crb_ai_model');
+            if (empty($model)) {
+                $model = 'openai/gpt-4o';
+            }
+            if (!empty($options['model'])) {
+                $model = $options['model'];
+            }
+
+            $message_role = 'Anda bertindak sebagai System Analyst untuk aplikasi SAKIP (Sistem Akuntabilitas Kinerja Instansi Pemerintah). Bantu saya merancang/memahami. ';
+            
+            $messages = array(
+                array(
+                    "role" => "user",
+                    "content" => "What is the meaning of life?"
+                )
+            );
+            
+            if (!empty($options['messages'])) {
+                $messages = $options['messages'];
+            } else if (!empty($options['prompt'])) {
+                $messages = array(
+                    array(
+                        "role" => "user",
+                        "content" => $message_role.$options['prompt']
+                    )
+                );
+            }
+            
+            $url = get_option('_crb_base_url_ai');
+            if (empty($url)) {
+                $url = 'https://openrouter.ai/api/v1';
+            }
+            $url .= '/chat/completions';
+            
+            $api_key = get_option('_crb_api_key_ai');
+            
+            $body = array(
+                "model" => $model,
+                "messages" => $messages
+            );
+            $opsi = array(
+                'headers' => array(
+                    'Authorization' => 'Bearer ' . $api_key,
+                    'Content-Type'  => 'application/json'
+                ),
+                'body'      => wp_json_encode($body),
+                'timeout'   => 60,
+                'sslverify' => false
+            );
+
+            $response = wp_remote_post($url, $opsi);
+            
+            if (!is_wp_error($response)) {
+                $ret = wp_remote_retrieve_body($response);
+            } else {
+                $ret = '{"error": "' . $response->get_error_message() . '"}';
+            }
+        }
+        return $ret;
+    }
+
     function curl_post($options)
     {
         $curl = curl_init();

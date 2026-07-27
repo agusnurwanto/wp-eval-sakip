@@ -361,3 +361,46 @@ function kirim_request_ajax_ekin(){
         jQuery("#wrap-loading").hide();
     });
 }
+
+function esakip_test_ai(){
+    var prompt = jQuery("#esakip_test_ai_prompt").val();
+    if(!prompt){
+        alert("Silakan masukkan pertanyaan terlebih dahulu.");
+        return;
+    }
+    jQuery("#esakip_btn_test_ai").prop("disabled", true);
+    jQuery("#esakip_spinner_test_ai").addClass("is-active");
+    jQuery("#esakip_test_ai_result").hide().html("");
+    
+    jQuery.ajax({
+        url: ajaxurl,
+        type: "POST",
+        data: {
+            action: "esakip_test_ai_connection",
+            prompt: prompt
+        },
+        success: function(response){
+            jQuery("#esakip_btn_test_ai").prop("disabled", false);
+            jQuery("#esakip_spinner_test_ai").removeClass("is-active");
+            if(response.success){
+                var text = response.data;
+                try {
+                    var json = JSON.parse(response.data);
+                    if(json.choices && json.choices[0] && json.choices[0].message){
+                        text = json.choices[0].message.content;
+                    } else if (json.error) {
+                        text = "Error: " + (json.error.message || JSON.stringify(json.error));
+                    }
+                } catch(e) {}
+                jQuery("#esakip_test_ai_result").html("<strong>Hasil:</strong><br/>" + text).show();
+            } else {
+                jQuery("#esakip_test_ai_result").html("<span style=\'color:red\'>Gagal: " + (response.data || "Unknown error") + "</span>").show();
+            }
+        },
+        error: function(){
+            jQuery("#esakip_btn_test_ai").prop("disabled", false);
+            jQuery("#esakip_spinner_test_ai").removeClass("is-active");
+            jQuery("#esakip_test_ai_result").html("<span style=\'color:red\'>Terjadi kesalahan koneksi AJAX.</span>").show();
+        }
+    });
+}

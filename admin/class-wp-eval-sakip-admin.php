@@ -156,6 +156,10 @@ class Wp_Eval_Sakip_Admin
 			->set_page_parent($basic_options_container)
 			->add_fields($this->generate_fields_2fa_otp());
 
+		Container::make('theme_options', __('AI Settings'))
+			->set_page_parent($basic_options_container)
+			->add_fields($this->generate_fields_ai());
+
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.1)
 			->set_icon('dashicons-bank')
@@ -2536,6 +2540,62 @@ class Wp_Eval_Sakip_Admin
 			Field::make('html', 'crb_esakip_2fa_backup_urls')
 				->set_html($html_backup)
 		];
+	}
+
+	public function generate_fields_ai(){
+		if (empty($_GET) || empty($_GET['page']) || $_GET['page'] != 'crb_carbon_fields_container_ai_settings.php') {
+			return array();
+		}
+		
+		$html_test_ai = '
+		<div style="background:#fff; padding:15px; border:1px solid #ccd0d4; margin-top:10px;">
+			<h4>Testing AI Connection</h4>
+			<p>Masukkan pertanyaan untuk mengetes koneksi AI menggunakan pengaturan yang telah disimpan (Pastikan Anda sudah menyimpan pengaturan terlebih dahulu).</p>
+			<textarea id="esakip_test_ai_prompt" style="width:100%; height:80px; margin-bottom:10px;" placeholder="Tuliskan pertanyaan Anda...">Apa fungsi memiliki nilai SAKIP yang baik? jelaskan dengan singkat.</textarea><br>
+			<button type="button" class="button button-primary" id="esakip_btn_test_ai" onclick="esakip_test_ai();">Test AI</button>
+			<span class="spinner" id="esakip_spinner_test_ai" style="float:none;"></span>
+			<div id="esakip_test_ai_result" style="margin-top:15px; padding:10px; background:#f1f1f1; border-left:4px solid #0073aa; display:none; white-space:pre-wrap;"></div>
+		</div>
+		';
+
+		return [
+			Field::make('checkbox', 'crb_ai_enabled', 'Aktifkan Fitur AI (Artificial Intelligent)')
+				->set_help_text('Centang untuk mengaktifkan fitur AI di aplikasi ini.'),
+			Field::make('text', 'crb_base_url_ai', __('URL MCP Server'))
+				->set_default_value('https://openrouter.ai/api/v1/chat/completions')
+				->set_help_text('MCP (Model Context Protocol) server untuk model AI.'),
+			Field::make('text', 'crb_api_key_ai', __('API Key AI'))
+				->set_default_value('sk-or-v1-xxxxxx')
+				->set_help_text('Kosongkan jika MCP server lokal tidak pakai API KEY. Dapatkan model AI gratis di <a href="https://openrouter.ai" target="_blank">https://openrouter.ai</a>.'),
+			Field::make('text', 'crb_ai_model', __('Model AI'))
+				->set_default_value('openrouter/free')
+				->set_help_text('Tentukan jenis model AI yang digunakan (contoh: openrouter/free) <a href="https://openrouter.ai/openrouter/free" target="_blank">https://openrouter.ai/openrouter/free</a>'),
+			Field::make('html', 'crb_ai_testing_html')
+				->set_html($html_test_ai)
+		];
+	}
+
+	public function esakip_test_ai_connection() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'Akses ditolak.' );
+		}
+
+		$prompt = isset( $_POST['prompt'] ) ? sanitize_text_field( wp_unslash( $_POST['prompt'] ) ) : '';
+		if ( empty( $prompt ) ) {
+			wp_send_json_error( 'Prompt kosong.' );
+		}
+
+		$options = array(
+			'prompt' => $prompt
+		);
+
+		$result = $this->functions->chat_ai( $options );
+
+		if ( empty( $result ) ) {
+			wp_send_json_error( 'Tidak ada respon dari AI. Pastikan AI diaktifkan dan disimpan.' );
+		}
+
+		wp_send_json_success( $result );
 	}
 
 	public function generate_fields_options_halaman_terkait()
