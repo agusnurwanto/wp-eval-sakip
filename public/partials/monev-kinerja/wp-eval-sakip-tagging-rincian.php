@@ -23,15 +23,19 @@ function get_pegawai_by_nip_id_jabatan($rhk, $wpdb)
 	$nama_pegawai = $wpdb->get_row(
 		$wpdb->prepare("
             SELECT 
-                nip_baru,
-                nama_pegawai
-            FROM esakip_data_pegawai_simpeg
-            WHERE nip_baru = %s
-            	AND satker_id = %d
-            ORDER BY active DESC
-        ", $rhk['nip'], $rhk['id_jabatan']),
+                p.nip_baru,
+				CONCAT(p.nama_pegawai, ' <br><span style=\"font-weight: normal;\">(', IFNULL(p.jabatan, '-'), ' ', IFNULL(s.nama, '-'), ')</span>') AS nama_pegawai
+            FROM esakip_data_pegawai_simpeg p
+			LEFT JOIN esakip_data_satker_simpeg s ON p.satker_id = s.satker_id
+				AND s.active=1
+				AND s.tahun_anggaran=%d
+            WHERE p.nip_baru = %s
+            	AND p.satker_id = %d
+            ORDER BY p.active DESC
+        ", $rhk['tahun_anggaran'], $rhk['nip'], $rhk['id_jabatan']),
 		ARRAY_A
 	);
+	
 	// Mengambil nama SKPD berdasarkan tahun anggaran dan ID SKPD
 	$nama_skpd = $wpdb->get_var(
 		$wpdb->prepare("
@@ -461,26 +465,20 @@ if (!empty($data_user_pegawai)) {
 		$nip_user_pegawai = 0;
 
 		$skpd_user_pegawai = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT 
-					simpeg.id_satker_simpeg,
+			$wpdb->prepare("
+				SELECT simpeg.id_satker_simpeg,
 					unit.nama_skpd, 
 					unit.id_skpd, 
 					unit.kode_skpd,
 					unit.is_skpd
-				FROM 
-					esakip_data_mapping_unit_sipd_simpeg AS simpeg
-				JOIN 
-					esakip_data_unit AS unit
-				ON 
-					simpeg.id_skpd = unit.id_skpd
-				WHERE 
-					simpeg.id_satker_simpeg=%d 
-				AND simpeg.tahun_anggaran=%d
-				AND simpeg.active=%d
-				AND unit.tahun_anggaran=%d
-				AND unit.active=%d
-			GROUP BY unit.id_skpd",
+				FROM esakip_data_mapping_unit_sipd_simpeg AS simpeg
+				JOIN esakip_data_unit AS unit ON simpeg.id_skpd = unit.id_skpd
+				WHERE simpeg.id_satker_simpeg=%d 
+					AND simpeg.tahun_anggaran=%d
+					AND simpeg.active=%d
+					AND unit.tahun_anggaran=%d
+					AND unit.active=%d
+				GROUP BY unit.id_skpd",
 				$satker_pegawai_simpeg,
 				$tahun_anggaran_sakip,
 				1,
@@ -492,9 +490,18 @@ if (!empty($data_user_pegawai)) {
 
 		// TIPE HAK AKSES USER PEGAWAI | 0 = TIDAK ADA | 1 = ALL | 2 = HANYA RHK TERKAIT
 		if (!empty($skpd_user_pegawai)) {
-			if (($skpd_user_pegawai['id_skpd'] == $id_skpd && $v_user['tipe_pegawai_id'] == 11 && strlen($v_user['satker_id']) == 2) || $is_administrator) {
+			if ((
+					$skpd_user_pegawai['id_skpd'] == $id_skpd 
+					&& $v_user['tipe_pegawai_id'] == 11 
+					&& strlen($v_user['satker_id']) == 2
+				) || $is_administrator
+			) {
 				$hak_akses_user_pegawai = 1;
-			} else if ($skpd_user_pegawai['id_skpd'] == $id_skpd && !empty($data_this_pegawai['nip_baru']) && $data_this_pegawai['nip_baru'] == $user_nip) {
+			} else if (
+				$skpd_user_pegawai['id_skpd'] == $id_skpd 
+				&& !empty($data_this_pegawai['nip_baru']) 
+				&& $data_this_pegawai['nip_baru'] == $user_nip
+			) {
 				$hak_akses_user_pegawai = 2;
 			}
 			if (empty($hak_akses_user_pegawai_per_skpd[$skpd_user_pegawai['id_skpd']])) {
@@ -938,7 +945,27 @@ foreach ($bulan as $k_bulan => $v_bulan) {
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $indikator_rhk['satuan'] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">' .  $all_realisasi['realisasi_' . $triwulan] . '</td>
 			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b>' . $capaian_tw . '%</b></td>
-			<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $indikator_rhk['ket_tw_' . $triwulan] . '</td>
+			<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+		</tr>
+		<tr style="background-color:#FDFFB6;">
+			<td colspan="7" class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="padding: 5px;">
+				<table style="margin: 0;">
+					<thead>
+						<tr style="background-color: #bde0fe;">
+							<th class="text-center esakip-kiri esakip-kanan esakip-atas esakip-bawah">Faktor Pendukung</th>
+							<th class="text-center esakip-kiri esakip-kanan esakip-atas esakip-bawah">Faktor Penghambat</th>
+							<th class="text-center esakip-kiri esakip-kanan esakip-atas esakip-bawah">Dialog Kinerja</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">-</td>
+							<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"></td>
+							<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah">' . $indikator_rhk['ket_tw_' . $triwulan] . '</td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
 		</tr>';
 		$triwulan++;
 		$sum_realisasi = $sum_realisasi + $realisasi_tw;
@@ -1015,6 +1042,7 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 		vertical-align: middle !important;
 		font-size: small;
 		text-align: center;
+		text-transform: uppercase;
 	}
 
 	#modal-renaksi thead th {
@@ -1234,13 +1262,13 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 							</tr>
 							<tr>
 								<td style="width: 290px;">Satuan Kerja</td>
-								<td>:</td>
+								<td class="text-center">:</td>
 								<td><?php echo $data_skpd[1]; ?></td>
 							</tr>
 							<tr>
 								<td style="width: 290px;">Nama Pegawai</td>
-								<td>:</td>
-								<td>
+								<td class="text-center">:</td>
+								<td style="font-weight: bold;">
 									<?php
 									if (!empty($data_pegawai[1])) {
 										echo $data_pegawai[1]['nip_baru'] . ' - ' . $data_pegawai[1]['nama_pegawai'];
@@ -1299,25 +1327,25 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 								echo '
 									<tr>
 										<td style="width: 290px;">Kegiatan</td>
-										<td>:</td>
+										<td class="text-center">:</td>
 										<td>' . $data_rhk[2]['kode_cascading_kegiatan'] . ' ' . $data_rhk[2]['label_cascading_kegiatan'] . '</td>
 									</tr>
 									<tr>
 										<td style="width: 290px;">Sub Kegiatan</td>
-										<td>:</td>
+										<td class="text-center">:</td>
 										<td>' . $data_rhk[2]['kode_cascading_sub_kegiatan'] . ' ' . $label_subkeg . '</td>
 									</tr>';
 							}
 							?>
 							<tr>
 								<td style="width: 290px;">Satuan Kerja</td>
-								<td>:</td>
+								<td class="text-center">:</td>
 								<td><?php echo $data_skpd[2]; ?></td>
 							</tr>
 							<tr>
 								<td style="width: 290px;">Nama Pegawai</td>
-								<td>:</td>
-								<td>
+								<td class="text-center">:</td>
+								<td style="font-weight: bold;">
 									<?php
 									if (!empty($data_pegawai[2])) {
 										echo $data_pegawai[2]['nip_baru'] . ' - ' . $data_pegawai[2]['nama_pegawai'];
@@ -1376,20 +1404,20 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 								echo '
 							<tr>
 								<td style="width: 290px;">Sub Kegiatan</td>
-								<td>:</td>
+								<td class="text-center">:</td>
 								<td>' . $data_rhk[3]['kode_cascading_sub_kegiatan'] . ' ' . $label_subkeg . '</td>
 							</tr>';
 							}
 							?>
 							<tr>
 								<td style="width: 290px;">Satuan Kerja</td>
-								<td>:</td>
+								<td class="text-center">:</td>
 								<td><?php echo $data_skpd[3]; ?></td>
 							</tr>
 							<tr>
 								<td style="width: 290px;">Nama Pegawai</td>
-								<td>:</td>
-								<td>
+								<td class="text-center">:</td>
+								<td style="font-weight: bold;">
 									<?php
 									if (!empty($data_pegawai[3])) {
 										echo $data_pegawai[3]['nip_baru'] . ' - ' . $data_pegawai[3]['nama_pegawai'];
@@ -1453,13 +1481,13 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 							</tr>
 							<tr>
 								<td style="width: 290px;">Satuan Kerja</td>
-								<td>:</td>
+								<td class="text-center">:</td>
 								<td><?php echo $data_skpd[4]; ?></td>
 							</tr>
 							<tr>
 								<td style="width: 290px;">Nama Pegawai</td>
-								<td>:</td>
-								<td>
+								<td class="text-center">:</td>
+								<td style="font-weight: bold;">
 									<?php
 									if (!empty($data_pegawai[4])) {
 										echo $data_pegawai[4]['nip_baru'] . ' - ' . $data_pegawai[4]['nama_pegawai'];
@@ -1476,56 +1504,51 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 		<?php endif; ?>
 
 		<div class="card bg-light shadow-lg m-3 p-3">
-			<div class="wrap-table">
-				<h3 class="text-center">Target dan Realisasi Per Bulan</h3>
-				<table>
-					<thead style="background-color: #bde0fe; color: #212529;">
-						<tr>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3">INDIKATOR</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">SATUAN</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AWAL</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AKHIR</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3"><?php echo $indikator_rhk['indikator']; ?></td>
-							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
-							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_awal']; ?></td>
-							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
-						</tr>
-						<tr>
-							<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="6">
-								<table>
-									<thead style="background-color: #bde0fe; color: #212529;">
-										<tr>
-											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 130px;">Bulan/TW</th>
-											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rencana Aksi</th>
-											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Target</th>
-											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Satuan</th>
-											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Realisasi</th>
-											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 140px;">Capaian</th>
-											<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 240px;">Tanggapan Atasan</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php echo $tbody_target_realisasi_bulanan; ?>
-										<tr style="background-color:#FDFFB6;">
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Total</td>
-											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['indikator']; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $sum_realisasi; ?></td>
-											<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b><?php echo $capaian_tahunan_display; ?>%</b></td>
-											<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['ket_total']; ?></td>
-										</tr>
-									</tbody>
-								</table>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+			<h3 class="text-center">Indikator Kinerja</h3>
+			<table>
+				<thead style="background-color: #bde0fe; color: #212529;">
+					<tr>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3">INDIKATOR</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">SATUAN</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AWAL</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">TARGET AKHIR</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" colspan="3"><?php echo $indikator_rhk['indikator']; ?></td>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_awal']; ?></td>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
+					</tr>
+				</tbody>
+			</table>
+			<h3 class="text-center">Monitoring dan Evaluasi Kinerja</h3>
+			<table>
+				<thead style="background-color: #bde0fe; color: #212529;">
+					<tr>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 130px;">Bulan</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Rencana Aksi</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Target</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Satuan</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 120px;">Realisasi</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 140px;">Capaian</th>
+						<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 240px;">Tanggapan Atasan</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php echo $tbody_target_realisasi_bulanan; ?>
+					<tr style="background-color:#FDFFB6;">
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah">Total</td>
+						<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['indikator']; ?></td>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['target_akhir']; ?></td>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['satuan']; ?></td>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $sum_realisasi; ?></td>
+						<td class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah"><b><?php echo $capaian_tahunan_display; ?>%</b></td>
+						<td class="esakip-text_kiri esakip-kiri esakip-kanan esakip-atas esakip-bawah"><?php echo $indikator_rhk['ket_total']; ?></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 
 		<div class="card bg-light shadow-lg m-3 p-3">
@@ -1556,7 +1579,7 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">PAGU RENCANA HASIL KERJA</th>
 							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">PAGU RINCIAN RENCANA HASIL KERJA</th>
 							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">REALISASI</th>
-							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">CAPAIAN REALIASI TERHADAP RENCANA PAGU</th>
+							<th class="esakip-text_tengah esakip-kiri esakip-kanan esakip-atas esakip-bawah" style="width: 25%;">CAPAIAN REALIASI TERHADAP PAGU</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -1642,7 +1665,7 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 								<div class="bg-light p-3 rounded">
 									<div class="row">
 										<div class="col-md-3 mb-3">
-											<div class="text-muted text-center">Rencana Pagu</div>
+											<div class="text-muted text-center">Pagu</div>
 											<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($indikator_rhk['rencana_pagu'], 2, ',', '.'); ?></div>
 										</div>
 										<div class="col-md-3 mb-3">
@@ -1650,7 +1673,7 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 											<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($total_all, 2, ',', '.'); ?></div>
 										</div>
 										<div class="col-md-3 mb-3">
-											<div class="text-muted text-center">Sisa Rencana Pagu</div>
+											<div class="text-muted text-center">Sisa Pagu</div>
 											<div class="amount font-weight-bold text-success text-center"><?php echo number_format($sisa_pagu_rhk, 2, ',', '.'); ?></div>
 										</div>
 										<div class="col-md-3 mb-3">
@@ -1733,7 +1756,7 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 						<div class="bg-light p-3 rounded">
 							<div class="row">
 								<div class="col-md-3 mb-3">
-									<div class="text-muted text-center">Rencana Pagu</div>
+									<div class="text-muted text-center">Pagu</div>
 									<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($indikator_rhk['rencana_pagu'], 2, ',', '.'); ?></div>
 								</div>
 								<div class="col-md-3 mb-3">
@@ -1741,7 +1764,7 @@ $capaian_tahunan_display = ($capaian_tahunan === false) ? 'N/A' : $capaian_tahun
 									<div class="amount font-weight-bold text-primary text-center"><?php echo number_format($total_all, 2, ',', '.'); ?></div>
 								</div>
 								<div class="col-md-3 mb-3">
-									<div class="text-muted text-center">Sisa Rencana Pagu</div>
+									<div class="text-muted text-center">Sisa Pagu</div>
 									<div class="amount font-weight-bold text-success text-center"><?php echo number_format($sisa_pagu_rhk, 2, ',', '.'); ?></div>
 								</div>
 								<div class="col-md-3 mb-3">

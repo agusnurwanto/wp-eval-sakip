@@ -487,7 +487,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             <th class="text-center" colspan="6" style="width: 400px;">TARGET KEGIATAN PER TRIWULAN</th>
                             <th class="text-center" colspan="4" style="width: 250px;">REALISASI KEGIATAN PER TRIWULAN</th>
                             <th class="text-center" rowspan="2" style="width: 140px;">CAPAIAN REALISASI (%)</th>
-                            <th class="text-center" rowspan="2" style="width: 140px;">RENCANA PAGU</th>
+                            <th class="text-center" rowspan="2" style="width: 140px;">PAGU</th>
                             <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">PAGU RINCIAN</th>
                             <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">REALISASI PAGU</th>
                             <th class="text-center anggaran_column" rowspan="2" style="width: 140px;">CAPAIAN REALISASI PAGU</th>
@@ -1633,7 +1633,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             if (tipe == 1) {
                                 setTimeout(function() {
                                     if (rhk.input_rencana_pagu_level == 1 && rhk.cascading_pk) {
-                                        console.log('Edit mode: Input rencana pagu aktif dengan cascading_pk:', rhk.cascading_pk);
+                                        console.log('Edit mode: Input pagu aktif dengan cascading_pk:', rhk.cascading_pk);
                                     } else if (rhk.is_tujuan && rhk.is_tujuan != '0' && rhk.is_tujuan != 0) {
                                         jQuery('#is_tujuan').prop('checked', true);
                                         jQuery('#wrapper-is-tujuan').show();
@@ -1688,7 +1688,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     }
                     
                     if(rhk.input_rencana_pagu_level == 1 && tipe < 2) {
-                        console.log('Load cascading-renstra-program untuk input rencana pagu');
+                        console.log('Load cascading-renstra-program untuk input pagu');
                         jQuery("#cascading-renstra-program").empty();
                         get_cascading_input_rencana_pagu('program').then(function() {
                             resolve();
@@ -1766,7 +1766,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                         if (rhk.id_sub_skpd_cascading) {
                             kode_cascading_renstra_program = rhk.kode_cascading_program+'_'+rhk.id_sub_skpd_cascading;
                         }
-                        console.log('Load cascading-renstra-kegiatan untuk input rencana pagu');
+                        console.log('Load cascading-renstra-kegiatan untuk input pagu');
                         jQuery("#cascading-renstra-kegiatan").empty();
                         get_cascading_input_rencana_pagu('kegiatan').then(function() {
                             resolve();
@@ -1841,7 +1841,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     }
                     
                     if((rhk.input_rencana_pagu_level == 1 || cek_parent_global.input_pagu == 1) && tipe < 4) {
-                        console.log('Load cascading-renstra-sub-kegiatan untuk input rencana pagu');
+                        console.log('Load cascading-renstra-sub-kegiatan untuk input pagu');
                         jQuery("#cascading-renstra-sub-kegiatan").empty();
                         get_cascading_input_rencana_pagu('sub_kegiatan').then(function() {
                             resolve();
@@ -2126,7 +2126,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
 
                 if(rhk.input_rencana_pagu_level == 1 && tipe < 4) {
                     setTimeout(function() {
-                        console.log('Menampilkan semua pokin untuk input rencana pagu');
+                        console.log('Menampilkan semua pokin untuk input pagu');
                         
                         var selectedCascading = null;
                         var jenisCascading = '';
@@ -3117,7 +3117,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                     input_pagu = '' +
                         `<div class="form-group row">` +
                             '<div class="col-md-2">' +
-                                `<label for="rencana_pagu">Rencana Pagu</label>` +
+                                `<label for="rencana_pagu">Pagu</label>` +
                             '</div>' +
                             '<div class="col-md-10">' +
                                 `<input type="number" class="form-control format-rupiah" id="rencana_pagu" disabled>` +
@@ -3182,7 +3182,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                                 '</div>' +
                                 '<div class="col-md-1"></div>' +
                                 '<div class="col-md-2">' +
-                                    `<label for="total_rincian">Rencana Pagu</label>` +
+                                    `<label for="total_rincian">Pagu</label>` +
                                 '</div>' +
                                 '<div class="col-md-5">' +
                                     `<div class="input-group">` +
@@ -3819,7 +3819,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
             var fungsi_tambah = '';
             var id_tabel = '';
             var header_dasar_pelaksanaan = `<th class="text-center" style="width:50px;">Dasar Pelaksanaan</th>`;
-            var header_pagu = `<th class="text-center" style="width:170px;">Rencana Pagu</th>`;
+            var header_pagu = `<th class="text-center" style="width:170px;">Pagu</th>`;
             let title_cascading = '';
             let rhk_level = '';
 
@@ -5719,10 +5719,10 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
                             <div class="form-group form-check" ${hide}>
                                 <label class="form-check-label" for="set_input_rencana_pagu">
                                     <input class="form-check-input" type="checkbox" id="set_input_rencana_pagu" name="set_input_rencana_pagu">
-                                    Pengaturan Input Rencana Pagu
+                                    Pengaturan Input Pagu
                                 </label>
                                 <small class="form-text text-muted">
-                                    Pengaturan Input Rencana Pagu Menjadikan Level Ini Menjadi Level RHK Terakhir.
+                                    Pengaturan Input Pagu Menjadikan Level Ini Menjadi Level RHK Terakhir.
                                 </small>
                             </div>
                         `;
@@ -6456,7 +6456,7 @@ $data_rhk_individu = $wpdb->get_results($wpdb->prepare("
         if (setting_input_rencana_pagu == 1 && status_input_rencana_pagu == 0) {
             var kode_sub_kegiatan_check = jQuery('#cascading-renstra-sub-kegiatan').val();
             if (!kode_sub_kegiatan_check || kode_sub_kegiatan_check == '') {
-                return alert('Jika Pengaturan Input Rencana Pagu dicentang, Sub Kegiatan Cascading wajib diisi!');
+                return alert('Jika Pengaturan Input Pagu dicentang, Sub Kegiatan Cascading wajib diisi!');
             }
         }
         
