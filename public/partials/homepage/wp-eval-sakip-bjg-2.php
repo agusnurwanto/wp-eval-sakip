@@ -16,6 +16,24 @@ $page_cascading_publish = $this->functions->generatePage([
     'show_header' => 1,
     'post_status' => 'publish'
 ]);
+$perjanjian_kinerja_page = $this->functions->generatePage([
+    'nama_page'   => 'Capaian Kinerja Perjanjian Kinerja',
+    'content'     => '[capaian_kinerja_pk_publish]',
+    'show_header' => 1,
+    'post_status' => 'publish'
+]);
+$iku_page = $this->functions->generatePage([
+    'nama_page'   => 'Capaian Kinerja',
+    'content'     => '[capaian_kinerja_publish]',
+    'show_header' => 1,
+    'post_status' => 'publish'
+]);
+$page_monev_publish = $this->functions->generatePage([
+    'nama_page'   => 'MONEV KINERJA',
+    'content'     => '[monev_kinerja_publik]',
+    'show_header' => 1,
+    'post_status' => 'publish'
+]);
 ?>
 <style>
     /* CSS Scoped khusus agar tidak merusak layout bawaan WordPress */
@@ -308,7 +326,9 @@ $page_cascading_publish = $this->functions->generatePage([
                 <div class="menu-group">
                     <h3>Pengukuran</h3>
                     <ul>
-                        <li class="menu-item" data-target="monev">📄 Monev Pengukuran</li>
+                        <li class="menu-item" data-target="monev_iku">📄 Monev IKU RENSTRA</li>
+                        <li class="menu-item" data-target="monev_renja">📄 Monev RENJA</li>
+                        <li class="menu-item" data-target="monev">📄 Monev Perjanjian Kinerja</li>
                         <li class="menu-item" data-target="pko">📄 Penilaian Kinerja Organisasi</li>
                         <li class="menu-item" data-target="pkop">📄 Penilaian Kinerja Organisasi Periodik</li>
                         <li class="menu-item" data-target="jnis-ukur">🔗 Pedoman Teknis Pengukuran</li>
@@ -345,7 +365,7 @@ $page_cascading_publish = $this->functions->generatePage([
                             <thead>
                                 <tr>
                                     <th class="label-dynamic-periode text-center" style="max-width: 250px">Tahun</th>
-                                    <th class="text-center">Perangkat Daerah</th>
+                                    <th class="text-center" style="max-width: 350px">Perangkat Daerah</th>
                                     <th class="text-center">Data</th>
                                 </tr>
                             </thead>
@@ -440,7 +460,7 @@ function getTableSakip(target) {
             option.setAttribute('data-tahun', item.tahun_anggaran);
             select.appendChild(option);
         });
-    }else if (['rpjmd', 'iku', 'pohon', 'cascading'].includes(target)) {
+    }else if (['rpjmd', 'iku', 'pohon', 'cascading', 'monev_iku'].includes(target)) {
         label.text('Periode');
         data.periode.forEach(item => {
             const option = document.createElement('option');
@@ -466,6 +486,10 @@ function getTableSakipAjax() {
     const periode = document.getElementById('dynamic-periode');
     const text_periode = periode.options[periode.selectedIndex].text;
 
+    if (jQuery.fn.DataTable.isDataTable('#tabel-dinamis-sakip')) {
+        jQuery('#tabel-dinamis-sakip').DataTable().destroy();
+    }
+
     if(slug == 'pohon'){
         var url_pokin = '<?php echo $page_pohon_kinerja_publish['url']; ?>';
         var tahun_anggaran = periode.options[periode.selectedIndex].getAttribute('data-tahun');
@@ -473,7 +497,7 @@ function getTableSakipAjax() {
         var html = `
             <tr>
                 <td>${text_periode}</td>
-                <td>${nama_pemda}</td>
+                <td>${nama_pemda} dan OPD</td>
                 <td><a href="${url_pokin+'&tahun='+tahun_anggaran}" target="_blank">POHON KINERJA</a></td>
             </tr>
         `;
@@ -486,8 +510,47 @@ function getTableSakipAjax() {
         var html = `
             <tr>
                 <td>${text_periode}</td>
-                <td>${nama_pemda}</td>
+                <td>${nama_pemda} dan OPD</td>
                 <td><a href="${url_cascading+'&tahun='+tahun_anggaran}" target="_blank">CASCADING</a></td>
+            </tr>
+        `;
+        jQuery('#tabel-dinamis-sakip tbody').html(html);
+        return;
+    }else if(slug == 'monev_iku'){
+        var url_monev_iku = '<?php echo $iku_page['url']; ?>';
+        var tahun_anggaran = periode.options[periode.selectedIndex].getAttribute('data-tahun');
+        var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
+        var html = `
+            <tr>
+                <td>${text_periode}</td>
+                <td>${nama_pemda} dan OPD</td>
+                <td><a href="${url_monev_iku+'&tahun='+tahun_anggaran+'&iscurrentpage=true'}" target="_blank">MONEV KINERJA</a></td>
+            </tr>
+        `;
+        jQuery('#tabel-dinamis-sakip tbody').html(html);
+        return;
+    }else if(slug == 'monev_renja'){
+        var url_monev_renja = '<?php echo $perjanjian_kinerja_page['url']; ?>';
+        var tahun_anggaran = periode.options[periode.selectedIndex].value;
+        var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
+        var html = `
+            <tr>
+                <td>${text_periode}</td>
+                <td>${nama_pemda} dan OPD</td>
+                <td><a href="${url_monev_renja+'&tahun='+tahun_anggaran}" target="_blank">MONEV KINERJA</a></td>
+            </tr>
+        `;
+        jQuery('#tabel-dinamis-sakip tbody').html(html);
+        return;
+    }else if(slug == 'monev'){
+        var url_monev = '<?php echo $page_monev_publish['url']; ?>';
+        var tahun_anggaran = periode.options[periode.selectedIndex].value;
+        var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
+        var html = `
+            <tr>
+                <td>${text_periode}</td>
+                <td>${nama_pemda}</td>
+                <td><a href="${url_monev+'&tahun='+tahun_anggaran}" target="_blank">MONEV KINERJA</a></td>
             </tr>
         `;
         jQuery('#tabel-dinamis-sakip tbody').html(html);
@@ -495,11 +558,6 @@ function getTableSakipAjax() {
     }
 
     const $loading = jQuery('#wrap-loading');
-
-    if (jQuery.fn.DataTable.isDataTable('#tabel-dinamis-sakip')) {
-        jQuery('#tabel-dinamis-sakip').DataTable().destroy();
-    }
-
     jQuery('#tabel-dinamis-sakip').DataTable({
         "processing": false, // Kita gunakan custom loader
         "serverSide": false,

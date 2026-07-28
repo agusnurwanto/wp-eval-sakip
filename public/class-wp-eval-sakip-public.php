@@ -35800,6 +35800,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					AND u.is_skpd=1
 					AND u.tahun_anggaran = %d
 					$where_esr
+				ORDER by u.kode_skpd ASC
 			", $tahun_anggaran, $tahun_skpd),
 			ARRAY_A
 		);
