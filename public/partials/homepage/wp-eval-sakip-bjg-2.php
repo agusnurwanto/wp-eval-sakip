@@ -330,7 +330,7 @@ $tahun_default = get_option('_crb_tahun_wpsipd');
                     <h3>Pengukuran</h3>
                     <ul>
                         <li class="menu-item" data-target="monev_iku">📄 Monev IKU RENSTRA</li>
-                        <li class="menu-item" data-target="monev_renja">📄 Monev RENJA</li>
+                        <li class="menu-item" style="display: none;" data-target="monev_renja">📄 Monev RENJA</li>
                         <li class="menu-item" data-target="monev">📄 Monev Perjanjian Kinerja</li>
                         <li class="menu-item" style="display: none;" data-target="pko">📄 Penilaian Kinerja Organisasi</li>
                         <li class="menu-item" style="display: none;" data-target="pkop">📄 Penilaian Kinerja Organisasi Periodik</li>
@@ -550,13 +550,13 @@ function getTableSakipAjax() {
         jQuery('#tabel-dinamis-sakip tbody').html(html);
         return;
     }else if(slug == 'monev'){
-        var url_monev = '<?php echo $page_monev_publish['url']; ?>';
+        var url_monev = '<?php echo $perjanjian_kinerja_page['url']; ?>';
         var tahun_anggaran = periode.options[periode.selectedIndex].value;
         var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
         var html = `
             <tr>
                 <td>${text_periode}</td>
-                <td>${nama_pemda}</td>
+                <td>${nama_pemda} dan OPD</td>
                 <td><a href="${url_monev+'&tahun='+tahun_anggaran}" target="_blank">MONEV KINERJA</a></td>
             </tr>
         `;
