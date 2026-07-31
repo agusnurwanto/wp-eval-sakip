@@ -106,7 +106,7 @@ foreach ($idtahun as $val) {
         overflow-wrap: break-word; 
         font-size: 90%;
     }
-    .table_dokumen_rencana_aksi_pemda thead {
+    .table_dokumen_rencana_aksi_pemda > thead {
         position: sticky;
         top: -6px;
     }
@@ -132,12 +132,12 @@ foreach ($idtahun as $val) {
                 <table cellpadding="2" cellspacing="0" class="table_dokumen_rencana_aksi_pemda table table-bordered">
                     <thead style="background: #ffc491;">
                         <tr>
-                            <th class="atas kiri bawah kanan text-center" style="width: 85px;">No</th>
-                            <th class="atas kiri bawah kanan text-center">SASARAN STRATEGIS</th>
-                            <th class="atas kiri bawah kanan text-center">INDIKATOR KINERJA</th>
+                            <th class="atas kiri bawah kanan text-center" style="width: 50px;">No</th>
+                            <th class="atas kiri bawah kanan text-center">TUJUAN/SASARAN STRATEGIS</th>
+                            <th class="atas kiri bawah kanan text-center" style="width: 400px;">INDIKATOR KINERJA</th>
                             <th class="atas kiri bawah kanan text-center">NAMA PERANGKAT DAERAH</th>
                             <th class="atas kiri bawah kanan text-center">RENCANA AKSI PERANGKAT DAERAH</th>
-                            <th class="atas kiri bawah kanan text-center" style="width: 200px;">RENCANA PAGU</th>
+                            <th class="atas kiri bawah kanan text-center">PAGU</th>
                             <th class="atas kiri bawah kanan text-center">PROGRAM PERANGKAT DAERAH</th>
                             <th class="atas kiri bawah kanan text-center">PAGU APBD</th>
                         </tr>

@@ -35732,8 +35732,8 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}else if($_POST['target'] == 'lkj'){
 			$res = $this->get_dokumen_publik(array(
 				'periode' => $_POST['periode'],
-				'tabel_pemda' => 'esakip_lkjip_lppd_pemda',
-				'tabel_opd' => 'esakip_lkjip_lppd',
+				'tabel_pemda' => 'esakip_laporan_kinerja_pemda',
+				'tabel_opd' => 'esakip_laporan_kinerja',
 				'kolom_periode' => 'tahun_anggaran'
 			));
 		}else if($_POST['target'] == 'lhe'){

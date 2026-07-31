@@ -372,6 +372,7 @@ $tahun_default = get_option('_crb_tahun_wpsipd');
                                     <th class="text-center" style="max-width: 150px">Data</th>
                                 </tr>
                             </thead>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>

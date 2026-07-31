@@ -122,43 +122,43 @@ class Wp_Eval_Sakip_Admin
 			->add_tab('🔌 API ESR', $this->generate_fields_options_api_esr())
 			->add_tab('🔌 API E-Kinerja', $this->generate_fields_options_api_ekin());
 
-		Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
-			->set_page_parent($basic_options_container)
-			->add_tab('🏢 Perangkat Daerah', $this->generate_fields_perangkat_daerah_options())
-			->add_tab('🏦 Lembaga Lainnya', $this->generate_fields_lembaga_lainnya_options())
-			->add_tab('🗃️ Mapping Jenis Dokumen', $this->generate_fields_mapping_jenis_dokumen_options());
+			Container::make('theme_options', __('Pengaturan Perangkat Daerah'))
+				->set_page_parent($basic_options_container)
+				->add_tab('🏢 Perangkat Daerah', $this->generate_fields_perangkat_daerah_options())
+				->add_tab('🏦 Lembaga Lainnya', $this->generate_fields_lembaga_lainnya_options())
+				->add_tab('🗃️ Mapping Jenis Dokumen', $this->generate_fields_mapping_jenis_dokumen_options());
 
-		Container::make('theme_options', __('Jadwal'))
-			->set_page_parent($basic_options_container)
-			->add_tab('🏙️ RPJPD dan RPJMD/RPD/Renstra', $this->generate_fields_jadwal('rpjpd_rpjmd'))
-			->add_tab('📋 LKE (Lembar Kerja Evaluasi)', $this->generate_fields_jadwal('lke'))
-			->add_tab('📄 Verifikasi Upload Dokumen', $this->generate_fields_jadwal('upload_dokumen'));
+			Container::make('theme_options', __('Jadwal'))
+				->set_page_parent($basic_options_container)
+				->add_tab('🏙️ RPJPD dan RPJMD/RPD/Renstra', $this->generate_fields_jadwal('rpjpd_rpjmd'))
+				->add_tab('📋 LKE (Lembar Kerja Evaluasi)', $this->generate_fields_jadwal('lke'))
+				->add_tab('📄 Verifikasi Upload Dokumen', $this->generate_fields_jadwal('upload_dokumen'));
 
-		Container::make('theme_options', __('Menu Setting'))
-			->set_page_parent($basic_options_container)
-			->add_fields($this->generate_fields_options_menu_settings());
+			Container::make('theme_options', __('Menu Setting'))
+				->set_page_parent($basic_options_container)
+				->add_fields($this->generate_fields_options_menu_settings());
 
-		Container::make('theme_options', __('Visibilitas Menu Utama'))
-			->set_page_parent($basic_options_container)
-			->add_tab(__('Menu Admin'), $this->generate_fields_menu_vis_admin())
-			->add_tab(__('Menu PA/KPA/Kepala'), $this->generate_fields_menu_vis_skpd());
+			Container::make('theme_options', __('Visibilitas Menu Utama'))
+				->set_page_parent($basic_options_container)
+				->add_tab(__('Menu Admin'), $this->generate_fields_menu_vis_admin())
+				->add_tab(__('Menu PA/KPA/Kepala'), $this->generate_fields_menu_vis_skpd());
 
-		Container::make('theme_options', __('Tampilan Beranda'))
-			->set_page_parent($basic_options_container)
-			->add_tab(__('🏠 Frontpage / Halaman Depan'), $this->generate_fields_front_page())
-			->add_tab(__('👤 Menu Profile User'), $this->generate_fields_profile_user());
+			Container::make('theme_options', __('Tampilan Beranda'))
+				->set_page_parent($basic_options_container)
+				->add_tab(__('🏠 Frontpage / Halaman Depan'), $this->generate_fields_front_page())
+				->add_tab(__('👤 Menu Profile User'), $this->generate_fields_profile_user());
 
-		Container::make('theme_options', __('Auto Login'))
-			->set_page_parent($basic_options_container)
-			->add_fields($this->generate_fields_options_auto_login());
+			Container::make('theme_options', __('Auto Login'))
+				->set_page_parent($basic_options_container)
+				->add_fields($this->generate_fields_options_auto_login());
 
-		Container::make('theme_options', __('Keamanan 2FA'))
-			->set_page_parent($basic_options_container)
-			->add_fields($this->generate_fields_2fa_otp());
+			Container::make('theme_options', __('Keamanan 2FA'))
+				->set_page_parent($basic_options_container)
+				->add_fields($this->generate_fields_2fa_otp());
 
-		Container::make('theme_options', __('AI Settings'))
-			->set_page_parent($basic_options_container)
-			->add_fields($this->generate_fields_ai());
+			Container::make('theme_options', __('AI Settings'))
+				->set_page_parent($basic_options_container)
+				->add_fields($this->generate_fields_ai());
 
 		$dokumen_pemda_menu = Container::make('theme_options', __('Dokumen Pemda'))
 			->set_page_menu_position(3.1)
@@ -173,77 +173,77 @@ class Wp_Eval_Sakip_Admin
 		        	')
 			));
 
-		Container::make('theme_options', __('RPJPD'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_rpjpd_pemda());
+			Container::make('theme_options', __('RPJPD'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_rpjpd_pemda());
 
-		Container::make('theme_options', __('RPJMD'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_rpjmd_pemda());
+			Container::make('theme_options', __('RPJMD'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_rpjmd_pemda());
 
-		Container::make('theme_options', __('IKU'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_iku_pemda());
+			Container::make('theme_options', __('IKU'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_iku_pemda());
 
-		Container::make('theme_options', __('RKPD'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_rkpd_pemda());
+			Container::make('theme_options', __('RKPD'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_rkpd_pemda());
 
-		Container::make('theme_options', __('Perjanjian Kinerja'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_pk_pemda());
+			Container::make('theme_options', __('Perjanjian Kinerja'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_pk_pemda());
 
-		Container::make('theme_options', __('Laporan Kinerja'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_laporan_kinerja_pemda());
+			Container::make('theme_options', __('Laporan Kinerja'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_laporan_kinerja_pemda());
 
-		Container::make('theme_options', __('DPA'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_dpa_pemda());
+			Container::make('theme_options', __('DPA'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_dpa_pemda());
 
-		Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_pokin_cascading_pemda());
+			Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_pokin_cascading_pemda());
 
-		Container::make('theme_options', __('LHE AKIP Internal'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_lhe_internal_pemda());
+			Container::make('theme_options', __('LHE AKIP Internal'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_lhe_internal_pemda());
 
-		Container::make('theme_options', __('TL LHE AKIP Internal'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_tl_lhe_internal_pemda());
+			Container::make('theme_options', __('TL LHE AKIP Internal'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_tl_lhe_internal_pemda());
 
-		Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_tl_lhe_kemenpan_pemda());
+			Container::make('theme_options', __('TL LHE AKIP Kemenpan'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_tl_lhe_kemenpan_pemda());
 
-		Container::make('theme_options', __('Laporan Monev Renaksi'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_monev_renaksi_pemda());
+			Container::make('theme_options', __('Laporan Monev Renaksi'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_monev_renaksi_pemda());
 
-		Container::make('theme_options', __('Pedoman Teknis Perencanaan'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_pedoman_teknis_perencanaan_pemda());
+			Container::make('theme_options', __('Pedoman Teknis Perencanaan'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_pedoman_teknis_perencanaan_pemda());
 
-		Container::make('theme_options', __('Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_pedoman_teknis_pengukuran_pengumpulan_kinerja_pemda());
+			Container::make('theme_options', __('Pedoman Teknis Pengukuran dan Pengumpulan Data Kinerja'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_pedoman_teknis_pengukuran_pengumpulan_kinerja_pemda());
 
-		Container::make('theme_options', __('Pedoman Teknis Evaluasi Internal'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_pedoman_teknis_evaluasi_internal_pemda());
+			Container::make('theme_options', __('Pedoman Teknis Evaluasi Internal'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_pedoman_teknis_evaluasi_internal_pemda());
 
-		Container::make('theme_options', __('Rencana Hasil Kerja'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_renaksi_pemda());
+			Container::make('theme_options', __('Rencana Hasil Kerja'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_renaksi_pemda());
 
-		Container::make('theme_options', __('LKJIP/LPPD'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_lkjip_pemda());
+			Container::make('theme_options', __('LKJIP/LPPD'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_lkjip_pemda());
 
-		Container::make('theme_options', __('Dokumen Lainnya'))
-			->set_page_parent($dokumen_pemda_menu)
-			->add_fields($this->generate_fields_dokumen_lain_pemda());
+			Container::make('theme_options', __('Dokumen Lainnya'))
+				->set_page_parent($dokumen_pemda_menu)
+				->add_fields($this->generate_fields_dokumen_lain_pemda());
 
 		$dokumen_menu = Container::make('theme_options', __('Dokumen Perangkat Daerah'))
 			->set_page_menu_position(3.2)
@@ -258,165 +258,165 @@ class Wp_Eval_Sakip_Admin
 		        	')
 			));
 
-		Container::make('theme_options', __('RENSTRA'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_renstra_opd());
+			Container::make('theme_options', __('RENSTRA'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_renstra_opd());
 
-		Container::make('theme_options', __('IKU'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_iku_opd());
+			Container::make('theme_options', __('IKU'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_iku_opd());
 
-		Container::make('theme_options', __('RENJA/RKT'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_renja_opd());
+			Container::make('theme_options', __('RENJA/RKT'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_renja_opd());
 
-		Container::make('theme_options', __('Perjanjian Kinerja'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_pk_opd());
+			Container::make('theme_options', __('Perjanjian Kinerja'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_pk_opd());
 
-		Container::make('theme_options', __('Laporan Kinerja'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_laporan_kinerja_opd());
+			Container::make('theme_options', __('Laporan Kinerja'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_laporan_kinerja_opd());
 
-		Container::make('theme_options', __('DPA'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_dpa_opd());
+			Container::make('theme_options', __('DPA'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_dpa_opd());
 
-		Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_pokin_cascading_opd());
+			Container::make('theme_options', __('Pohon Kinerja dan Cascading'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_pokin_cascading_opd());
 
-		Container::make('theme_options', __('LHE AKIP Internal'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_lhe_internal_opd());
+			Container::make('theme_options', __('LHE AKIP Internal'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_lhe_internal_opd());
 
-		Container::make('theme_options', __('TL LHE AKIP Internal'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_tl_lhe_internal_opd());
+			Container::make('theme_options', __('TL LHE AKIP Internal'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_tl_lhe_internal_opd());
 
-		Container::make('theme_options', __('Laporan Monev Renaksi'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_laporan_monev_renaksi_opd());
+			Container::make('theme_options', __('Laporan Monev Renaksi'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_laporan_monev_renaksi_opd());
 
-		Container::make('theme_options', __('Rencana Hasil Kerja'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_renaksi_opd());
+			Container::make('theme_options', __('Rencana Hasil Kerja'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_renaksi_opd());
 
-		Container::make('theme_options', __('SKP'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_skp_opd());
+			Container::make('theme_options', __('SKP'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_skp_opd());
 
-		Container::make('theme_options', __('Evaluasi Internal'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_evaluasi_internal_opd());
+			Container::make('theme_options', __('Evaluasi Internal'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_evaluasi_internal_opd());
 
-		Container::make('theme_options', __('Dokumen Lainnya'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_dokumen_lain_opd());
+			Container::make('theme_options', __('Dokumen Lainnya'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_dokumen_lain_opd());
 
-		Container::make('theme_options', __('Dokumen Pengukuran Kinerja'))
-			->set_page_parent($dokumen_menu)
-			->add_fields($this->generate_fields_dokumen_pengukuran_kinerja_opd());
+			Container::make('theme_options', __('Dokumen Pengukuran Kinerja'))
+				->set_page_parent($dokumen_menu)
+				->add_fields($this->generate_fields_dokumen_pengukuran_kinerja_opd());
 
-		Container::make('theme_options', __('Pengisian LKE SAKIP'))
+		Container::make('theme_options', __('Input RPJPD'))
 			->set_page_menu_position(3.3)
-			->set_icon('dashicons-edit-page')
-			->add_fields($this->generate_fields_pengisian_lke_sakip());
+			->set_icon('dashicons-flag')
+			->add_fields($this->generate_fields_input_rpjpd());
 
 		$pengisian_pokin_menu = Container::make('theme_options', __('Pohon Kinerja'))
 			->set_page_menu_position(3.4)
 			->set_icon('dashicons-networking');
 
-		Container::make('theme_options', __('Pohon Kinerja Pemerintah Daerah'))
-			->set_page_parent($pengisian_pokin_menu)
-			->add_fields($this->generate_fields_pokin_pemda());
+			Container::make('theme_options', __('Pohon Kinerja Pemerintah Daerah'))
+				->set_page_parent($pengisian_pokin_menu)
+				->add_fields($this->generate_fields_pokin_pemda());
 
-		Container::make('theme_options', __('Cascading Pemerintah Daerah'))
-			->set_page_parent($pengisian_pokin_menu)
-			->add_fields($this->generate_fields_cascading_pemda());
+			Container::make('theme_options', __('Cascading Pemerintah Daerah'))
+				->set_page_parent($pengisian_pokin_menu)
+				->add_fields($this->generate_fields_cascading_pemda());
 
-		Container::make('theme_options', __('Crosscutting Pemerintah Daerah'))
-			->set_page_parent($pengisian_pokin_menu)
-			->add_fields($this->generate_fields_crosscutting_pemda());
+			Container::make('theme_options', __('Crosscutting Pemerintah Daerah'))
+				->set_page_parent($pengisian_pokin_menu)
+				->add_fields($this->generate_fields_crosscutting_pemda());
 
-		Container::make('theme_options', __('Pohon Kinerja Perangkat Daerah'))
-			->set_page_parent($pengisian_pokin_menu)
-			->add_fields($this->generate_fields_pokin_opd());
+			Container::make('theme_options', __('Pohon Kinerja Perangkat Daerah'))
+				->set_page_parent($pengisian_pokin_menu)
+				->add_fields($this->generate_fields_pokin_opd());
 
-		Container::make('theme_options', __('Cascading Perangkat Daerah'))
-			->set_page_parent($pengisian_pokin_menu)
-			->add_fields($this->generate_fields_cascading_opd());
+			Container::make('theme_options', __('Cascading Perangkat Daerah'))
+				->set_page_parent($pengisian_pokin_menu)
+				->add_fields($this->generate_fields_cascading_opd());
 
-		$monev_renaksi_menu = Container::make('theme_options', __('Rencana Hasil Kerja'))
+		Container::make('theme_options', __('Input RPJMD'))
 			->set_page_menu_position(3.5)
-			->set_icon('dashicons-analytics');
-
-		Container::make('theme_options', __('Rencana Aksi Pemerintah Daerah'))
-			->set_page_parent($monev_renaksi_menu)
-			->add_fields($this->generate_fields_renaksi_pemda());
-
-		Container::make('theme_options', __('Rencana Aksi Perangkat Daerah'))
-			->set_page_parent($monev_renaksi_menu)
-			->add_fields($this->generate_fields_renaksi_opd());
-
-		Container::make('theme_options', __('Rencana Aksi Setting'))
-			->set_page_parent($monev_renaksi_menu)
-			->add_fields($this->generate_fields_renaksi_settings());
+			->set_icon('dashicons-calendar-alt')
+			->add_fields($this->generate_fields_input_rpjmd());
 
 		$input_iku_menu = Container::make('theme_options', __('Input IKU'))
 			->set_page_menu_position(3.6)
 			->set_icon('dashicons-performance');
 
-		Container::make('theme_options', __('Input IKU Pemerintah Daerah'))
-			->set_page_parent($input_iku_menu)
-			->add_fields($this->generate_fields_input_iku_pemda());
+			Container::make('theme_options', __('Input IKU Pemerintah Daerah'))
+				->set_page_parent($input_iku_menu)
+				->add_fields($this->generate_fields_input_iku_pemda());
 
-		Container::make('theme_options', __('Input IKU Perangkat Daerah'))
-			->set_page_parent($input_iku_menu)
-			->add_fields($this->generate_fields_input_iku_opd());
-
-		Container::make('theme_options', __('Input RPJPD'))
-			->set_page_menu_position(3.7)
-			->set_icon('dashicons-flag')
-			->add_fields($this->generate_fields_input_rpjpd());
-
-		Container::make('theme_options', __('Input RPJMD'))
-			->set_page_menu_position(3.8)
-			->set_icon('dashicons-calendar-alt')
-			->add_fields($this->generate_fields_input_rpjmd());
+			Container::make('theme_options', __('Input IKU Perangkat Daerah'))
+				->set_page_parent($input_iku_menu)
+				->add_fields($this->generate_fields_input_iku_opd());
 
 		$laporan_pk_menu = Container::make('theme_options', __('Perjanjian Kinerja'))
-			->set_page_menu_position(3.9)
+			->set_page_menu_position(3.7)
 			->set_icon('dashicons-businessman');
 
-		Container::make('theme_options', __('Perjanjian Kinerja Pemerintah Daerah'))
-			->set_page_parent($laporan_pk_menu)
-			->add_fields($this->generate_fields_laporan_pk_pemda());
+			Container::make('theme_options', __('Perjanjian Kinerja Pemerintah Daerah'))
+				->set_page_parent($laporan_pk_menu)
+				->add_fields($this->generate_fields_laporan_pk_pemda());
 
-		Container::make('theme_options', __('Perjanjian Kinerja Perangkat Daerah'))
-			->set_page_parent($laporan_pk_menu)
-			->add_fields($this->generate_fields_laporan_pk_opd());
+			Container::make('theme_options', __('Perjanjian Kinerja Perangkat Daerah'))
+				->set_page_parent($laporan_pk_menu)
+				->add_fields($this->generate_fields_laporan_pk_opd());
+
+		$monev_renaksi_menu = Container::make('theme_options', __('Rencana Hasil Kerja'))
+			->set_page_menu_position(3.8)
+			->set_icon('dashicons-analytics');
+
+			Container::make('theme_options', __('Rencana Aksi Pemerintah Daerah'))
+				->set_page_parent($monev_renaksi_menu)
+				->add_fields($this->generate_fields_renaksi_pemda());
+
+			Container::make('theme_options', __('Rencana Aksi Perangkat Daerah'))
+				->set_page_parent($monev_renaksi_menu)
+				->add_fields($this->generate_fields_renaksi_opd());
+
+			Container::make('theme_options', __('Rencana Aksi Setting'))
+				->set_page_parent($monev_renaksi_menu)
+				->add_fields($this->generate_fields_renaksi_settings());
+
+		Container::make('theme_options', __('Pengisian LKE SAKIP'))
+			->set_page_menu_position(3.9)
+			->set_icon('dashicons-edit-page')
+			->add_fields($this->generate_fields_pengisian_lke_sakip());
 
 		$kuesioner = Container::make('theme_options', __('Kuesioner'))
 			->set_page_menu_position(3.10)
 			->set_icon('dashicons-clipboard')
 			->add_fields($this->generate_fields_kuesioner());
 
-		Container::make('theme_options', __('Kuesioner Menpan'))
-			->set_page_parent($kuesioner)
-			->add_fields($this->generate_fields_kuesioner_menpan());
+			Container::make('theme_options', __('Kuesioner Menpan'))
+				->set_page_parent($kuesioner)
+				->add_fields($this->generate_fields_kuesioner_menpan());
 
-		Container::make('theme_options', __('Kuesioner Mendagri'))
-			->set_page_parent($kuesioner)
-			->add_fields($this->generate_fields_kuesioner_mendagri());
+			Container::make('theme_options', __('Kuesioner Mendagri'))
+				->set_page_parent($kuesioner)
+				->add_fields($this->generate_fields_kuesioner_mendagri());
 
-		Container::make('theme_options', __('Dokumen Kuesioner'))
-			->set_page_parent($kuesioner)
-			->add_fields($this->generate_fields_dokumen_kuesioner());
+			Container::make('theme_options', __('Dokumen Kuesioner'))
+				->set_page_parent($kuesioner)
+				->add_fields($this->generate_fields_dokumen_kuesioner());
 
-		Container::make('theme_options', __('Jadwal Kuesioner'))
-			->set_page_parent($kuesioner)
-			->add_fields($this->generate_fields_jadwal_kuesioner());
+			Container::make('theme_options', __('Jadwal Kuesioner'))
+				->set_page_parent($kuesioner)
+				->add_fields($this->generate_fields_jadwal_kuesioner());
 	}
 
 	function get_jadwal_renstra_wp_sipd()

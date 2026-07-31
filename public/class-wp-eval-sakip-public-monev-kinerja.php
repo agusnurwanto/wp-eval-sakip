@@ -13492,10 +13492,70 @@ class Wp_Eval_Sakip_Monev_Kinerja
 									$label_indikator = $v['label_indikator'] ?? '';
 								}
 
+								if($v['is_target_teks'] == 2){
+									$label_target_tahunan = $v['target'].' '.$v['satuan'];
+									$label_tw1 = $v['realisasi_1'];
+									$label_tw2 = $v['realisasi_2'];
+									$label_tw3 = $v['realisasi_3'];
+									$label_tw4 = $v['realisasi_4'];
+								}else{
+									$label_target_tahunan = $v['target_teks'].' '.$v['satuan'];
+									$label_tw1 = $v['realisasi_teks_1'];
+									$label_tw2 = $v['realisasi_teks_2'];
+									$label_tw3 = $v['realisasi_teks_3'];
+									$label_tw4 = $v['realisasi_teks_4'];
+								}
+								$target_tahunan = (float) $v['target'] ?? 0;
+								$all_realisasi = [
+									'realisasi_1' => (float) $v['realisasi_1'] ?? 0, 
+									'realisasi_2' => (float) $v['realisasi_2'] ?? 0, 
+									'realisasi_3' => (float) $v['realisasi_3'] ?? 0, 
+									'realisasi_4' => (float) $v['realisasi_4'] ?? 0
+								];
+								
+								$capaian = $this->get_capaian_realisasi_tahunan_by_type(
+									(int) $v['rumus_capaian_kinerja'],
+									(float) $target_tahunan,
+									(array) $all_realisasi,
+									(int) $v['tahun_anggaran']
+								);
+
+								$capaian_display = ($capaian === false) ? 'N/A' : $capaian;
+								
+								// jika capaian 0 tampilkan kosong.
+								$anti_zero_capaian = ($capaian_display == 0) ? '' : $capaian . '%';
+
 								if ($row_index === 0) {
+									$html_target = '
+										<table style="margin: 0;">
+											<thead>
+												<tr>
+													<th rowspan="2" style="border: 1px solid black;">Target</th>
+													<th colspan="4" style="border: 1px solid black;">Realisasi</th>
+													<th rowspan="2" style="border: 1px solid black;">Capaian</th>
+												</tr>
+												<tr>
+													<th style="border: 1px solid black;">TW1</th>
+													<th style="border: 1px solid black;">TW2</th>
+													<th style="border: 1px solid black;">TW3</th>
+													<th style="border: 1px solid black;">TW4</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td style="border: 1px solid black;">' . $label_target_tahunan . '</td>
+													<td style="border: 1px solid black;">' . $label_tw1 . '</td>
+													<td style="border: 1px solid black;">' . $label_tw2 . '</td>
+													<td style="border: 1px solid black;">' . $label_tw3 . '</td>
+													<td style="border: 1px solid black;">' . $label_tw4 . '</td>
+													<td style="border: 1px solid black;">' .$anti_zero_capaian . '</td>
+												</tr>
+											</tbody>
+										</table>';
+
 									$html .= '<td style="border: 1px solid black; text-align: center;" rowspan="' . $rowspan_total . '">' . $no . '</td>';
 									$html .= '<td style="border: 1px solid black;" rowspan="' . $rowspan_total . '">' . $label_sasaran . '</td>';
-									$html .= '<td style="border: 1px solid black;" rowspan="' . $rowspan_total . '">' . $label_indikator . '</td>';
+									$html .= '<td style="border: 1px solid black;" rowspan="' . $rowspan_total . '">IK: ' . $label_indikator . '<br><br>'.$html_target.'</td>';
 								}
 
 								if ($i === 0) {
