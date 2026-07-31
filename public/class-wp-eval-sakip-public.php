@@ -83,6 +83,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		wp_enqueue_style('dashicons');
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/wp-eval-sakip-public.css', array(), $this->version, 'all');
 		wp_enqueue_style($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name . 'bootstrap-icons', plugin_dir_url(__FILE__) . 'css/bootstrap-icons.css', array(), $this->version, 'all');
 		wp_enqueue_style($this->plugin_name . 'datatables', plugin_dir_url(__FILE__) . 'css/jquery.dataTables.min.css', array(), $this->version, 'all');
 	}
 
@@ -35701,7 +35702,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 			$res = $this->get_dokumen_publik(array(
 				'periode' => $_POST['periode'],
 				'tabel_pemda' => 'esakip_rkpd_pemda',
-				'tabel_opd' => 'esakip_rkpd',
+				'tabel_opd' => 'esakip_renja_rkt',
 				'kolom_periode' => 'tahun_anggaran'
 			));
 		}else if($_POST['target'] == 'iku'){
@@ -35729,9 +35730,26 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		}else if($_POST['target'] == 'pko'){
 		}else if($_POST['target'] == 'pkop'){
 		}else if($_POST['target'] == 'lkj'){
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_lkjip_lppd_pemda',
+				'tabel_opd' => 'esakip_lkjip_lppd',
+				'kolom_periode' => 'tahun_anggaran'
+			));
 		}else if($_POST['target'] == 'lhe'){
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_lhe_akip_internal_pemda',
+				'tabel_opd' => 'esakip_lhe_akip_internal',
+				'kolom_periode' => 'tahun_anggaran'
+			));
 		}else if($_POST['target'] == 'tl-lhe'){
-
+			$res = $this->get_dokumen_publik(array(
+				'periode' => $_POST['periode'],
+				'tabel_pemda' => 'esakip_tl_lhe_akip_internal_pemda',
+				'tabel_opd' => 'esakip_tl_lhe_akip_internal',
+				'kolom_periode' => 'tahun_anggaran'
+			));
 		}
 		foreach($res as $k => $v){
 			if($k == 'data'){
@@ -35769,6 +35787,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				WHERE $kolom = %d 
 					AND active = 1
 					$where_esr
+				ORDER BY tanggal_upload DESC
 			", $tahun_anggaran),
 			ARRAY_A
 		);
@@ -35776,10 +35795,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$upload_dir = ESAKIP_PLUGIN_URL . 'public/media/dokumen/dokumen_pemda/';
 		$dokumen = array();
 		foreach($dok_pemda as $dok){
-			$dokumen[] = '<a href="'.$upload_dir.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
+			$dokumen[] = '<a href="'.$upload_dir.$dok['dokumen'].'" target="_blank" class="badge p-2 badge-success"><i class="bi bi-arrow-up-right-circle"></i> Lihat Dokumen</a>';
 		}
 		if(empty($dokumen)){
-			$dokumen[] = '<a onclik="return false;" href="#" class="badge badge-danger">Belum Diunggah</a>';
+			$dokumen[] = '<a onclik="return false;" href="#" class="badge p-2 badge-danger">Belum Diunggah</a>';
 		}
 		$ret['data'][] = array(
 			'periode' => $tahun_anggaran,
@@ -35800,7 +35819,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 					AND u.is_skpd=1
 					AND u.tahun_anggaran = %d
 					$where_esr
-				ORDER by u.kode_skpd ASC
+				ORDER by u.kode_skpd ASC, o.created_at DESC
 			", $tahun_anggaran, $tahun_skpd),
 			ARRAY_A
 		);
@@ -35812,17 +35831,17 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 				$dokumen[$dok['opd']] = array();
 			}
 			if(!empty($dok['dokumen'])){
-				$dokumen[$dok['opd']][] = '<a href="'.$upload_dir_opd.$dok['dokumen'].'" target="_blank">'.$dok['dokumen'].'</a>';
+				$dokumen[$dok['opd']][] = '<a href="'.$upload_dir_opd.$dok['dokumen'].'" target="_blank" class="badge p-2 badge-success"><i class="bi bi-arrow-up-right-circle"></i> Lihat Dokumen</a>';
 			}
 		}
 		foreach($dokumen as $opd => $dok){
 			if(empty($dok)){
-				$dok[] = '<a onclik="return false;" href="#" class="badge badge-danger">Belum Diunggah</a>';
+				$dok[] = '<a onclik="return false;" href="#" class="badge p-2 badge-danger">Belum Diunggah</a>';
 			}
 			$ret['data'][] = array(
 				'periode' => $id_jadwal,
 				'perangkat_daerah' => $opd,
-				'data' => implode('<br>', $dok)
+				'data' => $dok[0]
 			);
 		}
 		return $ret;

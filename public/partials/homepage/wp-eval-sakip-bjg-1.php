@@ -73,8 +73,9 @@ $tahun_rpjmd = $wpdb->get_var("
         letter-spacing: -0.02em;
         line-height: 1.2;
     }
-    .ast-desktop .ast-primary-header-bar.main-header-bar, .ast-header-break-point #masthead .ast-primary-header-bar.main-header-bar {
-        marging-bottom: 0; 
+    .ast-primary-header-bar.main-header-bar, 
+    .ast-primary-header-bar.main-header-bar {
+        margin-bottom: 0 !important; 
     }
 </style>
 

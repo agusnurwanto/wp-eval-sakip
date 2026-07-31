@@ -34,6 +34,8 @@ $page_monev_publish = $this->functions->generatePage([
     'show_header' => 1,
     'post_status' => 'publish'
 ]);
+
+$tahun_default = get_option('_crb_tahun_wpsipd');
 ?>
 <style>
     /* CSS Scoped khusus agar tidak merusak layout bawaan WordPress */
@@ -294,8 +296,9 @@ $page_monev_publish = $this->functions->generatePage([
     #tabel-dinamis-sakip_filter {
         margin-bottom: 15px !important;
     }
-    .ast-desktop .ast-primary-header-bar.main-header-bar, .ast-header-break-point #masthead .ast-primary-header-bar.main-header-bar {
-        marging-bottom: 0; 
+    .ast-primary-header-bar.main-header-bar, 
+    .ast-primary-header-bar.main-header-bar {
+        margin-bottom: 0 !important; 
     }
 </style>
 <div class="sakip-container">
@@ -314,8 +317,8 @@ $page_monev_publish = $this->functions->generatePage([
                     <ul>
                         <li class="menu-item" data-target="jnis-plan">🔗 Pedoman Teknis Perencanaan</li>
                         <li class="menu-item" data-target="rpjpd">📄 RPJPD</li>
-                        <li class="menu-item" data-target="pohon">🔗 Pohon Kinerja</li>
-                        <li class="menu-item" data-target="cascading">🔗 Cascading</li>
+                        <li class="menu-item" data-target="pohon">📄 Pohon Kinerja</li>
+                        <li class="menu-item" data-target="cascading">📄 Cascading</li>
                         <li class="menu-item active" data-target="rpjmd">📄 RPJMD / RENSTRA</li>
                         <li class="menu-item" data-target="rkpd">📄 RKPD / RENJA</li>
                         <li class="menu-item" data-target="iku">📄 Indikator Kinerja Utama</li>
@@ -329,8 +332,8 @@ $page_monev_publish = $this->functions->generatePage([
                         <li class="menu-item" data-target="monev_iku">📄 Monev IKU RENSTRA</li>
                         <li class="menu-item" data-target="monev_renja">📄 Monev RENJA</li>
                         <li class="menu-item" data-target="monev">📄 Monev Perjanjian Kinerja</li>
-                        <li class="menu-item" data-target="pko">📄 Penilaian Kinerja Organisasi</li>
-                        <li class="menu-item" data-target="pkop">📄 Penilaian Kinerja Organisasi Periodik</li>
+                        <li class="menu-item" style="display: none;" data-target="pko">📄 Penilaian Kinerja Organisasi</li>
+                        <li class="menu-item" style="display: none;" data-target="pkop">📄 Penilaian Kinerja Organisasi Periodik</li>
                         <li class="menu-item" data-target="jnis-ukur">🔗 Pedoman Teknis Pengukuran</li>
                     </ul>
                 </div>
@@ -343,7 +346,7 @@ $page_monev_publish = $this->functions->generatePage([
                 <div class="menu-group">
                     <h3>Evaluasi</h3>
                     <ul>
-                        <li class="menu-item" data-target="lhe">🔗 LHE AKIP Internal</li>
+                        <li class="menu-item" data-target="lhe">📄 LHE AKIP Internal</li>
                         <li class="menu-item" data-target="tl-lhe">📄 TL LHE AKIP Internal</li>
                         <li class="menu-item" data-target="jnis-eval">🔗 Pedoman Teknis Evaluasi</li>
                     </ul>
@@ -365,8 +368,8 @@ $page_monev_publish = $this->functions->generatePage([
                             <thead>
                                 <tr>
                                     <th class="label-dynamic-periode text-center" style="max-width: 250px">Tahun</th>
-                                    <th class="text-center" style="max-width: 350px">Perangkat Daerah</th>
-                                    <th class="text-center">Data</th>
+                                    <th class="text-center">Perangkat Daerah</th>
+                                    <th class="text-center" style="max-width: 150px">Data</th>
                                 </tr>
                             </thead>
                         </table>
@@ -448,6 +451,7 @@ function getTableSakip(target) {
     const label = jQuery('.label-dynamic-periode');
     const select = document.getElementById('dynamic-periode');
     const data = window.jadwal_sakip;
+    window.tahun_default = <?php echo $tahun_default; ?>;
     select.innerHTML = '';
 
     if (['rpjpd'].includes(target)) {
@@ -475,6 +479,9 @@ function getTableSakip(target) {
             const option = document.createElement('option');
             option.value = item.tahun_anggaran;
             option.textContent = item.tahun_anggaran;
+            if(item.tahun_anggaran == tahun_default){
+                option.selected = true;
+            }
             select.appendChild(option);
         });
     }
@@ -596,7 +603,10 @@ function getTableSakipAjax() {
                     return data.toUpperCase();
                 }
             },
-            { "data": "data" }
+            { 
+                "data": "data",
+                "className": "text-center"
+            }
         ],
         "drawCallback": function(settings) {
             $loading.hide();
