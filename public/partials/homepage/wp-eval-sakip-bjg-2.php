@@ -504,9 +504,9 @@ function getTableSakipAjax() {
         var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
         var html = `
             <tr>
-                <td>${text_periode}</td>
+                <td class="text-center">${text_periode}</td>
                 <td>${nama_pemda} dan OPD</td>
-                <td><a href="${url_pokin+'&tahun='+tahun_anggaran}" target="_blank">POHON KINERJA</a></td>
+                <td class="text-center"><a href="${url_pokin+'&tahun='+tahun_anggaran}" target="_blank" class="badge p-2 badge-success"><i class="bi bi-arrow-up-right-circle"></i> Lihat Data</a></td>
             </tr>
         `;
         jQuery('#tabel-dinamis-sakip tbody').html(html);
@@ -517,9 +517,9 @@ function getTableSakipAjax() {
         var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
         var html = `
             <tr>
-                <td>${text_periode}</td>
+                <td class="text-center">${text_periode}</td>
                 <td>${nama_pemda} dan OPD</td>
-                <td><a href="${url_cascading+'&tahun='+tahun_anggaran}" target="_blank">CASCADING</a></td>
+                <td class="text-center"><a href="${url_cascading+'&tahun='+tahun_anggaran}" target="_blank" class="badge p-2 badge-success"><i class="bi bi-arrow-up-right-circle"></i> Lihat Data</a></td>
             </tr>
         `;
         jQuery('#tabel-dinamis-sakip tbody').html(html);
@@ -530,9 +530,9 @@ function getTableSakipAjax() {
         var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
         var html = `
             <tr>
-                <td>${text_periode}</td>
+                <td class="text-center">${text_periode}</td>
                 <td>${nama_pemda} dan OPD</td>
-                <td><a href="${url_monev_iku+'&tahun='+tahun_anggaran+'&iscurrentpage=true'}" target="_blank">MONEV KINERJA</a></td>
+                <td class="text-center"><a href="${url_monev_iku+'&tahun='+tahun_anggaran+'&iscurrentpage=true'}" target="_blank" class="badge p-2 badge-success"><i class="bi bi-arrow-up-right-circle"></i> Lihat Data</a></td>
             </tr>
         `;
         jQuery('#tabel-dinamis-sakip tbody').html(html);
@@ -543,9 +543,9 @@ function getTableSakipAjax() {
         var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
         var html = `
             <tr>
-                <td>${text_periode}</td>
+                <td class="text-center">${text_periode}</td>
                 <td>${nama_pemda} dan OPD</td>
-                <td><a href="${url_monev_renja+'&tahun='+tahun_anggaran}" target="_blank">MONEV KINERJA</a></td>
+                <td class="text-center"><a href="${url_monev_renja+'&tahun='+tahun_anggaran}" target="_blank" class="badge p-2 badge-success"><i class="bi bi-arrow-up-right-circle"></i> Lihat Data</a></td>
             </tr>
         `;
         jQuery('#tabel-dinamis-sakip tbody').html(html);
@@ -556,9 +556,9 @@ function getTableSakipAjax() {
         var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
         var html = `
             <tr>
-                <td>${text_periode}</td>
+                <td class="text-center">${text_periode}</td>
                 <td>${nama_pemda} dan OPD</td>
-                <td><a href="${url_monev+'&tahun='+tahun_anggaran}" target="_blank">MONEV KINERJA</a></td>
+                <td class="text-center"><a href="${url_monev+'&tahun='+tahun_anggaran}" target="_blank" class="badge p-2 badge-success"><i class="bi bi-arrow-up-right-circle"></i> Lihat Data</a></td>
             </tr>
         `;
         jQuery('#tabel-dinamis-sakip tbody').html(html);

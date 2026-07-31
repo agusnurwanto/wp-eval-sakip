@@ -35803,7 +35803,7 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 		$ret['data'][] = array(
 			'periode' => $tahun_anggaran,
 			'perangkat_daerah' => $nama_pemda,
-			'data' => implode('<br>', $dokumen)
+			'data' => $dokumen[0]
 		);
 
 		$dok_opd = $wpdb->get_results(
