@@ -72,6 +72,11 @@ class Wp_Eval_Sakip_Monev_Kinerja
 		$this->render_partial('monev/iku-opd', $atts);
 	}
 
+	public function monev_renja_publish($atts)
+	{
+		$this->render_partial('monev/renja-opd', $atts);
+	}
+
 	public function get_data_renaksi()
 	{
 		global $wpdb;

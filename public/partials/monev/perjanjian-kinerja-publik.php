@@ -121,10 +121,6 @@ $pk_gabungan_page_url = $pk_gabungan_page['url'] . "&id_skpd=" . $id_skpd;
 <script>
     jQuery(document).ready(() => {
         getDataTable();
-        let extend_action = '';
-        extend_action += '<a class="btn btn-secondary mr-2" href="<?php echo $pk_gabungan_page_url; ?>" target="_blank"><span class="dashicons dashicons-controls-back"></span> Kembali</a>';
-
-        jQuery('#action-section').append(extend_action);
     });
 
     function get_penanggung_jawab() {

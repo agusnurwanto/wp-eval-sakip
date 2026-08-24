@@ -16,6 +16,12 @@ $page_cascading_publish = $this->functions->generatePage([
     'show_header' => 1,
     'post_status' => 'publish'
 ]);
+$page_renja_publish = $this->functions->generatePage([
+    'nama_page'   => 'MONEV RENJA',
+    'content'     => '[monev_renja_publish]',
+    'show_header' => 1,
+    'post_status' => 'publish'
+]);
 $perjanjian_kinerja_page = $this->functions->generatePage([
     'nama_page'   => 'Capaian Kinerja Perjanjian Kinerja',
     'content'     => '[capaian_kinerja_pk_publish]',
@@ -336,17 +342,17 @@ $tahun_default = get_option('_crb_tahun_wpsipd');
                         <li class="menu-item" data-target="cascading">📄 Cascading</li>
                         <li class="menu-item active" data-target="rpjmd">📄 RPJMD / RENSTRA</li>
                         <li class="menu-item" data-target="rkpd">📄 RKPD / RENJA</li>
-                        <li class="menu-item" data-target="iku">📄 Indikator Kinerja Utama</li>
-                        <li class="menu-item" data-target="pk">📄 Perjanjian Kinerja</li>
+                        <li class="menu-item" data-target="iku">📄 Indikator Kinerja Utama (IKU)</li>
+                        <li class="menu-item" data-target="pk">📄 Perjanjian Kinerja (PK)</li>
                         <li class="menu-item" data-target="ra">📄 Rencana Aksi</li>
                     </ul>
                 </div>
                 <div class="menu-group">
                     <h3>Pengukuran</h3>
                     <ul>
-                        <li class="menu-item" data-target="monev_iku">📄 Monev IKU RENSTRA</li>
-                        <li class="menu-item" style="display: none;" data-target="monev_renja">📄 Monev RENJA</li>
+                        <li class="menu-item" data-target="monev_iku">📄 Monev IKU</li>
                         <li class="menu-item" data-target="monev">📄 Monev Perjanjian Kinerja</li>
+                        <li class="menu-item" data-target="monev_renja">📄 Monev RENJA</li>
                         <li class="menu-item" style="display: none;" data-target="pko">📄 Penilaian Kinerja Organisasi</li>
                         <li class="menu-item" style="display: none;" data-target="pkop">📄 Penilaian Kinerja Organisasi Periodik</li>
                         <li class="menu-item" data-target="jnis-ukur">🔗 Pedoman Teknis Pengukuran</li>
@@ -556,7 +562,7 @@ function getTableSakipAjax() {
         jQuery('#tabel-dinamis-sakip tbody').html(html);
         return;
     }else if(slug == 'monev_renja'){
-        var url_monev_renja = '<?php echo $perjanjian_kinerja_page['url']; ?>';
+        var url_monev_renja = '<?php echo $page_renja_publish['url']; ?>';
         var tahun_anggaran = periode.options[periode.selectedIndex].value;
         var nama_pemda = jQuery('#nama_pemda').text().toUpperCase();
         var html = `

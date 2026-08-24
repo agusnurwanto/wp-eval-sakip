@@ -9,13 +9,6 @@ $input = shortcode_atts(array(
 ), $atts);
 $id_skpd = $_GET['id_skpd'];
 
-$pk_pisah_page = $this->functions->generatePage(array(
-    'nama_page' => 'Perjanjian Kinerja Format Pisah| Tahun Anggaran ' . $input['tahun_anggaran'],
-    'content' => '[perjanjian_kinerja_publik tahun_anggaran=' . $input['tahun_anggaran'] . ']',
-    'show_header' => 1,
-    'post_status' => 'publish'
-));
-$url_pk_pisah_page = $pk_pisah_page['url'] . "&id_skpd=" . $id_skpd;
 $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['tahun_anggaran']);
 ?>
 <style>
@@ -346,11 +339,7 @@ $data_skpd = $this->get_data_unit_by_id_skpd_tahun_anggaran($id_skpd, $input['ta
 </div>
 <script>
     jQuery(document).ready(() => {
-        getDataTable()
-        let extend_action = '';
-        extend_action += '<a class="btn btn-primary mr-2" href="<?php echo $url_pk_pisah_page; ?>" target="_blank" style="text-decoration: none;"><span class="dashicons dashicons-controls-forward"></span> Perjanjian Kinerja</a>';
-
-        jQuery('#action-section').append(extend_action);
+        getDataTable();
     });
 
     function get_penanggung_jawab() {
