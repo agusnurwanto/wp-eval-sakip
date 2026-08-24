@@ -161,8 +161,6 @@ $tahun_default = get_option('_crb_tahun_wpsipd');
         box-shadow: 0 2px 4px rgba(0,0,0,0.04);
     }
     .table-card h2 {
-        font-size: 1.3rem;
-        margin-top: 0;
         margin-bottom: 20px;
         color: #2b3a4a;
     }
@@ -300,12 +298,29 @@ $tahun_default = get_option('_crb_tahun_wpsipd');
     .ast-primary-header-bar.main-header-bar {
         margin-bottom: 0 !important; 
     }
+    thead {
+        position: sticky;
+        top: 0px;
+        z-index: 10;
+    }
+    table.dataTable thead th {
+        position: sticky;
+        top: 0px;
+        z-index: 2;
+        background-color: rgb(13, 110, 253);
+    }
+    table.dataTable thead th {
+        position: sticky;
+        top: 0px;
+        z-index: 10;
+        background-color: rgb(13, 110, 253);
+    }
 </style>
 <div class="sakip-container">
     <!-- Konten Utama -->
     <main class="sakip-content">
         <div class="sakip-hero">
-            <h1>Laporan Kinerja <span id="nama_pemda"><?php echo $nama_pemda; ?></span></h1>
+            <h1>( Sistem Informasi Kinerja Instansi Pemerintah )<br>SAKIP <span id="nama_pemda"><?php echo $nama_pemda; ?></span></h1>
             <p>Proses pemilihan dan pengembangan tindakan yang terbaik dan menguntungkan mencapai tujuan.</p>
         </div>
 
@@ -356,7 +371,7 @@ $tahun_default = get_option('_crb_tahun_wpsipd');
             <!-- Area Tabel Kanan -->
             <section class="sakip-main-table">
                 <div class="table-card">
-                    <h2 id="dynamic-table-title" data-id="rpjmd">RPJMD / RENSTRA</h2>
+                    <h2 id="dynamic-table-title" data-id="rpjmd" class="text-center">Ambil data ...</h2>
                     <div class="table-toolbar row align-items-center mb-3">
                         <label for="dynamic-periode" class="col-md-3 text-md-end mb-0 text-right label-dynamic-periode">Tahun</label>
                         <div class="col-md-6">
@@ -389,10 +404,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
+            var group = jQuery(this).closest('.menu-group').find('h3').text();
             menuItems.forEach(i => i.classList.remove('active'));
             this.classList.add('active');
             const menuText = this.innerText.replace(/[^\w\s\/]/g, '').trim(); 
-            tableTitle.innerText = menuText;
+            tableTitle.innerText = group+' / '+menuText;
             var target = jQuery(this).attr('data-target');
             tableTitle.setAttribute('data-id', target);
 
@@ -470,8 +486,9 @@ function getTableSakip(target) {
         data.periode.forEach(item => {
             const option = document.createElement('option');
             option.value = item.id; // Or specific ID field
-            option.textContent = `${item.nama_jadwal} (${item.tahun_anggaran} - ${item.tahun_selesai_anggaran})`;
+            option.textContent = `${item.nama_jadwal}`;
             option.setAttribute('data-tahun', item.tahun_anggaran);
+            option.setAttribute('nama-renstra', item.nama_jadwal_renstra);
             select.appendChild(option);
         });
     } else {
@@ -493,6 +510,7 @@ function getTableSakipAjax() {
     const slug = document.getElementById('dynamic-table-title').getAttribute('data-id');
     const periode = document.getElementById('dynamic-periode');
     const text_periode = periode.options[periode.selectedIndex].text;
+    const text_periode_opd = periode.options[periode.selectedIndex].getAttribute('nama-renstra');
 
     if (jQuery.fn.DataTable.isDataTable('#tabel-dinamis-sakip')) {
         jQuery('#tabel-dinamis-sakip').DataTable().destroy();
@@ -595,6 +613,13 @@ function getTableSakipAjax() {
                 "data": "periode",
                 "className": "text-center",
                 "render": function(data, type, row) {
+                    console.log('text_periode_opd, data', text_periode_opd, data);
+                    if(
+                        text_periode_opd != null 
+                        && data == null
+                    ){
+                        return text_periode_opd;
+                    }
                     return text_periode;
                 }
             },

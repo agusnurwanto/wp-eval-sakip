@@ -6,155 +6,87 @@ class Wp_Eval_Sakip_LKE extends Wp_Eval_Sakip_Pohon_Kinerja
 
 	public function desain_lke_sakip($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-desain-lke-sakip.php';
+		$this->render_partial('lke/desain-lke', $atts);
 	}
 
 	public function pengisian_lke_sakip($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-pengisian-lke-sakip.php';
+		$this->render_partial('lke/pengisian-lke', $atts);
 	}
 
 	public function pengisian_lke_sakip_per_skpd($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-pengisian-lke-sakip-per-skpd.php';
+		$this->render_partial('lke/pengisian-lke-skpd', $atts);
 	}
 
 	public function list_kuesioner_menpan($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-list-kuesioner-menpan.php';
+		$this->render_partial('lke/list-kuesioner-menpan', $atts);
 	}
 
 	public function list_kuesioner_mendagri($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-list-kuesioner-mendagri.php';
+		$this->render_partial('lke/list-kuesioner-mendagri', $atts);
 	}
 
 	public function kuesioner_menpan($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-kuesioner-menpan.php';
+		$this->render_partial('lke/kuesioner-menpan', $atts);
 	}
 
 	public function kuesioner_mendagri($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-kuesioner-mendagri.php';
+		$this->render_partial('lke/kuesioner-mendagri', $atts);
 	}
 
 	public function input_kuesioner_menpan($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-input-kuesioner-menpan.php';
+		$this->render_partial('lke/input-kuesioner-menpan', $atts);
 	}
 
 	public function input_kuesioner_mendagri($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-input-kuesioner-mendagri.php';
+		$this->render_partial('lke/input-kuesioner-mendagri', $atts);
 	}
 
 	public function list_kuesioner_dokumen($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-list_dokumen_kuesioner.php';
+		$this->render_partial('dokumen/opd/dokumen-kuesioner-list', $atts);
 	}
 
 	public function jadwal_kuesioner($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/wp-eval-sakip-jadwal-kuesioner.php';
+		$this->render_partial('lke/jadwal-kuesioner', $atts);
 	}
 
 	public function format_kke_1($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/format_kke/wp-eval-sakip-kke-1.php';
+		$this->render_partial('lke/kke/kke-1', $atts);
 	}
 
 	public function format_kke_2($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/format_kke/wp-eval-sakip-kke-2.php';
+		$this->render_partial('lke/kke/kke-2', $atts);
 	}
 
 	public function format_kke_3($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/format_kke/wp-eval-sakip-kke-3.php';
+		$this->render_partial('lke/kke/kke-3', $atts);
 	}
 
 	public function format_kke_4($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/format_kke/wp-eval-sakip-kke-4.php';
+		$this->render_partial('lke/kke/kke-4', $atts);
 	}
 
 	public function format_kke_5($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/format_kke/wp-eval-sakip-kke-5.php';
+		$this->render_partial('lke/kke/kke-5', $atts);
 	}
 
 	public function format_kke_6($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/lke/format_kke/wp-eval-sakip-kke-6.php';
+		$this->render_partial('lke/kke/kke-6', $atts);
 	}
 
 	public function get_table_skpd_pengisian_lke()

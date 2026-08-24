@@ -2,58 +2,74 @@
 
 class Wp_Eval_Sakip_Monev_Kinerja
 {
-	public function pengisian_rencana_aksi_setting($atts)
+	/**
+	 * Render partial template with optional parameters and fallback.
+	 *
+	 * @param string $template_name Relative template path (e.g. 'dokumen/opd/dpa')
+	 * @param array  $atts          Shortcode / view attributes
+	 * @return string|void
+	 */
+	public function render_partial($template_name, $atts = array())
 	{
-		// untuk disable render shortcode di halaman edit page/post
+		// Disable render shortcode in post edit page
 		if (!empty($_GET) && !empty($_GET['POST'])) {
 			return '';
 		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/setting-menu/wp-eval-sakip-setting-rencana-aksi.php';
+
+		$base_dir = plugin_dir_path(dirname(__FILE__)) . 'public/partials/';
+
+		// Normalize extension
+		$rel_path = ltrim($template_name, '/\\');
+		if (substr($rel_path, -4) !== '.php') {
+			$rel_path .= '.php';
+		}
+
+		$file = $base_dir . $rel_path;
+
+		if (file_exists($file)) {
+			require_once $file;
+			return;
+		}
+
+		// Fallback to absolute or legacy path if provided
+		if (file_exists($template_name)) {
+			require_once $template_name;
+			return;
+		}
+
+		if (defined('WP_DEBUG') && WP_DEBUG) {
+			error_log("wp-eval-sakip: Template partial not found: " . $file);
+		}
+	}
+
+	public function pengisian_rencana_aksi_setting($atts)
+	{
+		$this->render_partial('pengaturan/setting-rencana-aksi', $atts);
 	}
 
 	public function detail_pengisian_rencana_aksi($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-detail-pengisian-rencana-aksi-per-skpd.php';
+		$this->render_partial('monev/detail-pengisian-rencana-aksi-skpd', $atts);
 	}
 
 	public function tagging_rincian_sakip($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-tagging-rincian.php';
+		$this->render_partial('monev/tagging-rincian', $atts);
 	}
 
 	public function input_rencana_aksi_pemda($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-input-rencana-aksi-pemda.php';
+		$this->render_partial('monev/input-rencana-aksi-pemda', $atts);
 	}
 
 	public function halaman_laporan_pk_pemda($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-laporan-pk-pemda.php';
+		$this->render_partial('dokumen/pemda/laporan-pk', $atts);
 	}
 
 	public function capaian_iku_opd($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-iku-opd.php';
+		$this->render_partial('monev/iku-opd', $atts);
 	}
 
 	public function get_data_renaksi()

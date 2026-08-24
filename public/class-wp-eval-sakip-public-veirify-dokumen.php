@@ -5,101 +5,57 @@ class Wp_Eval_Sakip_Verify_Dokumen extends Wp_Eval_Sakip_LKE
 {
     public function jadwal_verifikasi_upload_dokumen($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/jadwal/wp-eval-sakip-jadwal-verifikasi-upload-dokumen.php';
+        $this->render_partial('jadwal/verifikasi-dokumen', $atts);
     }
 
     public function jadwal_verifikasi_upload_dokumen_renstra($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/jadwal/wp-eval-sakip-jadwal-verifikasi-upload-dokumen_renstra.php';
+        $this->render_partial('jadwal/verifikasi-renstra', $atts);
     }
 
     public function list_halaman_laporan_pk($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-laporan-pk.php';
+        $this->render_partial('dokumen/opd/laporan-pk', $atts);
     }
 
     public function detail_laporan_pk($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-laporan-pk-per-skpd.php';
+        $this->render_partial('dokumen/opd/laporan-pk-detail', $atts);
     }
 
     public function halaman_laporan_pk_setting($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-laporan-pk-setting.php';
+        $this->render_partial('dokumen/opd/laporan-pk-setting', $atts);
     }
 
     public function list_pegawai_laporan_pk($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-list-pegawai-laporan-pk.php';
+        $this->render_partial('dokumen/opd/list-pegawai-laporan-pk', $atts);
     }
 
     public function list_perjanjian_kinerja($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-list-pegawai-perjanjian-kinerja.php';
+        $this->render_partial('monev/list-pegawai-pk', $atts);
     }
 
     public function perjanjian_kinerja_publik($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-perjanjian-kinerja-publik.php';
+        $this->render_partial('monev/perjanjian-kinerja-publik', $atts);
     }
 
     public function perjanjian_kinerja_publik_baru($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-perjanjian-kinerja-publik-baru.php';
+        $this->render_partial('monev/perjanjian-kinerja-publik-baru', $atts);
     }
 
     public function detail_laporan_rhk($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/monev-kinerja/wp-eval-sakip-detail-laporan-rhk-pegawai.php';
+        $this->render_partial('monev/detail-laporan-rhk-pegawai', $atts);
     }
 
     public function dokumen_detail_kuesioner($atts)
     {
-        // untuk disable render shortcode di halaman edit page/post
-        if (!empty($_GET) && !empty($_GET['POST'])) {
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-dokumen-kuesioner.php';
+        $this->render_partial('dokumen/opd/dokumen-kuesioner-detail', $atts);
     }
 
     public function get_data_pengaturan_menu()

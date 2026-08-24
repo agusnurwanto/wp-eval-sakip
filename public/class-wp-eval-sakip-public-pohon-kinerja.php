@@ -8,137 +8,77 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 {
 	public function penyusunan_pohon_kinerja($atts)
 	{
-		if (!empty($_GET) && !empty($_GET['post'])) {
-			return '';
-		}
-
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-penyusunan-pohon-kinerja.php';
+		$this->render_partial('pohon-kinerja/penyusunan', $atts);
 	}
+
 	public function penyusunan_pohon_kinerja_opd($atts)
 	{
-		if (!empty($_GET) && !empty($_GET['post'])) {
-			return '';
-		}
-
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-penyusunan-pohon-kinerja-opd.php';
+		$this->render_partial('pohon-kinerja/penyusunan-opd', $atts);
 	}
+
 	public function list_penyusunan_pohon_kinerja_opd($atts)
 	{
-		if (!empty($_GET) && !empty($_GET['post'])) {
-			return '';
-		}
-
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/dokumen-list-opd/wp-eval-sakip-list-penyusunan-pohon-kinerja-opd.php';
+		$this->render_partial('pohon-kinerja/list-penyusunan-opd', $atts);
 	}
+
 	public function view_pohon_kinerja($atts)
 	{
-		if (!empty($_GET) && !empty($_GET['post'])) {
-			return '';
-		}
-
-		$tipe = 'pemda';
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
+		$this->render_partial('pohon-kinerja/view', $atts);
 	}
 
 	public function view_pohon_kinerja_opd($atts)
 	{
-		if (!empty($_GET) && !empty($_GET['post'])) {
-			return '';
-		}
-
-		$tipe = 'opd';
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view-pohon-kinerja.php';
+		$this->render_partial('pohon-kinerja/view', $atts);
 	}
 
 	public function new_view_pohon_kinerja($atts)
 	{
-		if (!empty($_GET) && !empty($_GET['post'])) {
-			return '';
-		}
-
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-new-view-pohon-kinerja.php';
+		$this->render_partial('pohon-kinerja/view-new', $atts);
 	}
 
 	public function view_crosscutting_pemda($atts)
 	{
-		if (!empty($_GET) && !empty($_GET['post'])) {
-			return '';
-		}
-
-		$tipe = 'pemda';
-		require_once ESAKIP_PLUGIN_PATH . 'public/partials/pohon-kinerja/wp-eval-sakip-view_crosscutting_pemda.php';
+		$this->render_partial('pohon-kinerja/crosscutting-view', $atts);
 	}
 
 	public function cascading_pemda($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-cascading-pemda.php';
+		$this->render_partial('pohon-kinerja/cascading-pemda', $atts);
 	}
 
 	public function cascading_pd($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-input-cascading-opd.php';
+		$this->render_partial('pohon-kinerja/input-cascading-opd', $atts);
 	}
 
 	public function list_pengisian_rencana_aksi($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-pengisian-rencana-aksi.php';
+		$this->render_partial('dokumen/opd/pengisian-rencana-aksi', $atts);
 	}
 
 	public function list_input_iku($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-list-opd/wp-eval-sakip-input-iku.php';
+		$this->render_partial('dokumen/opd/input-iku', $atts);
 	}
 
 	public function detail_input_iku($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-perangkat-daerah/wp-eval-sakip-detail-input-iku-per-skpd.php';
+		$this->render_partial('dokumen/opd/input-iku-detail', $atts);
 	}
 
 	public function detail_input_cascading_pd($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-cascading-opd.php';
+		$this->render_partial('pohon-kinerja/cascading-opd', $atts);
 	}
 
 	public function input_iku_pemda($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/dokumen-pemda/wp-eval-sakip-detail-input-iku-pemda.php';
+		$this->render_partial('dokumen/pemda/input-iku-detail', $atts);
 	}
 
 	public function halaman_lembaga_lainnya($atts)
 	{
-		// untuk disable render shortcode di halaman edit page/post
-		if (!empty($_GET) && !empty($_GET['POST'])) {
-			return '';
-		}
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/pohon-kinerja/wp-eval-sakip-lembaga-lainnya.php';
+		$this->render_partial('pohon-kinerja/lembaga-lainnya', $atts);
 	}
 
 	public function get_data_pokin()
