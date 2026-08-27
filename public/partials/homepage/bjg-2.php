@@ -120,6 +120,7 @@ $tahun_default = get_option('_crb_tahun_wpsipd');
         flex-shrink: 0;
     }
     .menu-group {
+        display: none;
         background: #fff;
         border-radius: 6px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.04);
@@ -440,12 +441,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 jQuery(document).ready(function(){
     const urlParams = new URLSearchParams(window.location.search);
-    let targetMenu = jQuery('.menu-item[data-target="rpjmd"');
-    if (urlParams.get('tab') === 'pengukuran') {
+    const tab = urlParams.get('tab');
+
+    // Map tab value → which menu-group heading to show
+    const groupMap = {
+        'pengukuran': 'Pengukuran',
+        'pelaporan':  'Pelaporan',
+        'evaluasi':   'Evaluasi',
+    };
+    const activeGroup = groupMap[tab] || 'Perencanaan';
+    jQuery('.menu-group').each(function(){
+        if (jQuery(this).find('h3').text().trim() === activeGroup) {
+            jQuery(this).show();
+        }
+    });
+
+    // Determine which menu-item to auto-click
+    let targetMenu = jQuery('.menu-item[data-target="rpjmd"]');
+    if (tab === 'pengukuran') {
         targetMenu = jQuery('.menu-item[data-target="monev"]');
-    }else if (urlParams.get('tab') === 'pelaporan') {
+    } else if (tab === 'pelaporan') {
         targetMenu = jQuery('.menu-item[data-target="lkj"]');
-    }else if (urlParams.get('tab') === 'evaluasi') {
+    } else if (tab === 'evaluasi') {
         targetMenu = jQuery('.menu-item[data-target="lhe"]');
     }
     getjadwal(function(){
