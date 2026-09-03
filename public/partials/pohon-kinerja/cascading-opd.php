@@ -240,7 +240,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         #action-sakip,
         .site-header,
         .site-footer,
-        #ast-scroll-top {
+        #ast-scroll-top,
+        button.btn {
             display: none;
         }
     }
@@ -671,7 +672,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#id_data').val(response.data.id_unik);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan);
                     jQuery('label[for="sasaran_cascading"]').hide();
@@ -717,7 +718,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             success: function(response) {
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
-                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#id_data').val(response.data.id_unik);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
@@ -764,7 +765,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 jQuery('#wrap-loading').hide();
                 if (response.status === 'success') {
                     let get_program = response.data.no_urut ? `${response.data.no_urut} ${program}` : program;
-                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#id_data').val(response.data.id_unik);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
@@ -813,7 +814,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 if (response.status === 'success') {
                     let get_program = no_urut ? `${no_urut} ${program}` : program;
                     let get_kegiatan = response.data.no_urut ? `${response.data.no_urut} ${kegiatan}` : kegiatan;
-                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#id_data').val(response.data.id_unik);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
@@ -864,7 +865,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     let get_program = no_urut ? `${no_urut} ${program}` : program;
                     let get_kegiatan = response.get_kegiatan.no_urut ? `${response.get_kegiatan.no_urut} ${kegiatan}` : kegiatan;
                     let get_sub_giat = response.data.no_urut ? `${response.data.no_urut} ${sub_giat}` : sub_giat;
-                    jQuery('#id_data').val(response.data.id);
+                    jQuery('#id_data').val(response.data.id_unik);
                     jQuery('#modalUpload').modal('show');
                     jQuery('#tujuan_cascading').val(tujuan); 
                     jQuery('#sasaran_cascading').val(sasaran); 
@@ -920,7 +921,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
             data: {
                 action: 'submit_pegawai_cascading',
                 api_key: esakip.api_key,
-                tahun_anggaran: <?php echo $tahun_anggaran_sakip; ?>,
+                id_jadwal_wpsipd: <?php echo $input['periode']; ?>,
                 id_skpd: <?php echo $id_skpd; ?>,
                 id_data: id_data,
                 tipe: tipe,
@@ -932,7 +933,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 alert(res.message);
                 if (res.status === 'success') {
                     jQuery('#modalUpload').modal('hide');
-                    location.reload();
+                    getTableCascading();
                 }
             },
             error: function(xhr, status, error) {
