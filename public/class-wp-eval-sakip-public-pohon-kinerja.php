@@ -6665,7 +6665,7 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 													<button class="btn btn-danger edit-pegawai-button" onclick="get_program_cascading(this, \'' . $p['id'] . '\', \'' . $p['program'] . '\',  \'' . $s['sasaran'] . '\', \'' . $t['tujuan'] . '\');">
 														<i style="font-size: 2rem; margin-right: 10px;" class="dashicons dashicons-edit"></i>
 													</button>
-													<button class="btn btn-danger view-kegiatan-button hide_print" onclick="view_kegiatan(this, \'' . $p['id'] . '\');">
+													<button class="btn btn-danger view-kegiatan-button hide_print" onclick="view_kegiatan(this, \'' . $p['id'] . '\', \'' . $p['program'] . '\',  \'' . $s['sasaran'] . '\', \'' . $t['tujuan'] . '\');">
 														<i style="font-size: 2rem;" class="dashicons dashicons-visibility visibility-icon"></i>
                                                 	</button>
 												</div>
@@ -6934,6 +6934,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                                     <span class="nama_satker">Satuan Kerja : <ol class="text-left">' . $nama_satker . '</ol></span>
                                     <br />
 									<button class="btn btn-primary edit-pegawai-button" onclick="get_kegiatan_cascading(this, \'' . $k['id'] . '\', \'' . $k['kegiatan'] . '\', \'' . $program . '\', \'' . $sasaran . '\', \'' . $tujuan . '\', \'' . $no_urut . '\');">
+										<i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
+									</button>
                                 </div>
                             </div>
                         </td>';
@@ -6952,7 +6954,8 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
                                         <br />
                                         <span class="nama_satker">Satuan Kerja : <ol class="text-left">' . $nama_satker . '</ol></span>
                                         <br />
-										<button class="btn btn-secondary edit-pegawai-button" onclick="get_sub_giat_cascading(this, \'' . $g['id'] . '\', \'' . $g['sub_giat'] . '\', \'' . $k['kegiatan'] . '\', \'' . $program . '\', \'' . $sasaran . '\', \'' . $tujuan . '\', \'' . $no_urut . '\');"><i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
+										<button class="btn btn-secondary edit-pegawai-button" onclick="get_sub_giat_cascading(this, \'' . $g['id'] . '\', \'' . $g['sub_giat'] . '\', \'' . $k['kegiatan'] . '\', \'' . $program . '\', \'' . $sasaran . '\', \'' . $tujuan . '\', \'' . $no_urut . '\');">
+											<i style="font-size: 2rem;" class="dashicons dashicons-edit"></i>
 							            </button>
                                     </div>
                                 </div>

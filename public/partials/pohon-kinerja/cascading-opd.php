@@ -585,7 +585,8 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
         }
     }
 
-    function view_kegiatan(button, id) {
+    function view_kegiatan(button, id, program, sasaran, tujuan) {
+        window.button_kegiatan = false;
         let icon = jQuery(button).find('.visibility-icon');
         let body = jQuery('#tabel-cascading-kegiatan tbody');
 
@@ -612,7 +613,10 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                     action: 'get_kegiatan_by_program',
                     id: id,
                     id_skpd: <?php echo $id_skpd; ?>,
-                    show_pokin: showPokin
+                    show_pokin: showPokin,
+                    program: program,
+                    sasaran: sasaran,
+                    tujuan: tujuan
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -624,6 +628,7 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                         icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
                         
                         togglePokinVisibility(showPokin, '#tabel-cascading-kegiatan');
+                        window.button_kegiatan = button;
                     } else {
                         alert(response.message);
                     }
@@ -934,6 +939,13 @@ $get_satker = $wpdb->get_results($wpdb->prepare('
                 if (res.status === 'success') {
                     jQuery('#modalUpload').modal('hide');
                     getTableCascading();
+                    if(typeof button_kegiatan != 'undefined' && button_kegiatan){
+                        var button_kegiatan_baru = button_kegiatan;
+                        jQuery(button_kegiatan_baru).click(); // untuk menutup
+                        setTimeout(() => {
+                            jQuery(button_kegiatan_baru).click(); // untuk buka kegiatan dan sub kegiatan
+                        }, 1000);
+                    }
                 }
             },
             error: function(xhr, status, error) {
