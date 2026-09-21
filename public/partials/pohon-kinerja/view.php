@@ -9,7 +9,10 @@ global $wpdb;
 
 $input = shortcode_atts(array(
 	'periode' => '',
+	'tipe' => 'pemda'
 ), $atts);
+
+$tipe = $input['tipe'];
 if (!empty($_GET) && !empty($_GET['id_jadwal'])) {
 	$input['periode'] = $_GET['id_jadwal'];
 }

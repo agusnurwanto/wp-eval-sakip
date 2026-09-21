@@ -23,11 +23,13 @@ class Wp_Eval_Sakip_Pohon_Kinerja extends Wp_Eval_Sakip_Monev_Kinerja
 
 	public function view_pohon_kinerja($atts)
 	{
+		$atts['tipe'] = 'pemda';
 		$this->render_partial('pohon-kinerja/view', $atts);
 	}
 
 	public function view_pohon_kinerja_opd($atts)
 	{
+		$atts['tipe'] = 'opd';
 		$this->render_partial('pohon-kinerja/view', $atts);
 	}
 
