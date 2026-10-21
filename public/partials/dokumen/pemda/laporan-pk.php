@@ -934,12 +934,14 @@ if (!empty($data_tahapan)) {
                                             <option value="1">Indikator Tren Positif</option>
                                             <option value="2">Nilai Akhir</option>
                                             <option value="3">Indikator Tren Negatif</option>
+                                            <option value="4">Indikator Tren Negatif Nilai Akhir</option>
                                         </select>
                                         <small class="text-muted">
                                             <ul>
                                                 <li>Tren Positif : (Akumulasi Realisasi / Akumulasi Target) * 100.</li>
                                                 <li>Nilai Akhir : (Nilai Akhir Realisasi / Nilai Akhir Target) * 100.</li>
                                                 <li>Tren Negatif : (Akumulasi Target / Akumulasi Realisasi) * 100.</li>
+                                                <li>Tren Negatif Nilai Akhir : (Target / Nilai Akhir) * 100.</li>
                                                 <li>Kedua rumus dihitung berdasarkan Realisasi dan Target triwulan berjalan.</li>
                                             </ul>
                                         </small>

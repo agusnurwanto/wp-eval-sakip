@@ -10444,6 +10444,10 @@ class Wp_Eval_Sakip_Monev_Kinerja
 				$pembilang = $targetUntukPerhitungan;
 				$penyebut = $realisasi_kumulatif;
 				break;
+			case 4: // tren negatif nilai akhir
+				$pembilang = $targetUntukPerhitungan;
+				$penyebut = $realisasi_nilai_akhir ?? 0;
+				break;
 			default:
 				return false;
 		}
@@ -10455,12 +10459,7 @@ class Wp_Eval_Sakip_Monev_Kinerja
 			return 0.0;
 		}
 
-		$hasil = 0.0;
-		if ($type === 3) {
-			$hasil = (($pembilang - $penyebut) / $pembilang) * 100;
-		} else {
-			$hasil = ($pembilang / $penyebut) * 100;
-		}
+		$hasil = ($pembilang / $penyebut) * 100;
 
 		return round($hasil, 2);
 	}

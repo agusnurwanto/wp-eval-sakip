@@ -33730,9 +33730,10 @@ class Wp_Eval_Sakip_Public extends Wp_Eval_Sakip_Verify_Dokumen
 	function get_rumus_capaian_kinerja_tahunan_by_tipe(int $tipe)
 	{
 		$rumus = [
-			1 => 'Rumus Capaian: Indikator Tren Positif ((Akumulasi Realisasi TW Berjalan / Target Akhir) * 100)',
-			2 => 'Rumus Capaian: Nilai Akhir ((Realisasi TW Akhir Berjalan / Target Akhir) * 100)',
-			3 => 'Rumus Capaian: Indikator Tren Negatif (((Nilai Akhir - Akumulasi Realisasi TW Berjalan) / Target Akhir) * 100)'
+			1 => 'Rumus Capaian: Indikator Tren Positif ((Akumulasi Realisasi TW Berjalan / Target) * 100)',
+			2 => 'Rumus Capaian: Nilai Akhir ((Realisasi TW Akhir Berjalan / Target) * 100)',
+			3 => 'Rumus Capaian: Indikator Tren Negatif ((Target / Akumulasi Realisasi TW Berjalan) * 100)',
+			4 => 'Rumus Capaian: Indikator Tren Negatif Nilai Akhir ((Target / Nilai Akhir) * 100)'
 		];
 
 		return $rumus[$tipe] ?? 'N/A';
